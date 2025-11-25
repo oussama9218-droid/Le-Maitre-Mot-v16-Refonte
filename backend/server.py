@@ -1384,8 +1384,8 @@ Réponds UNIQUEMENT avec le JSON complet, JAMAIS null pour un énoncé géométr
             timeout=15.0  # 15 seconds max for schema generation
         )
         
-        # Sanitize and validate the AI response
-        sanitized_response = sanitize_ai_response(response)
+        # Sanitize and validate the AI response with schema-specific cleaning
+        sanitized_response = sanitize_schema_ai_response(response)
         
         # Verify we have a valid schema
         try:
