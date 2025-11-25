@@ -1589,24 +1589,30 @@ Chaque exercice doit avoir une difficulté {difficulte}. Respecte parfaitement l
 4. Le schéma doit suivre une structure claire (type, points, labels, segments, angles, etc.).
 5. Les exercices ne doivent pas être similaire dans la consigne varier comme dans un manuel d'exercice de mathématique
 
+**RÈGLE IMPORTANTE - DIVERSITÉ DES POINTS** :
+Tu DOIS utiliser des lettres DIFFÉRENTES pour chaque exercice ! 
+- Exercice 1 : points M, N, P ou D, E, F ou X, Y, Z
+- Exercice 2 : autres lettres que l'exercice 1
+- JAMAIS tous les exercices avec A, B, C !
+
 **Format JSON attendu pour chaque exercice** :
 {{
   "titre": "Titre concis",
-  "enonce": "Texte clair de l'exercice (sans JSON).",
+  "enonce": "Dans le triangle DEF rectangle en E, DE = 5 cm et EF = 12 cm. Calculer la longueur DF.",
   "type": "geometry",
   "difficulte": "{difficulte}",
   "donnees": {{
     "schema": {{
-      "type": "triangle",
-      "points": ["A", "B", "C"],
-      "labels": {{"A": "(0,8)", "B": "(0,0)", "C": "(6,0)"}},
-      "segments": [["A","B", {{"longueur": 8}}], ["B","C", {{"longueur": 6}}]],
-      "angles": [["B", {{"angle_droit": true}}]]
+      "type": "triangle_rectangle",
+      "points": ["D", "E", "F"],
+      "labels": {{"D": "(0,8)", "E": "(0,0)", "F": "(6,0)"}},
+      "segments": [["D","E", {{"longueur": "5 cm"}}], ["E","F", {{"longueur": "12 cm"}}]],
+      "angles": [["E", {{"angle_droit": true}}]]
     }}
   }},
   "solution": {{
-    "etapes": ["..."],
-    "resultat": "..."
+    "etapes": ["Appliquer le théorème de Pythagore", "DF² = DE² + EF²", "DF² = 5² + 12² = 25 + 144 = 169", "DF = √169 = 13 cm"],
+    "resultat": "DF = 13 cm"
   }},
   "bareme": [
     {{"etape": "Méthode", "points": 2.0}},
