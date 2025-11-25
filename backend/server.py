@@ -1214,7 +1214,7 @@ def sanitize_ai_response(response: str) -> str:
         json_end = response.rfind('}') + 1
         
         if json_start == -1 or json_end == 0:
-            logger.warning("No JSON found in AI response")
+            logger.warning(f"No JSON found in AI response: {response[:200]}...")
             return '{"schema": null}'
         
         json_content = response[json_start:json_end]
