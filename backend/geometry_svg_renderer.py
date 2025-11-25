@@ -341,6 +341,104 @@ class GeometrySVGRenderer:
         self.add_right_angle_mark(svg, midpoint_jk, mediatrice.start, J, 8)
         
         return ET.tostring(svg, encoding='unicode')
+    
+    def render_triangle(self, data: Dict[str, Any]) -> str:
+        """Rendu d'un triangle général de qualité MathALÉA"""
+        svg = self.create_svg_root()
+        
+        # Paramètres
+        points = data.get('points', ['A', 'B', 'C'])
+        triangle_type = data.get('type', 'quelconque')
+        
+        # Triangle équilatéral par défaut centré
+        if triangle_type == 'equilateral':
+            # Triangle équilatéral
+            center_x, center_y = self.width/2, self.height/2
+            radius = 60
+            angle_offset = -math.pi/2  # Pointe vers le haut
+            
+            A = Point(
+                center_x + radius * math.cos(angle_offset),
+                center_y + radius * math.sin(angle_offset),
+                points[0]
+            )
+            B = Point(
+                center_x + radius * math.cos(angle_offset + 2*math.pi/3),
+                center_y + radius * math.sin(angle_offset + 2*math.pi/3),
+                points[1]
+            )
+            C = Point(
+                center_x + radius * math.cos(angle_offset + 4*math.pi/3),
+                center_y + radius * math.sin(angle_offset + 4*math.pi/3),
+                points[2]
+            )
+        else:
+            # Triangle quelconque par défaut
+            center_x, center_y = self.width/2, self.height/2
+            A = Point(center_x, center_y - 60, points[0])
+            B = Point(center_x - 70, center_y + 40, points[1])
+            C = Point(center_x + 70, center_y + 40, points[2])
+        
+        # Lignes du triangle
+        lines = [Line(A, B), Line(B, C), Line(C, A)]
+        
+        # Dessiner les lignes
+        for line in lines:
+            self.add_line(svg, line)
+        
+        # Ajouter les points
+        for point in [A, B, C]:
+            self.add_point(svg, point)
+        
+        # Cotes si spécifiées
+        segments = data.get('segments', [])
+        for segment in segments:
+            if len(segment) >= 3:
+                p1_name, p2_name, props = segment[0], segment[1], segment[2]
+                longueur = props.get('longueur')
+                if longueur:
+                    point_map = {'A': A, 'B': B, 'C': C}
+                    if p1_name in point_map and p2_name in point_map:
+                        line = Line(point_map[p1_name], point_map[p2_name])
+                        self.add_dimension_label(svg, line, f"{longueur}")
+        
+        return ET.tostring(svg, encoding='unicode')
+    
+    def render_cercle(self, data: Dict[str, Any]) -> str:
+        """Rendu d'un cercle de qualité MathALÉA"""
+        svg = self.create_svg_root()
+        
+        # Paramètres
+        rayon = data.get('rayon', 60)
+        centre = data.get('centre', 'O')
+        
+        # Centre du cercle
+        center_x, center_y = self.width/2, self.height/2
+        O = Point(center_x, center_y, centre)
+        
+        # Cercle
+        ET.SubElement(svg, 'circle', {
+            'cx': str(center_x),
+            'cy': str(center_y), 
+            'r': str(rayon),
+            'fill': 'none',
+            'stroke': self.style_config['line_color'],
+            'stroke-width': str(self.style_config['line_width']),
+            'class': 'geometry-line'
+        })
+        
+        # Point central
+        self.add_point(svg, O)
+        
+        # Rayon (ligne depuis le centre)
+        rayon_end = Point(center_x + rayon, center_y)
+        rayon_line = Line(O, rayon_end, style="dashed")
+        self.add_line(svg, rayon_line)
+        
+        # Label du rayon
+        self.add_dimension_label(svg, rayon_line, f"r = {rayon} cm", 15)
+        
+        return ET.tostring(svg, encoding='unicode')
 
 # Instance globale
 geometry_svg_renderer = GeometrySVGRenderer()
