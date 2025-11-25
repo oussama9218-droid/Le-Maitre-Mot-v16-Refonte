@@ -414,6 +414,12 @@ class GeometryRenderer:
             elif figure_type == 'triangle_rectangle':
                 svg_content = geometry_svg_renderer.render_triangle_rectangle(schema_data)
                 return self._svg_to_base64(svg_content)
+            elif figure_type == 'triangle':
+                svg_content = geometry_svg_renderer.render_triangle(schema_data)
+                return self._svg_to_base64(svg_content)
+            elif figure_type == 'cercle':
+                svg_content = geometry_svg_renderer.render_cercle(schema_data)
+                return self._svg_to_base64(svg_content)
             elif figure_type == 'mediatrice' or figure_type == 'construction_mediatrice':
                 svg_content = geometry_svg_renderer.render_mediatrice_construction(schema_data)
                 return self._svg_to_base64(svg_content)
