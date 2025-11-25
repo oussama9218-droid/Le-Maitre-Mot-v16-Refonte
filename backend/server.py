@@ -1352,20 +1352,27 @@ Tu dois analyser cet énoncé et générer un schéma géométrique qui CORRESPO
 }}
 ```
 
-**ÉTAPES À SUIVRE :**
-1. IDENTIFIER les noms des points dans l'énoncé (ex: triangle ABC → utilise A, B, C)
-2. IDENTIFIER les dimensions mentionnées (ex: AB = 5 cm → segment AB longueur 5)
-3. IDENTIFIER les propriétés (ex: rectangle en B → angle droit en B)
-4. GÉNÉRER le JSON avec CES DONNÉES EXACTES
+**ANALYSE OBLIGATOIRE :**
+1. EXTRAIRE tous les noms de points mentionnés (ex: "triangle DEF" → points D, E, F)
+2. EXTRAIRE toutes les dimensions (ex: "DE = 5 cm" → segment DE longueur 5)
+3. EXTRAIRE les propriétés géométriques (ex: "rectangle en E" → angle droit en E)
+4. DÉTERMINER le type de figure (triangle, triangle_rectangle, rectangle, etc.)
+
+**GÉNÉRATION OBLIGATOIRE :**
+Si l'énoncé mentionne une figure géométrique (triangle, rectangle, cercle, etc.), tu DOIS générer un schéma complet.
 
 **RÈGLES TECHNIQUES :**
-1. TOUJOURS utiliser la clé "schema" (sans accent, sans underscore)
-2. TOUJOURS fermer toutes les accolades et crochets
-3. TOUJOURS utiliser des virgules correctes
-4. Types valides : "triangle", "rectangle", "carre", "cercle", "pyramide"
-5. Si pas de géométrie, retourner : {{"schema": null}}
+1. TOUJOURS utiliser la clé "schema" (sans accent)
+2. JAMAIS retourner {{"schema": null}} si l'énoncé contient de la géométrie
+3. Types valides : "triangle", "triangle_rectangle", "rectangle", "carre", "cercle"
+4. Format des segments : [["point1", "point2", {{"longueur": "valeur"}}]]
+5. Format des angles : [["point", {{"angle_droit": true}}]]
 
-Réponds UNIQUEMENT avec ce JSON, rien d'autre.
+**EXEMPLE CONCRET :**
+Énoncé: "triangle DEF rectangle en E, DE = 5 cm, EF = 12 cm"
+→ DOIT générer: {{"schema": {{"type": "triangle_rectangle", "points": ["D","E","F"], "segments": [["D","E",{{"longueur":"5 cm"}}], ["E","F",{{"longueur":"12 cm"}}]], "angles": [["E",{{"angle_droit":true}}]]}}}}
+
+Réponds UNIQUEMENT avec le JSON complet, JAMAIS null pour un énoncé géométrique.
 """
 
         user_message = UserMessage(text=prompt)
