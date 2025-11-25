@@ -169,7 +169,7 @@ class GeometryRenderer:
         """Render a right triangle with labeled vertices to existing figure"""
         
         # Default coordinates for right triangle
-        points = data.get('points', ['A', 'B', 'C'])
+        points = data.get('points', self._get_smart_default_points(3, 'triangle'))
         angle_droit = data.get('angle_droit', points[1] if len(points) > 1 else 'B')
         
         # Position coordinates
@@ -221,7 +221,7 @@ class GeometryRenderer:
         """Render a general triangle"""
         fig, ax = self._create_figure(6, 5)
         
-        points = data.get('points', ['A', 'B', 'C'])
+        points = data.get('points', self._get_smart_default_points(3, 'triangle'))
         
         # Default equilateral triangle coordinates
         coords = {
