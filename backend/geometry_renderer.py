@@ -361,6 +361,21 @@ class GeometryRenderer:
             plt.close(fig)
             return ""
     
+    def _svg_to_base64(self, svg_content: str) -> str:
+        """Convert SVG to Base64 encoded PNG for web display using new high-quality renderer"""
+        try:
+            # Pour l'affichage web, on peut soit :
+            # 1. Retourner le SVG directement (recommandé)
+            # 2. Convertir en PNG via cairosvg si nécessaire
+            
+            # Option 1: SVG direct (meilleure qualité)
+            svg_base64 = base64.b64encode(svg_content.encode('utf-8')).decode('utf-8')
+            return f"data:image/svg+xml;base64,{svg_base64}"
+            
+        except Exception as e:
+            logger.error(f"Error converting SVG to Base64: {e}")
+            return ""
+    
     def render_geometric_figure(self, schema_data: Dict[str, Any]) -> str:
         """Render a geometric figure from structured data as SVG (for PDF) - Version améliorée"""
         figure_type = schema_data.get('figure', 'triangle')
