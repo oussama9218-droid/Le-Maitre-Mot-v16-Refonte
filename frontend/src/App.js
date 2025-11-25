@@ -469,7 +469,7 @@ function MainApp() {
         nb_exercices: nbExercices,
         guest_id: guestId
       }, {
-        timeout: 30000  // 30 seconds timeout
+        timeout: 60000  // 60 seconds timeout (augmenté pour le nouveau système géométrique)
       });
       
       setCurrentDocument(response.data.document);
