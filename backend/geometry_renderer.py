@@ -51,6 +51,35 @@ class GeometryRenderer:
             'parallelogramme': self._render_parallelogram
         }
     
+    def _get_smart_default_points(self, needed_count: int, figure_type: str = "") -> List[str]:
+        """Generate intelligent default points - NEVER use A,B,C as first choice"""
+        point_sets = [
+            ['D', 'E', 'F'],      # Premier choix
+            ['M', 'N', 'P'],      # Deuxième choix  
+            ['X', 'Y', 'Z'],      # Troisième choix
+            ['R', 'S', 'T'],      # Quatrième choix
+            ['A', 'B', 'C']       # Dernier recours seulement
+        ]
+        
+        # Pour rectangles et carrés, utiliser des lettres traditionnelles
+        if figure_type in ['rectangle', 'carre']:
+            rect_sets = [
+                ['P', 'Q', 'R', 'S'],
+                ['M', 'N', 'O', 'P'], 
+                ['A', 'B', 'C', 'D']
+            ]
+            for point_set in rect_sets:
+                if len(point_set) >= needed_count:
+                    return point_set[:needed_count]
+        
+        # Pour autres figures
+        for point_set in point_sets:
+            if len(point_set) >= needed_count:
+                return point_set[:needed_count]
+        
+        # Fallback si besoin de plus de points
+        return [chr(65 + i) for i in range(needed_count)]  # A, B, C, D, E, ...
+    
     def _create_figure(self, width: float = 8, height: float = 6) -> Tuple[plt.Figure, plt.Axes]:
         """Create a clean matplotlib figure for geometric rendering"""
         fig, ax = plt.subplots(figsize=(width, height))
