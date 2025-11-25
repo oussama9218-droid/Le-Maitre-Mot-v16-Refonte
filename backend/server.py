@@ -1200,6 +1200,54 @@ async def validate_session_token(session_token: str):
         logger.error(f"Error validating session token: {e}")
         return None
 
+def sanitize_schema_ai_response(response: str) -> str:
+    """
+    Clean AI responses specifically for geometric schema generation.
+    More careful handling to preserve geometric data.
+    """
+    try:
+        # Remove leading/trailing whitespace
+        response = response.strip()
+        
+        # Find JSON boundaries
+        json_start = response.find('{')
+        json_end = response.rfind('}') + 1
+        
+        if json_start == -1 or json_end == 0:
+            logger.warning(f"No JSON found in schema AI response: {response[:200]}...")
+            return '{"schema": null}'
+        
+        json_content = response[json_start:json_end]
+        
+        # Gentle cleaning for schemas - avoid aggressive replacements
+        # Only fix obvious issues
+        json_content = json_content.replace('\\n', ' ')     # Replace literal newlines
+        json_content = json_content.replace('\\t', ' ')     # Replace literal tabs
+        json_content = re.sub(r'\s+', ' ', json_content)    # Normalize whitespace
+        
+        # Try to parse as-is first
+        try:
+            parsed = json.loads(json_content)
+            return json.dumps(parsed)  # Re-serialize to ensure valid JSON
+        except json.JSONDecodeError as e:
+            logger.warning(f"Schema JSON needs cleaning: {e}")
+            
+            # More aggressive cleaning only if needed
+            json_content = json_content.replace('\\\\', '\\')
+            json_content = re.sub(r'\\[a-zA-Z]', ' ', json_content)  # Remove problematic escapes
+            
+            try:
+                parsed = json.loads(json_content)
+                logger.info("Schema JSON recovered after cleaning")
+                return json.dumps(parsed)
+            except Exception as e2:
+                logger.error(f"Schema JSON still invalid: {e2}")
+                return '{"schema": null}'
+                
+    except Exception as e:
+        logger.error(f"Error sanitizing schema AI response: {e}")
+        return '{"schema": null}'
+
 def sanitize_ai_response(response: str) -> str:
     """
     Clean and validate AI JSON responses to handle common formatting issues.
