@@ -1587,8 +1587,8 @@ Chaque exercice doit avoir une difficulté {difficulte}. Respecte parfaitement l
 2. Utilise des **valeurs numériques différentes et variées** pour chaque exercice (pas de répétition des mêmes données).
 3. Le schéma doit toujours être placé dans `"donnees.schema"` et jamais dans `"enonce"`.
 3. L’énoncé doit contenir uniquement du texte lisible pour l’élève et sa formulation doit être claire comme il serait lu dans un manuel de mathématique à leur niveau.
-4. Le schéma doit suivre une structure claire (type, points, labels, segments, angles, etc.).
-5. Les exercices ne doivent pas être similaire dans la consigne varier comme dans un manuel d'exercice de mathématique
+6. Le schéma doit suivre une structure claire (type, points, labels, segments, angles, etc.).
+7. Les exercices ne doivent pas être similaires dans la consigne, varier comme dans un manuel d'exercice de mathématique
 
 **RÈGLE IMPORTANTE - DIVERSITÉ DES POINTS** :
 Tu DOIS utiliser des lettres DIFFÉRENTES pour chaque exercice ! 
