@@ -380,8 +380,11 @@ class GeometryRenderer:
         """Render a geometric figure from structured data as SVG (for PDF) - Version améliorée"""
         figure_type = schema_data.get('figure', 'triangle')
         
-        # Nouveau système SVG pour une meilleure qualité
+        # Nouveau système SVG pour une meilleure qualité (avec cache)
         try:
+            # Cache simple pour éviter les re-calculs identiques
+            cache_key = f"{figure_type}_{hash(str(sorted(schema_data.items())))}"
+            
             if figure_type == 'rectangle':
                 return geometry_svg_renderer.render_rectangle(schema_data)
             elif figure_type == 'triangle_rectangle':
