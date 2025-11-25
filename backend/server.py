@@ -2145,35 +2145,25 @@ JSON OBLIGATOIRE:
             approach="two_pass"
         )
         
-        # 🗺️ LOGS DE DÉBOGAGE DIVERSITÉ GÉOGRAPHIE
-        if matiere == "Géographie":
-            logger.info("🗺️ DOCUMENT DIVERSITY CHECK (AI Generated Types):")
+        # 🗺️ LOGS DE DÉBOGAGE DIVERSITÉ GÉOGRAPHIE (optimisé)
+        if matiere == "Géographie" and len(exercises) > 1:
             document_types_requested = []
-            for i, exercise in enumerate(exercises, 1):
-                # Check in document_attendu field which was requested by AI
+            for exercise in exercises:
                 if hasattr(exercise, 'document_attendu') and exercise.document_attendu:
                     if isinstance(exercise.document_attendu, dict):
                         doc_type = exercise.document_attendu.get('type', 'unknown')
                     else:
                         doc_type = str(exercise.document_attendu)
                     document_types_requested.append(doc_type)
-                    logger.info(f"  Exercice {i} AI requested: {doc_type}")
-                elif hasattr(exercise, 'document') and exercise.document:
-                    doc_type = getattr(exercise.document, 'titre', 'No title')
-                    document_types_requested.append(doc_type)
-                    logger.info(f"  Exercice {i} has document: {doc_type}")
-                else:
-                    logger.info(f"  Exercice {i}: NO DOCUMENT REQUEST")
             
-            # Vérifier la diversité des types demandés
+            # Vérifier la diversité rapidement
             unique_types = len(set(document_types_requested))
             total_types = len(document_types_requested)
-            logger.info(f"🎯 DIVERSITY RESULT: {unique_types}/{total_types} types uniques demandés par l'IA")
             
             if unique_types < total_types:
-                logger.warning("⚠️ DIVERSITY ISSUE: L'IA a demandé des types répétés!")
+                logger.warning(f"🎯 Geography diversity: {unique_types}/{total_types} types uniques")
             else:
-                logger.info("✅ DIVERSITY SUCCESS: L'IA a demandé des types différents")
+                logger.info(f"✅ Geography diversity: {unique_types}/{total_types} types différents")
         
         return exercises
         
