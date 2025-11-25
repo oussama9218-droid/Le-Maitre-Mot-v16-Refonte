@@ -254,7 +254,7 @@ class GeometrySVGRenderer:
         svg = self.create_svg_root()
         
         # Paramètres
-        points = data.get('points', ['A', 'B', 'C'])
+        points = data.get('points', ['D', 'E', 'F'])  # Éviter ABC par défaut
         angle_droit = data.get('angle_droit', points[1])  # B par défaut
         
         # Dimensions par défaut ou récupérées
@@ -347,7 +347,7 @@ class GeometrySVGRenderer:
         svg = self.create_svg_root()
         
         # Paramètres
-        points = data.get('points', ['A', 'B', 'C'])
+        points = data.get('points', ['D', 'E', 'F'])  # Éviter ABC par défaut
         triangle_type = data.get('type', 'quelconque')
         
         # Triangle équilatéral par défaut centré
