@@ -84,15 +84,7 @@ class DocumentSearcher:
         enonce = document_request.get("enonce", "")
         if enonce:
             intelligent_doc_type = self._analyze_content_for_document_type(enonce)
-            logger.info(
-                f"🧠 Intelligent document type analysis",
-                module_name="document_search",
-                func_name="intelligent_analysis",
-                original_type=doc_type,
-                analyzed_type=intelligent_doc_type,
-                content_preview=enonce[:100],
-                avoid_types=avoid_types
-            )
+            logger.info(f"🧠 Document analysis: {doc_type} → {intelligent_doc_type}")
             # Utiliser le type intelligent si différent
             if intelligent_doc_type != "carte_monde" or doc_type == "cartographic":
                 doc_type = intelligent_doc_type
