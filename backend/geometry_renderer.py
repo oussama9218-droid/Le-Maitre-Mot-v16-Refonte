@@ -386,6 +386,10 @@ class GeometryRenderer:
                 return geometry_svg_renderer.render_rectangle(schema_data)
             elif figure_type == 'triangle_rectangle':
                 return geometry_svg_renderer.render_triangle_rectangle(schema_data)
+            elif figure_type == 'triangle':
+                return geometry_svg_renderer.render_triangle(schema_data)
+            elif figure_type == 'cercle':
+                return geometry_svg_renderer.render_cercle(schema_data)
             elif figure_type == 'mediatrice' or figure_type == 'construction_mediatrice':
                 return geometry_svg_renderer.render_mediatrice_construction(schema_data)
             elif figure_type in self.figure_renderers:
