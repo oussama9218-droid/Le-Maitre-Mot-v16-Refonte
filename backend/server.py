@@ -1591,11 +1591,7 @@ Chaque exercice doit avoir une difficulté {difficulte}. Respecte parfaitement l
 6. Le schéma doit suivre une structure claire (type, points, labels, segments, angles, etc.).
 7. Les exercices ne doivent pas être similaires dans la consigne, varier comme dans un manuel d'exercice de mathématique
 
-**RÈGLE IMPORTANTE - DIVERSITÉ DES POINTS** :
-Tu DOIS utiliser des lettres DIFFÉRENTES pour chaque exercice ! 
-- Exercice 1 : points M, N, P ou D, E, F ou X, Y, Z
-- Exercice 2 : autres lettres que l'exercice 1
-- JAMAIS tous les exercices avec A, B, C !
+ 
 
 **Format JSON attendu pour chaque exercice** :
 {{
