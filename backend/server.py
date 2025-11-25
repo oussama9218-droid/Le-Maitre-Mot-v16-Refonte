@@ -2024,12 +2024,9 @@ JSON OBLIGATOIRE:
                     generate_exercises_with_ai.used_document_types = []
                 
                 logger.info(
-                    "🗺️ Geographic document required, starting document search",
+                    "🗺️ Geographic document search started",
                     module_name="generation",
-                    func_name="document_search",
-                    enonce_preview=enonce_clean[:100],
-                    document_type=ex_data["document_attendu"].get("type", "unknown"),
-                    already_used=generate_exercises_with_ai.used_document_types
+                    func_name="document_search"
                 )
                 
                 try:
