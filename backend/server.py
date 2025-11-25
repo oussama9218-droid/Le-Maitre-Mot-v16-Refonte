@@ -284,11 +284,12 @@ def process_schema_to_base64(schema: Optional[dict]) -> Optional[str]:
     )
     
     try:
-        # Convert schema to geometry_renderer format
+        # Convert schema to geometry_renderer format - FIX STRUCTURE
         geometry_schema = {
             "type": "schema_geometrique",
             "figure": schema.get("type", "triangle"),
-            "donnees": schema
+            # CRITICAL: Pass schema data directly, not nested in "donnees"
+            **schema  # Spread all schema properties at root level
         }
         
         # Render to Base64 for web display
