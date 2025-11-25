@@ -362,18 +362,26 @@ class GeometryRenderer:
             return ""
     
     def render_geometric_figure(self, schema_data: Dict[str, Any]) -> str:
-        """Render a geometric figure from structured data as SVG (for PDF)"""
+        """Render a geometric figure from structured data as SVG (for PDF) - Version améliorée"""
         figure_type = schema_data.get('figure', 'triangle')
         
-        if figure_type in self.figure_renderers:
-            try:
+        # Nouveau système SVG pour une meilleure qualité
+        try:
+            if figure_type == 'rectangle':
+                return geometry_svg_renderer.render_rectangle(schema_data)
+            elif figure_type == 'triangle_rectangle':
+                return geometry_svg_renderer.render_triangle_rectangle(schema_data)
+            elif figure_type == 'mediatrice' or figure_type == 'construction_mediatrice':
+                return geometry_svg_renderer.render_mediatrice_construction(schema_data)
+            elif figure_type in self.figure_renderers:
+                # Fallback vers l'ancien système pour les autres types
                 return self.figure_renderers[figure_type](schema_data)
-            except Exception as e:
-                logger.error(f"Error rendering {figure_type}: {e}")
-                return f'<span style="color: red; font-style: italic;">[Erreur rendu figure: {figure_type}]</span>'
-        else:
-            logger.warning(f"Unknown figure type: {figure_type}")
-            return f'<span style="color: orange; font-style: italic;">[Figure non supportée: {figure_type}]</span>'
+            else:
+                logger.warning(f"Unknown figure type: {figure_type}")
+                return f'<span style="color: orange; font-style: italic;">[Figure non supportée: {figure_type}]</span>'
+        except Exception as e:
+            logger.error(f"Error rendering {figure_type}: {e}")
+            return f'<span style="color: red; font-style: italic;">[Erreur rendu figure: {figure_type}]</span>'
     
     def render_geometry_to_base64(self, schema_data: Dict[str, Any]) -> str:
         """Render a geometric figure from structured data as Base64 PNG (for web display)"""
