@@ -255,7 +255,10 @@ Tu réponds UNIQUEMENT en JSON avec les champs : "enonce", "explication_prof", "
             "volume": self._fallback_volume,
             "statistiques": self._fallback_statistiques,
             "probabilites": self._fallback_probabilites,
-            "puissances": self._fallback_puissances
+            "puissances": self._fallback_puissances,
+            "cercle": self._fallback_cercle,
+            "thales": self._fallback_thales,
+            "trigonometrie": self._fallback_trigonometrie
         }
         
         template_key = spec.type_exercice.value
