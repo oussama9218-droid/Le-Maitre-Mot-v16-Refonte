@@ -1399,7 +1399,8 @@ class LeMaitreMotAPITester:
                         print(f"   ⚠️  Points géométriques non détectés")
                     
                     # 3. Vérification spec_mathematique
-                    spec_math = exercise.get('spec_mathematique') or exercise.get('donnees', {}).get('spec_mathematique')
+                    donnees = exercise.get('donnees') or {}
+                    spec_math = exercise.get('spec_mathematique') or donnees.get('spec_mathematique')
                     if spec_math:
                         print(f"   ✅ spec_mathematique présent")
                         pythagore_results["passed"] += 1
