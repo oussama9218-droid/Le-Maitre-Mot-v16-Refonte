@@ -420,22 +420,29 @@ Résultat : {spec.resultat_final}"""
             return self._fallback_generic(spec)
     
     def _fallback_puissances(self, spec: MathExerciseSpec) -> MathTextGeneration:
-        """Template fallback pour puissances"""
-        params = spec.parametres
-        type_calcul = params["type"]
+        """Template fallback pour puissances - Robuste"""
         
-        if type_calcul == "calcul_simple":
-            enonce = f"Calculer {params['base']}^{{{params['exposant']}}}."
-        elif type_calcul == "produit":
-            enonce = f"Calculer {params['base']}^{{{params['exposant1']}}} × {params['base']}^{{{params['exposant2']}}}."
-        else:
-            enonce = f"Calculer {params['base']}^{{{params['exposant1']}}} ÷ {params['base']}^{{{params['exposant2']}}}."
-        
-        return MathTextGeneration(
-            enonce=enonce,
-            explication_prof="Exercice sur les puissances",
-            solution_redigee=f"Résultat = {spec.resultat_final}"
-        )
+        try:
+            params = spec.parametres
+            type_calcul = params.get("type", "")
+            
+            if type_calcul == "calcul_simple" and all(k in params for k in ['base', 'exposant']):
+                enonce = f"Calculer {params['base']}^{{{params['exposant']}}}."
+            elif type_calcul == "produit" and all(k in params for k in ['base', 'exposant1', 'exposant2']):
+                enonce = f"Calculer {params['base']}^{{{params['exposant1']}}} × {params['base']}^{{{params['exposant2']}}}."
+            elif type_calcul == "quotient" and all(k in params for k in ['base', 'exposant1', 'exposant2']):
+                enonce = f"Calculer {params['base']}^{{{params['exposant1']}}} ÷ {params['base']}^{{{params['exposant2']}}}."
+            else:
+                return self._fallback_generic(spec)
+            
+            return MathTextGeneration(
+                enonce=enonce,
+                explication_prof="Exercice sur les puissances",
+                solution_redigee=f"Résultat = {spec.resultat_final}"
+            )
+        except Exception as e:
+            logger.warning(f"Fallback puissances échoué, utilisation fallback generic: {e}")
+            return self._fallback_generic(spec)
 
     
     def _fallback_cercle(self, spec: MathExerciseSpec) -> MathTextGeneration:
