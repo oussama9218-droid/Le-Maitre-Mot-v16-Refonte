@@ -15,7 +15,7 @@ import os
 from datetime import datetime
 
 class LoggingSystemTester:
-    def __init__(self, base_url="https://reliable-calc.preview.emergentagent.com"):
+    def __init__(self, base_url="https://pythonmath-engine.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0

@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 
 def test_two_pass_ai():
-    base_url = "https://reliable-calc.preview.emergentagent.com"
+    base_url = "https://pythonmath-engine.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     guest_id = f"test-simple-{datetime.now().strftime('%H%M%S')}"
     
