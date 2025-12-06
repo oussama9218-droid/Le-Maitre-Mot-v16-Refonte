@@ -1427,7 +1427,8 @@ class LeMaitreMotAPITester:
                             print(f"   ⚠️  Résultat non numérique: {resultat}")
                     
                     # 5. Cohérence énoncé-schéma
-                    schema = exercise.get('geometric_schema') or exercise.get('donnees', {}).get('schema')
+                    donnees = exercise.get('donnees') or {}
+                    schema = exercise.get('geometric_schema') or donnees.get('schema')
                     if schema and isinstance(schema, dict):
                         schema_points = schema.get('points', [])
                         enonce_points = re.findall(r'[A-Z]', enonce)
