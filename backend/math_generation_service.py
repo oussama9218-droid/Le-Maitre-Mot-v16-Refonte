@@ -510,7 +510,7 @@ class MathGenerationService:
         resultat_a_trouver = val3 * k
         
         etapes = [
-            f"Tableau de proportionnalité",
+            "Tableau de proportionnalité",
             f"{val1} → {resultat1}",
             f"{val2} → {resultat2}",
             f"Coefficient : {k}",
