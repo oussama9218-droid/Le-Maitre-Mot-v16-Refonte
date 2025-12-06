@@ -91,6 +91,7 @@ class MathGenerationService:
             # 4e
             "Théorème de Pythagore": [MathExerciseType.TRIANGLE_RECTANGLE],
             "Équations": [MathExerciseType.EQUATION_1ER_DEGRE],
+            "Cosinus": [MathExerciseType.TRIGONOMETRIE],
             
             # 3e et géométrie avancée
             "Probabilités": [MathExerciseType.PROBABILITES],
