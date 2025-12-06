@@ -102,7 +102,8 @@ class CoherenceChecker:
         valeurs_figure: Dict[str, Any],
         valeurs_enonce: Set[float],
         valeurs_solution: Set[float],
-        exercice_id: str
+        exercice_id: str,
+        spec=None
     ) -> List[str]:
         """Vérifier que les valeurs numériques sont cohérentes"""
         erreurs = []
@@ -113,9 +114,26 @@ class CoherenceChecker:
             if isinstance(val, (int, float)):
                 valeurs_attendues.add(float(val))
         
-        # Vérifier qu'au moins une valeur de la figure apparaît dans l'énoncé
+        # Pour les cercles, accepter aussi les valeurs dérivées (périmètre, aire)
+        valeurs_derivees = set()
+        if spec and hasattr(spec, 'parametres'):
+            params = spec.parametres
+            # Si c'est un exercice de type "rayon_depuis_perimetre", accepter le périmètre
+            if params.get('type') == 'rayon_depuis_perimetre' and 'perimetre' in params:
+                valeurs_derivees.add(float(params['perimetre']))
+            # Pour les exercices sur cercles, accepter aussi périmètre/aire calculés
+            if 'rayon' in valeurs_figure:
+                rayon = valeurs_figure['rayon']
+                import math
+                perimetre_calcule = round(2 * math.pi * rayon, 2)
+                aire_calculee = round(math.pi * rayon * rayon, 2)
+                valeurs_derivees.add(perimetre_calcule)
+                valeurs_derivees.add(aire_calculee)
+        
+        # Vérifier qu'au moins une valeur (directe ou dérivée) apparaît dans l'énoncé
         if valeurs_attendues and valeurs_enonce:
-            intersection = valeurs_attendues & valeurs_enonce
+            toutes_valeurs_acceptables = valeurs_attendues | valeurs_derivees
+            intersection = toutes_valeurs_acceptables & valeurs_enonce
             if not intersection:
                 erreurs.append(
                     f"[{exercice_id}] Aucune valeur de la figure n'apparaît dans l'énoncé. "
