@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime
 
 class UrgentValidator:
-    def __init__(self, base_url="https://pythonmath-engine.preview.emergentagent.com"):
+    def __init__(self, base_url="https://math-svg-renderer.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.guest_id = f"urgent-test-{datetime.now().strftime('%H%M%S')}-{uuid.uuid4().hex[:8]}"
