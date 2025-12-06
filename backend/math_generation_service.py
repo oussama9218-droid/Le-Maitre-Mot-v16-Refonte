@@ -347,28 +347,279 @@ class MathGenerationService:
     # Générateurs supplémentaires (simplifiés pour l'exemple)
     
     def _gen_calcul_fractions(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
-        """Générateur simplifié pour fractions"""
-        # Implémentation similaire avec objets Fraction de Python
-        pass
+        """Génère un exercice de calculs avec fractions"""
+        
+        if difficulte == "facile":
+            # Fractions simples avec dénominateurs petits
+            num1, den1 = random.randint(1, 5), random.choice([2, 3, 4, 5])
+            num2, den2 = random.randint(1, 5), random.choice([2, 3, 4, 5])
+        else:
+            num1, den1 = random.randint(1, 10), random.randint(2, 12)
+            num2, den2 = random.randint(1, 10), random.randint(2, 12)
+        
+        frac1 = Fraction(num1, den1)
+        frac2 = Fraction(num2, den2)
+        
+        operation = random.choice(["+", "-"])
+        
+        if operation == "+":
+            resultat = frac1 + frac2
+            expression = f"\\frac{{{num1}}}{{{den1}}} + \\frac{{{num2}}}{{{den2}}}"
+        else:
+            resultat = frac1 - frac2
+            expression = f"\\frac{{{num1}}}{{{den1}}} - \\frac{{{num2}}}{{{den2}}}"
+        
+        etapes = [
+            f"Expression : {expression}",
+            f"Trouver un dénominateur commun : {frac1.denominator * frac2.denominator // math.gcd(frac1.denominator, frac2.denominator)}",
+            f"Résultat : \\frac{{{resultat.numerator}}}{{{resultat.denominator}}}"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.CALCUL_FRACTIONS,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "fraction1": f"{num1}/{den1}",
+                "fraction2": f"{num2}/{den2}",
+                "operation": operation,
+                "expression": expression
+            },
+            solution_calculee={
+                "resultat_fraction": f"{resultat.numerator}/{resultat.denominator}",
+                "resultat_decimal": float(resultat)
+            },
+            etapes_calculees=etapes,
+            resultat_final=f"\\frac{{{resultat.numerator}}}{{{resultat.denominator}}}"
+        )
     
     def _gen_calcul_decimaux(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
-        """Générateur simplifié pour décimaux"""
-        # Implémentation avec nombres décimaux
-        pass
+        """Génère un exercice de calculs avec nombres décimaux"""
+        
+        if difficulte == "facile":
+            a = round(random.uniform(1, 20), 1)
+            b = round(random.uniform(1, 20), 1)
+        else:
+            a = round(random.uniform(5, 50), 2)
+            b = round(random.uniform(5, 50), 2)
+        
+        operation = random.choice(["+", "-", "*"])
+        
+        if operation == "+":
+            resultat = round(a + b, 2)
+            expression = f"{a} + {b}"
+            op_text = "addition"
+        elif operation == "-":
+            resultat = round(a - b, 2)
+            expression = f"{a} - {b}"
+            op_text = "soustraction"
+        else:
+            resultat = round(a * b, 2)
+            expression = f"{a} × {b}"
+            op_text = "multiplication"
+        
+        etapes = [
+            f"Calcul : {expression}",
+            f"Résultat : {resultat}"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "a": a,
+                "b": b,
+                "operation": operation,
+                "expression": expression
+            },
+            solution_calculee={
+                "resultat": resultat,
+                "operation": op_text
+            },
+            etapes_calculees=etapes,
+            resultat_final=resultat
+        )
     
     def _gen_triangle_quelconque(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
-        """Générateur pour triangles quelconques"""
-        # Implémentation avec angles, périmètres, etc.
-        pass
+        """Génère un exercice sur triangle quelconque (angles)"""
+        
+        points = self._get_next_geometry_points()
+        
+        # Générer deux angles, le troisième se déduit
+        angle1 = random.randint(30, 80)
+        angle2 = random.randint(30, 80)
+        angle3 = 180 - angle1 - angle2
+        
+        # Vérifier que le troisième angle est valide
+        if angle3 <= 0 or angle3 >= 150:
+            angle1 = 60
+            angle2 = 70
+            angle3 = 50
+        
+        figure = GeometricFigure(
+            type="triangle",
+            points=points,
+            angles_connus={
+                f"{points[0]}{points[1]}{points[2]}": angle1,
+                f"{points[1]}{points[2]}{points[0]}": angle2
+            },
+            angles_a_calculer=[f"{points[2]}{points[0]}{points[1]}"]
+        )
+        
+        etapes = [
+            f"Triangle {points[0]}{points[1]}{points[2]}",
+            "La somme des angles d'un triangle est 180°",
+            f"Angle en {points[0]} = {angle1}°, Angle en {points[1]} = {angle2}°",
+            f"Angle en {points[2]} = 180° - {angle1}° - {angle2}° = {angle3}°"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.TRIANGLE_QUELCONQUE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "triangle": f"{points[0]}{points[1]}{points[2]}",
+                "angle1": angle1,
+                "angle2": angle2
+            },
+            solution_calculee={
+                "angle3": angle3
+            },
+            etapes_calculees=etapes,
+            resultat_final=f"{angle3}°",
+            figure_geometrique=figure
+        )
     
     def _gen_proportionnalite(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
-        """Générateur pour proportionnalité"""
-        # Implémentation avec tableaux de proportionnalité
-        pass
+        """Génère un exercice de proportionnalité"""
+        
+        # Coefficient de proportionnalité
+        k = random.randint(2, 8)
+        
+        # Valeurs du tableau
+        val1 = random.randint(3, 10)
+        val2 = random.randint(12, 25)
+        val3 = random.randint(5, 15)  # Valeur à trouver
+        
+        resultat1 = val1 * k
+        resultat2 = val2 * k
+        resultat_a_trouver = val3 * k
+        
+        etapes = [
+            f"Tableau de proportionnalité",
+            f"{val1} → {resultat1}",
+            f"{val2} → {resultat2}",
+            f"Coefficient : {k}",
+            f"{val3} → {val3} × {k} = {resultat_a_trouver}"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.PROPORTIONNALITE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "valeurs_donnees": [val1, val2],
+                "resultats_donnes": [resultat1, resultat2],
+                "valeur_a_trouver": val3,
+                "coefficient": k
+            },
+            solution_calculee={
+                "resultat": resultat_a_trouver,
+                "methode": "produit_en_croix"
+            },
+            etapes_calculees=etapes,
+            resultat_final=resultat_a_trouver
+        )
     
     def _gen_perimetre_aire(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
-        """Générateur pour périmètres et aires"""
-        pass
+        """Génère un exercice de périmètres et aires"""
+        
+        figure_type = random.choice(["rectangle", "carre", "cercle"])
+        
+        if figure_type == "rectangle":
+            longueur = random.randint(8, 20)
+            largeur = random.randint(4, 12)
+            perimetre = 2 * (longueur + largeur)
+            aire = longueur * largeur
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PERIMETRE_AIRE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "figure": "rectangle",
+                    "longueur": longueur,
+                    "largeur": largeur
+                },
+                solution_calculee={
+                    "perimetre": perimetre,
+                    "aire": aire
+                },
+                etapes_calculees=[
+                    f"Rectangle de longueur {longueur} cm et largeur {largeur} cm",
+                    f"Périmètre = 2 × ({longueur} + {largeur}) = {perimetre} cm",
+                    f"Aire = {longueur} × {largeur} = {aire} cm²"
+                ],
+                resultat_final=f"Périmètre = {perimetre} cm, Aire = {aire} cm²"
+            )
+        
+        elif figure_type == "carre":
+            cote = random.randint(5, 15)
+            perimetre = 4 * cote
+            aire = cote * cote
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PERIMETRE_AIRE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "figure": "carre",
+                    "cote": cote
+                },
+                solution_calculee={
+                    "perimetre": perimetre,
+                    "aire": aire
+                },
+                etapes_calculees=[
+                    f"Carré de côté {cote} cm",
+                    f"Périmètre = 4 × {cote} = {perimetre} cm",
+                    f"Aire = {cote}² = {aire} cm²"
+                ],
+                resultat_final=f"Périmètre = {perimetre} cm, Aire = {aire} cm²"
+            )
+        
+        else:  # cercle
+            rayon = random.randint(3, 10)
+            perimetre = round(2 * math.pi * rayon, 2)
+            aire = round(math.pi * rayon * rayon, 2)
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PERIMETRE_AIRE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "figure": "cercle",
+                    "rayon": rayon
+                },
+                solution_calculee={
+                    "perimetre": perimetre,
+                    "aire": aire
+                },
+                etapes_calculees=[
+                    f"Cercle de rayon {rayon} cm",
+                    f"Périmètre = 2 × π × {rayon} ≈ {perimetre} cm",
+                    f"Aire = π × {rayon}² ≈ {aire} cm²"
+                ],
+                resultat_final=f"Périmètre ≈ {perimetre} cm, Aire ≈ {aire} cm²"
+            )
     
     def _gen_rectangle(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
         """Générateur pour rectangles"""
