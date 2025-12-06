@@ -1513,8 +1513,10 @@ class LeMaitreMotAPITester:
             "matiere": "Mathématiques",
             "niveau": "4e",
             "chapitre": "Calcul littéral",
+            "type_doc": "exercices",
             "difficulte": "facile",
             "nb_exercices": 3,
+            "versions": ["A"],
             "guest_id": self.guest_id
         }
         
