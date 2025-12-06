@@ -1592,13 +1592,14 @@ class LeMaitreMotAPITester:
                             structure_results["issues"].append(f"Ex{i+1}: Champ {field} manquant")
                     
                     # Vérification spec_mathematique (nouveau champ)
-                    if 'spec_mathematique' in exercise or ('donnees' in exercise and 'spec_mathematique' in exercise.get('donnees', {})):
+                    donnees = exercise.get('donnees') or {}
+                    if 'spec_mathematique' in exercise or 'spec_mathematique' in donnees:
                         print(f"   ✅ spec_mathematique présent dans exercice {i+1}")
                         structure_results["passed"] += 1
                     
                     # Vérification geometric_schema (pour géométrie)
                     if exercise.get('type') == 'geometry':
-                        if 'geometric_schema' in exercise or ('donnees' in exercise and 'schema' in exercise.get('donnees', {})):
+                        if 'geometric_schema' in exercise or 'schema' in donnees:
                             print(f"   ✅ geometric_schema présent pour exercice géométrie {i+1}")
                             structure_results["passed"] += 1
         
