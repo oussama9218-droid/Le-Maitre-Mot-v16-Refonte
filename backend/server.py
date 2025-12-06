@@ -458,6 +458,9 @@ class Exercise(BaseModel):
     schema_img: Optional[str] = None  # Base64 PNG image for web display
     # NEW: Geographic document for Geography exercises
     document: Optional[dict] = None  # Educational document metadata for Geography
+    # NEW: Mathematical specification for new architecture
+    spec_mathematique: Optional[dict] = None  # Complete math spec from Python generation
+    solution_calculee: Optional[dict] = None  # Calculated solution details
 
 class Document(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
