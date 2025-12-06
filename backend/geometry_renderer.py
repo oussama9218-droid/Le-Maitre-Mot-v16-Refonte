@@ -16,6 +16,9 @@ from typing import Dict, Any, List, Tuple, Optional
 
 # Import du nouveau système SVG
 from geometry_svg_renderer import geometry_svg_renderer
+# Nouveaux imports pour l'architecture mathématique structurée
+from math_generation_service import MathGenerationService
+from math_text_service import MathTextService
 
 logger = logging.getLogger(__name__)
 
