@@ -91,7 +91,9 @@ class MathGenerationService:
             "Équations": [MathExerciseType.EQUATION_1ER_DEGRE],
             
             # 3e
-            "Probabilités": [MathExerciseType.PROBABILITES]
+            "Probabilités": [MathExerciseType.PROBABILITES],
+            "Statistiques et probabilités": [MathExerciseType.STATISTIQUES, MathExerciseType.PROBABILITES],
+            "Aires et volumes": [MathExerciseType.VOLUME, MathExerciseType.PERIMETRE_AIRE]
         }
         
         return mapping.get(chapitre, [MathExerciseType.CALCUL_DECIMAUX])
