@@ -275,28 +275,42 @@ Tu réponds UNIQUEMENT en JSON avec les champs : "enonce", "explication_prof", "
         return generator(spec)
     
     def _fallback_triangle_rectangle(self, spec: MathExerciseSpec) -> MathTextGeneration:
-        """Template fallback pour triangle rectangle"""
+        """Template fallback pour triangle rectangle - Robuste"""
         
-        figure = spec.figure_geometrique
-        triangle_name = "".join(figure.points)
-        
-        # Construire l'énoncé
-        longueurs_str = []
-        for segment, longueur in figure.longueurs_connues.items():
-            longueurs_str.append(f"{segment} = {longueur} cm")
-        
-        enonce = f"""Dans le triangle {triangle_name} rectangle en {figure.rectangle_en}, """ + \
-                f"""{" et ".join(longueurs_str)}. """ + \
-                f"""Calculer la longueur {figure.longueurs_a_calculer[0]}."""
-        
-        solution = f"""Le triangle est rectangle, on applique le théorème de Pythagore.
+        try:
+            figure = spec.figure_geometrique
+            
+            if not figure or not figure.points or len(figure.points) < 3:
+                return self._fallback_generic(spec)
+            
+            triangle_name = "".join(figure.points)
+            
+            # Construire l'énoncé
+            longueurs_str = []
+            for segment, longueur in figure.longueurs_connues.items():
+                longueurs_str.append(f"{segment} = {longueur} cm")
+            
+            if not longueurs_str:
+                return self._fallback_generic(spec)
+            
+            rectangle_en = figure.rectangle_en if figure.rectangle_en else figure.points[1]
+            a_calculer = figure.longueurs_a_calculer[0] if figure.longueurs_a_calculer else "le côté manquant"
+            
+            enonce = f"""Dans le triangle {triangle_name} rectangle en {rectangle_en}, """ + \
+                    f"""{" et ".join(longueurs_str)}. """ + \
+                    f"""Calculer la longueur {a_calculer}."""
+            
+            solution = f"""Le triangle est rectangle, on applique le théorème de Pythagore.
 Résultat : {spec.resultat_final}"""
-        
-        return MathTextGeneration(
-            enonce=enonce,
-            explication_prof="Exercice d'application du théorème de Pythagore",
-            solution_redigee=solution
-        )
+            
+            return MathTextGeneration(
+                enonce=enonce,
+                explication_prof="Exercice d'application du théorème de Pythagore",
+                solution_redigee=solution
+            )
+        except Exception as e:
+            logger.warning(f"Fallback triangle_rectangle échoué, utilisation fallback generic: {e}")
+            return self._fallback_generic(spec)
     
     def _fallback_calcul_relatifs(self, spec: MathExerciseSpec) -> MathTextGeneration:
         """Template fallback pour calculs relatifs - Robuste"""
