@@ -1127,6 +1127,13 @@ class MathGenerationService:
                 f"Aire ≈ {aire} cm²"
             ]
             
+            # Créer la figure géométrique
+            figure = GeometricFigure(
+                type="cercle",
+                points=["O"],
+                longueurs_connues={"rayon": rayon}
+            )
+            
             return MathExerciseSpec(
                 niveau=niveau,
                 chapitre=chapitre,
@@ -1141,7 +1148,8 @@ class MathGenerationService:
                     "unite": "cm²"
                 },
                 etapes_calculees=etapes,
-                resultat_final=f"{aire} cm²"
+                resultat_final=f"{aire} cm²",
+                figure_geometrique=figure
             )
         
         else:  # rayon depuis périmètre
