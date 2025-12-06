@@ -471,17 +471,25 @@ Résultat : {spec.resultat_final}"""
             return self._fallback_generic(spec)
     
     def _fallback_thales(self, spec: MathExerciseSpec) -> MathTextGeneration:
-        """Template fallback pour théorème de Thalès"""
-        params = spec.parametres
-        points = params["points"]
+        """Template fallback pour théorème de Thalès - Robuste"""
         
-        enonce = f"Dans le triangle {points[0]}{points[1]}{points[2]}, ({points[3]}{points[4]}) // ({points[1]}{points[2]}). Appliquer le théorème de Thalès."
-        
-        return MathTextGeneration(
-            enonce=enonce,
-            explication_prof="Exercice sur le théorème de Thalès",
-            solution_redigee=f"Rapport = {spec.resultat_final}"
-        )
+        try:
+            params = spec.parametres
+            points = params.get("points", [])
+            
+            if len(points) >= 5:
+                enonce = f"Dans le triangle {points[0]}{points[1]}{points[2]}, ({points[3]}{points[4]}) // ({points[1]}{points[2]}). Appliquer le théorème de Thalès."
+            else:
+                return self._fallback_generic(spec)
+            
+            return MathTextGeneration(
+                enonce=enonce,
+                explication_prof="Exercice sur le théorème de Thalès",
+                solution_redigee=f"Rapport = {spec.resultat_final}"
+            )
+        except Exception as e:
+            logger.warning(f"Fallback thales échoué, utilisation fallback generic: {e}")
+            return self._fallback_generic(spec)
     
     def _fallback_trigonometrie(self, spec: MathExerciseSpec) -> MathTextGeneration:
         """Template fallback pour trigonométrie"""
