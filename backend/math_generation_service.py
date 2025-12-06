@@ -694,4 +694,358 @@ class MathGenerationService:
             ],
             resultat_final=f"Périmètre = {perimetre} cm, Aire = {aire} cm²",
             figure_geometrique=figure
+
+    def _gen_volume(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Génère un exercice de calcul de volumes"""
+        
+        solides = ["cube", "pave", "cylindre", "prisme"]
+        
+        if difficulte == "facile":
+            solides = ["cube", "pave"]
+        
+        solide = random.choice(solides)
+        
+        if solide == "cube":
+            arete = random.randint(3, 12)
+            volume = arete ** 3
+            
+            etapes = [
+                f"Cube d'arête {arete} cm",
+                f"Volume = arête³",
+                f"Volume = {arete}³ = {arete} × {arete} × {arete}",
+                f"Volume = {volume} cm³"
+            ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.VOLUME,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "solide": "cube",
+                    "arete": arete
+                },
+                solution_calculee={
+                    "volume": volume,
+                    "unite": "cm³"
+                },
+                etapes_calculees=etapes,
+                resultat_final=f"{volume} cm³"
+            )
+        
+        elif solide == "pave":
+            longueur = random.randint(5, 15)
+            largeur = random.randint(4, 12)
+            hauteur = random.randint(3, 10)
+            volume = longueur * largeur * hauteur
+            
+            etapes = [
+                f"Pavé droit de dimensions {longueur} cm × {largeur} cm × {hauteur} cm",
+                "Volume = longueur × largeur × hauteur",
+                f"Volume = {longueur} × {largeur} × {hauteur}",
+                f"Volume = {volume} cm³"
+            ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.VOLUME,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "solide": "pave",
+                    "longueur": longueur,
+                    "largeur": largeur,
+                    "hauteur": hauteur
+                },
+                solution_calculee={
+                    "volume": volume,
+                    "unite": "cm³"
+                },
+                etapes_calculees=etapes,
+                resultat_final=f"{volume} cm³"
+            )
+        
+        elif solide == "cylindre":
+            rayon = random.randint(3, 10)
+            hauteur = random.randint(5, 15)
+            volume = round(math.pi * rayon * rayon * hauteur, 2)
+            
+            etapes = [
+                f"Cylindre de rayon {rayon} cm et hauteur {hauteur} cm",
+                "Volume = π × rayon² × hauteur",
+                f"Volume = π × {rayon}² × {hauteur}",
+                f"Volume = π × {rayon * rayon} × {hauteur}",
+                f"Volume ≈ {volume} cm³"
+            ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.VOLUME,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "solide": "cylindre",
+                    "rayon": rayon,
+                    "hauteur": hauteur
+                },
+                solution_calculee={
+                    "volume": volume,
+                    "unite": "cm³"
+                },
+                etapes_calculees=etapes,
+                resultat_final=f"{volume} cm³"
+            )
+        
+        else:  # prisme
+            base_longueur = random.randint(5, 12)
+            base_largeur = random.randint(4, 10)
+            hauteur = random.randint(6, 15)
+            aire_base = base_longueur * base_largeur
+            volume = aire_base * hauteur
+            
+            etapes = [
+                f"Prisme droit à base rectangulaire ({base_longueur} cm × {base_largeur} cm), hauteur {hauteur} cm",
+                "Volume = aire de la base × hauteur",
+                f"Aire de la base = {base_longueur} × {base_largeur} = {aire_base} cm²",
+                f"Volume = {aire_base} × {hauteur} = {volume} cm³"
+            ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.VOLUME,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "solide": "prisme",
+                    "base_longueur": base_longueur,
+                    "base_largeur": base_largeur,
+                    "hauteur": hauteur
+                },
+                solution_calculee={
+                    "volume": volume,
+                    "aire_base": aire_base,
+                    "unite": "cm³"
+                },
+                etapes_calculees=etapes,
+                resultat_final=f"{volume} cm³"
+            )
+    
+    def _gen_statistiques(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Génère un exercice de statistiques (moyenne, médiane, étendue)"""
+        
+        # Générer une série de données
+        if difficulte == "facile":
+            nb_valeurs = random.randint(5, 8)
+            valeurs = [random.randint(5, 20) for _ in range(nb_valeurs)]
+        else:
+            nb_valeurs = random.randint(8, 12)
+            valeurs = [random.randint(0, 30) for _ in range(nb_valeurs)]
+        
+        # Calculs statistiques
+        moyenne = round(sum(valeurs) / len(valeurs), 2)
+        valeurs_triees = sorted(valeurs)
+        
+        # Médiane
+        n = len(valeurs_triees)
+        if n % 2 == 0:
+            mediane = (valeurs_triees[n//2 - 1] + valeurs_triees[n//2]) / 2
+        else:
+            mediane = valeurs_triees[n//2]
+        
+        # Étendue
+        etendue = max(valeurs) - min(valeurs)
+        
+        etapes = [
+            f"Série de données : {valeurs}",
+            f"Nombre de valeurs : {len(valeurs)}",
+            f"Moyenne = somme / effectif = {sum(valeurs)} / {len(valeurs)} = {moyenne}",
+            f"Série triée : {valeurs_triees}",
+            f"Médiane = {mediane}",
+            f"Étendue = max - min = {max(valeurs)} - {min(valeurs)} = {etendue}"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.STATISTIQUES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "valeurs": valeurs,
+                "nb_valeurs": len(valeurs)
+            },
+            solution_calculee={
+                "moyenne": moyenne,
+                "mediane": mediane,
+                "etendue": etendue,
+                "min": min(valeurs),
+                "max": max(valeurs)
+            },
+            etapes_calculees=etapes,
+            resultat_final=f"Moyenne = {moyenne}, Médiane = {mediane}, Étendue = {etendue}"
+        )
+    
+    def _gen_probabilites(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Génère un exercice de probabilités"""
+        
+        situations = [
+            {
+                "contexte": "dé",
+                "nb_issues": 6,
+                "question": "obtenir un nombre pair",
+                "issues_favorables": 3
+            },
+            {
+                "contexte": "dé",
+                "nb_issues": 6,
+                "question": "obtenir un nombre supérieur à 4",
+                "issues_favorables": 2
+            },
+            {
+                "contexte": "pièce",
+                "nb_issues": 2,
+                "question": "obtenir pile",
+                "issues_favorables": 1
+            },
+            {
+                "contexte": "sac avec 5 boules rouges et 3 boules bleues",
+                "nb_issues": 8,
+                "question": "tirer une boule rouge",
+                "issues_favorables": 5
+            }
+        ]
+        
+        situation = random.choice(situations)
+        
+        probabilite = situation["issues_favorables"] / situation["nb_issues"]
+        probabilite_fraction = Fraction(situation["issues_favorables"], situation["nb_issues"])
+        
+        etapes = [
+            f"Expérience : {situation['contexte']}",
+            f"Nombre d'issues possibles : {situation['nb_issues']}",
+            f"Nombre d'issues favorables ({situation['question']}) : {situation['issues_favorables']}",
+            f"Probabilité = issues favorables / issues possibles",
+            f"Probabilité = {situation['issues_favorables']} / {situation['nb_issues']}",
+            f"Probabilité = {probabilite_fraction} = {probabilite:.2f}"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.PROBABILITES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "contexte": situation["contexte"],
+                "question": situation["question"],
+                "nb_issues": situation["nb_issues"],
+                "issues_favorables": situation["issues_favorables"]
+            },
+            solution_calculee={
+                "probabilite": probabilite,
+                "fraction": f"{probabilite_fraction.numerator}/{probabilite_fraction.denominator}"
+            },
+            etapes_calculees=etapes,
+            resultat_final=f"\\frac{{{probabilite_fraction.numerator}}}{{{probabilite_fraction.denominator}}}"
+        )
+    
+    def _gen_puissances(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Génère un exercice sur les puissances"""
+        
+        type_calcul = random.choice(["calcul_simple", "produit", "quotient"])
+        
+        if type_calcul == "calcul_simple":
+            base = random.randint(2, 10)
+            exposant = random.randint(2, 5) if difficulte == "facile" else random.randint(3, 6)
+            resultat = base ** exposant
+            
+            etapes = [
+                f"Calculer {base}^{{{exposant}}}",
+                f"{base}^{{{exposant}}} = " + " × ".join([str(base)] * exposant),
+                f"{base}^{{{exposant}}} = {resultat}"
+            ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PUISSANCES,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "calcul_simple",
+                    "base": base,
+                    "exposant": exposant
+                },
+                solution_calculee={
+                    "resultat": resultat
+                },
+                etapes_calculees=etapes,
+                resultat_final=resultat
+            )
+        
+        elif type_calcul == "produit":
+            base = random.randint(2, 8)
+            exp1 = random.randint(2, 4)
+            exp2 = random.randint(2, 4)
+            exp_somme = exp1 + exp2
+            resultat = base ** exp_somme
+            
+            etapes = [
+                f"Calculer {base}^{{{exp1}}} × {base}^{{{exp2}}}",
+                "Propriété : a^m × a^n = a^(m+n)",
+                f"{base}^{{{exp1}}} × {base}^{{{exp2}}} = {base}^{{{exp1}+{exp2}}}",
+                f"{base}^{{{exp1}}} × {base}^{{{exp2}}} = {base}^{{{exp_somme}}}",
+                f"{base}^{{{exp_somme}}} = {resultat}"
+            ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PUISSANCES,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "produit",
+                    "base": base,
+                    "exposant1": exp1,
+                    "exposant2": exp2
+                },
+                solution_calculee={
+                    "exposant_somme": exp_somme,
+                    "resultat": resultat
+                },
+                etapes_calculees=etapes,
+                resultat_final=resultat
+            )
+        
+        else:  # quotient
+            base = random.randint(2, 8)
+            exp1 = random.randint(4, 7)
+            exp2 = random.randint(2, exp1-1)  # exp2 < exp1 pour éviter exposants négatifs
+            exp_diff = exp1 - exp2
+            resultat = base ** exp_diff
+            
+            etapes = [
+                f"Calculer {base}^{{{exp1}}} ÷ {base}^{{{exp2}}}",
+                "Propriété : a^m ÷ a^n = a^(m-n)",
+                f"{base}^{{{exp1}}} ÷ {base}^{{{exp2}}} = {base}^{{{exp1}-{exp2}}}",
+                f"{base}^{{{exp1}}} ÷ {base}^{{{exp2}}} = {base}^{{{exp_diff}}}",
+                f"{base}^{{{exp_diff}}} = {resultat}"
+            ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PUISSANCES,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "quotient",
+                    "base": base,
+                    "exposant1": exp1,
+                    "exposant2": exp2
+                },
+                solution_calculee={
+                    "exposant_diff": exp_diff,
+                    "resultat": resultat
+                },
+                etapes_calculees=etapes,
+                resultat_final=resultat
+            )
+
         )
