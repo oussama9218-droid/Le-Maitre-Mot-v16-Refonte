@@ -401,16 +401,23 @@ Résultat : {spec.resultat_final}"""
             return self._fallback_generic(spec)
     
     def _fallback_probabilites(self, spec: MathExerciseSpec) -> MathTextGeneration:
-        """Template fallback pour probabilités"""
-        params = spec.parametres
+        """Template fallback pour probabilités - Robuste"""
         
-        enonce = f"Dans l'expérience suivante : {params['contexte']}, calculer la probabilité de {params['question']}."
-        
-        return MathTextGeneration(
-            enonce=enonce,
-            explication_prof="Exercice de calcul de probabilité",
-            solution_redigee=f"Probabilité = {spec.resultat_final}"
-        )
+        try:
+            params = spec.parametres
+            contexte = params.get('contexte', 'une expérience aléatoire')
+            question = params.get('question', 'un événement')
+            
+            enonce = f"Dans l'expérience suivante : {contexte}, calculer la probabilité de {question}."
+            
+            return MathTextGeneration(
+                enonce=enonce,
+                explication_prof="Exercice de calcul de probabilité",
+                solution_redigee=f"Probabilité = {spec.resultat_final}"
+            )
+        except Exception as e:
+            logger.warning(f"Fallback probabilites échoué, utilisation fallback generic: {e}")
+            return self._fallback_generic(spec)
     
     def _fallback_puissances(self, spec: MathExerciseSpec) -> MathTextGeneration:
         """Template fallback pour puissances"""
