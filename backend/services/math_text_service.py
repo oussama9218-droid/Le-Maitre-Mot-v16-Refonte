@@ -226,30 +226,64 @@ Tu réponds UNIQUEMENT en JSON avec les champs : "enonce", "explication_prof", "
         text: MathTextGeneration, 
         spec: MathExerciseSpec
     ) -> bool:
-        """Valide que la réponse IA respecte les contraintes"""
+        """Valide que la réponse IA respecte les contraintes - VALIDATION STRICTE"""
         
         # Vérifications de base
         if not text.enonce or len(text.enonce.strip()) < 10:
-            logger.warning("Énoncé trop court ou vide")
+            logger.warning("❌ Validation: Énoncé trop court ou vide")
             return False
         
-        # Validation géométrie
+        # VALIDATION GÉOMÉTRIQUE STRICTE (critique pour Thalès)
         if spec.figure_geometrique:
-            points_autorises = spec.figure_geometrique.points
+            points_autorises = set(spec.figure_geometrique.points)
             
-            # Vérifier qu'aucun point non autorisé n'apparaît
-            for letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
-                if letter not in points_autorises and letter in text.enonce:
-                    # Vérifier que c'est vraiment un point géométrique
-                    if f" {letter} " in text.enonce or f"triangle {letter}" in text.enonce:
-                        logger.warning(f"Point non autorisé détecté: {letter}")
-                        return False
+            # Extraire TOUS les points géométriques de l'énoncé et solution
+            import re
+            all_text = text.enonce + (text.solution_redigee or "")
             
-            # Vérifier que les points autorisés sont utilisés
-            points_found = any(point in text.enonce for point in points_autorises)
-            if not points_found:
-                logger.warning("Aucun point géométrique autorisé trouvé dans l'énoncé")
+            # Pattern pour détecter les points : lettres majuscules isolées ou dans des contextes géométriques
+            patterns = [
+                r'\b([A-Z])\b',  # Lettre isolée
+                r'point ([A-Z])',  # "point A"
+                r'segment \[([A-Z])([A-Z])\]',  # "segment [AB]"
+                r'triangle ([A-Z])([A-Z])([A-Z])',  # "triangle ABC"
+                r'\(([A-Z])([A-Z])\)',  # "(AB)"
+                r'droite[s]? \(([A-Z])([A-Z])\)',  # "droite (AB)"
+            ]
+            
+            points_detectes = set()
+            for pattern in patterns:
+                matches = re.findall(pattern, all_text)
+                for match in matches:
+                    if isinstance(match, tuple):
+                        points_detectes.update(m for m in match if m)
+                    else:
+                        points_detectes.add(match)
+            
+            # Filtrer les faux positifs (mots courants avec lettre majuscule)
+            mots_exclus = {'I', 'L', 'On', 'Le', 'La', 'Les', 'Un', 'Une', 'De', 'Du', 'Des'}
+            points_detectes = points_detectes - mots_exclus
+            
+            # Vérifier qu'AUCUN point non autorisé n'est utilisé
+            points_interdits = points_detectes - points_autorises
+            if points_interdits:
+                logger.warning(f"❌ Validation THALÈS: Points NON AUTORISÉS détectés: {points_interdits}")
+                logger.warning(f"   Points autorisés: {points_autorises}")
+                logger.warning(f"   Énoncé: {text.enonce[:100]}...")
                 return False
+            
+            # Vérifier que les points autorisés sont bien utilisés
+            if not points_detectes.intersection(points_autorises):
+                logger.warning(f"❌ Validation: Aucun point autorisé trouvé dans le texte")
+                logger.warning(f"   Points autorisés: {points_autorises}")
+                return False
+            
+            # VALIDATION SPÉCIALE THALÈS : Vérifier que tous les 5 points sont mentionnés
+            if spec.type_exercice.value == "thales" and len(points_autorises) >= 5:
+                points_manquants = points_autorises - points_detectes
+                if len(points_manquants) > 1:  # Tolérer 1 point manquant
+                    logger.warning(f"❌ Validation THALÈS: Points manquants: {points_manquants}")
+                    return False
         
         return True
     
