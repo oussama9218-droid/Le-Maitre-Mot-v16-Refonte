@@ -322,3 +322,66 @@ Résultat : {spec.resultat_final}"""
             explication_prof=f"Exercice de type {spec.type_exercice}",
             solution_redigee=f"Résultat : {spec.resultat_final}"
         )
+
+    
+    def _fallback_volume(self, spec: MathExerciseSpec) -> MathTextGeneration:
+        """Template fallback pour volumes"""
+        params = spec.parametres
+        solide = params["solide"]
+        
+        if solide == "cube":
+            enonce = f"Calculer le volume d'un cube d'arête {params['arete']} cm."
+        elif solide == "pave":
+            enonce = f"Calculer le volume d'un pavé droit de dimensions {params['longueur']} cm × {params['largeur']} cm × {params['hauteur']} cm."
+        elif solide == "cylindre":
+            enonce = f"Calculer le volume d'un cylindre de rayon {params['rayon']} cm et de hauteur {params['hauteur']} cm."
+        else:
+            enonce = f"Calculer le volume du solide donné."
+        
+        return MathTextGeneration(
+            enonce=enonce,
+            explication_prof="Exercice de calcul de volume",
+            solution_redigee=f"Volume = {spec.resultat_final}"
+        )
+    
+    def _fallback_statistiques(self, spec: MathExerciseSpec) -> MathTextGeneration:
+        """Template fallback pour statistiques"""
+        valeurs = spec.parametres["valeurs"]
+        
+        enonce = f"Calculer la moyenne, la médiane et l'étendue de la série : {valeurs}"
+        
+        return MathTextGeneration(
+            enonce=enonce,
+            explication_prof="Exercice de statistiques descriptives",
+            solution_redigee=f"Résultats : {spec.resultat_final}"
+        )
+    
+    def _fallback_probabilites(self, spec: MathExerciseSpec) -> MathTextGeneration:
+        """Template fallback pour probabilités"""
+        params = spec.parametres
+        
+        enonce = f"Dans l'expérience suivante : {params['contexte']}, calculer la probabilité de {params['question']}."
+        
+        return MathTextGeneration(
+            enonce=enonce,
+            explication_prof="Exercice de calcul de probabilité",
+            solution_redigee=f"Probabilité = {spec.resultat_final}"
+        )
+    
+    def _fallback_puissances(self, spec: MathExerciseSpec) -> MathTextGeneration:
+        """Template fallback pour puissances"""
+        params = spec.parametres
+        type_calcul = params["type"]
+        
+        if type_calcul == "calcul_simple":
+            enonce = f"Calculer {params['base']}^{{{params['exposant']}}}."
+        elif type_calcul == "produit":
+            enonce = f"Calculer {params['base']}^{{{params['exposant1']}}} × {params['base']}^{{{params['exposant2']}}}."
+        else:
+            enonce = f"Calculer {params['base']}^{{{params['exposant1']}}} ÷ {params['base']}^{{{params['exposant2']}}}."
+        
+        return MathTextGeneration(
+            enonce=enonce,
+            explication_prof="Exercice sur les puissances",
+            solution_redigee=f"Résultat = {spec.resultat_final}"
+        )
