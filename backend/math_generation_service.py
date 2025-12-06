@@ -708,6 +708,7 @@ class MathGenerationService:
             ],
             resultat_final=f"Périmètre = {perimetre} cm, Aire = {aire} cm²",
             figure_geometrique=figure
+        )
 
     def _gen_volume(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
         """Génère un exercice de calcul de volumes"""
