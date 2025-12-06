@@ -263,7 +263,7 @@ class GeometrySVGRenderer:
         
         # Ajouter les points avec labels SOUS/AU-DESSUS des sommets
         # P (bas-gauche) - label en bas
-        self.add_point(svg, P)
+        self.add_point(svg, P, show_label=False)  # Point sans label automatique
         text_p = ET.SubElement(svg, 'text', {
             'x': str(P.x),
             'y': str(P.y + 18),
@@ -273,7 +273,7 @@ class GeometrySVGRenderer:
         text_p.text = P.label
         
         # Q (haut-gauche) - label en haut
-        self.add_point(svg, Q)
+        self.add_point(svg, Q, show_label=False)
         text_q = ET.SubElement(svg, 'text', {
             'x': str(Q.x),
             'y': str(Q.y - 8),
@@ -283,7 +283,7 @@ class GeometrySVGRenderer:
         text_q.text = Q.label
         
         # R (haut-droite) - label en haut
-        self.add_point(svg, R)
+        self.add_point(svg, R, show_label=False)
         text_r = ET.SubElement(svg, 'text', {
             'x': str(R.x),
             'y': str(R.y - 8),
@@ -293,7 +293,7 @@ class GeometrySVGRenderer:
         text_r.text = R.label
         
         # S (bas-droite) - label en bas
-        self.add_point(svg, S)
+        self.add_point(svg, S, show_label=False)
         text_s = ET.SubElement(svg, 'text', {
             'x': str(S.x),
             'y': str(S.y + 18),
