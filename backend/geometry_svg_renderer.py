@@ -218,7 +218,13 @@ class GeometrySVGRenderer:
         # Paramètres
         longueur = data.get('longueur', 120)
         largeur = data.get('largeur', 80)
-        points = data.get('points', ['P', 'Q', 'R', 'S'])  # Éviter ABC par défaut
+        points_input = data.get('points', ['P', 'Q', 'R', 'S'])
+        
+        # S'assurer qu'on a 4 points
+        if len(points_input) < 4:
+            points = ['P', 'Q', 'R', 'S']
+        else:
+            points = points_input
         
         # Centrer le rectangle
         start_x = (self.width - longueur) / 2
