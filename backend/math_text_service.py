@@ -252,7 +252,10 @@ Tu réponds UNIQUEMENT en JSON avec les champs : "enonce", "explication_prof", "
             "triangle_rectangle": self._fallback_triangle_rectangle,
             "calcul_relatifs": self._fallback_calcul_relatifs,
             "equation_1er_degre": self._fallback_equation,
-            # Ajouter d'autres templates
+            "volume": self._fallback_volume,
+            "statistiques": self._fallback_statistiques,
+            "probabilites": self._fallback_probabilites,
+            "puissances": self._fallback_puissances
         }
         
         template_key = spec.type_exercice.value
