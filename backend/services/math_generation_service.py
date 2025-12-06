@@ -676,7 +676,10 @@ class MathGenerationService:
     
     def _gen_rectangle(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
         """Générateur pour rectangles"""
-        points = self._get_next_geometry_points()[:4]  # P, Q, R, S par défaut
+        # Obtenir 2 sets de points (3+3 = 6 points, on en utilisera 4)
+        points_set1 = self._get_next_geometry_points()  # A, B, C
+        points_set2 = self._get_next_geometry_points()  # D, E, F
+        points = points_set1 + [points_set2[0]]  # A, B, C, D (4 points pour rectangle)
         
         longueur = random.randint(8, 20)
         largeur = random.randint(4, 12)
