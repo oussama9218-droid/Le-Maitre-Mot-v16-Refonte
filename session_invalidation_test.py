@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 
 class SessionInvalidationTester:
-    def __init__(self, base_url="https://lemaitremot-1.preview.emergentagent.com"):
+    def __init__(self, base_url="https://reliable-calc.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0

@@ -1,76 +1,116 @@
-<analysis>
-The trajectory outlines an intensive development and debugging cycle for the Le Maître Mot application. The initial task was to provide a comprehensive summary of the existing project, which features a FastAPI backend and a React frontend for AI-powered educational content generation.
+<analysis>**original_problem_statement:**
+The user has requested a complete architectural refactoring of the mathematics exercise generation system. The current approach, which relies on an AI model for both mathematical logic (calculations, geometry) and text generation, has proven unreliable, leading to calculation errors, malformed JSON responses, and inconsistent geometric figures where the schema does not match the exercise text.
 
-The core of the work involved three major, sequential feature implementations requested by the user:
-1.  **Subject Expansion**: Integrating Physique-Chimie and SVT by updating  and adding subject-specific AI prompts in .
-2.  **Architectural Overhaul**: Implementing a feature flag system to support the entire French curriculum (23 subjects). This introduced a new  file, refactored  and  endpoints, and updated the React frontend to display subject statuses (e.g., active, coming_soon). This phase was followed by significant debugging to resolve  issues caused by incorrect prompt logic flow.
-3.  **Advanced Geography Module**: Creating a sophisticated system to automatically find and attach rights-free educational documents (maps) to Geography exercises. This required a new  module and further integration into .
+**PRODUCT REQUIREMENTS:**
+The new architecture must separate the mathematical logic from the text generation.
 
-The final phase has been a series of rapid bug-fix cycles for the Geography feature. Issues addressed include a  caused by a validation conflict between the new and old curriculum systems, implementing the missing frontend/PDF display logic for documents, refining document selection to be context-aware, and finally, diagnosing that the documents fail to display because their cached URLs are invalid and return 404 errors.
-</analysis>
+1.  **Backend Logic (Python, No AI):**
+    *   A new service () will programmatically generate a structured .
+    *   This spec will contain all mathematical parameters (numbers, lengths, points), perform all calculations, and determine the correct solution without AI involvement. This applies to all math types, including geometry.
+    *   For geometry, this spec will be the single source of truth for points, lengths, and relationships.
 
-<product_requirements>
-Le Maître Mot is an AI-driven web application for French educators to generate custom exercises. Initially focused on Mathematics, the platform has undergone significant expansion.
+2.  **AI for Text Generation Only:**
+    *   A new service () will receive the .
+    *   It will then call an AI with a strict prompt, instructing it only to write a natural language  (problem statement) and solution explanation based on the provided spec.
+    *   The AI will be strictly forbidden from altering any numbers, points, or results.
 
-**Core Functionality:**
-*   **AI Content Generation (GPT-4o):** Creates exercises and solutions based on the French national curriculum.
-*   **Freemium Model:** A free tier with limits and a Pro subscription (Stripe) unlocking advanced features.
-*   **PDF/DOCX Export:** Pro users can export content using customizable templates with school logos.
+3.  **Recombination & Fallback:**
+    *   The  endpoint will combine the Python-generated spec (for data) and the AI-generated text () into the final  model.
+    *   A fallback mechanism must be implemented. If the AI fails, the backend will generate a simple, templated  from the spec to ensure the feature remains 100% functional.
 
-**Recent Implementations & Vision:**
-The product vision has expanded to become a comprehensive platform for the entire French curriculum.
-1.  **Multi-Subject Support:** The application now actively supports **Mathématiques, Physique-Chimie, and SVT**, with specialized AI prompts for each.
-2.  **Feature Flag System:** A robust backend system has been implemented to manage the rollout of all 23 official subjects. The frontend displays the full catalog, visually indicating which subjects are active, coming soon, or in development, creating a clear product roadmap for users.
-3.  **Advanced Document Integration (Géographie):** For the Geography subject, a new system automatically searches for and embeds relevant, rights-free educational documents (e.g., maps from Wikimedia Commons) directly into the generated exercises, complete with licensing information.
-</product_requirements>
+**User's preferred language**: French
 
-<key_technical_concepts>
-- **Backend:** FastAPI (Python), MongoDB, Pydantic, WeasyPrint (PDFs).
-- **Frontend:** React, shadcn/ui components.
-- **AI & Integrations:** GPT-4o via .
-- **Architecture:**
-    - **Feature Flags:** A dictionary-based system in  controls subject availability (, , etc.) without requiring redeployment.
-    - **Dynamic AI Prompts:**  uses a dictionary () to select specialized prompts based on the chosen subject, with a generic fallback for newly activated subjects.
-    - **Automated Document Search:** A two-pass system for Geography first generates the exercise text, then uses keywords to search and attach a relevant map from a cached/validated list or via the Wikimedia Commons API.
-</key_technical_concepts>
+**what currently exists?**
+The application is a FastAPI backend with a React frontend. It uses an AI-driven, two-pass system for generating educational exercises. This system has proven unreliable for mathematics, causing inconsistencies.
 
-<code_architecture>
-The application uses a standard monolith architecture with a separate frontend and backend.
+A significant amount of work was recently done to debug and improve two main features:
+1.  **Geography Document Attachment**: Fixed 404 errors with image URLs and improved the AI prompts to ensure diverse and relevant maps are attached to exercises.
+2.  **Geometry Schema Rendering**: Replaced an old Matplotlib-based renderer with a new, high-quality pure SVG renderer () to improve visual quality. However, persistent issues with the AI generating mismatched exercise text and schemas led to the current major refactoring task.
+
+**Last working item**:
+- **Last item agent was working**: The agent began the major architectural refactoring of the mathematics exercise generation system. It created the foundational files for the new architecture: , , and . The agent was in the process of integrating these new services by adding the necessary imports into .
+- **Status**: IN PROGRESS
+- **Agent Testing Done**: N
+- **Which testing method agent to use?**: backend testing agent. This is a major backend refactor. It will require  once the new pipeline is fully implemented. Manual  tests will be necessary during development to validate each component of the new architecture.
+- **User Testing Done**: N
+
+**All Pending/In progress Issue list**:
+There are no separate pending issues. All previously reported problems related to mathematical and geometrical inconsistencies are being addressed by the primary ongoing task.
+
+**In progress Task List**:
+- **Task 1**: Refactor Math Generation Logic (Priority: P0)
+    - **Where to resume**: The agent has created the new files (, , ) and added the necessary imports to . The next step is to implement the core logic within these new service files and then replace the old math generation logic in the  endpoint with this new, robust pipeline.
+    - **What will be achieved with this?**: This will create a reliable and predictable math exercise generation system. By having Python handle all mathematical logic and calculations, it will eliminate the frequent AI-related errors, such as incorrect calculations and mismatched geometric schemas. The AI's role will be reduced to only text generation, which it is better suited for.
+    - **Status**: IN PROGRESS
+    - **Should Test frontend/backend/both after fix?**: backend
+    - **Blocked on something**: No
+
+**Upcoming and Future Tasks**
+- No other tasks are planned. The current refactoring is the sole focus.
+
+**Completed work in this session**
+- **Geography Document Feature (DONE)**:
+  - Fixed 404 errors for map images by updating URLs in .
+  - Resolved an issue of repetitive maps by implementing a more detailed AI prompt in  to force diversification of requested map types.
+  - Implemented a tracking system () to prevent duplicate maps in a single generation request.
+- **Backend Stability (DONE)**:
+  - Fixed a critical backend startup failure by installing missing  system dependencies for the WeasyPrint library, which resolved an issue where the subject list appeared empty.
+- **Geometry Schema Generation (Refactored & Stabilized)**:
+  - Replaced the old Matplotlib-based renderer with a new, higher-quality pure SVG renderer in  to match the MathALÉA quality standard.
+  - Resolved a frontend timeout error by increasing the request timeout in .
+  - Fixed multiple JSON parsing errors caused by invalid escape characters in the AI's response by implementing a more robust JSON cleaning function in .
+  - Addressed the critical issue of schemas not matching exercise text (e.g., text mentions triangle DEF, schema shows A,B,C) by correcting AI prompts and removing hardcoded default point names from renderer functions.
+
+**Earlier issues found/mentioned but not fixed**
+- All previously identified issues, particularly the unreliability of AI for mathematical logic, are the direct motivation for the current refactoring task and are therefore being addressed.
+
+**Known issue recurrence from previous fork**
+- The issue of two-pass AI generation for geometric schemas being unreliable has been a recurring theme. The previous fixes were incremental. The current architectural refactor is the definitive solution designed to eliminate this class of problems permanently.
+
+**Code Architecture**
 
 
+**Key Technical Concepts**
+- **Backend**: FastAPI, MongoDB, Pydantic.
+- **Frontend**: React.
+- **AI & Integrations**: GPT-4o via .
+- **Architecture**:
+    - **Separation of Concerns for Math Generation (New)**: A hybrid approach where the backend (Python) handles all mathematical logic, calculations, and solution generation, while the AI is used exclusively for natural language text generation (problem statements and explanations).
+    - **Feature Flags**: A dictionary-based system in  manages subject availability.
+    - **Automated Document Search**: A system for Geography that generates an exercise and then attaches a relevant map from a validated cache.
+    - **High-Quality SVG Rendering**: A pure SVG generation engine for geometric schemas to ensure professional, vector-based output.
 
-- ****: The core FastAPI application. It was heavily modified to:
-    - Integrate the feature flag system, refactoring the  and  endpoints to check subject status from .
-    - Implement dynamic AI prompt selection logic for different subjects.
-    - Integrate the  module to attach documents to Geography exercises.
-    - Add logging for the document attachment process in the PDF export logic.
-    - Fix a Pydantic model name conflict by renaming the  field to .
+**All files of reference**
+- **Created in this session**:
+    - : Defines the Pydantic models for the new math generation architecture, like .
+    - : Will contain the Python-only logic for generating math problems and solutions.
+    - : Will contain the logic to call the AI for text generation based on the spec.
+    - : A new module for rendering high-quality, MathALÉA style geometric figures as pure SVG.
+- **Updated in this session**:
+    - : Heavily modified to fix bugs in geography and geometry generation. Currently being refactored to integrate the new math generation services.
+    - : URLs and logic updated to fix geography map issues.
+    - : Generation timeout increased from 30s to 60s.
 
-- ****: Originally stored the curriculum for Mathematics. It was updated to include data for Physique-Chimie and SVT. It now represents the data source for subjects that were active before the feature flag system.
+**Critical Info for New Agent**
+The core task is to complete the major architectural refactor of the mathematics generation system. The old, unreliable AI-driven logic is being replaced by a new hybrid system where Python handles all the math. You must follow the user's detailed specification for this refactor. The foundational files have been created, and your next job is to implement the logic inside them and wire everything together in .
 
-- ****: A new file that is central to the platform's multi-subject strategy. It contains the  dictionary, which defines the status (, , etc.), description, and curriculum data for all 23 subjects of the French educational system.
+**Last 10 User Messages and any pending user messages**
+The user provided an extremely detailed, multi-page prompt outlining a new architectural design for generating mathematics exercises. The core principle is to separate mathematical logic (to be handled by Python code) from text generation (the AI's only remaining role). The user then gave the go command to begin implementation. The agent has started this implementation. All subsequent messages are from the agent detailing its progress. The user's directive is clear: implement the new architecture as specified.
 
-- ****: A new module created to implement the advanced Geography feature. It handles the logic for searching educational documents, primarily from a pre-validated cache of maps with keywords, and includes a (currently unused) framework for querying the Wikimedia Commons API as a fallback. It was updated to include more specific maps and a content analysis function to select the most relevant one.
+**Project Health Check:**
+- **Broken**: The mathematics generation feature is currently broken as it is in the middle of a major architectural refactor.
+- **Mocked**: No components are mocked.
 
-- ****: The React component for previewing generated exercises. It was modified to display the educational document attached to Geography exercises, including its title, image, and attribution notice. This was a critical addition to complete the feature on the user-facing side.
+**3rd Party Integrations**
+- **OpenAI GPT-4o**: Uses Emergent LLM Key for exercise and text generation.
 
-- ****: The Jinja2 templates for PDF exports. All relevant templates (, , etc.) were updated with a new section and CSS to conditionally render the attached educational document and its attribution information if present in the exercise data.
-</code_architecture>
+**Testing status**
+- **Testing agent used after significant changes**: YES. The agent used backend API tests and log analysis extensively to debug issues with geography and geometry generation.
+- **Troubleshoot agent used after agent stuck in loop**: NO.
+- **Test files created**:
+    - 
+    - 
+    - 
 
-<pending_tasks>
-- **Original Deferred Tasks:** The two-pass AI generation for geometric schemas and the implementation of general analytics/testing remain unaddressed as development focus shifted to major feature expansions.
-</pending_tasks>
-
-<current_work>
-The most recent work focuses on debugging the Advanced Geography Module. After successfully implementing the backend logic for document search and the frontend/PDF logic for display, two user-reported issues arose:
-
-1.  **Repetitive Documents:** The system always attached the same generic world map regardless of the exercise content. This was addressed by implementing an intelligent document system in . This system analyzes keywords in the exercise text (e.g., Tokyo, New York) to select a more contextually appropriate map from an expanded cache.
-
-2.  **Documents Not Displaying:** Following the previous fix, the user reported that no documents were being displayed at all (pas de document affiché). The metadata (title, license) was visible, but the image itself was broken.
-
-Investigation revealed the root cause: the URLs for the maps stored in the  within  are invalid and return **404 Not Found** errors. The immediate task is to fix these broken image URLs.
-</current_work>
-
-<optional_next_step>
-Correct the invalid image URLs in the  within  to resolve the 404 errors and ensure geography documents are displayed correctly.
-</optional_next_step>
+**What agent forgot to execute**
+The agent correctly understood and began implementing the user's latest and most critical request for a full architectural refactor. Nothing was forgotten; the task is simply large and in progress.</analysis>
