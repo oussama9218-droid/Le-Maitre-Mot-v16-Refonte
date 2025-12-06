@@ -2285,6 +2285,84 @@ JSON OBLIGATOIRE:
         logger.error(f"Error generating exercises: {e}")
         return await generate_fallback_exercises(matiere, niveau, chapitre, difficulte, nb_exercices)
 
+
+async def generate_math_exercises_new_architecture(
+    niveau: str, 
+    chapitre: str, 
+    difficulte: str, 
+    nb_exercices: int
+) -> List[Exercise]:
+    """
+    Nouvelle architecture pour génération d'exercices mathématiques
+    Sépare complètement logique mathématique (Python) de la rédaction (IA)
+    """
+    logger = get_logger()
+    logger.info(
+        "🎯 NOUVELLE ARCHITECTURE MATHÉMATIQUES - Démarrage",
+        module_name="math_generation",
+        func_name="generate_math_exercises_new_architecture",
+        niveau=niveau,
+        chapitre=chapitre,
+        difficulte=difficulte,
+        nb_exercices=nb_exercices
+    )
+    
+    try:
+        # ÉTAPE 1: Génération des specs mathématiques (Python pur, pas d'IA)
+        logger.info("📊 ÉTAPE 1: Génération specs mathématiques (Python)")
+        math_service = MathGenerationService()
+        specs = math_service.generate_math_exercise_specs(
+            niveau=niveau,
+            chapitre=chapitre,
+            difficulte=difficulte,
+            nb_exercices=nb_exercices
+        )
+        
+        logger.info(f"✅ {len(specs)} specs mathématiques générées")
+        
+        # ÉTAPE 2: Génération des textes IA (IA uniquement pour rédaction)
+        logger.info("✍️ ÉTAPE 2: Génération textes IA (rédaction uniquement)")
+        text_service = MathTextService()
+        generated_exercises = await text_service.generate_text_for_specs(specs)
+        
+        logger.info(f"✅ {len(generated_exercises)} exercices avec texte générés")
+        
+        # ÉTAPE 3: Conversion vers le format Exercise existant
+        logger.info("🔄 ÉTAPE 3: Conversion vers format Exercise")
+        exercises = []
+        
+        for gen_ex in generated_exercises:
+            exercise_dict = gen_ex.to_exercise_dict()
+            
+            # Enrichir avec geometric_schema si nécessaire
+            if gen_ex.spec.figure_geometrique:
+                # Utiliser le nouveau renderer SVG
+                try:
+                    from geometry_svg_renderer import render_svg_schema
+                    svg_data = render_svg_schema(gen_ex.spec.figure_geometrique)
+                    exercise_dict["geometric_schema_svg"] = svg_data
+                except Exception as e:
+                    logger.warning(f"SVG rendering failed: {e}")
+            
+            # Créer l'objet Exercise
+            exercise = Exercise(**exercise_dict)
+            exercises.append(exercise)
+        
+        logger.info(f"✅ Conversion terminée - {len(exercises)} exercices prêts")
+        logger.info("🎉 NOUVELLE ARCHITECTURE - Génération réussie")
+        
+        return exercises
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur nouvelle architecture: {e}", exc_info=True)
+        logger.info("🔄 Fallback vers ancien système")
+        
+        # Fallback vers l'ancien système si échec
+        return await generate_fallback_exercises(
+            "Mathématiques", niveau, chapitre, difficulte, nb_exercices
+        )
+
+
 async def generate_fallback_exercises(matiere: str, niveau: str, chapitre: str, difficulte: str, nb_exercices: int) -> List[Exercise]:
     """Generate quick fallback exercises"""
     exercises = []
