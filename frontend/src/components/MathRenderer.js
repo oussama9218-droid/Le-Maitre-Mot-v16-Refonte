@@ -3,7 +3,22 @@ import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 
 const MathRenderer = ({ content, className = "" }) => {
-  if (!content) return null;
+  // Protection critique : afficher un message d'erreur visible si pas de contenu
+  if (!content) {
+    console.error("⚠️ MathRenderer: Contenu vide ou undefined reçu");
+    return (
+      <div className={`math-renderer-error ${className}`} style={{
+        padding: '12px',
+        backgroundColor: '#fff3cd',
+        border: '1px solid #ffc107',
+        borderRadius: '4px',
+        color: '#856404',
+        fontSize: '14px'
+      }}>
+        ⚠️ Erreur : Énoncé manquant ou vide. Veuillez regénérer l'exercice.
+      </div>
+    );
+  }
 
   // Regular expressions for LaTeX patterns
   const LATEX_PATTERNS = {
