@@ -381,16 +381,24 @@ Résultat : {spec.resultat_final}"""
             return self._fallback_generic(spec)
     
     def _fallback_statistiques(self, spec: MathExerciseSpec) -> MathTextGeneration:
-        """Template fallback pour statistiques"""
-        valeurs = spec.parametres["valeurs"]
+        """Template fallback pour statistiques - Robuste"""
         
-        enonce = f"Calculer la moyenne, la médiane et l'étendue de la série : {valeurs}"
-        
-        return MathTextGeneration(
-            enonce=enonce,
-            explication_prof="Exercice de statistiques descriptives",
-            solution_redigee=f"Résultats : {spec.resultat_final}"
-        )
+        try:
+            valeurs = spec.parametres.get("valeurs", None)
+            
+            if valeurs:
+                enonce = f"Calculer la moyenne, la médiane et l'étendue de la série : {valeurs}"
+            else:
+                return self._fallback_generic(spec)
+            
+            return MathTextGeneration(
+                enonce=enonce,
+                explication_prof="Exercice de statistiques descriptives",
+                solution_redigee=f"Résultats : {spec.resultat_final}"
+            )
+        except Exception as e:
+            logger.warning(f"Fallback statistiques échoué, utilisation fallback generic: {e}")
+            return self._fallback_generic(spec)
     
     def _fallback_probabilites(self, spec: MathExerciseSpec) -> MathTextGeneration:
         """Template fallback pour probabilités"""
