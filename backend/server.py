@@ -1469,10 +1469,16 @@ Réponds UNIQUEMENT avec le JSON complet, JAMAIS null pour un énoncé géométr
 
 @log_execution_time("generate_exercises_with_ai")
 async def generate_exercises_with_ai(matiere: str, niveau: str, chapitre: str, type_doc: str, difficulte: str, nb_exercices: int) -> List[Exercise]:
-    """Generate exercises using AI"""
+    """Generate exercises using AI - New architecture for Mathématiques"""
     logger = get_logger()
     
-    # 🎯 RESET DIVERSITY TRACKING for new document generation
+    # 🎯 NOUVELLE ARCHITECTURE MATHÉMATIQUES
+    if matiere == "Mathématiques":
+        return await generate_math_exercises_new_architecture(
+            niveau, chapitre, difficulte, nb_exercices
+        )
+    
+    # 🎯 RESET DIVERSITY TRACKING for new document generation (autres matières)
     if hasattr(generate_exercises_with_ai, 'used_document_types'):
         generate_exercises_with_ai.used_document_types = []
     
