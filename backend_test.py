@@ -13614,6 +13614,16 @@ if __name__ == "__main__":
             success, results = tester.test_geography_document_fix()
             print(f"\n🗺️ Geography Document Fix Test: {'PASSED' if success else 'FAILED'}")
             sys.exit(0 if success else 1)
+        elif test_mode == "nouvelle-architecture":
+            # Run Nouvelle Architecture Mathématiques tests
+            print("🎯 RUNNING NOUVELLE ARCHITECTURE MATHÉMATIQUES TESTS")
+            success, results = tester.test_nouvelle_architecture_mathematiques()
+            print(f"\n🎯 Nouvelle Architecture Mathématiques Test: {'PASSED' if success else 'FAILED'}")
+            if not success:
+                print("🚨 CRITICAL ISSUES DETECTED:")
+                for issue in results.get('all_issues', []):
+                    print(f"   - {issue}")
+            sys.exit(0 if success else 1)
         elif test_mode == "race-condition":
             # Legacy support for race condition tests
             run_magic_link_race_condition_tests()
