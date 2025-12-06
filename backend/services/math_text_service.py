@@ -299,18 +299,27 @@ Résultat : {spec.resultat_final}"""
         )
     
     def _fallback_calcul_relatifs(self, spec: MathExerciseSpec) -> MathTextGeneration:
-        """Template fallback pour calculs relatifs"""
+        """Template fallback pour calculs relatifs - Robuste"""
         
-        expression = spec.parametres["expression"]
-        
-        enonce = f"Calculer : {expression}"
-        solution = f"Résultat : {spec.resultat_final}"
-        
-        return MathTextGeneration(
-            enonce=enonce,
-            explication_prof="Exercice de calcul avec nombres relatifs",
-            solution_redigee=solution
-        )
+        try:
+            expression = spec.parametres.get("expression", None)
+            
+            if expression:
+                enonce = f"Calculer : {expression}"
+            else:
+                # Fallback vers generic si pas d'expression
+                return self._fallback_generic(spec)
+            
+            solution = f"Résultat : {spec.resultat_final}"
+            
+            return MathTextGeneration(
+                enonce=enonce,
+                explication_prof="Exercice de calcul avec nombres relatifs",
+                solution_redigee=solution
+            )
+        except Exception as e:
+            logger.warning(f"Fallback calcul_relatifs échoué, utilisation fallback generic: {e}")
+            return self._fallback_generic(spec)
     
     def _fallback_equation(self, spec: MathExerciseSpec) -> MathTextGeneration:
         """Template fallback pour équations"""
