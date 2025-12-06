@@ -1066,6 +1066,7 @@ class MathGenerationService:
                 },
                 etapes_calculees=etapes,
                 resultat_final=resultat
+            )
 
     def _gen_cercle(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
         """Génère un exercice sur les cercles (périmètre, aire)"""
