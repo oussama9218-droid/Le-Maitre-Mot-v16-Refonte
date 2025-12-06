@@ -439,6 +439,106 @@ class GeometrySVGRenderer:
         self.add_dimension_label(svg, rayon_line, f"r = {rayon} cm", 15)
         
         return ET.tostring(svg, encoding='unicode')
+    
+    def render_thales(self, data: Dict[str, Any]) -> str:
+        """Rendu d'une configuration de Thalès de qualité MathALÉA"""
+        svg = self.create_svg_root()
+        
+        # Paramètres : 5 points minimum (A, B, C pour le triangle principal, D sur AB, E sur AC)
+        points_names = data.get('points', ['D', 'E', 'F', 'M', 'N'])
+        if len(points_names) < 5:
+            # Fallback si pas assez de points
+            return self.render_triangle(data)
+        
+        # Extraire les longueurs connues
+        longueurs = data.get('longueurs_connues', {})
+        
+        # Triangle principal : points A, B, C (premiers 3 points)
+        A_name, B_name, C_name = points_names[0], points_names[1], points_names[2]
+        D_name, E_name = points_names[3], points_names[4]  # Points intermédiaires
+        
+        # Calculer les positions
+        # Triangle principal au centre
+        center_x, center_y = self.width/2, self.height/2
+        
+        # Point A (sommet)
+        A = Point(center_x, center_y - 80, A_name)
+        
+        # Configuration : D sur [AB], E sur [AC]
+        # Pour simplifier, créons un triangle avec B et C écartés
+        B = Point(center_x - 90, center_y + 60, B_name)
+        C = Point(center_x + 90, center_y + 60, C_name)
+        
+        # Calculer les positions de D et E selon les longueurs connues
+        # D est sur [AB] : AD / AB détermine sa position
+        AD_key = f"{A_name}{D_name}"
+        DB_key = f"{D_name}{B_name}"
+        
+        if AD_key in longueurs and DB_key in longueurs:
+            AD = longueurs[AD_key]
+            DB = longueurs[DB_key]
+            AB = AD + DB
+            ratio_D = AD / AB
+        else:
+            ratio_D = 0.4  # Ratio par défaut
+        
+        # Position de D sur [AB]
+        D = Point(
+            A.x + ratio_D * (B.x - A.x),
+            A.y + ratio_D * (B.y - A.y),
+            D_name
+        )
+        
+        # E est sur [AC] : AE / AC détermine sa position
+        AE_key = f"{A_name}{E_name}"
+        EC_key = f"{E_name}{C_name}"
+        
+        if AE_key in longueurs and EC_key in longueurs:
+            AE = longueurs[AE_key]
+            EC = longueurs[EC_key]
+            AC = AE + EC
+            ratio_E = AE / AC
+        else:
+            ratio_E = ratio_D  # Même ratio pour Thalès
+        
+        # Position de E sur [AC]
+        E = Point(
+            A.x + ratio_E * (C.x - A.x),
+            A.y + ratio_E * (C.y - A.y),
+            E_name
+        )
+        
+        # Dessiner le triangle principal ABC
+        lines_triangle = [
+            Line(A, B),
+            Line(A, C),
+            Line(B, C)
+        ]
+        
+        for line in lines_triangle:
+            self.add_line(svg, line)
+        
+        # Dessiner le segment DE (parallèle à BC)
+        line_DE = Line(D, E, color="#FF6600", width=2.0)  # En orange pour le distinguer
+        self.add_line(svg, line_DE)
+        
+        # Ajouter tous les points avec labels
+        for point in [A, B, C, D, E]:
+            self.add_point(svg, point)
+        
+        # Ajouter les cotes si demandées
+        segments = data.get('segments', [])
+        point_map = {A_name: A, B_name: B, C_name: C, D_name: D, E_name: E}
+        
+        for segment in segments:
+            if len(segment) >= 3:
+                p1_name, p2_name, props = segment[0], segment[1], segment[2]
+                longueur = props.get('longueur')
+                if longueur and p1_name in point_map and p2_name in point_map:
+                    line = Line(point_map[p1_name], point_map[p2_name])
+                    self.add_dimension_label(svg, line, f"{longueur}")
+        
+        return ET.tostring(svg, encoding='unicode')
 
 # Instance globale
 geometry_svg_renderer = GeometrySVGRenderer()
