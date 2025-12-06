@@ -132,25 +132,48 @@ class TestSVGGeneration:
         print(f"✅ Cercle: {len(svg)} caractères, rayon {rayon_math} cm bien affiché")
     
     def test_rectangle_svg(self):
-        """Test SVG pour rectangles"""
+        """Test SVG pour rectangles/carrés - Vérifie le rendu optimisé mobile"""
         specs = self.math_service.generate_math_exercise_specs(
-            niveau="6e",
-            chapitre="Périmètres et aires",
+            niveau="5e",
+            chapitre="Aires et périmètres",
             difficulte="facile",
-            nb_exercices=1
+            nb_exercices=10  # Générer plusieurs pour avoir un rectangle
         )
         
         assert len(specs) > 0
-        spec = specs[0]
         
-        if spec.figure_geometrique:
-            assert spec.figure_geometrique.type in ["rectangle", "cercle"]
-            
-            svg = geometry_render_service.render_figure_to_svg(spec.figure_geometrique)
+        # Trouver un exercice de rectangle
+        rect_spec = None
+        for spec in specs:
+            if spec.figure_geometrique and spec.figure_geometrique.type == "rectangle":
+                rect_spec = spec
+                break
+        
+        if rect_spec:
+            svg = geometry_render_service.render_figure_to_svg(rect_spec.figure_geometrique)
             assert svg is not None
             assert len(svg) > 0
             
-            print(f"✅ Rectangle/Carré/Cercle: {len(svg)} caractères")
+            # Vérifications structure rectangle
+            assert '<line' in svg, "Pas de lignes"
+            assert svg.count('<line') == 4, "Devrait avoir 4 côtés"
+            assert '<circle' in svg, "Pas de points"
+            assert svg.count('<circle') == 4, "Devrait avoir 4 sommets"
+            assert '<text' in svg, "Pas de labels"
+            assert svg.count('<text') >= 6, "Devrait avoir au moins 6 textes (4 points + 2 longueurs)"
+            
+            # Vérifier que les dimensions sont affichées
+            longueurs = rect_spec.figure_geometrique.longueurs_connues
+            if longueurs:
+                # Au moins une dimension devrait être dans le SVG
+                dimension_found = False
+                for val in longueurs.values():
+                    if f"{val} cm" in svg:
+                        dimension_found = True
+                        break
+                assert dimension_found, "Aucune dimension trouvée dans le SVG"
+            
+            print(f"✅ Rectangle/Carré: {len(svg)} caractères, 4 sommets distincts")
     
     def test_triangle_quelconque_svg(self):
         """Test SVG pour triangles quelconques"""
