@@ -9,7 +9,7 @@ import logging
 from typing import List, Optional
 from math_models import MathExerciseSpec, MathTextGeneration, GeneratedMathExercise
 from utils import get_emergent_key
-from server import LlmChat, UserMessage
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 logger = logging.getLogger(__name__)
 
