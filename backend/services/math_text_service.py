@@ -90,6 +90,13 @@ class MathTextService:
             
             # Valider la réponse
             if self._validate_ai_response(text_generation, spec):
+                # Normaliser les symboles mathématiques
+                text_generation.enonce = normalizer.normalize_math_symbols(text_generation.enonce)
+                text_generation.solution_redigee = normalizer.normalize_math_symbols(text_generation.solution_redigee)
+                
+                # Supprimer les prénoms personnels si présents
+                text_generation.enonce = normalizer.remove_personal_names(text_generation.enonce)
+                
                 return text_generation
             else:
                 raise ValueError("Réponse IA invalide après validation")
