@@ -1090,6 +1090,13 @@ class MathGenerationService:
                 f"Périmètre ≈ {perimetre} cm"
             ]
             
+            # Créer la figure géométrique
+            figure = GeometricFigure(
+                type="cercle",
+                points=["O"],
+                longueurs_connues={"rayon": rayon}
+            )
+            
             return MathExerciseSpec(
                 niveau=niveau,
                 chapitre=chapitre,
@@ -1104,7 +1111,8 @@ class MathGenerationService:
                     "unite": "cm"
                 },
                 etapes_calculees=etapes,
-                resultat_final=f"{perimetre} cm"
+                resultat_final=f"{perimetre} cm",
+                figure_geometrique=figure
             )
         
         elif type_calcul == "aire":
