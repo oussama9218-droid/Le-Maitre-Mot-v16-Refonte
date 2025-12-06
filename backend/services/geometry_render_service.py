@@ -136,20 +136,21 @@ class GeometryRenderService:
     def _render_thales(self, figure: GeometricFigure) -> str:
         """Rendu d'une configuration de Thalès"""
         
-        # Configuration Thalès: triangle ABC avec DE // BC
-        # Points: A, B, C, D (sur AB), E (sur AC)
+        # Configuration Thalès: triangle DEF avec MN // EF
+        # Points: D, E, F (triangle principal), M (sur DE), N (sur DF)
         
         if len(figure.points) < 5:
             logger.warning("Configuration Thalès nécessite 5 points minimum")
             return self._render_triangle(figure)  # Fallback
         
-        # Pour l'instant, on utilise le rendu de triangle de base
-        # TODO: Créer un rendu spécifique pour Thalès avec les parallèles
+        # Préparer les données pour le renderer Thalès
         data = {
-            "points": figure.points[:3],  # Triangle principal ABC
-            "type": "quelconque"
+            "points": figure.points[:5],  # Les 5 points : D, E, F, M, N
+            "longueurs_connues": figure.longueurs_connues,
+            "proprietes": figure.proprietes
         }
         
+        # Préparer les segments avec longueurs pour les cotes
         segments = []
         for seg_name, longueur in figure.longueurs_connues.items():
             if len(seg_name) == 2:
@@ -158,7 +159,7 @@ class GeometryRenderService:
         
         data["segments"] = segments
         
-        return self.renderer.render_triangle(data)
+        return self.renderer.render_thales(data)
 
 
 # Instance globale
