@@ -1344,5 +1344,3 @@ class MathGenerationService:
             resultat_final=f"{resultat} cm",
             figure_geometrique=figure
         )
-
-            )
