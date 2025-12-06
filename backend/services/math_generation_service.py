@@ -640,6 +640,18 @@ class MathGenerationService:
             perimetre = 4 * cote
             aire = cote * cote
             
+            # Créer la figure géométrique du carré (rectangle avec longueur = largeur)
+            points = self._get_next_geometry_points()[:4]
+            figure = GeometricFigure(
+                type="rectangle",
+                points=points,
+                longueurs_connues={
+                    f"{points[0]}{points[1]}": cote,
+                    f"{points[1]}{points[2]}": cote
+                },
+                proprietes=["carre", "rectangle"]
+            )
+            
             return MathExerciseSpec(
                 niveau=niveau,
                 chapitre=chapitre,
@@ -658,7 +670,8 @@ class MathGenerationService:
                     f"Périmètre = 4 × {cote} = {perimetre} cm",
                     f"Aire = {cote}² = {aire} cm²"
                 ],
-                resultat_final=f"Périmètre = {perimetre} cm, Aire = {aire} cm²"
+                resultat_final=f"Périmètre = {perimetre} cm, Aire = {aire} cm²",
+                figure_geometrique=figure
             )
         
         else:  # cercle
