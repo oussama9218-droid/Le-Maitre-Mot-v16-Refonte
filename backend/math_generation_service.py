@@ -64,38 +64,34 @@ class MathGenerationService:
     def _map_chapter_to_types(self, chapitre: str, niveau: str) -> List[MathExerciseType]:
         """Mappe les chapitres aux types d'exercices appropriés"""
         
+        # Note: Les chapitres sont uniques dans le mapping
+        # Pour des chapitres présents dans plusieurs niveaux, 
+        # le mapping s'applique à tous les niveaux
         mapping = {
             # 6e
             "Nombres entiers et décimaux": [MathExerciseType.CALCUL_DECIMAUX],
-            "Fractions": [MathExerciseType.CALCUL_FRACTIONS],
-            "Proportionnalité": [MathExerciseType.PROPORTIONNALITE],
             "Périmètres et aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.RECTANGLE],
             "Géométrie - Triangles et quadrilatères": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],
+            
+            # Chapitres multi-niveaux (6e, 4e, 5e, 3e)
+            "Fractions": [MathExerciseType.CALCUL_FRACTIONS],
+            "Proportionnalité": [MathExerciseType.PROPORTIONNALITE],
+            "Nombres relatifs": [MathExerciseType.CALCUL_RELATIFS],
+            "Statistiques": [MathExerciseType.STATISTIQUES],
             "Géométrie dans l'espace": [MathExerciseType.VOLUME],
             "Volumes": [MathExerciseType.VOLUME],
+            "Puissances": [MathExerciseType.PUISSANCES],
+            "Calcul littéral": [MathExerciseType.EQUATION_1ER_DEGRE, MathExerciseType.CALCUL_DECIMAUX],
             
             # 5e  
             "Triangles": [MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.TRIANGLE_RECTANGLE],
-            "Nombres relatifs": [MathExerciseType.CALCUL_RELATIFS],
-            "Statistiques": [MathExerciseType.STATISTIQUES],
-            "Calcul littéral": [MathExerciseType.CALCUL_DECIMAUX],
             
             # 4e
             "Théorème de Pythagore": [MathExerciseType.TRIANGLE_RECTANGLE],
             "Équations": [MathExerciseType.EQUATION_1ER_DEGRE],
-            "Calcul littéral": [MathExerciseType.EQUATION_1ER_DEGRE],
-            "Puissances": [MathExerciseType.PUISSANCES],
-            "Nombres relatifs": [MathExerciseType.CALCUL_RELATIFS],
-            "Fractions": [MathExerciseType.CALCUL_FRACTIONS],
-            "Statistiques": [MathExerciseType.STATISTIQUES],
-            "Géométrie dans l'espace": [MathExerciseType.VOLUME],
             
             # 3e
-            "Probabilités": [MathExerciseType.PROBABILITES],
-            "Volumes": [MathExerciseType.VOLUME],
-            "Statistiques": [MathExerciseType.STATISTIQUES],
-            "Puissances": [MathExerciseType.PUISSANCES],
-            "Calcul littéral": [MathExerciseType.EQUATION_1ER_DEGRE]
+            "Probabilités": [MathExerciseType.PROBABILITES]
         }
         
         return mapping.get(chapitre, [MathExerciseType.CALCUL_DECIMAUX])
