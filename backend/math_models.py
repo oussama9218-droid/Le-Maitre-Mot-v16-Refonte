@@ -38,6 +38,8 @@ class MathExerciseType(str, Enum):
     PERIMETRE_AIRE = "perimetre_aire"
     VOLUME = "volume"
     ANGLES = "angles"
+    THALES = "thales"
+    TRIGONOMETRIE = "trigonometrie"
     
     # Statistiques
     STATISTIQUES = "statistiques"
