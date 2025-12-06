@@ -717,9 +717,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Système Feature Flags - Test API catalog avec 23 matières" 
-    - "Validation contrôle accès - Matières actives vs non-actives"
-    - "Interface utilisateur - Affichage statuts et tooltips"
+    - "SVG Geometric Figures Display in Math Exercises"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
     - "Endpoint roadmap - Page publique transparence"
   stuck_tasks: []
   test_all: false
