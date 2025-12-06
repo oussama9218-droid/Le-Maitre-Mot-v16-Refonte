@@ -233,15 +233,18 @@ class MathGenerationService:
         
         if difficulte == "facile":
             operandes = [random.randint(-10, 10) for _ in range(3)]
-            operations = ["+", "-"]
+            operations_list = ["+", "-"]
         else:
             operandes = [random.randint(-20, 20) for _ in range(4)]
-            operations = ["+", "-", "*"] if difficulte == "difficile" else ["+", "-"]
+            operations_list = ["+", "-", "*"] if difficulte == "difficile" else ["+", "-"]
         
-        # Construire l'expression
+        # Construire l'expression et stocker les opérations
         expression = str(operandes[0])
+        operations_used = []
+        
         for i in range(1, len(operandes)):
-            op = random.choice(operations)
+            op = random.choice(operations_list)
+            operations_used.append(op)
             operand = operandes[i]
             
             if op == "+" and operand >= 0:
@@ -255,21 +258,34 @@ class MathGenerationService:
             elif op == "*":
                 expression += f" × {operand}"
         
-        # Calculer le résultat
+        # Calculer le résultat correctement
         resultat = operandes[0]
-        for i in range(1, len(operandes)):
-            if "+" in expression:
-                resultat += operandes[i]
-            elif "-" in expression:
-                resultat -= operandes[i]
-            elif "×" in expression:
-                resultat *= operandes[i]
+        for i, op in enumerate(operations_used):
+            operand = operandes[i + 1]
+            if op == "+":
+                resultat += operand
+            elif op == "-":
+                resultat -= operand
+            elif op == "*":
+                resultat *= operand
         
+        # Construire les étapes
         etapes = [
             f"Expression à calculer : {expression}",
             "Calcul étape par étape :",
-            f"= {resultat}"
         ]
+        
+        # Détailler les étapes intermédiaires
+        intermediate = operandes[0]
+        for i, op in enumerate(operations_used):
+            operand = operandes[i + 1]
+            if op == "+":
+                intermediate += operand
+            elif op == "-":
+                intermediate -= operand
+            elif op == "*":
+                intermediate *= operand
+            etapes.append(f"= {intermediate}")
         
         return MathExerciseSpec(
             niveau=niveau,
@@ -279,7 +295,7 @@ class MathGenerationService:
             parametres={
                 "expression": expression,
                 "operandes": operandes,
-                "operations": operations
+                "operations": operations_used
             },
             solution_calculee={
                 "resultat": resultat,
