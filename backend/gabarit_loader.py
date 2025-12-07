@@ -171,6 +171,15 @@ class GabaritLoader:
         elif "symétrie centrale" in chapitre_lower or "symetrie centrale" in chapitre_lower:
             values = self._prepare_symetrie_centrale_values(params, spec.type_exercice.value)
         
+        elif "pythagore" in chapitre_lower or "théorème de pythagore" in chapitre_lower:
+            values = self._prepare_pythagore_values(params)
+        
+        elif "proportionnalité" in chapitre_lower or "proportionnalite" in chapitre_lower:
+            values = self._prepare_proportionnalite_values(params)
+        
+        elif "périmètre" in chapitre_lower or "aire" in chapitre_lower or "perimetre" in chapitre_lower:
+            values = self._prepare_perimetre_aire_values(params)
+        
         else:
             logger.warning(f"Unknown chapter for interpolation: {spec.chapitre}")
         
