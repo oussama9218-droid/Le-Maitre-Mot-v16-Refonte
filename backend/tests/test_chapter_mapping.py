@@ -32,7 +32,7 @@ class TestChapterMapping:
         niveau = "6e"
         
         # Test unitaire : vérifier le mapping
-        types = self.math_service._get_exercise_types_for_chapter(chapitre)
+        types = self.math_service._map_chapter_to_types(chapitre, niveau)
         
         print(f"Chapitre : {chapitre}")
         print(f"Types mappés : {[t.value for t in types]}")
