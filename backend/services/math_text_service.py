@@ -408,7 +408,7 @@ Tu réponds UNIQUEMENT en JSON avec les champs : "enonce", "explication_prof", "
             
             # Vérifier que les points autorisés sont bien utilisés
             if not points_detectes.intersection(points_autorises):
-                logger.warning(f"❌ Validation: Aucun point autorisé trouvé dans le texte")
+                logger.warning("❌ Validation: Aucun point autorisé trouvé dans le texte")
                 logger.warning(f"   Points autorisés: {points_autorises}")
                 return False
             
@@ -739,7 +739,7 @@ Résultat : {spec.resultat_final}"""
             if a_calculer:
                 enonce_parts.append(f"Calculer la longueur {a_calculer}.")
             else:
-                enonce_parts.append(f"En déduire le rapport de Thalès.")
+                enonce_parts.append("En déduire le rapport de Thalès.")
             
             enonce = " ".join(enonce_parts)
             
@@ -829,7 +829,7 @@ Résultat : {spec.resultat_final}"""
                 return self._fallback_generic(spec)
             
             enonce = f"""Dans le triangle {triangle_name}, {" et ".join(angles_str)}. """ + \
-                    f"""Calculer la mesure du troisième angle."""
+                    """Calculer la mesure du troisième angle."""
             
             solution = f"""La somme des angles d'un triangle est toujours égale à 180°.
 Résultat : {spec.resultat_final}"""
@@ -870,7 +870,7 @@ Résultat : {spec.resultat_final}"""
                 
                 if longueur and largeur:
                     enonce = f"Un rectangle a pour dimensions {longueur} cm et {largeur} cm. " + \
-                            f"Calculer son périmètre et son aire."
+                            "Calculer son périmètre et son aire."
                     
                     return MathTextGeneration(
                         enonce=enonce,
@@ -889,7 +889,7 @@ Résultat : {spec.resultat_final}"""
                 
                 if cote:
                     enonce = f"Un carré a pour côté {cote} cm. " + \
-                            f"Calculer son périmètre et son aire."
+                            "Calculer son périmètre et son aire."
                     
                     return MathTextGeneration(
                         enonce=enonce,
@@ -906,7 +906,7 @@ Résultat : {spec.resultat_final}"""
                 
                 if rayon:
                     enonce = f"Un cercle a pour rayon {rayon} cm. " + \
-                            f"Calculer son périmètre et son aire."
+                            "Calculer son périmètre et son aire."
                     
                     return MathTextGeneration(
                         enonce=enonce,
@@ -946,7 +946,7 @@ Résultat : {spec.resultat_final}"""
                 return self._fallback_generic(spec)
             
             enonce = f"Le rectangle {rectangle_name} a pour dimensions : longueur = {longueur} cm et largeur = {largeur} cm. " + \
-                    f"Calculer son périmètre et son aire."
+                    "Calculer son périmètre et son aire."
             
             solution = f"""Périmètre = 2 × (longueur + largeur) = 2 × ({longueur} + {largeur})
 Aire = longueur × largeur = {longueur} × {largeur}
@@ -1037,14 +1037,14 @@ Résultat : {spec.resultat_final}"""
             if type_calcul == "perimetre":
                 # Doit contenir "2πr" ou "2 × π × r" ou équivalent
                 if not re.search(r'2\s*[×x*]\s*π\s*[×x*]\s*r|2\s*π\s*r', all_text, re.IGNORECASE):
-                    logger.warning(f"❌ Validation Cercle : Formule périmètre absente ou incorrecte")
+                    logger.warning("❌ Validation Cercle : Formule périmètre absente ou incorrecte")
                     # Tolérer si fallback sera utilisé
                     pass
             
             elif type_calcul == "aire":
                 # Doit contenir "πr²" ou "π × r²"
                 if not re.search(r'π\s*[×x*]?\s*r[²2]', all_text, re.IGNORECASE):
-                    logger.warning(f"❌ Validation Cercle : Formule aire absente ou incorrecte")
+                    logger.warning("❌ Validation Cercle : Formule aire absente ou incorrecte")
                     pass
             
             # 5. Vérifier qu'il n'y a pas de valeurs absurdes
