@@ -15,10 +15,27 @@
     "symetrie_centrale__trouver_valeur__facile__guide": "Observe le point {pointA} placé en ({coordA_x}, {coordA_y}). Le centre de symétrie est {pointO}({centreX}, {centreY}). Pour trouver {pointB}, rappelle-toi que {pointO} doit être le milieu du segment [{pointA}{pointB}].",
     "symetrie_centrale__trouver_valeur__facile__oral": "OK, {pointA} c'est ({coordA_x}, {coordA_y}). Le centre c'est {pointO}({centreX}, {centreY}). Maintenant dis-moi où va {pointB}.",
     "symetrie_axiale__verifier_propriete__moyen__guide": "Étape 1 : Localise {axeDesc}. Étape 2 : Calcule la distance de {pointA}({coordA_x}, {coordA_y}) à l'axe. Étape 3 : Calcule celle de {pointB}({coordB_x}, {coordB_y}). Compare.",
-    "symetrie_axiale__trouver_valeur__moyen__guide": "Étape par étape : localise {pointA} en ({coordA_x}, {coordA_y}), puis identifie {axeDesc}. Le point {pointB} sera à la même distance de l'axe, mais de l'autre côté. Calcule ses coordonnées."
+    "symetrie_axiale__trouver_valeur__moyen__guide": "Étape par étape : localise {pointA} en ({coordA_x}, {coordA_y}), puis identifie {axeDesc}. Le point {pointB} sera à la même distance de l'axe, mais de l'autre côté. Calcule ses coordonnées.",
+    "symetrie_axiale__verifier_propriete__moyen__academique": "Étant donnés les points {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y}), établis si ces points satisfont la propriété de symétrie axiale relativement à {axeDesc}.",
+    "symetrie_axiale__trouver_valeur__moyen__qr": "Q : Point initial ?\nR : {pointA}({coordA_x}, {coordA_y}).\nQ : Axe ?\nR : {axeDesc}.\nQ : Point symétrique {pointB} ?",
+    "symetrie_axiale__verifier_propriete__moyen__narratif": "Sarah a placé deux points sur son graphique : {pointA} en ({coordA_x}, {coordA_y}) et {pointB} en ({coordB_x}, {coordB_y}). Elle se demande s'ils sont symétriques par rapport à {axeDesc}. Qu'en penses-tu ?",
+    "symetrie_axiale__verifier_propriete__moyen__scolaire": "On donne {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y}). Démontre si ces deux points sont symétriques par rapport à {axeDesc}.",
+    "symetrie_axiale__trouver_valeur__moyen__defi": "Mission symétrie : {pointA} en ({coordA_x}, {coordA_y}), {axeDesc}. Calcule {pointB} le plus vite possible !",
+    "symetrie_axiale__verifier_propriete__moyen__inductif": "Comme dans les exercices précédents, utilise la règle d'équidistance. {pointA}({coordA_x}, {coordA_y}), {pointB}({coordB_x}, {coordB_y}), {axeDesc}. Qu'en conclus-tu ?",
+    "symetrie_axiale__trouver_valeur__moyen__academique": "Soit le point {pointA}({coordA_x}, {coordA_y}) dans le plan muni d'un repère. Par application de la transformation géométrique de symétrie axiale d'axe {axeDesc}, détermine les coordonnées exactes du point image {pointB}.",
+    "symetrie_centrale__verifier_propriete__moyen__oral": "Dis-moi, avec {pointA} en ({coordA_x}, {coordA_y}), {pointB} en ({coordB_x}, {coordB_y}) et {pointO} en ({centreX}, {centreY}), on a une symétrie centrale ?",
+    "symetrie_centrale__trouver_valeur__moyen__oral": "Alors voilà : {pointA} est en ({coordA_x}, {coordA_y}), et le centre de symétrie c'est {pointO}({centreX}, {centreY}). Où tu mets {pointB} ?",
+    "symetrie_centrale__trouver_valeur__moyen__academique": "Dans un repère orthonormé, considère le point {pointA}({coordA_x}, {coordA_y}). En appliquant les propriétés de la symétrie centrale, détermine les coordonnées du point {pointB}, image de {pointA} par la symétrie de centre {pointO}({centreX}, {centreY}).",
+    "symetrie_centrale__trouver_valeur__moyen__narratif": "Emma dessine un point {pointA} aux coordonnées ({coordA_x}, {coordA_y}) sur son cahier. Elle souhaite tracer son symétrique {pointB} par rapport au centre {pointO}({centreX}, {centreY}). Aide-la à trouver où placer {pointB}.",
+    "symetrie_centrale__trouver_valeur__moyen__defi": "Challenge ! {pointA}({coordA_x}, {coordA_y}), centre {pointO}({centreX}, {centreY}). Trouve {pointB} en moins de 2 minutes !",
+    "symetrie_axiale__verifier_propriete__moyen__defi": "Mission : {pointA}({coordA_x}, {coordA_y}), {pointB}({coordB_x}, {coordB_y}), {axeDesc}. Symétrie : vrai ou faux ?",
+    "symetrie_axiale__verifier_propriete__moyen__etapes": "1) Repère {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y})\n2) Localise {axeDesc}\n3) Calcule et compare les distances\n4) Conclus sur la symétrie",
+    "symetrie_axiale__trouver_valeur__moyen__scolaire": "Soit le point {pointA} de coordonnées ({coordA_x}, {coordA_y}). Détermine les coordonnées du point {pointB} symétrique de {pointA} par rapport à l'axe {axeDesc}.",
+    "symetrie_axiale__trouver_valeur__moyen__inductif": "Rappelle-toi comment on fait pour les symétries. Ici, {pointA}({coordA_x}, {coordA_y}) et {axeDesc}. Déduis-en la position de {pointB}.",
+    "symetrie_axiale__trouver_valeur__moyen__narratif": "Lucas travaille sur un exercice de symétrie. Il a placé {pointA} en ({coordA_x}, {coordA_y}) et doit trouver son symétrique {pointB} par rapport à {axeDesc}. Quelle sera la position de {pointB} ?"
   },
-  "hits": 4,
-  "misses": 16,
-  "total_cost_saved": 187.0,
-  "last_updated": "2025-12-07T22:28:40.872177"
+  "hits": 21,
+  "misses": 33,
+  "total_cost_saved": 808.0,
+  "last_updated": "2025-12-07T22:29:48.807792"
 }
