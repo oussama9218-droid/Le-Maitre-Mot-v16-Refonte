@@ -638,6 +638,7 @@ class MathGenerationService:
             type_exercice=MathExerciseType.PROPORTIONNALITE,
             difficulte=DifficultyLevel(difficulte),
             parametres={
+                "type": "trouver_valeur",  # Type pédagogique pour gabarits
                 "valeurs_donnees": [val1, val2],
                 "resultats_donnes": [resultat1, resultat2],
                 "valeur_a_trouver": val3,
