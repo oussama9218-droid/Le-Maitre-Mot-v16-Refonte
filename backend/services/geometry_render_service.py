@@ -19,9 +19,38 @@ from pedagogie_rules import determine_elements_to_hide_in_question as determine_
 logger = logging.getLogger(__name__)
 
 
+def determine_elements_to_hide_in_question(exercise_type: str, figure: GeometricFigure) -> Dict[str, Any]:
+    """
+    Wrapper pour utiliser le module central pedagogie_rules.
+    
+    Cette fonction adapte l'interface existante au nouveau système universel.
+    """
+    
+    # Construire les métadonnées pour le module central
+    metadata = {
+        "points": figure.points if figure.points else [],
+        "properties": figure.proprietes if figure.proprietes else [],
+        "shapes": [],
+        "is_geometry": True,
+        "is_completion": "triangle" in (figure.proprietes if figure.proprietes else [])
+    }
+    
+    # Appeler le module central
+    hiding_rules = determine_hiding_rules(exercise_type, metadata)
+    
+    # Adapter le résultat au format attendu par ce service
+    # (pour compatibilité avec le code existant)
+    return {
+        "points_to_hide": hiding_rules["elements_to_hide"],
+        "hide_image_shapes": hiding_rules["hide_constructions"],
+        "hide_construction_lines": hiding_rules["hide_constructions"],
+        "exercise_type": hiding_rules["exercise_type_detected"]
+    }
+
+
 def determine_elements_to_hide_in_question_legacy(exercise_type: str, figure: GeometricFigure) -> Dict[str, Any]:
     """
-    📌 FONCTION CENTRALE : Règle pédagogique universelle
+    📌 FONCTION LEGACY : Ancienne logique (conservée pour référence)
     
     Détermine quels éléments doivent être cachés dans le SUJET selon le type d'exercice.
     
