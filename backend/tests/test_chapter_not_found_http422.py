@@ -246,7 +246,7 @@ if __name__ == "__main__":
         test.test_symetrie_centrale_returns_422()
         
         # Tests de non-régression (chapitres existants)
-        test.test_existing_chapter_cercle_returns_200()
+        test.test_existing_chapter_proportionnalite_returns_200()
         test.test_existing_chapter_pythagore_returns_200()
         test.test_existing_chapter_fractions_returns_200()
         
