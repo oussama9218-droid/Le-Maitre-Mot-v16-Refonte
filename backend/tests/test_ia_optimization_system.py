@@ -147,7 +147,8 @@ class IAOptimizationTester:
         )
         
         if success and isinstance(response, dict):
-            exercises = response.get('exercises', [])
+            document = response.get('document', {})
+            exercises = document.get('exercises', [])
             
             print(f"\n📊 RÉSULTATS:")
             print(f"   ✅ {len(exercises)} exercices générés")
@@ -279,7 +280,8 @@ class IAOptimizationTester:
         )
         
         if success and isinstance(response, dict):
-            exercises = response.get('exercises', [])
+            document = response.get('document', {})
+            exercises = document.get('exercises', [])
             
             print(f"\n📊 RÉSULTATS:")
             print(f"   ✅ {len(exercises)} exercices générés")
@@ -455,7 +457,8 @@ class IAOptimizationTester:
         )
         
         if success and isinstance(response, dict):
-            exercises = response.get('exercises', [])
+            document = response.get('document', {})
+            exercises = document.get('exercises', [])
             enonces = [ex.get('enonce', '') for ex in exercises]
             
             print(f"\n📊 ANALYSE DES STYLES:")
@@ -563,7 +566,8 @@ class IAOptimizationTester:
         )
         
         if success and isinstance(response, dict):
-            exercises = response.get('exercises', [])
+            document = response.get('document', {})
+            exercises = document.get('exercises', [])
             
             print(f"\n📊 RÉSULTATS FALLBACK:")
             print(f"   ✅ {len(exercises)} exercices générés")
