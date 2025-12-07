@@ -72,10 +72,37 @@ class MathTextService:
         self, 
         spec: MathExerciseSpec
     ) -> MathTextGeneration:
-        """Génère le texte IA pour une spec mathématique"""
+        """
+        Génère le texte IA pour une spec mathématique.
+        
+        OPTIMISATION IA (Le Maître Mot) :
+            1. Tenter génération depuis gabarit (0 appel IA)
+            2. Si échec : appel IA classique
+            3. Fallback si nécessaire
+        """
         
         # ⏱️ Démarrer chronomètre pour monitoring
         start_time = time.time()
+        
+        # ✨ NOUVELLE PRIORITÉ : Tenter génération depuis gabarit
+        # Ceci permet de réduire drastiquement les appels IA
+        gabarit_result = self._try_generate_from_gabarit(spec)
+        if gabarit_result:
+            logger.info(f"🎯 GABARIT utilisé pour {spec.type_exercice.value} → 0 appel IA, coût = 0")
+            
+            # 📊 Monitoring : gabarit utilisé (pas d'IA)
+            ia_monitoring.log_generation(
+                type_exercice=spec.type_exercice.value,
+                niveau=spec.niveau,
+                chapitre=spec.chapitre,
+                ia_utilisee=False,  # Gabarit
+                ia_acceptee=False,
+                fallback_utilise=False,
+                cause_rejet="gabarit_utilise",
+                temps_generation_ms=(time.time() - start_time) * 1000
+            )
+            
+            return gabarit_result
         
         # 🚨 SÉCURITÉ PRODUCTION : Bypass IA pour types problématiques
         # Ces types ont des fallbacks parfaits (100% cohérents)
