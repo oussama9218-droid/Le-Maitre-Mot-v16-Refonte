@@ -1702,6 +1702,44 @@ class MathGenerationService:
                         etapes.append(f"Les abscisses sont différentes ({point_a_x} ≠ {point_b_x})")
                     etapes.append(f"Conclusion : {point_a} et {point_b} ne sont PAS symétriques par rapport à l'axe")
             
+            else:  # oblique (y = x)
+                # Pour l'axe y = x, les coordonnées sont échangées
+                point_a_x = random.randint(2, 7)
+                point_a_y = random.randint(2, 10)
+                
+                if sont_symetriques:
+                    # Symétrique par rapport à y = x : échanger x et y
+                    point_b_x = point_a_y
+                    point_b_y = point_a_x
+                else:
+                    # Créer un point non symétrique
+                    point_b_x = random.randint(2, 10)
+                    point_b_y = random.randint(2, 10)
+                    # S'assurer qu'il n'est pas symétrique par hasard
+                    while point_b_x == point_a_y and point_b_y == point_a_x:
+                        point_b_x = random.randint(2, 10)
+                        point_b_y = random.randint(2, 10)
+                
+                axe_description = "la droite y = x"
+                axe_position = "y=x"
+                
+                etapes = [
+                    f"Points : {point_a}({point_a_x}, {point_a_y}) et {point_b}({point_b_x}, {point_b_y})",
+                    f"Axe : droite oblique y = x",
+                    f"Pour la symétrie par rapport à y = x, les coordonnées doivent être échangées",
+                    f"Si {point_a} est symétrique de {point_b}, alors {point_b} devrait avoir les coordonnées ({point_a_y}, {point_a_x})"
+                ]
+                
+                if sont_symetriques:
+                    etapes.append(f"Vérification : {point_b}({point_b_x}, {point_b_y}) = ({point_a_y}, {point_a_x}) ✓")
+                    etapes.append(f"Conclusion : {point_a} et {point_b} sont symétriques par rapport à y = x")
+                else:
+                    etapes.append(f"Vérification : {point_b}({point_b_x}, {point_b_y}) ≠ ({point_a_y}, {point_a_x})")
+                    etapes.append(f"Conclusion : {point_a} et {point_b} ne sont PAS symétriques par rapport à y = x")
+                
+                distance_a = 0  # Pas pertinent pour y = x
+                distance_b = 0
+            
             figure = GeometricFigure(
                 type="symetrie_axiale",
                 points=[point_a, point_b],
