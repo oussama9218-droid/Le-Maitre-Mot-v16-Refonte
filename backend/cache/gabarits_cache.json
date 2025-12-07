@@ -32,10 +32,12 @@
     "symetrie_axiale__verifier_propriete__moyen__etapes": "1) Repère {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y})\n2) Localise {axeDesc}\n3) Calcule et compare les distances\n4) Conclus sur la symétrie",
     "symetrie_axiale__trouver_valeur__moyen__scolaire": "Soit le point {pointA} de coordonnées ({coordA_x}, {coordA_y}). Détermine les coordonnées du point {pointB} symétrique de {pointA} par rapport à l'axe {axeDesc}.",
     "symetrie_axiale__trouver_valeur__moyen__inductif": "Rappelle-toi comment on fait pour les symétries. Ici, {pointA}({coordA_x}, {coordA_y}) et {axeDesc}. Déduis-en la position de {pointB}.",
-    "symetrie_axiale__trouver_valeur__moyen__narratif": "Lucas travaille sur un exercice de symétrie. Il a placé {pointA} en ({coordA_x}, {coordA_y}) et doit trouver son symétrique {pointB} par rapport à {axeDesc}. Quelle sera la position de {pointB} ?"
+    "symetrie_axiale__trouver_valeur__moyen__narratif": "Lucas travaille sur un exercice de symétrie. Il a placé {pointA} en ({coordA_x}, {coordA_y}) et doit trouver son symétrique {pointB} par rapport à {axeDesc}. Quelle sera la position de {pointB} ?",
+    "symetrie_axiale__verifier_propriete__difficile__guide": "Étape 1 : Localise {axeDesc}. Étape 2 : Calcule la distance de {pointA}({coordA_x}, {coordA_y}) à l'axe. Étape 3 : Calcule celle de {pointB}({coordB_x}, {coordB_y}). Compare.",
+    "symetrie_axiale__trouver_valeur__difficile__academique": "Soit le point {pointA}({coordA_x}, {coordA_y}) dans le plan muni d'un repère. Par application de la transformation géométrique de symétrie axiale d'axe {axeDesc}, détermine les coordonnées exactes du point image {pointB}."
   },
   "hits": 21,
-  "misses": 33,
+  "misses": 35,
   "total_cost_saved": 808.0,
-  "last_updated": "2025-12-07T22:29:48.807792"
+  "last_updated": "2025-12-07T22:37:12.710844"
 }
