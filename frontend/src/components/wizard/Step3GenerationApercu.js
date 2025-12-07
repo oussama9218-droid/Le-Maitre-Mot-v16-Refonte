@@ -220,8 +220,17 @@ const Step3GenerationApercu = ({
                         </div>
                       )}
                       
-                      {/* Display SVG geometric figure if present */}
-                      {exercise.figure_svg && (
+                      {/* Display SVG geometric figure for QUESTION (without answer) */}
+                      {exercise.figure_svg_question && (
+                        <div className="mt-4 flex justify-center">
+                          <div 
+                            className="border border-gray-300 rounded-lg shadow-sm bg-white p-4"
+                            dangerouslySetInnerHTML={{ __html: exercise.figure_svg_question }}
+                          />
+                        </div>
+                      )}
+                      {/* Fallback to figure_svg if figure_svg_question not available (backward compatibility) */}
+                      {!exercise.figure_svg_question && exercise.figure_svg && (
                         <div className="mt-4 flex justify-center">
                           <div 
                             className="border border-gray-300 rounded-lg shadow-sm bg-white p-4"
