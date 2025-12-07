@@ -136,13 +136,23 @@ class GeneratedMathExercise(BaseModel):
         
         # Ajouter geometric_schema si géométrie
         if self.spec.figure_geometrique:
+            # Traiter les segments correctement selon le type de figure
+            segments = []
+            for seg, val in self.spec.figure_geometrique.longueurs_connues.items():
+                # Pour les cercles, seg = "rayon" (pas un segment entre 2 points)
+                if self.spec.figure_geometrique.type == "cercle" and seg == "rayon":
+                    segments.append([seg, {"longueur": f"{val} cm"}])
+                # Pour les autres figures, diviser le segment en 2 points (ex: "AB" -> ["A", "B"])
+                elif len(seg) >= 2:
+                    segments.append([seg[:len(seg)//2], seg[len(seg)//2:], {"longueur": f"{val} cm"}])
+                else:
+                    # Cas spécial (ne devrait pas arriver normalement)
+                    segments.append([seg, {"longueur": f"{val} cm"}])
+            
             exercise["geometric_schema"] = {
                 "type": self.spec.figure_geometrique.type,
                 "points": self.spec.figure_geometrique.points,
-                "segments": [
-                    [seg[:len(seg)//2], seg[len(seg)//2:], {"longueur": f"{val} cm"}]
-                    for seg, val in self.spec.figure_geometrique.longueurs_connues.items()
-                ],
+                "segments": segments,
                 "angles": [
                     [self.spec.figure_geometrique.rectangle_en, {"angle_droit": True}]
                 ] if self.spec.figure_geometrique.rectangle_en else []
