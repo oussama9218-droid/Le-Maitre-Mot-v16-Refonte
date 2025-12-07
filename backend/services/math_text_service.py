@@ -1121,7 +1121,7 @@ Résultat : {spec.resultat_final}"""
             # 3. Construire la clé de cache
             cache_key = style_manager.build_cache_key(
                 chapitre=spec.chapitre,
-                type_exercice=spec.type_exercice.value,
+                type_exercice=pedagogical_type,
                 difficulte=spec.difficulte.value,
                 style=style
             )
@@ -1139,7 +1139,7 @@ Résultat : {spec.resultat_final}"""
                 logger.info(f"💛 CACHE MISS : {cache_key} → Chargement gabarit")
                 template = gabarit_loader.get_random_gabarit(
                     chapitre=spec.chapitre,
-                    type_exercice=spec.type_exercice.value,
+                    type_exercice=pedagogical_type,
                     style=style
                 )
                 
