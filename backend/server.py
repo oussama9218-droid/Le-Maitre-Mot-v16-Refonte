@@ -2362,8 +2362,21 @@ async def generate_math_exercises_new_architecture(
                         gen_ex.spec.figure_geometrique
                     )
                     if svg_data:
-                        exercise_dict["figure_svg"] = svg_data
-                        logger.info(f"✅ SVG généré pour {gen_ex.spec.figure_geometrique.type}")
+                        # Pour symétries: svg_data est un dict avec question/correction
+                        # Pour autres types: svg_data est une string
+                        if isinstance(svg_data, dict):
+                            # Extraire les strings du dict et les mettre dans exercise_dict
+                            exercise_dict["figure_svg"] = svg_data.get("figure_svg", "")
+                            exercise_dict["figure_svg_question"] = svg_data.get("figure_svg_question", "")
+                            exercise_dict["figure_svg_correction"] = svg_data.get("figure_svg_correction", "")
+                            logger.info(f"✅ SVG (question + correction) généré pour {gen_ex.spec.figure_geometrique.type}")
+                        else:
+                            # Pour les autres types, c'est une string simple
+                            exercise_dict["figure_svg"] = svg_data
+                            # Pas de différence question/correction pour les autres types
+                            exercise_dict["figure_svg_question"] = svg_data
+                            exercise_dict["figure_svg_correction"] = svg_data
+                            logger.info(f"✅ SVG généré pour {gen_ex.spec.figure_geometrique.type}")
                 except Exception as e:
                     logger.warning(f"⚠️ Échec rendu SVG: {e}")
             
