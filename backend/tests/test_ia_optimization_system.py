@@ -544,7 +544,7 @@ class IAOptimizationTester:
         success, response, exec_time = self.run_api_test(
             "Fallback System Test",
             "POST",
-            "math/generate-exercises",
+            "generate",
             200,
             data=test_data,
             timeout=90
