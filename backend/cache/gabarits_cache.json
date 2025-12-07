@@ -13,10 +13,12 @@
     "symetrie_centrale__trouver_valeur__facile__academique": "Dans un repère orthonormé, considère le point {pointA}({coordA_x}, {coordA_y}). En appliquant les propriétés de la symétrie centrale, détermine les coordonnées du point {pointB}, image de {pointA} par la symétrie de centre {pointO}({centreX}, {centreY}).",
     "symetrie_centrale__trouver_valeur__facile__etapes": "Procédure :\n→ Localise {pointA}({coordA_x}, {coordA_y})\n→ Repère {pointO}({centreX}, {centreY})\n→ Calcule {pointB} : {pointO} milieu de [{pointA}{pointB}]",
     "symetrie_centrale__trouver_valeur__facile__guide": "Observe le point {pointA} placé en ({coordA_x}, {coordA_y}). Le centre de symétrie est {pointO}({centreX}, {centreY}). Pour trouver {pointB}, rappelle-toi que {pointO} doit être le milieu du segment [{pointA}{pointB}].",
-    "symetrie_centrale__trouver_valeur__facile__oral": "OK, {pointA} c'est ({coordA_x}, {coordA_y}). Le centre c'est {pointO}({centreX}, {centreY}). Maintenant dis-moi où va {pointB}."
+    "symetrie_centrale__trouver_valeur__facile__oral": "OK, {pointA} c'est ({coordA_x}, {coordA_y}). Le centre c'est {pointO}({centreX}, {centreY}). Maintenant dis-moi où va {pointB}.",
+    "symetrie_axiale__verifier_propriete__moyen__guide": "Étape 1 : Localise {axeDesc}. Étape 2 : Calcule la distance de {pointA}({coordA_x}, {coordA_y}) à l'axe. Étape 3 : Calcule celle de {pointB}({coordB_x}, {coordB_y}). Compare.",
+    "symetrie_axiale__trouver_valeur__moyen__guide": "Étape par étape : localise {pointA} en ({coordA_x}, {coordA_y}), puis identifie {axeDesc}. Le point {pointB} sera à la même distance de l'axe, mais de l'autre côté. Calcule ses coordonnées."
   },
-  "hits": 3,
-  "misses": 14,
-  "total_cost_saved": 144.0,
-  "last_updated": "2025-12-07T22:14:39.871890"
+  "hits": 4,
+  "misses": 16,
+  "total_cost_saved": 187.0,
+  "last_updated": "2025-12-07T22:28:40.872177"
 }
