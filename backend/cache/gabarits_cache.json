@@ -1,9 +1,13 @@
 {
   "cache": {
-    "symetrie_axiale__trouver_valeur__facile__qr": "Question : Quelles sont les coordonnées de {pointA} ?\nRéponse : ({coordA_x}, {coordA_y}).\nQuestion : Quel est l'axe ?\nRéponse : {axeDesc}.\nQuestion : Calcule {pointB}."
+    "symetrie_axiale__trouver_valeur__facile__qr": "Question : Quelles sont les coordonnées de {pointA} ?\nRéponse : ({coordA_x}, {coordA_y}).\nQuestion : Quel est l'axe ?\nRéponse : {axeDesc}.\nQuestion : Calcule {pointB}.",
+    "symetrie_axiale__trouver_valeur__facile__concis": "{pointA}({coordA_x}, {coordA_y}). Symétrie / {axeDesc}. {pointB} = ?",
+    "symetrie_axiale__trouver_valeur__facile__scolaire": "Soit {pointA}({coordA_x}, {coordA_y}). Quelle est la position du point {pointB}, symétrique de {pointA} relativement à l'axe {axeDesc} ?",
+    "symetrie_axiale__trouver_valeur__facile__academique": "Étant donné {pointA}({coordA_x}, {coordA_y}) et l'axe de symétrie {axeDesc}, établis les coordonnées du point {pointB} en utilisant les propriétés de conservation de la distance à l'axe.",
+    "symetrie_axiale__trouver_valeur__facile__guide": "Étape par étape : localise {pointA} en ({coordA_x}, {coordA_y}), puis identifie {axeDesc}. Le point {pointB} sera à la même distance de l'axe, mais de l'autre côté. Calcule ses coordonnées."
   },
-  "hits": 0,
-  "misses": 1,
-  "total_cost_saved": 0.0,
-  "last_updated": "2025-12-07T22:12:31.574917"
+  "hits": 1,
+  "misses": 5,
+  "total_cost_saved": 46.0,
+  "last_updated": "2025-12-07T22:12:44.337049"
 }
