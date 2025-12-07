@@ -162,6 +162,59 @@ class GeometryRenderService:
         data["segments"] = segments
         
         return self.renderer.render_thales(data)
+    
+    def _render_symetrie_axiale(self, figure: GeometricFigure) -> str:
+        """
+        Rendu d'une symétrie axiale
+        
+        Figure contient:
+        - points: [point_original, point_image]
+        - longueurs_connues: {
+            "point_x": coordonnée x,
+            "point_y": coordonnée y,
+            "point_prime_x": coordonnée x symétrique,
+            "point_prime_y": coordonnée y symétrique
+          }
+        - proprietes: ["axe_vertical"/"axe_horizontal"/"axe_oblique", "axe_position_X"]
+        """
+        
+        # Extraire les coordonnées des points
+        coords = {}
+        for key, val in figure.longueurs_connues.items():
+            coords[key] = val
+        
+        # Extraire le type d'axe depuis les propriétés
+        axe_type = "vertical"
+        axe_position = 5
+        
+        for prop in figure.proprietes:
+            if prop.startswith("axe_"):
+                parts = prop.split("_")
+                if len(parts) >= 2:
+                    if parts[1] in ["vertical", "horizontal", "oblique"]:
+                        axe_type = parts[1]
+                    elif parts[1] == "position":
+                        try:
+                            if "y=x" in prop:
+                                axe_type = "oblique"
+                                axe_position = "y=x"
+                            else:
+                                axe_position = int(parts[2]) if len(parts) > 2 else 5
+                        except:
+                            axe_position = 5
+        
+        # Récupérer les points
+        points_list = figure.points if figure.points else []
+        
+        # Construire les données pour le renderer
+        data = {
+            "axe_type": axe_type,
+            "axe_position": axe_position,
+            "points_coords": coords,
+            "points_labels": points_list
+        }
+        
+        return self.renderer.render_symetrie_axiale(data)
 
 
 # Instance globale
