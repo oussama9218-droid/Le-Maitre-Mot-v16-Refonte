@@ -64,6 +64,15 @@ class MathTextService:
     ) -> MathTextGeneration:
         """Génère le texte IA pour une spec mathématique"""
         
+        # 🚨 SÉCURITÉ PRODUCTION : Bypass IA pour types problématiques
+        # Ces types ont des fallbacks parfaits (100% cohérents)
+        # Le bypass garantit 0% de risque d'incohérence
+        TYPES_BYPASS_IA = ["cercle", "rectangle", "trigonometrie"]
+        
+        if spec.type_exercice.value in TYPES_BYPASS_IA:
+            logger.info(f"🔒 BYPASS IA activé pour {spec.type_exercice.value} → Fallback direct")
+            return self._generate_fallback_text(spec)
+        
         # Construire le prompt structuré
         prompt_data = spec.to_ai_prompt_data()
         
