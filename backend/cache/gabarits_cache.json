@@ -9,10 +9,14 @@
     "symetrie_axiale__trouver_valeur__moyen__etapes": "Méthode :\nÉtape A : Note les coordonnées de {pointA} : ({coordA_x}, {coordA_y})\nÉtape B : Identifie l'axe : {axeDesc}\nÉtape C : Trouve {pointB}",
     "symetrie_axiale__verifier_propriete__moyen__concis": "{pointA}({coordA_x}, {coordA_y}), {pointB}({coordB_x}, {coordB_y}), {axeDesc}. Symétriques par rapport à l'axe ?",
     "symetrie_axiale__trouver_valeur__moyen__oral": "OK, {pointA} c'est ({coordA_x}, {coordA_y}). L'axe c'est {axeDesc}. Maintenant dis-moi où va {pointB}.",
-    "symetrie_axiale__trouver_valeur__moyen__concis": "Coordonnées de {pointA} : ({coordA_x}, {coordA_y}). Axe : {axeDesc}. Calcule {pointB}."
+    "symetrie_axiale__trouver_valeur__moyen__concis": "Coordonnées de {pointA} : ({coordA_x}, {coordA_y}). Axe : {axeDesc}. Calcule {pointB}.",
+    "symetrie_centrale__trouver_valeur__facile__academique": "Dans un repère orthonormé, considère le point {pointA}({coordA_x}, {coordA_y}). En appliquant les propriétés de la symétrie centrale, détermine les coordonnées du point {pointB}, image de {pointA} par la symétrie de centre {pointO}({centreX}, {centreY}).",
+    "symetrie_centrale__trouver_valeur__facile__etapes": "Procédure :\n→ Localise {pointA}({coordA_x}, {coordA_y})\n→ Repère {pointO}({centreX}, {centreY})\n→ Calcule {pointB} : {pointO} milieu de [{pointA}{pointB}]",
+    "symetrie_centrale__trouver_valeur__facile__guide": "Observe le point {pointA} placé en ({coordA_x}, {coordA_y}). Le centre de symétrie est {pointO}({centreX}, {centreY}). Pour trouver {pointB}, rappelle-toi que {pointO} doit être le milieu du segment [{pointA}{pointB}].",
+    "symetrie_centrale__trouver_valeur__facile__oral": "OK, {pointA} c'est ({coordA_x}, {coordA_y}). Le centre c'est {pointO}({centreX}, {centreY}). Maintenant dis-moi où va {pointB}."
   },
-  "hits": 2,
-  "misses": 10,
-  "total_cost_saved": 81.0,
-  "last_updated": "2025-12-07T22:14:22.758866"
+  "hits": 3,
+  "misses": 14,
+  "total_cost_saved": 144.0,
+  "last_updated": "2025-12-07T22:14:39.871890"
 }
