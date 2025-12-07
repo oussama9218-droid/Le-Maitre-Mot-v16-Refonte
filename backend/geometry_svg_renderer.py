@@ -660,6 +660,160 @@ class GeometrySVGRenderer:
                     self.add_dimension_label(svg, line, f"{longueur}")
         
         return ET.tostring(svg, encoding='unicode')
+    
+    def render_symetrie_axiale(self, data: Dict[str, Any]) -> str:
+        """
+        Rendu SVG pour la symétrie axiale
+        
+        Args:
+            data: {
+                "axe_type": "vertical" | "horizontal" | "oblique",
+                "axe_position": int ou "y=x",
+                "points_coords": {"A_x": 3, "A_y": 5, "A_prime_x": 7, "A_prime_y": 5, ...},
+                "points_labels": ["A", "A'"] ou ["D", "E"]
+            }
+        """
+        svg = self.create_svg_root()
+        
+        axe_type = data.get('axe_type', 'vertical')
+        axe_position = data.get('axe_position', 5)
+        points_coords = data.get('points_coords', {})
+        points_labels = data.get('points_labels', [])
+        
+        # Système de coordonnées : taille du repère
+        grid_size = 14  # Grille de 0 à 14 (pour accommoder les coordonnées mathématiques)
+        cell_size = min((self.width - 2 * self.margin) / grid_size, 
+                       (self.height - 2 * self.margin) / grid_size)
+        
+        # Décaler pour centrer
+        offset_x = self.margin
+        offset_y = self.margin
+        
+        # Fonction pour convertir coordonnées mathématiques -> coordonnées SVG
+        def math_to_svg(x_math, y_math):
+            x_svg = offset_x + x_math * cell_size
+            y_svg = self.height - offset_y - y_math * cell_size  # Inverser Y
+            return x_svg, y_svg
+        
+        # 1. Dessiner le repère (axes X et Y légers)
+        # Axe X
+        x_axis_start = Point(offset_x, self.height - offset_y, "")
+        x_axis_end = Point(self.width - offset_x, self.height - offset_y, "")
+        x_axis_line = Line(x_axis_start, x_axis_end, color="#CCCCCC", width=1)
+        self.add_line(svg, x_axis_line)
+        
+        # Axe Y
+        y_axis_start = Point(offset_x, offset_y, "")
+        y_axis_end = Point(offset_x, self.height - offset_y, "")
+        y_axis_line = Line(y_axis_start, y_axis_end, color="#CCCCCC", width=1)
+        self.add_line(svg, y_axis_line)
+        
+        # Labels des axes
+        ET.SubElement(svg, 'text', {
+            'x': str(self.width - offset_x + 5),
+            'y': str(self.height - offset_y + 5),
+            'class': 'geometry-text',
+            'font-size': '12'
+        }).text = "x"
+        
+        ET.SubElement(svg, 'text', {
+            'x': str(offset_x - 10),
+            'y': str(offset_y - 5),
+            'class': 'geometry-text',
+            'font-size': '12'
+        }).text = "y"
+        
+        # 2. Dessiner l'axe de symétrie
+        if axe_type == "vertical":
+            # Axe vertical x = position
+            axe_x_svg, _ = math_to_svg(axe_position, 0)
+            axe_start = Point(axe_x_svg, offset_y, "")
+            axe_end = Point(axe_x_svg, self.height - offset_y, "")
+            axe_line = Line(axe_start, axe_end, style="dashed", color="#FF0000", width=2)
+            self.add_line(svg, axe_line)
+            
+            # Label de l'axe
+            ET.SubElement(svg, 'text', {
+                'x': str(axe_x_svg + 5),
+                'y': str(offset_y + 20),
+                'class': 'geometry-text',
+                'font-size': '12',
+                'fill': '#FF0000'
+            }).text = f"x = {axe_position}"
+            
+        elif axe_type == "horizontal":
+            # Axe horizontal y = position
+            _, axe_y_svg = math_to_svg(0, axe_position)
+            axe_start = Point(offset_x, axe_y_svg, "")
+            axe_end = Point(self.width - offset_x, axe_y_svg, "")
+            axe_line = Line(axe_start, axe_end, style="dashed", color="#FF0000", width=2)
+            self.add_line(svg, axe_line)
+            
+            # Label de l'axe
+            ET.SubElement(svg, 'text', {
+                'x': str(self.width - offset_x - 40),
+                'y': str(axe_y_svg - 5),
+                'class': 'geometry-text',
+                'font-size': '12',
+                'fill': '#FF0000'
+            }).text = f"y = {axe_position}"
+            
+        elif axe_type == "oblique":
+            # Axe oblique y = x (première bissectrice)
+            start_x, start_y = math_to_svg(0, 0)
+            end_x, end_y = math_to_svg(grid_size, grid_size)
+            axe_start = Point(start_x, start_y, "")
+            axe_end = Point(end_x, end_y, "")
+            axe_line = Line(axe_start, axe_end, style="dashed", color="#FF0000", width=2)
+            self.add_line(svg, axe_line)
+            
+            # Label de l'axe
+            mid_x = (start_x + end_x) / 2
+            mid_y = (start_y + end_y) / 2
+            ET.SubElement(svg, 'text', {
+                'x': str(mid_x + 10),
+                'y': str(mid_y - 5),
+                'class': 'geometry-text',
+                'font-size': '12',
+                'fill': '#FF0000'
+            }).text = "y = x"
+        
+        # 3. Extraire et dessiner les points
+        # Regrouper les coordonnées par point
+        points_dict = {}
+        for key, value in points_coords.items():
+            parts = key.rsplit('_', 1)  # Séparer "D_x" en ["D", "x"]
+            if len(parts) == 2:
+                point_name, coord = parts
+                if point_name not in points_dict:
+                    points_dict[point_name] = {}
+                points_dict[point_name][coord] = value
+        
+        # Dessiner les points et le segment entre eux
+        point_objects = {}
+        for point_name, coords in points_dict.items():
+            if 'x' in coords and 'y' in coords:
+                x_svg, y_svg = math_to_svg(coords['x'], coords['y'])
+                point = Point(x_svg, y_svg, point_name)
+                point_objects[point_name] = point
+                self.add_point(svg, point, show_label=True)
+        
+        # 4. Dessiner le segment entre les deux points (si 2 points)
+        if len(point_objects) >= 2:
+            points_list = list(point_objects.values())
+            segment_line = Line(points_list[0], points_list[1], color="#0066CC", width=1.5)
+            self.add_line(svg, segment_line)
+            
+            # Marquer le point milieu (intersection avec l'axe)
+            midpoint = segment_line.midpoint()
+            ET.SubElement(svg, 'circle', {
+                'cx': str(midpoint.x),
+                'cy': str(midpoint.y),
+                'r': '2',
+                'fill': '#FF0000'
+            })
+        
+        return ET.tostring(svg, encoding='unicode')
 
 # Instance globale
 geometry_svg_renderer = GeometrySVGRenderer()
