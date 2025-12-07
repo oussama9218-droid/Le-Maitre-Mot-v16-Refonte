@@ -14,7 +14,7 @@ class LeMaitreMotAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.generated_document_id = None
-        self.guest_id = f"test-geometry-{datetime.now().strftime('%H%M%S')}-{uuid.uuid4().hex[:8]}"
+        self.guest_id = f"test-coherence-{datetime.now().strftime('%H%M%S')}-{uuid.uuid4().hex[:8]}"
         self.initial_quota = None
         # Authentication testing variables
         self.pro_user_email = "oussama92.18@gmail.com"
@@ -22,6 +22,17 @@ class LeMaitreMotAPITester:
         self.magic_token = None
         self.session_token = None
         self.device_id = f"test_device_{datetime.now().strftime('%H%M%S')}"
+        
+        # Coherence testing results
+        self.coherence_results = {
+            "total_exercises": 0,
+            "coherent_exercises": 0,
+            "phantom_points": 0,
+            "missing_svg": 0,
+            "empty_enonce": 0,
+            "failed_generations": 0,
+            "detailed_results": []
+        }
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, timeout=30):
         """Run a single API test"""
