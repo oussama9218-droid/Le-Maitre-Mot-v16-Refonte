@@ -50,17 +50,38 @@ Re-test complet de la cohérence géométrique après correction du bug geometri
 4. **MAINTENIR**: Pythagore, Triangles, Thalès fonctionnent parfaitement
 
 ## Test Status Summary
-- **End-to-End API Coherence**: ⚠️ PARTIALLY PASSED (62.5% coherence rate)
-- **Geometric Coherence (Unit Tests)**: ✅ PASSED (100% - from previous session)
+- **Geometric Schema Bug Fix**: ✅ APPLIED (rayon no longer split into 'ra' and 'yon')
+- **End-to-End API Coherence**: ⚠️ IMPROVED (64.7% coherence rate, up from 62.5%)
+- **Cercles Coherence**: ⚠️ SIGNIFICANTLY IMPROVED (60% coherence, up from 0%)
+- **Rectangles Coherence**: ❌ UNCHANGED (40% coherence, still needs 4 points fix)
 - **SVG Generation**: ✅ PASSED (100% - all exercises generate SVG)
-- **Thales Coherence**: ✅ PASSED (100% - non-regression confirmed)
+- **Non-regression Tests**: ✅ PASSED (Pythagore, Triangles, Thalès maintain 100%)
 - **System Stability**: ✅ OPERATIONAL
 
 ## Priority Issues for Main Agent
-1. **HIGH PRIORITY**: Fix cercles generator - rayon not defined in figure_geometrique
-2. **HIGH PRIORITY**: Fix rectangles generator - ensure 4 points are defined
-3. **MEDIUM PRIORITY**: Fix trigonométrie phantom point issue
+1. **HIGH PRIORITY**: Cercles generator - Continue improvement to reach >80% coherence (currently 60%)
+2. **HIGH PRIORITY**: Rectangles generator - Fix 4 points definition (still at 40% coherence)
+3. **MEDIUM PRIORITY**: Trigonométrie phantom point 'L' - Specific issue identified
 4. **LOW PRIORITY**: Add "Périmètres et aires" chapter for 6e level or update test
+
+## Detailed Issue Analysis
+### Cercles (Aires - 6e)
+- **Status**: ✅ Bug fix applied, ⚠️ Coherence improved but incomplete
+- **Current**: 60% coherence (3/5 exercises)
+- **Issues**: Some exercises still missing rayon in spec_mathematique.figure_geometrique.longueurs_connues
+- **Fix needed**: Ensure all circle exercises have rayon properly defined
+
+### Rectangles (Aires et périmètres - 5e)  
+- **Status**: ❌ Still problematic
+- **Current**: 40% coherence (2/5 exercises)
+- **Issues**: Exercises have 1-3 points instead of required 4 points
+- **Fix needed**: Ensure all rectangle exercises define exactly 4 points
+
+### Trigonométrie (3e)
+- **Status**: ⚠️ Mostly working with specific issue
+- **Current**: 66.7% coherence (2/3 exercises)
+- **Issues**: Point fantôme 'L' appears in 1 exercise but not in figure
+- **Fix needed**: Eliminate phantom point 'L' generation
 
 ## Incorporate User Feedback
 - User confirmed Thales correction is working correctly ✅
