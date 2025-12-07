@@ -34,7 +34,7 @@ from typing import Dict, List, Any
 class IAOptimizationTester:
     """Comprehensive tester for the AI optimization system"""
     
-    def __init__(self, base_url="https://lesson-generator.preview.emergentagent.com"):
+    def __init__(self, base_url="http://localhost:8001"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.guest_id = f"test-optimization-{datetime.now().strftime('%H%M%S')}-{uuid.uuid4().hex[:8]}"
