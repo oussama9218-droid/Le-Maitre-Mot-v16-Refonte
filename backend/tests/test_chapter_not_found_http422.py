@@ -234,8 +234,10 @@ if __name__ == "__main__":
     print("🧪"*40 + "\n")
     
     try:
-        # Tests critiques
-        test.test_symetrie_axiale_returns_422()
+        # Test : Symétrie axiale fonctionne maintenant (200)
+        test.test_symetrie_axiale_returns_200()
+        
+        # Test critique : Symétrie centrale doit retourner 422 (pas encore implémenté)
         test.test_symetrie_centrale_returns_422()
         
         # Tests de non-régression (chapitres existants)
