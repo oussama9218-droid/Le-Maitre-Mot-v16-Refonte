@@ -940,6 +940,10 @@ class GeometrySVGRenderer:
             y_svg = self.height - offset_y - y_math * cell_size
             return x_svg, y_svg
         
+        # 0. Dessiner la grille de fond si demandée (AVANT tout le reste)
+        if with_grid:
+            self.add_grid(svg, grid_size, cell_size, offset_x, offset_y)
+        
         # 1. Dessiner le repère (axes X et Y)
         x_axis_start = Point(offset_x, self.height - offset_y, "")
         x_axis_end = Point(self.width - offset_x, self.height - offset_y, "")
