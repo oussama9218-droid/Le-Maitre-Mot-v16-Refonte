@@ -67,7 +67,7 @@ class MathTextService:
         # 🚨 SÉCURITÉ PRODUCTION : Bypass IA pour types problématiques
         # Ces types ont des fallbacks parfaits (100% cohérents)
         # Le bypass garantit 0% de risque d'incohérence
-        TYPES_BYPASS_IA = ["cercle", "rectangle", "trigonometrie"]
+        TYPES_BYPASS_IA = ["rectangle", "trigonometrie"]  # ✅ "cercle" retiré (réactivation IA progressive)
         
         if spec.type_exercice.value in TYPES_BYPASS_IA:
             logger.info(f"🔒 BYPASS IA activé pour {spec.type_exercice.value} → Fallback direct")
