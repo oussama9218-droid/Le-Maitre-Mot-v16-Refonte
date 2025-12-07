@@ -110,6 +110,46 @@ class GeometrySVGRenderer:
         
         return svg
     
+    def add_grid(self, svg: ET.Element, grid_size: int, cell_size: float, offset_x: float, offset_y: float):
+        """
+        Ajoute une grille de fond au SVG (quadrillage pédagogique)
+        
+        Args:
+            svg: Élément SVG racine
+            grid_size: Nombre d'unités de la grille (ex: 14)
+            cell_size: Taille d'une cellule en pixels
+            offset_x: Décalage horizontal
+            offset_y: Décalage vertical
+        """
+        grid_color = "#E8E8E8"  # Gris très clair
+        grid_width = 0.5
+        
+        # Lignes verticales
+        for i in range(grid_size + 1):
+            x = offset_x + i * cell_size
+            ET.SubElement(svg, 'line', {
+                'x1': str(x),
+                'y1': str(offset_y),
+                'x2': str(x),
+                'y2': str(self.height - offset_y),
+                'stroke': grid_color,
+                'stroke-width': str(grid_width),
+                'class': 'grid-line'
+            })
+        
+        # Lignes horizontales
+        for i in range(grid_size + 1):
+            y = offset_y + i * cell_size
+            ET.SubElement(svg, 'line', {
+                'x1': str(offset_x),
+                'y1': str(y),
+                'x2': str(self.width - offset_x),
+                'y2': str(y),
+                'stroke': grid_color,
+                'stroke-width': str(grid_width),
+                'class': 'grid-line'
+            })
+    
     def add_line(self, svg: ET.Element, line: Line) -> None:
         """Ajoute une ligne au SVG"""
         line_elem = ET.SubElement(svg, 'line', {
