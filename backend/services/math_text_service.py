@@ -66,6 +66,9 @@ class MathTextService:
     ) -> MathTextGeneration:
         """Génère le texte IA pour une spec mathématique"""
         
+        # ⏱️ Démarrer chronomètre pour monitoring
+        start_time = time.time()
+        
         # 🚨 SÉCURITÉ PRODUCTION : Bypass IA pour types problématiques
         # Ces types ont des fallbacks parfaits (100% cohérents)
         # Le bypass garantit 0% de risque d'incohérence
@@ -73,6 +76,19 @@ class MathTextService:
         
         if spec.type_exercice.value in TYPES_BYPASS_IA:
             logger.info(f"🔒 BYPASS IA activé pour {spec.type_exercice.value} → Fallback direct")
+            
+            # 📊 Monitoring : bypass IA
+            ia_monitoring.log_generation(
+                type_exercice=spec.type_exercice.value,
+                niveau=spec.niveau,
+                chapitre=spec.chapitre,
+                ia_utilisee=False,  # Bypass
+                ia_acceptee=False,
+                fallback_utilise=True,
+                cause_rejet="bypass_securite",
+                temps_generation_ms=(time.time() - start_time) * 1000
+            )
+            
             return self._generate_fallback_text(spec)
         
         # Construire le prompt structuré
