@@ -15,6 +15,8 @@ import random
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Any
+import sys
+sys.path.insert(0, '/app/backend')
 from models.math_models import MathExerciseSpec
 from style_manager import StyleFormulation
 from pedagogie_rules import ExerciseType
