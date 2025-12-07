@@ -26,7 +26,7 @@ class MathGenerationService:
             ["R", "S", "T"],
             ["X", "Y", "Z"],
             ["G", "H", "I"],
-            ["J", "K", "L"],
+            ["U", "V", "W"],  # ✅ Remplace ["J", "K", "L"] pour éviter "L" (faux positif avec "L'")
             ["A", "B", "C"]  # Dernier recours
         ]
         self.used_points_sets = set()
