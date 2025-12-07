@@ -16,7 +16,7 @@ class GeometryRenderService:
     def __init__(self):
         self.renderer = GeometrySVGRenderer(width=400, height=300)
     
-    def render_figure_to_svg(self, figure: GeometricFigure) -> Optional[str]:
+    def render_figure_to_svg(self, figure: GeometricFigure):
         """
         Convertit une GeometricFigure en SVG
         
@@ -24,7 +24,8 @@ class GeometryRenderService:
             figure: Objet GeometricFigure à rendre
             
         Returns:
-            Chaîne SVG ou None en cas d'erreur
+            - Pour symétrie axiale/centrale : dict avec {figure_svg, figure_svg_question, figure_svg_correction}
+            - Pour autres types : Chaîne SVG ou None en cas d'erreur
         """
         try:
             figure_type = figure.type.lower()
@@ -41,8 +42,10 @@ class GeometryRenderService:
             elif figure_type == "thales":
                 return self._render_thales(figure)
             elif figure_type == "symetrie_axiale":
+                # Retourne un dict avec question et correction
                 return self._render_symetrie_axiale(figure)
             elif figure_type == "symetrie_centrale":
+                # Retourne un dict avec question et correction
                 return self._render_symetrie_centrale(figure)
             else:
                 logger.warning(f"Type de figure non supporté: {figure_type}")
