@@ -208,12 +208,18 @@ class GeometryRenderService:
         # Récupérer les points
         points_list = figure.points if figure.points else []
         
+        # Vérifier si c'est un triangle et si on veut la grille
+        is_triangle = "triangle" in figure.proprietes
+        with_grid = "with_grid" in figure.proprietes
+        
         # Construire les données pour le renderer
         data = {
             "axe_type": axe_type,
             "axe_position": axe_position,
             "points_coords": coords,
-            "points_labels": points_list
+            "points_labels": points_list,
+            "is_triangle": is_triangle,
+            "with_grid": with_grid
         }
         
         return self.renderer.render_symetrie_axiale(data)
