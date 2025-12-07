@@ -34,10 +34,15 @@
     "symetrie_axiale__trouver_valeur__moyen__inductif": "Rappelle-toi comment on fait pour les symétries. Ici, {pointA}({coordA_x}, {coordA_y}) et {axeDesc}. Déduis-en la position de {pointB}.",
     "symetrie_axiale__trouver_valeur__moyen__narratif": "Lucas travaille sur un exercice de symétrie. Il a placé {pointA} en ({coordA_x}, {coordA_y}) et doit trouver son symétrique {pointB} par rapport à {axeDesc}. Quelle sera la position de {pointB} ?",
     "symetrie_axiale__verifier_propriete__difficile__guide": "Étape 1 : Localise {axeDesc}. Étape 2 : Calcule la distance de {pointA}({coordA_x}, {coordA_y}) à l'axe. Étape 3 : Calcule celle de {pointB}({coordB_x}, {coordB_y}). Compare.",
-    "symetrie_axiale__trouver_valeur__difficile__academique": "Soit le point {pointA}({coordA_x}, {coordA_y}) dans le plan muni d'un repère. Par application de la transformation géométrique de symétrie axiale d'axe {axeDesc}, détermine les coordonnées exactes du point image {pointB}."
+    "symetrie_axiale__trouver_valeur__difficile__academique": "Soit le point {pointA}({coordA_x}, {coordA_y}) dans le plan muni d'un repère. Par application de la transformation géométrique de symétrie axiale d'axe {axeDesc}, détermine les coordonnées exactes du point image {pointB}.",
+    "theoreme_de_pythagore__trouver_valeur__facile__qr": "Q : Angle droit où ?\nR : En {angleD}.\nQ : Côtés connus ?\nR : {cote1} = {long1} cm, {cote2} = {long2} cm.\nQ : Trouve {coteACalculer}.",
+    "theoreme_de_pythagore__trouver_valeur__facile__etapes": "Étape 1 : Triangle {triangle} rectangle en {angleD}\nÉtape 2 : Note {cote1} = {long1} cm et {cote2} = {long2} cm\nÉtape 3 : Applique Pythagore pour trouver {coteACalculer}",
+    "theoreme_de_pythagore__trouver_valeur__facile__academique": "Dans le triangle {triangle} rectangle en {angleD}, utilise les propriétés du théorème de Pythagore pour déterminer {coteACalculer}, sachant que {cote1} = {long1} cm et {cote2} = {long2} cm.",
+    "theoreme_de_pythagore__trouver_valeur__facile__defi": "Défi Pythagore ! Triangle {triangle}, angle droit en {angleD}, {cote1} = {long1} cm, {cote2} = {long2} cm. Trouve {coteACalculer} en moins de 2 minutes !",
+    "theoreme_de_pythagore__trouver_valeur__facile__inductif": "Comme dans l'exercice précédent, utilise Pythagore. Triangle {triangle} rectangle en {angleD}, {cote1} = {long1} cm, {cote2} = {long2} cm. Calcule {coteACalculer}."
   },
   "hits": 21,
-  "misses": 35,
+  "misses": 40,
   "total_cost_saved": 808.0,
-  "last_updated": "2025-12-07T22:37:12.710844"
+  "last_updated": "2025-12-07T22:38:07.628515"
 }
