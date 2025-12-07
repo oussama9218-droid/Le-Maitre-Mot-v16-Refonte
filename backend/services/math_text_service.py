@@ -1181,6 +1181,46 @@ Résultat : {spec.resultat_final}"""
             logger.error(f"❌ Erreur génération depuis gabarit : {e}", exc_info=True)
             return None
     
+    def _detect_pedagogical_type(self, spec: MathExerciseSpec) -> str:
+        """
+        Détecte le type pédagogique d'un exercice depuis ses paramètres.
+        
+        Mappe les types spécifiques (ex: "trouver_symetrique") vers 
+        les types de gabarits universels ("trouver_valeur", "verifier_propriete").
+        
+        Args:
+            spec: Spécification de l'exercice
+        
+        Returns:
+            Type pédagogique ("trouver_valeur", "verifier_propriete", etc.)
+        """
+        # Extraire le type depuis les paramètres
+        param_type = spec.parametres.get("type", "")
+        
+        # Mapping des types spécifiques vers types pédagogiques universels
+        TYPE_MAPPING = {
+            # Symétrie axiale / centrale
+            "trouver_symetrique": "trouver_valeur",
+            "verifier_symetrie": "verifier_propriete",
+            "completer_figure": "completer_structure",
+            
+            # Autres chapitres (à étendre)
+            "calculer": "trouver_valeur",
+            "verifier": "verifier_propriete",
+            "demontrer": "probleme_redige"
+        }
+        
+        # Chercher dans le mapping
+        pedagogical_type = TYPE_MAPPING.get(param_type)
+        
+        if pedagogical_type:
+            logger.debug(f"Type '{param_type}' mappé vers '{pedagogical_type}'")
+            return pedagogical_type
+        
+        # Fallback: utiliser le type de l'exercice si pas de mapping trouvé
+        logger.debug(f"Pas de mapping pour '{param_type}', utilisation du type d'exercice")
+        return spec.type_exercice.value
+    
     def _build_solution_from_steps(self, spec: MathExerciseSpec) -> str:
         """
         Construit une solution rédigée simple depuis les étapes calculées.
