@@ -2105,13 +2105,13 @@ class MathGenerationService:
             longueurs_converties[f"{centre}_x"] = centre_x
             longueurs_converties[f"{centre}_y"] = centre_y
             
-            all_points = [point_a, point_b, centre]
+            all_points = [point_a, point_b, point_c, centre]
             
             figure = GeometricFigure(
                 type="symetrie_centrale",
                 points=all_points,
                 longueurs_connues=longueurs_converties,
-                proprietes=["centre_symetrie", "figure_complete"]
+                proprietes=["centre_symetrie", "figure_complete", "triangle", "with_grid"]
             )
             
             return MathExerciseSpec(
@@ -2121,7 +2121,7 @@ class MathGenerationService:
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
                     "type": "completer_figure",
-                    "figure": "segment",
+                    "figure": "triangle",
                     "points_initiaux": all_points,
                     "centre": centre
                 },
@@ -2129,7 +2129,7 @@ class MathGenerationService:
                     "points_symetriques": coords_symetriques
                 },
                 etapes_calculees=etapes,
-                resultat_final=f"Segment symétrique : [{point_a_prime}{point_b_prime}]",
+                resultat_final=f"Triangle symétrique : {point_a_prime}{point_b_prime}{point_c_prime}",
                 figure_geometrique=figure,
                 points_bareme=[
                     {"etape": "Construction des symétriques", "points": 3.0},
