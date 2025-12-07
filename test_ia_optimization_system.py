@@ -30,7 +30,7 @@ from typing import Dict, List, Any, Optional
 class IAOptimizationTester:
     def __init__(self):
         # Configuration
-        self.base_url = os.environ.get('REACT_APP_BACKEND_URL', 'https://lesson-generator.preview.emergentagent.com')
+        self.base_url = "http://localhost:8001"
         self.api_url = f"{self.base_url}/api"
         self.guest_id = f"test-e2e-optimization-{datetime.now().strftime('%H%M%S')}-{uuid.uuid4().hex[:8]}"
         
