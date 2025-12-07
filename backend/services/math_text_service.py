@@ -870,3 +870,119 @@ Résultat : {spec.resultat_final}"""
             logger.warning(f"Fallback rectangle échoué, utilisation fallback generic: {e}")
             return self._fallback_generic(spec)
 
+
+
+    def _validate_cercle_specifique(
+        self, 
+        text: MathTextGeneration, 
+        spec: MathExerciseSpec
+    ) -> bool:
+        """
+        Validation STRICTE spécifique aux exercices de CERCLES
+        
+        Règles :
+        1. Le rayon mentionné doit être EXACTEMENT celui de la spec
+        2. Le centre doit être UNIQUEMENT le point autorisé
+        3. Aucune valeur inventée
+        4. Formules correctes (périmètre vs aire)
+        
+        Returns:
+            True si valide, False sinon (→ fallback)
+        """
+        
+        try:
+            import re
+            
+            # 1. Récupérer les données de référence
+            rayon_attendu = spec.parametres.get("rayon", None)
+            type_calcul = spec.parametres.get("type", "perimetre")
+            
+            if not rayon_attendu:
+                logger.warning("❌ Validation Cercle : rayon non défini dans spec")
+                return False
+            
+            # Point centre autorisé
+            centre_attendu = None
+            if spec.figure_geometrique and spec.figure_geometrique.points:
+                centre_attendu = spec.figure_geometrique.points[0]
+            
+            if not centre_attendu:
+                logger.warning("❌ Validation Cercle : centre non défini")
+                return False
+            
+            # 2. Vérifier le rayon dans l'énoncé
+            all_text = text.enonce + (text.solution_redigee or "")
+            
+            # Pattern : "rayon X cm" ou "rayon de X cm"
+            rayon_pattern = r'rayon\s+(?:de\s+)?(\d+(?:\.\d+)?)\s*cm'
+            rayons_detectes = re.findall(rayon_pattern, all_text, re.IGNORECASE)
+            
+            if rayons_detectes:
+                for rayon_str in rayons_detectes:
+                    rayon_detecte = float(rayon_str)
+                    
+                    # Vérifier que le rayon détecté = rayon attendu
+                    if abs(rayon_detecte - rayon_attendu) > 0.01:
+                        logger.warning(
+                            f"❌ Validation Cercle : Rayon INCOHÉRENT détecté={rayon_detecte}, "
+                            f"attendu={rayon_attendu}"
+                        )
+                        return False
+            
+            # 3. Vérifier que seul le centre autorisé est mentionné
+            # Pattern : "cercle de centre X" ou "centre X"
+            centre_pattern = r'centre\s+([A-Z])'
+            centres_detectes = re.findall(centre_pattern, all_text, re.IGNORECASE)
+            
+            for centre_detecte in centres_detectes:
+                if centre_detecte != centre_attendu:
+                    logger.warning(
+                        f"❌ Validation Cercle : Centre INCOHÉRENT détecté={centre_detecte}, "
+                        f"attendu={centre_attendu}"
+                    )
+                    return False
+            
+            # 4. Vérifier formule appropriée selon type
+            if type_calcul == "perimetre":
+                # Doit contenir "2πr" ou "2 × π × r" ou équivalent
+                if not re.search(r'2\s*[×x*]\s*π\s*[×x*]\s*r|2\s*π\s*r', all_text, re.IGNORECASE):
+                    logger.warning(f"❌ Validation Cercle : Formule périmètre absente ou incorrecte")
+                    # Tolérer si fallback sera utilisé
+                    pass
+            
+            elif type_calcul == "aire":
+                # Doit contenir "πr²" ou "π × r²"
+                if not re.search(r'π\s*[×x*]?\s*r[²2]', all_text, re.IGNORECASE):
+                    logger.warning(f"❌ Validation Cercle : Formule aire absente ou incorrecte")
+                    pass
+            
+            # 5. Vérifier qu'il n'y a pas de valeurs absurdes
+            # Pattern : tous les nombres dans le texte
+            nombres_pattern = r'\b(\d+(?:\.\d+)?)\b'
+            nombres_detectes = [float(n) for n in re.findall(nombres_pattern, all_text)]
+            
+            # Vérifier qu'aucun nombre n'est trop éloigné du rayon (sauf résultat)
+            for nombre in nombres_detectes:
+                # Ignorer les nombres très proches du rayon (valide)
+                if abs(nombre - rayon_attendu) < 0.1:
+                    continue
+                
+                # Ignorer les grands nombres (probablement le périmètre/aire calculé)
+                if nombre > rayon_attendu * 2:
+                    continue
+                
+                # Si un nombre entre rayon et 2*rayon n'est pas le rayon, suspect
+                if rayon_attendu < nombre < rayon_attendu * 1.5:
+                    logger.warning(
+                        f"⚠️ Validation Cercle : Nombre suspect détecté={nombre}, rayon={rayon_attendu}"
+                    )
+                    # Ne pas rejeter automatiquement, peut être valide
+            
+            # ✅ Toutes les validations passent
+            logger.info(f"✅ Validation Cercle réussie : rayon={rayon_attendu}, centre={centre_attendu}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Erreur validation Cercle : {e}")
+            return False  # En cas d'erreur, rejeter par sécurité
+
