@@ -710,7 +710,9 @@ class GeometrySVGRenderer:
                 "axe_type": "vertical" | "horizontal" | "oblique",
                 "axe_position": int ou "y=x",
                 "points_coords": {"A_x": 3, "A_y": 5, "A_prime_x": 7, "A_prime_y": 5, ...},
-                "points_labels": ["A", "A'"] ou ["D", "E"]
+                "points_labels": ["A", "A'"] ou ["D", "E"],
+                "is_triangle": bool,
+                "with_grid": bool
             }
         """
         svg = self.create_svg_root()
@@ -719,6 +721,8 @@ class GeometrySVGRenderer:
         axe_position = data.get('axe_position', 5)
         points_coords = data.get('points_coords', {})
         points_labels = data.get('points_labels', [])
+        is_triangle = data.get('is_triangle', False)
+        with_grid = data.get('with_grid', False)
         
         # Système de coordonnées : taille du repère
         grid_size = 14  # Grille de 0 à 14 (pour accommoder les coordonnées mathématiques)
