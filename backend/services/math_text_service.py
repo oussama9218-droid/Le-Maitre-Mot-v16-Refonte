@@ -6,11 +6,13 @@ L'IA ne fait QUE la rédaction, jamais les calculs ou paramètres
 import json
 import asyncio
 import logging
+import time
 from typing import List, Optional
 from models.math_models import MathExerciseSpec, MathTextGeneration, GeneratedMathExercise
 from utils import get_emergent_key
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from services.text_normalizer import normalizer
+from services.ia_monitoring_service import ia_monitoring
 
 logger = logging.getLogger(__name__)
 
