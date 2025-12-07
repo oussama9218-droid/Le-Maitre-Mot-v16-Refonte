@@ -1170,7 +1170,8 @@ class GeometrySVGRenderer:
                     self.add_point(svg, point, show_label=True)
         
         # 5. Dessiner les segments reliant les points au centre
-        if centre_name and centre_name in point_objects:
+        # MAIS seulement dans la version correction (quand tous les points sont visibles)
+        if centre_name and centre_name in point_objects and not points_to_hide_in_question:
             centre_point = point_objects[centre_name]
             
             for point_name, point in point_objects.items():
@@ -1180,7 +1181,8 @@ class GeometrySVGRenderer:
                     self.add_line(svg, segment_line)
         
         # 6. Si on a exactement 2 points + centre, tracer le segment complet
-        if len(point_objects) == 3 and centre_name:
+        # MAIS seulement dans la version correction
+        if len(point_objects) == 3 and centre_name and not points_to_hide_in_question:
             other_points = [p for name, p in point_objects.items() if name != centre_name]
             if len(other_points) == 2:
                 # Segment entre les deux points (passant par le centre)
