@@ -1084,22 +1084,23 @@ class GeometrySVGRenderer:
                     'class': 'triangle-initial'
                 })
             
-            # Triangle image (gris/bleu clair)
-            image_points_svg = []
-            for coords in list(points_images.values())[:3]:
-                if 'x' in coords and 'y' in coords:
-                    x_svg, y_svg = math_to_svg(coords['x'], coords['y'])
-                    image_points_svg.append(f"{x_svg},{y_svg}")
-            
-            if len(image_points_svg) == 3:
-                ET.SubElement(svg, 'polygon', {
-                    'points': ' '.join(image_points_svg),
-                    'fill': 'none',
-                    'stroke': '#99BBDD',
-                    'stroke-width': '2',
-                    'stroke-dasharray': '3,3',
-                    'class': 'triangle-image'
-                })
+            # Triangle image (gris/bleu clair) - SEULEMENT dans le corrigé
+            if not hide_image_triangle:
+                image_points_svg = []
+                for coords in list(points_images.values())[:3]:
+                    if 'x' in coords and 'y' in coords:
+                        x_svg, y_svg = math_to_svg(coords['x'], coords['y'])
+                        image_points_svg.append(f"{x_svg},{y_svg}")
+                
+                if len(image_points_svg) == 3:
+                    ET.SubElement(svg, 'polygon', {
+                        'points': ' '.join(image_points_svg),
+                        'fill': 'none',
+                        'stroke': '#99BBDD',
+                        'stroke-width': '2',
+                        'stroke-dasharray': '3,3',
+                        'class': 'triangle-image'
+                    })
         
         # 4. Dessiner tous les points
         point_objects = {}
