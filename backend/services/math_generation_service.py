@@ -715,8 +715,15 @@ class MathGenerationService:
         points_set2 = self._get_next_geometry_points()  # D, E, F
         points = points_set1 + [points_set2[0]]  # A, B, C, D (4 points pour rectangle)
         
+        # ✅ ASSERT : Garantir 4 points distincts pour rectangle
+        assert len(points) == 4, f"Rectangle doit avoir 4 points, pas {len(points)}"
+        assert len(set(points)) == 4, f"Rectangle doit avoir 4 points DISTINCTS: {points}"
+        
         longueur = random.randint(8, 20)
         largeur = random.randint(4, 12)
+        
+        # ✅ ASSERT : Garantir valeurs positives
+        assert longueur > 0 and largeur > 0, "Longueur et largeur doivent être > 0"
         
         figure = GeometricFigure(
             type="rectangle",
