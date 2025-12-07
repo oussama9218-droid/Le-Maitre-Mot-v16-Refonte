@@ -3141,7 +3141,7 @@ async def generate_document(request: GenerateRequest):
         # 🚨 Erreurs de validation (ex: chapitre non mappé)
         logger.error(f"Validation error: {e}")
         raise HTTPException(
-            status_code=400,
+            status_code=422,
             detail={
                 "error": "chapter_not_implemented",
                 "message": str(e),
