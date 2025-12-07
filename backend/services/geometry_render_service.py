@@ -40,6 +40,8 @@ class GeometryRenderService:
                 return self._render_triangle(figure)
             elif figure_type == "thales":
                 return self._render_thales(figure)
+            elif figure_type == "symetrie_axiale":
+                return self._render_symetrie_axiale(figure)
             else:
                 logger.warning(f"Type de figure non supporté: {figure_type}")
                 return None
