@@ -214,6 +214,9 @@ class GeometryRenderService:
             "axe_position": axe_position,
             "points_coords": coords,
             "points_labels": points_list
+        }
+        
+        return self.renderer.render_symetrie_axiale(data)
     
     def _render_symetrie_centrale(self, figure: GeometricFigure) -> str:
         """
