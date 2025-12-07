@@ -983,7 +983,8 @@ class GeometrySVGRenderer:
         points_labels = data.get('points_labels', [])
         is_triangle = data.get('is_triangle', False)
         with_grid = data.get('with_grid', False)
-        hide_image_triangle = data.get('hide_image_triangle', False)  # Pour version question
+        hide_image_triangle = data.get('hide_image_triangle', False)  # Pour version question (triangles)
+        points_to_hide_in_question = data.get('points_to_hide_in_question', [])  # Pour version question (points simples)
         
         # Système de coordonnées
         grid_size = 14
