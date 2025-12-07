@@ -757,6 +757,7 @@ class MathGenerationService:
                 type_exercice=MathExerciseType.PERIMETRE_AIRE,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "type": "trouver_valeur",  # Type pédagogique pour gabarits
                     "figure": "cercle",
                     "rayon": rayon
                 },
