@@ -218,10 +218,14 @@ class GeometryRenderService:
         with_grid = True  # Toujours activée pour cohérence pédagogique
         
         # Identifier les points à cacher dans la version question
-        # Pour les exercices simples (non-triangles), cacher le deuxième point (point image)
+        # Pour les exercices simples (non-triangles), déterminer si on cache le 2ème point
         points_to_hide_in_question = []
-        if not is_triangle and len(points_list) >= 2:
-            # Le deuxième point est le point symétrique (à trouver)
+        
+        # Vérifier si c'est un exercice "verifier_symetrie" (les deux points doivent être visibles)
+        is_verification_exercise = any("symetriques_" in prop for prop in figure.proprietes)
+        
+        if not is_triangle and len(points_list) >= 2 and not is_verification_exercise:
+            # Pour "trouver_symetrique" : le deuxième point est la réponse (à cacher)
             points_to_hide_in_question.append(points_list[1])
         
         # Construire les données pour le renderer
