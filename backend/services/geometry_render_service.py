@@ -233,7 +233,7 @@ class GeometryRenderService:
             "figure_svg_correction": svg_correction
         }
     
-    def _render_symetrie_centrale(self, figure: GeometricFigure) -> str:
+    def _render_symetrie_centrale(self, figure: GeometricFigure) -> dict:
         """
         Rendu d'une symétrie centrale
         
