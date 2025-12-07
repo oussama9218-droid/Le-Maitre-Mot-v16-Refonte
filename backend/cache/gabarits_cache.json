@@ -4,10 +4,15 @@
     "symetrie_axiale__trouver_valeur__facile__concis": "{pointA}({coordA_x}, {coordA_y}). Symétrie / {axeDesc}. {pointB} = ?",
     "symetrie_axiale__trouver_valeur__facile__scolaire": "Soit {pointA}({coordA_x}, {coordA_y}). Quelle est la position du point {pointB}, symétrique de {pointA} relativement à l'axe {axeDesc} ?",
     "symetrie_axiale__trouver_valeur__facile__academique": "Étant donné {pointA}({coordA_x}, {coordA_y}) et l'axe de symétrie {axeDesc}, établis les coordonnées du point {pointB} en utilisant les propriétés de conservation de la distance à l'axe.",
-    "symetrie_axiale__trouver_valeur__facile__guide": "Étape par étape : localise {pointA} en ({coordA_x}, {coordA_y}), puis identifie {axeDesc}. Le point {pointB} sera à la même distance de l'axe, mais de l'autre côté. Calcule ses coordonnées."
+    "symetrie_axiale__trouver_valeur__facile__guide": "Étape par étape : localise {pointA} en ({coordA_x}, {coordA_y}), puis identifie {axeDesc}. Le point {pointB} sera à la même distance de l'axe, mais de l'autre côté. Calcule ses coordonnées.",
+    "symetrie_axiale__verifier_propriete__moyen__qr": "Q : {pointA} = ?\nR : ({coordA_x}, {coordA_y}).\nQ : {pointB} = ?\nR : ({coordB_x}, {coordB_y}).\nQ : Axe ?\nR : {axeDesc}.\nQ : Symétrie vérifiée ?",
+    "symetrie_axiale__trouver_valeur__moyen__etapes": "Méthode :\nÉtape A : Note les coordonnées de {pointA} : ({coordA_x}, {coordA_y})\nÉtape B : Identifie l'axe : {axeDesc}\nÉtape C : Trouve {pointB}",
+    "symetrie_axiale__verifier_propriete__moyen__concis": "{pointA}({coordA_x}, {coordA_y}), {pointB}({coordB_x}, {coordB_y}), {axeDesc}. Symétriques par rapport à l'axe ?",
+    "symetrie_axiale__trouver_valeur__moyen__oral": "OK, {pointA} c'est ({coordA_x}, {coordA_y}). L'axe c'est {axeDesc}. Maintenant dis-moi où va {pointB}.",
+    "symetrie_axiale__trouver_valeur__moyen__concis": "Coordonnées de {pointA} : ({coordA_x}, {coordA_y}). Axe : {axeDesc}. Calcule {pointB}."
   },
-  "hits": 1,
-  "misses": 5,
-  "total_cost_saved": 46.0,
-  "last_updated": "2025-12-07T22:12:44.337049"
+  "hits": 2,
+  "misses": 10,
+  "total_cost_saved": 81.0,
+  "last_updated": "2025-12-07T22:14:22.758866"
 }
