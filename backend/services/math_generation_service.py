@@ -1666,7 +1666,7 @@ class MathGenerationService:
                         etapes.append(f"Les ordonnées sont différentes ({point_a_y} ≠ {point_b_y})")
                     etapes.append(f"Conclusion : {point_a} et {point_b} ne sont PAS symétriques par rapport à l'axe")
             
-            else:  # horizontal
+            elif axe_type == "horizontal":
                 axe_position = random.randint(4, 8)
                 point_a_x = random.randint(3, 10)
                 point_a_y = random.randint(1, axe_position - 1)
