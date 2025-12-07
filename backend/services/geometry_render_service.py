@@ -217,6 +217,13 @@ class GeometryRenderService:
         # GRILLE SYSTÉMATIQUE pour tous les exercices de symétrie axiale (collège)
         with_grid = True  # Toujours activée pour cohérence pédagogique
         
+        # Identifier les points à cacher dans la version question
+        # Pour les exercices simples (non-triangles), cacher le deuxième point (point image)
+        points_to_hide_in_question = []
+        if not is_triangle and len(points_list) >= 2:
+            # Le deuxième point est le point symétrique (à trouver)
+            points_to_hide_in_question.append(points_list[1])
+        
         # Construire les données pour le renderer
         data = {
             "axe_type": axe_type,
@@ -224,7 +231,8 @@ class GeometryRenderService:
             "points_coords": coords,
             "points_labels": points_list,
             "is_triangle": is_triangle,
-            "with_grid": with_grid
+            "with_grid": with_grid,
+            "points_to_hide_in_question": points_to_hide_in_question
         }
         
         # Générer les deux versions (question et correction)
