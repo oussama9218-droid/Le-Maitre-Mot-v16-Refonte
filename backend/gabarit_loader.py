@@ -186,8 +186,9 @@ class GabaritLoader:
         
         # Coordonnées du point initial - plusieurs formats possibles
         # Format 1: point_original_coords = {"x": val, "y": val}
-        # Format 2: coord_initial = (x, y)
-        coord_data = params.get("point_original_coords", params.get("point_a_coords", params.get("coord_initial")))
+        # Format 2: coords_a = {"x": val, "y": val}
+        # Format 3: coord_initial = (x, y)
+        coord_data = params.get("point_original_coords", params.get("coords_a", params.get("point_a_coords", params.get("coord_initial"))))
         
         if isinstance(coord_data, dict):
             values["coordA_x"] = coord_data.get("x", 0)
