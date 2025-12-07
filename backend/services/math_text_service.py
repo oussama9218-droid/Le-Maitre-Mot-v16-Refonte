@@ -86,6 +86,7 @@ class MathTextService:
         
         # ✨ NOUVELLE PRIORITÉ : Tenter génération depuis gabarit
         # Ceci permet de réduire drastiquement les appels IA
+        logger.info(f"🔍 Tentative de génération depuis gabarit pour {spec.chapitre} / {spec.type_exercice.value}")
         gabarit_result = self._try_generate_from_gabarit(spec)
         if gabarit_result:
             logger.info(f"🎯 GABARIT utilisé pour {spec.type_exercice.value} → 0 appel IA, coût = 0")
