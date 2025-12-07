@@ -367,7 +367,7 @@ class IAOptimizationTester:
         success_2, response_2, time_2 = self.run_api_test(
             "Cache Test - Second Generation",
             "POST",
-            "math/generate-exercises",
+            "generate",
             200,
             data=test_data_2,
             timeout=60
