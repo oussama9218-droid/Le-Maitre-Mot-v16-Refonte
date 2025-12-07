@@ -434,8 +434,10 @@ class IAOptimizationTester:
             "matiere": "Mathématiques",
             "niveau": "5e",
             "chapitre": "Symétrie axiale",
+            "type_doc": "exercices",
             "difficulte": "moyen",
             "nb_exercices": 10,  # Plus d'exercices pour voir la variété
+            "versions": ["A"],
             "guest_id": self.guest_id
         }
         
