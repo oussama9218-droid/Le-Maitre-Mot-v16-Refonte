@@ -368,6 +368,27 @@ const Step3GenerationApercu = ({
                           </div>
                         )}
                       </div>
+                      
+                      {/* Display SVG geometric figure for CORRECTION (with answer) */}
+                      {exercise.figure_svg_correction && (
+                        <div className="mt-4 flex justify-center">
+                          <h6 className="text-sm font-medium text-gray-700 mb-2 text-center">📐 Figure corrigée</h6>
+                          <div 
+                            className="border border-green-300 rounded-lg shadow-sm bg-white p-4"
+                            dangerouslySetInnerHTML={{ __html: exercise.figure_svg_correction }}
+                          />
+                        </div>
+                      )}
+                      {/* Fallback to figure_svg if figure_svg_correction not available (backward compatibility) */}
+                      {!exercise.figure_svg_correction && exercise.figure_svg && (
+                        <div className="mt-4 flex justify-center">
+                          <h6 className="text-sm font-medium text-gray-700 mb-2 text-center">📐 Figure</h6>
+                          <div 
+                            className="border border-gray-300 rounded-lg shadow-sm bg-white p-4"
+                            dangerouslySetInnerHTML={{ __html: exercise.figure_svg }}
+                          />
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}
