@@ -302,6 +302,7 @@ class MathGenerationService:
             type_exercice=MathExerciseType.TRIANGLE_RECTANGLE,
             difficulte=DifficultyLevel(difficulte),
             parametres={
+                "type": "trouver_valeur",  # Type pédagogique pour gabarits
                 "triangle": f"{points[0]}{points[1]}{points[2]}",
                 "angle_droit": angle_droit,
                 "longueurs_donnees": longueurs_connues,
