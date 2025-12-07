@@ -94,9 +94,9 @@ class MathGenerationService:
             "Triangles": [MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.TRIANGLE_RECTANGLE],
             "Aires et périmètres": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.CERCLE, MathExerciseType.RECTANGLE],
             "Angles et triangles": [MathExerciseType.TRIANGLE_QUELCONQUE],
-            "Parallélogrammes": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],  # ✅ AJOUTÉ
-            "Symétrie centrale": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],  # ✅ AJOUTÉ
-            "Homothétie": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],  # ✅ AJOUTÉ
+            "Parallélogrammes": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],
+            # ❌ "Symétrie centrale" RETIRÉ : Pas de générateur disponible
+            # ❌ "Homothétie" RETIRÉ : Pas de générateur disponible
             
             # ========== 4e ==========
             "Théorème de Pythagore": [MathExerciseType.TRIANGLE_RECTANGLE],
