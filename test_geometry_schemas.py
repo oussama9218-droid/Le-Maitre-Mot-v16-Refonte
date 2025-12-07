@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime
 
 class GeometricSchemaTest:
-    def __init__(self, base_url="https://exergen-repair.preview.emergentagent.com"):
+    def __init__(self, base_url="https://mathexercise.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.guest_id = f"geometry-test-{datetime.now().strftime('%H%M%S')}-{uuid.uuid4().hex[:8]}"

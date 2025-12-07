@@ -1033,7 +1033,7 @@ async def send_magic_link_email(email: str, token: str):
             return False
         
         # Generate magic link URL
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://exergen-repair.preview.emergentagent.com')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://mathexercise.preview.emergentagent.com')
         magic_link = f"{frontend_url}/login/verify?token={token}"
         
         # Email content

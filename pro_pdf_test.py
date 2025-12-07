@@ -8,7 +8,7 @@ import tempfile
 import os
 
 class ProPDFTester:
-    def __init__(self, base_url="https://exergen-repair.preview.emergentagent.com"):
+    def __init__(self, base_url="https://mathexercise.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
