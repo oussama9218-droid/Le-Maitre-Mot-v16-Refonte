@@ -214,6 +214,29 @@ class GeometryRenderService:
             "axe_position": axe_position,
             "points_coords": coords,
             "points_labels": points_list
+    
+    def _render_symetrie_centrale(self, figure: GeometricFigure) -> str:
+        """
+        Rendu d'une symétrie centrale
+        
+        Figure contient:
+        - points: [point_original, centre, point_image]
+        - longueurs_connues: coordonnées des points
+        - proprietes: ["centre_symetrie"]
+        """
+        
+        # Extraire les coordonnées
+        coords = {}
+        for key, val in figure.longueurs_connues.items():
+            coords[key] = val
+        
+        # Construire les données pour le renderer
+        data = {
+            "points_coords": coords,
+            "points_labels": figure.points if figure.points else []
+        }
+        
+        return self.renderer.render_symetrie_centrale(data)
         }
         
         return self.renderer.render_symetrie_axiale(data)
