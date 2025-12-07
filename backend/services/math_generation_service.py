@@ -1774,4 +1774,3 @@ class MathGenerationService:
                     {"etape": "Tracé de la figure complète", "points": 1.0}
                 ]
             )
-        )
