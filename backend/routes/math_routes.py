@@ -102,6 +102,16 @@ async def generate_math_exercises_new_architecture(
         
         return exercises
         
+    except ValueError as e:
+        # 🚨 ERREUR DE VALIDATION : Chapitre non mappé ou invalide
+        # Propager l'erreur pour retourner HTTP 422 au client
+        logger.error(f"❌ Erreur de validation: {e}")
+        raise HTTPException(
+            status_code=422,
+            detail=f"Aucun générateur disponible pour le chapitre sélectionné : {chapitre}. "
+                   f"Ce chapitre existe dans le curriculum mais n'a pas encore de générateur d'exercices."
+        )
+        
     except Exception as e:
         logger.error(f"❌ Erreur nouvelle architecture: {e}", exc_info=True)
         return []
