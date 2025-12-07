@@ -5,17 +5,21 @@ Convertit les objets GeometricFigure en images SVG affichables
 RÈGLE PÉDAGOGIQUE UNIVERSELLE (appliquée à toutes les transformations géométriques) :
     - SUJET = données connues uniquement
     - CORRIGÉ = données connues + données à trouver
+
+Ce service utilise le module central `pedagogie_rules` pour appliquer
+les règles de manière uniforme à tous les types d'exercices.
 """
 
 import logging
 from typing import Dict, Any, Optional, List
 from models.math_models import GeometricFigure
 from geometry_svg_renderer import GeometrySVGRenderer
+from pedagogie_rules import determine_elements_to_hide_in_question as determine_hiding_rules
 
 logger = logging.getLogger(__name__)
 
 
-def determine_elements_to_hide_in_question(exercise_type: str, figure: GeometricFigure) -> Dict[str, Any]:
+def determine_elements_to_hide_in_question_legacy(exercise_type: str, figure: GeometricFigure) -> Dict[str, Any]:
     """
     📌 FONCTION CENTRALE : Règle pédagogique universelle
     
