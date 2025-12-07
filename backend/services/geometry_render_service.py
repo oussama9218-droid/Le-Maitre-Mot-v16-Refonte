@@ -165,7 +165,7 @@ class GeometryRenderService:
         
         return self.renderer.render_thales(data)
     
-    def _render_symetrie_axiale(self, figure: GeometricFigure) -> str:
+    def _render_symetrie_axiale(self, figure: GeometricFigure) -> dict:
         """
         Rendu d'une symétrie axiale
         
