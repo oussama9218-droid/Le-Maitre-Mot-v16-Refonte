@@ -2038,24 +2038,29 @@ class MathGenerationService:
             )
         
         else:  # completer_figure
-            # Compléter une figure par symétrie centrale
+            # Compléter une figure par symétrie centrale - TRIANGLE
             point_a = points[0]
             point_b = points[1]
+            point_c = points[3] if len(points) > 3 else "P"  # 3ème sommet du triangle
             centre = points[2]
             
             # Centre
             centre_x = 7
             centre_y = 6
             
-            # Points d'un segment
+            # Générer un vrai triangle non aligné
+            x1, y1, x2, y2, x3, y3 = self._generate_non_aligned_triangle_points(min_coord=3, max_coord=10)
+            
             coords_originaux = {
-                point_a: {"x": 4, "y": 3},
-                point_b: {"x": 5, "y": 8}
+                point_a: {"x": x1, "y": y1},
+                point_b: {"x": x2, "y": y2},
+                point_c: {"x": x3, "y": y3}
             }
             
-            # Symétriques
+            # Symétriques des 3 sommets
             point_a_prime = f"{point_a}'"
             point_b_prime = f"{point_b}'"
+            point_c_prime = f"{point_c}'"
             
             coords_symetriques = {
                 point_a_prime: {
@@ -2065,12 +2070,17 @@ class MathGenerationService:
                 point_b_prime: {
                     "x": 2 * centre_x - coords_originaux[point_b]["x"],
                     "y": 2 * centre_y - coords_originaux[point_b]["y"]
+                },
+                point_c_prime: {
+                    "x": 2 * centre_x - coords_originaux[point_c]["x"],
+                    "y": 2 * centre_y - coords_originaux[point_c]["y"]
                 }
             }
             
             etapes = [
-                f"Segment [{point_a}{point_b}] avec {point_a}({coords_originaux[point_a]['x']}, {coords_originaux[point_a]['y']}), "
-                f"{point_b}({coords_originaux[point_b]['x']}, {coords_originaux[point_b]['y']})",
+                f"Triangle {point_a}{point_b}{point_c} avec {point_a}({coords_originaux[point_a]['x']}, {coords_originaux[point_a]['y']}), "
+                f"{point_b}({coords_originaux[point_b]['x']}, {coords_originaux[point_b]['y']}), "
+                f"{point_c}({coords_originaux[point_c]['x']}, {coords_originaux[point_c]['y']})",
                 f"Centre de symétrie {centre}({centre_x}, {centre_y})",
                 f"Pour chaque point, calculer son symétrique avec la formule M' = 2O - M :",
                 f"{point_a_prime} : (2×{centre_x} - {coords_originaux[point_a]['x']}, "
@@ -2078,7 +2088,10 @@ class MathGenerationService:
                 f"({coords_symetriques[point_a_prime]['x']}, {coords_symetriques[point_a_prime]['y']})",
                 f"{point_b_prime} : (2×{centre_x} - {coords_originaux[point_b]['x']}, "
                 f"2×{centre_y} - {coords_originaux[point_b]['y']}) = "
-                f"({coords_symetriques[point_b_prime]['x']}, {coords_symetriques[point_b_prime]['y']})"
+                f"({coords_symetriques[point_b_prime]['x']}, {coords_symetriques[point_b_prime]['y']})",
+                f"{point_c_prime} : (2×{centre_x} - {coords_originaux[point_c]['x']}, "
+                f"2×{centre_y} - {coords_originaux[point_c]['y']}) = "
+                f"({coords_symetriques[point_c_prime]['x']}, {coords_symetriques[point_c_prime]['y']})"
             ]
             
             # Convertir coords en format plat
