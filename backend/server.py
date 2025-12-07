@@ -1486,9 +1486,20 @@ async def generate_exercises_with_ai(matiere: str, niveau: str, chapitre: str, t
     
     # 🎯 NOUVELLE ARCHITECTURE MATHÉMATIQUES
     if matiere == "Mathématiques":
-        return await generate_math_exercises_new_architecture(
+        exercise_dicts = await generate_math_exercises_new_architecture(
             niveau, chapitre, difficulte, nb_exercices
         )
+        # Convert dicts to Exercise objects
+        exercises = []
+        for ex_dict in exercise_dicts:
+            try:
+                exercise = Exercise(**ex_dict)
+                exercises.append(exercise)
+            except Exception as e:
+                logger.error(f"Failed to create Exercise from dict: {e}")
+                logger.error(f"Dict keys: {list(ex_dict.keys())}")
+                raise
+        return exercises
     
     # 🎯 RESET DIVERSITY TRACKING for new document generation (autres matières)
     if hasattr(generate_exercises_with_ai, 'used_document_types'):
