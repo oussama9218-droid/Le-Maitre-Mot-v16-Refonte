@@ -236,7 +236,7 @@ Lors d'un export PDF réussi, les logs doivent afficher :
 INFO: ✅ SVG figure copié vers schema_svg pour PDF
 INFO:   module_name=export
 INFO:   func_name=copy_figure_svg
-INFO:   doc_id=6d1a94d2-5b1c-4dd7-bd75-f9c29be0929f
+INFO:   doc_id=exergen-repair
 INFO:   svg_length=1267
 ```
 
