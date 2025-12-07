@@ -837,7 +837,51 @@ class GeometrySVGRenderer:
                     points_dict[point_name] = {}
                 points_dict[point_name][coord] = value
         
-        # Dessiner les points et le segment entre eux
+        # Séparer les points initiaux et leurs images (points avec prime)
+        points_initiaux = {}
+        points_images = {}
+        for point_name, coords in points_dict.items():
+            if "'" in point_name or "_prime" in point_name:
+                points_images[point_name] = coords
+            else:
+                points_initiaux[point_name] = coords
+        
+        # 4. Si c'est un triangle, dessiner les triangles MNP et M'N'P'
+        if is_triangle and len(points_initiaux) >= 3 and len(points_images) >= 3:
+            # Triangle initial (bleu)
+            initial_points_svg = []
+            for coords in list(points_initiaux.values())[:3]:
+                if 'x' in coords and 'y' in coords:
+                    x_svg, y_svg = math_to_svg(coords['x'], coords['y'])
+                    initial_points_svg.append(f"{x_svg},{y_svg}")
+            
+            if len(initial_points_svg) == 3:
+                ET.SubElement(svg, 'polygon', {
+                    'points': ' '.join(initial_points_svg),
+                    'fill': 'none',
+                    'stroke': '#0066CC',
+                    'stroke-width': '2',
+                    'class': 'triangle-initial'
+                })
+            
+            # Triangle image (gris/bleu clair)
+            image_points_svg = []
+            for coords in list(points_images.values())[:3]:
+                if 'x' in coords and 'y' in coords:
+                    x_svg, y_svg = math_to_svg(coords['x'], coords['y'])
+                    image_points_svg.append(f"{x_svg},{y_svg}")
+            
+            if len(image_points_svg) == 3:
+                ET.SubElement(svg, 'polygon', {
+                    'points': ' '.join(image_points_svg),
+                    'fill': 'none',
+                    'stroke': '#99BBDD',
+                    'stroke-width': '2',
+                    'stroke-dasharray': '3,3',
+                    'class': 'triangle-image'
+                })
+        
+        # 5. Dessiner tous les points avec labels
         point_objects = {}
         for point_name, coords in points_dict.items():
             if 'x' in coords and 'y' in coords:
@@ -846,8 +890,8 @@ class GeometrySVGRenderer:
                 point_objects[point_name] = point
                 self.add_point(svg, point, show_label=True)
         
-        # 4. Dessiner le segment entre les deux points (si 2 points)
-        if len(point_objects) >= 2:
+        # 6. Si ce n'est PAS un triangle, dessiner le segment simple entre les deux points
+        if not is_triangle and len(point_objects) >= 2:
             points_list = list(point_objects.values())
             segment_line = Line(points_list[0], points_list[1], color="#0066CC", width=1.5)
             self.add_line(svg, segment_line)
