@@ -118,12 +118,38 @@ class MathTextService:
             # VALIDATION CRITIQUE : Vérifier la cohérence de la réponse IA
             if not self._validate_ai_response(text_generation, spec):
                 logger.warning("⚠️ Réponse IA invalide détectée, utilisation du fallback")
+                
+                # 📊 Monitoring : validation générale échouée
+                ia_monitoring.log_generation(
+                    type_exercice=spec.type_exercice.value,
+                    niveau=spec.niveau,
+                    chapitre=spec.chapitre,
+                    ia_utilisee=True,
+                    ia_acceptee=False,
+                    fallback_utilise=True,
+                    cause_rejet="validation_generale_echouee",
+                    temps_generation_ms=(time.time() - start_time) * 1000
+                )
+                
                 return self._generate_fallback_text(spec)
             
             # ✅ VALIDATION SPÉCIFIQUE CERCLES (réactivation progressive)
             if spec.type_exercice.value == "cercle":
                 if not self._validate_cercle_specifique(text_generation, spec):
                     logger.warning("⚠️ Validation Cercle échouée, utilisation du fallback")
+                    
+                    # 📊 Monitoring : validation cercle échouée
+                    ia_monitoring.log_generation(
+                        type_exercice=spec.type_exercice.value,
+                        niveau=spec.niveau,
+                        chapitre=spec.chapitre,
+                        ia_utilisee=True,
+                        ia_acceptee=False,
+                        fallback_utilise=True,
+                        cause_rejet="validation_cercle_specifique_echouee",
+                        temps_generation_ms=(time.time() - start_time) * 1000
+                    )
+                    
                     return self._generate_fallback_text(spec)
             
             # Normaliser les symboles mathématiques
