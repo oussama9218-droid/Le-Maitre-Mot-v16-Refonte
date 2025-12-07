@@ -177,6 +177,43 @@ class MathGenerationService:
         self.used_points_sets.add(tuple(self.geometry_points_sets[0]))
         return self.geometry_points_sets[0].copy()
     
+    
+    def _are_points_aligned(self, x1: float, y1: float, x2: float, y2: float, x3: float, y3: float) -> bool:
+        """
+        Vérifie si trois points sont alignés
+        Utilise le calcul de l'aire du triangle : si aire = 0, les points sont alignés
+        Formule : aire = |x1(y2-y3) + x2(y3-y1) + x3(y1-y2)| / 2
+        """
+        area = abs(x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2
+        return area < 0.5  # Tolérance pour éviter les triangles trop plats
+    
+    def _generate_non_aligned_triangle_points(self, min_coord: int = 2, max_coord: int = 10) -> tuple:
+        """
+        Génère 3 points formant un vrai triangle (non alignés)
+        Retourne : (x1, y1, x2, y2, x3, y3)
+        """
+        max_attempts = 50
+        for _ in range(max_attempts):
+            x1 = random.randint(min_coord, max_coord)
+            y1 = random.randint(min_coord, max_coord)
+            x2 = random.randint(min_coord, max_coord)
+            y2 = random.randint(min_coord, max_coord)
+            x3 = random.randint(min_coord, max_coord)
+            y3 = random.randint(min_coord, max_coord)
+            
+            # Vérifier que les points ne sont pas alignés
+            if not self._are_points_aligned(x1, y1, x2, y2, x3, y3):
+                # Vérifier que les points sont suffisamment espacés
+                dist_12 = ((x2 - x1)**2 + (y2 - y1)**2)**0.5
+                dist_23 = ((x3 - x2)**2 + (y3 - y2)**2)**0.5
+                dist_31 = ((x1 - x3)**2 + (y1 - y3)**2)**0.5
+                
+                # Les côtés doivent avoir une longueur minimale de 2 unités
+                if dist_12 >= 2 and dist_23 >= 2 and dist_31 >= 2:
+                    return (x1, y1, x2, y2, x3, y3)
+        
+        # Fallback : triangle par défaut garantit non aligné
+        return (3, 3, 7, 3, 5, 7)
     # === GÉNÉRATEURS SPÉCIALISÉS ===
     
     def _gen_triangle_rectangle(
