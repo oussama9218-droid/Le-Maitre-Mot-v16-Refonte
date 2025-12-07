@@ -701,6 +701,32 @@ class GeometrySVGRenderer:
         
         return ET.tostring(svg, encoding='unicode')
     
+    def render_symetrie_axiale_question_et_correction(self, data: Dict[str, Any]) -> tuple:
+        """
+        Génère DEUX versions du SVG pour exercices de construction :
+        1. Version QUESTION (sans le triangle image - pour le sujet)
+        2. Version CORRECTION (avec le triangle image - pour le corrigé)
+        
+        Returns:
+            (svg_question, svg_correction) : tuple de deux strings SVG
+        """
+        is_triangle = data.get('is_triangle', False)
+        
+        if not is_triangle:
+            # Si ce n'est pas un triangle, même SVG pour question et correction
+            svg = self.render_symetrie_axiale(data)
+            return (svg, svg)
+        
+        # Générer le SVG complet (correction)
+        svg_correction = self.render_symetrie_axiale(data)
+        
+        # Générer le SVG sans triangle image (question)
+        data_question = data.copy()
+        data_question['hide_image_triangle'] = True
+        svg_question = self.render_symetrie_axiale(data_question)
+        
+        return (svg_question, svg_correction)
+    
     def render_symetrie_axiale(self, data: Dict[str, Any]) -> str:
         """
         Rendu SVG pour la symétrie axiale
