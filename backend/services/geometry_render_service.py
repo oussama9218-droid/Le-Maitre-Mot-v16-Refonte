@@ -224,7 +224,14 @@ class GeometryRenderService:
             "with_grid": with_grid
         }
         
-        return self.renderer.render_symetrie_axiale(data)
+        # Générer les deux versions (question et correction)
+        svg_question, svg_correction = self.renderer.render_symetrie_axiale_question_et_correction(data)
+        
+        return {
+            "figure_svg": svg_correction,  # Rétrocompatibilité
+            "figure_svg_question": svg_question,
+            "figure_svg_correction": svg_correction
+        }
     
     def _render_symetrie_centrale(self, figure: GeometricFigure) -> str:
         """
