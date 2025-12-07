@@ -1102,9 +1102,12 @@ Résultat : {spec.resultat_final}"""
         """
         try:
             # 1. Vérifier si des gabarits existent
+            logger.info(f"🔍 Check gabarit pour: {spec.chapitre} / {spec.type_exercice.value}")
             if not gabarit_loader.has_gabarit(spec.chapitre, spec.type_exercice.value):
-                logger.debug(f"Pas de gabarits pour {spec.chapitre} / {spec.type_exercice.value}")
+                logger.info(f"❌ Pas de gabarits pour {spec.chapitre} / {spec.type_exercice.value}")
                 return None
+            
+            logger.info(f"✅ Gabarits trouvés pour {spec.chapitre} / {spec.type_exercice.value}")
             
             # 2. Sélectionner un style aléatoire
             style = style_manager.get_random_style()
