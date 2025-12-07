@@ -201,7 +201,7 @@ class GabaritLoader:
         
         # Pour verifier_propriete, ajouter les coordonnées du second point
         if type_ex == "verifier_propriete" or params.get("type") == "verifier_symetrie":
-            coord_second = params.get("point_image_coords", params.get("point_b_coords", params.get("coord_second")))
+            coord_second = params.get("point_image_coords", params.get("coords_b", params.get("point_b_coords", params.get("coord_second"))))
             
             if isinstance(coord_second, dict):
                 values["coordB_x"] = coord_second.get("x", 0)
