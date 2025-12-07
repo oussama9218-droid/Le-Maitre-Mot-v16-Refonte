@@ -285,6 +285,106 @@ class GabaritLoader:
         
         return values
     
+    def _prepare_pythagore_values(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Prépare les valeurs pour théorème de Pythagore."""
+        values = {}
+        
+        # Triangle et angle droit
+        values["triangle"] = params.get("triangle", "ABC")
+        values["angleD"] = params.get("angle_droit", "B")
+        
+        # Longueurs données
+        longueurs_donnees = params.get("longueurs_donnees", {})
+        
+        # Extraire les deux côtés connus
+        cotes = list(longueurs_donnees.keys())
+        if len(cotes) >= 2:
+            values["cote1"] = cotes[0]
+            values["long1"] = longueurs_donnees[cotes[0]]
+            values["cote2"] = cotes[1]
+            values["long2"] = longueurs_donnees[cotes[1]]
+        else:
+            # Fallback
+            values["cote1"] = "AB"
+            values["long1"] = 3
+            values["cote2"] = "BC"
+            values["long2"] = 4
+        
+        # Côté à calculer
+        values["coteACalculer"] = params.get("longueur_a_calculer", "AC")
+        
+        return values
+    
+    def _prepare_proportionnalite_values(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Prépare les valeurs pour proportionnalité."""
+        values = {}
+        
+        # Valeurs données et résultats
+        valeurs_donnees = params.get("valeurs_donnees", [3, 6])
+        resultats_donnes = params.get("resultats_donnes", [9, 18])
+        
+        values["val1"] = valeurs_donnees[0] if len(valeurs_donnees) > 0 else 3
+        values["val2"] = valeurs_donnees[1] if len(valeurs_donnees) > 1 else 6
+        values["res1"] = resultats_donnes[0] if len(resultats_donnes) > 0 else 9
+        values["res2"] = resultats_donnes[1] if len(resultats_donnes) > 1 else 18
+        
+        # Valeur à trouver
+        values["val3"] = params.get("valeur_a_trouver", 9)
+        
+        return values
+    
+    def _prepare_perimetre_aire_values(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Prépare les valeurs pour périmètres et aires."""
+        values = {}
+        
+        # Type de figure
+        figure_type = params.get("figure", "rectangle")
+        
+        # Mapping des noms de figures
+        figure_names = {
+            "rectangle": "rectangle",
+            "carre": "carré",
+            "cercle": "cercle",
+            "triangle": "triangle"
+        }
+        values["figureType"] = figure_names.get(figure_type, figure_type)
+        
+        # Dimensions selon le type de figure
+        if figure_type == "rectangle":
+            values["dim1Nom"] = "longueur"
+            values["dim1Val"] = params.get("longueur", 10)
+            values["dim2Nom"] = "largeur"
+            values["dim2Val"] = params.get("largeur", 5)
+            values["unite"] = "cm"
+            values["quoiCalculer"] = "périmètre"  # ou "aire" selon le contexte
+            
+        elif figure_type == "carre":
+            values["dim1Nom"] = "côté"
+            values["dim1Val"] = params.get("cote", 5)
+            values["dim2Nom"] = "côté"
+            values["dim2Val"] = params.get("cote", 5)
+            values["unite"] = "cm"
+            values["quoiCalculer"] = "périmètre"
+            
+        elif figure_type == "cercle":
+            values["dim1Nom"] = "rayon"
+            values["dim1Val"] = params.get("rayon", 5)
+            values["dim2Nom"] = "diamètre"
+            values["dim2Val"] = params.get("rayon", 5) * 2
+            values["unite"] = "cm"
+            values["quoiCalculer"] = "périmètre"
+            
+        else:
+            # Fallback générique
+            values["dim1Nom"] = "dimension1"
+            values["dim1Val"] = 10
+            values["dim2Nom"] = "dimension2"
+            values["dim2Val"] = 5
+            values["unite"] = "cm"
+            values["quoiCalculer"] = "mesure"
+        
+        return values
+    
     def _build_key(self, chapitre: str, type_exercice: str) -> str:
         """Construit la clé de recherche pour les gabarits."""
         chapitre_clean = chapitre.lower().replace(" ", "_").replace("é", "e").replace("è", "e")
