@@ -180,43 +180,59 @@ class GabaritLoader:
         """Prépare les valeurs pour symétrie axiale."""
         values = {}
         
-        # Points
-        values["pointA"] = params.get("point_initial", "M")
-        values["pointB"] = params.get("point_symetrique", "M'")
+        # Points - mapper depuis les noms générés (point_original, point_image, etc.)
+        values["pointA"] = params.get("point_original", params.get("point_a", params.get("point_initial", "M")))
+        values["pointB"] = params.get("point_image", params.get("point_b", params.get("point_symetrique", "M'")))
         
-        # Coordonnées du point initial
-        coord_initial = params.get("coord_initial", (0, 0))
-        if isinstance(coord_initial, (list, tuple)) and len(coord_initial) >= 2:
-            values["coordA_x"] = coord_initial[0]
-            values["coordA_y"] = coord_initial[1]
+        # Coordonnées du point initial - plusieurs formats possibles
+        # Format 1: point_original_coords = {"x": val, "y": val}
+        # Format 2: coord_initial = (x, y)
+        coord_data = params.get("point_original_coords", params.get("point_a_coords", params.get("coord_initial")))
+        
+        if isinstance(coord_data, dict):
+            values["coordA_x"] = coord_data.get("x", 0)
+            values["coordA_y"] = coord_data.get("y", 0)
+        elif isinstance(coord_data, (list, tuple)) and len(coord_data) >= 2:
+            values["coordA_x"] = coord_data[0]
+            values["coordA_y"] = coord_data[1]
         else:
             values["coordA_x"] = 0
             values["coordA_y"] = 0
         
         # Pour verifier_propriete, ajouter les coordonnées du second point
-        if type_ex == "verifier_propriete":
-            coord_second = params.get("coord_second", (0, 0))
-            if isinstance(coord_second, (list, tuple)) and len(coord_second) >= 2:
+        if type_ex == "verifier_propriete" or params.get("type") == "verifier_symetrie":
+            coord_second = params.get("point_image_coords", params.get("point_b_coords", params.get("coord_second")))
+            
+            if isinstance(coord_second, dict):
+                values["coordB_x"] = coord_second.get("x", 0)
+                values["coordB_y"] = coord_second.get("y", 0)
+            elif isinstance(coord_second, (list, tuple)) and len(coord_second) >= 2:
                 values["coordB_x"] = coord_second[0]
                 values["coordB_y"] = coord_second[1]
             else:
                 values["coordB_x"] = 0
                 values["coordB_y"] = 0
         
-        # Description de l'axe
-        axe_type = params.get("axe_type", "vertical")
-        axe_value = params.get("axe_value", 0)
-        
-        if axe_type == "vertical":
-            values["axeDesc"] = f"l'axe vertical x = {axe_value}"
-        elif axe_type == "horizontal":
-            values["axeDesc"] = f"l'axe horizontal y = {axe_value}"
-        elif axe_type == "ox":
-            values["axeDesc"] = "l'axe des abscisses"
-        elif axe_type == "oy":
-            values["axeDesc"] = "l'axe des ordonnées"
+        # Description de l'axe - utiliser axe_description si disponible, sinon construire
+        axe_desc = params.get("axe_description")
+        if axe_desc:
+            values["axeDesc"] = axe_desc
         else:
-            values["axeDesc"] = f"l'axe {axe_type}"
+            axe_type = params.get("axe_type", "vertical")
+            axe_value = params.get("axe_value", params.get("axe_position", 0))
+            
+            if axe_type == "vertical":
+                values["axeDesc"] = f"l'axe vertical x = {axe_value}"
+            elif axe_type == "horizontal":
+                values["axeDesc"] = f"l'axe horizontal y = {axe_value}"
+            elif axe_type == "ox":
+                values["axeDesc"] = "l'axe des abscisses"
+            elif axe_type == "oy":
+                values["axeDesc"] = "l'axe des ordonnées"
+            elif axe_type == "oblique":
+                values["axeDesc"] = "la première bissectrice (y = x)"
+            else:
+                values["axeDesc"] = f"l'axe {axe_type}"
         
         return values
     
