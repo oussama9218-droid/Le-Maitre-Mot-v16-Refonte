@@ -814,9 +814,6 @@ class GeometrySVGRenderer:
             })
         
         return ET.tostring(svg, encoding='unicode')
-
-# Instance globale
-geometry_svg_renderer = GeometrySVGRenderer()
     
     def render_symetrie_centrale(self, data: Dict[str, Any]) -> str:
         """
