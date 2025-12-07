@@ -1783,7 +1783,7 @@ class MathGenerationService:
                     {"etape": "Construction des symétriques", "points": 3.0},
                     {"etape": "Tracé de la figure complète", "points": 1.0}
                 ]
-
+            )
     
     def _gen_symetrie_centrale(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
         """
