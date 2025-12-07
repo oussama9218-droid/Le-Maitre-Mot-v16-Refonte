@@ -40,6 +40,7 @@ class MathExerciseType(str, Enum):
     ANGLES = "angles"
     THALES = "thales"
     TRIGONOMETRIE = "trigonometrie"
+    SYMETRIE_AXIALE = "symetrie_axiale"
     
     # Statistiques
     STATISTIQUES = "statistiques"
