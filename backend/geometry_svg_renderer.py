@@ -947,25 +947,26 @@ class GeometrySVGRenderer:
     
     def render_symetrie_centrale_question_et_correction(self, data: Dict[str, Any]) -> tuple:
         """
-        Génère DEUX versions du SVG pour exercices de construction :
-        1. Version QUESTION (sans le triangle image - pour le sujet)
-        2. Version CORRECTION (avec le triangle image - pour le corrigé)
+        Génère DEUX versions du SVG pour exercices de construction de symétrie centrale :
+        1. Version QUESTION (sans le triangle image OU sans point symétrique - pour le sujet)
+        2. Version CORRECTION (avec le triangle image OU avec point symétrique - pour le corrigé)
         
         Returns:
             (svg_question, svg_correction) : tuple de deux strings SVG
         """
         is_triangle = data.get('is_triangle', False)
         
-        if not is_triangle:
-            svg = self.render_symetrie_centrale(data)
-            return (svg, svg)
+        # Générer le SVG complet (correction) - sans restrictions
+        data_correction = data.copy()
+        data_correction['points_to_hide_in_question'] = []  # Tous les points visibles
+        svg_correction = self.render_symetrie_centrale(data_correction)
         
-        # Générer le SVG complet (correction)
-        svg_correction = self.render_symetrie_centrale(data)
-        
-        # Générer le SVG sans triangle image (question)
+        # Générer le SVG question - avec restrictions selon le type
         data_question = data.copy()
-        data_question['hide_image_triangle'] = True
+        if is_triangle:
+            # Pour les triangles : cacher le triangle image
+            data_question['hide_image_triangle'] = True
+        # Pour les exercices simples : points_to_hide_in_question est déjà dans data
         svg_question = self.render_symetrie_centrale(data_question)
         
         return (svg_question, svg_correction)
