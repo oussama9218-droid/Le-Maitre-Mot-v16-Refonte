@@ -1743,12 +1743,20 @@ class MathGenerationService:
             ]
             
             all_points = [point_a, point_b, point_c]
-            all_coords = {**coords, **coords_symetriques}
+            
+            # Convertir coords en format plat pour GeometricFigure
+            longueurs_converties = {}
+            for pt, coord in coords.items():
+                longueurs_converties[f"{pt}_x"] = coord["x"]
+                longueurs_converties[f"{pt}_y"] = coord["y"]
+            for pt, coord in coords_symetriques.items():
+                longueurs_converties[f"{pt}_x"] = coord["x"]
+                longueurs_converties[f"{pt}_y"] = coord["y"]
             
             figure = GeometricFigure(
                 type="symetrie_axiale",
                 points=all_points,
-                longueurs_connues=all_coords,
+                longueurs_connues=longueurs_converties,
                 proprietes=[f"axe_vertical", f"axe_position_{axe_position}"]
             )
             
