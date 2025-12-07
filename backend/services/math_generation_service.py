@@ -151,7 +151,8 @@ class MathGenerationService:
             MathExerciseType.PUISSANCES: self._gen_puissances,
             MathExerciseType.CERCLE: self._gen_cercle,
             MathExerciseType.THALES: self._gen_thales,
-            MathExerciseType.TRIGONOMETRIE: self._gen_trigonometrie
+            MathExerciseType.TRIGONOMETRIE: self._gen_trigonometrie,
+            MathExerciseType.SYMETRIE_AXIALE: self._gen_symetrie_axiale
         }
         
         generator = generators.get(exercise_type)
