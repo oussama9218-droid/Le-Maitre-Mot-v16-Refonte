@@ -1,6 +1,11 @@
 """
 Service de rédaction textuelle pour exercices mathématiques
 L'IA ne fait QUE la rédaction, jamais les calculs ou paramètres
+
+SYSTÈME D'OPTIMISATION IA (Le Maître Mot) :
+    1. Vérifier si un gabarit existe dans le cache
+    2. Si oui : interpolation directe (0 appel IA, coût = 0)
+    3. Si non : appel IA classique + stockage en cache pour le futur
 """
 
 import json
@@ -13,6 +18,9 @@ from utils import get_emergent_key
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from services.text_normalizer import normalizer
 from services.ia_monitoring_service import ia_monitoring
+from style_manager import style_manager, StyleFormulation
+from cache_manager import cache_manager
+from gabarit_loader import gabarit_loader
 
 logger = logging.getLogger(__name__)
 
