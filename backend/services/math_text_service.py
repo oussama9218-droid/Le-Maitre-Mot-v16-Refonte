@@ -1111,6 +1111,7 @@ Résultat : {spec.resultat_final}"""
             
             # 2. Sélectionner un style aléatoire
             style = style_manager.get_random_style()
+            logger.info(f"🎨 Style sélectionné: {style.value}")
             
             # 3. Construire la clé de cache
             cache_key = style_manager.build_cache_key(
@@ -1119,6 +1120,7 @@ Résultat : {spec.resultat_final}"""
                 difficulte=spec.difficulte.value,
                 style=style
             )
+            logger.info(f"🔑 Cache key: {cache_key}")
             
             # 4. Vérifier le cache
             cached_template = cache_manager.get(cache_key)
@@ -1137,21 +1139,26 @@ Résultat : {spec.resultat_final}"""
                 )
                 
                 if not template:
-                    logger.warning(f"Aucun gabarit trouvé pour style {style.value}")
+                    logger.warning(f"❌ Aucun gabarit trouvé pour style {style.value}")
                     return None
                 
+                logger.info(f"✅ Template chargé: {template[:50]}...")
                 # Stocker dans le cache pour le futur
                 cache_manager.set(cache_key, template)
             
             # 5. Préparer les valeurs d'interpolation
+            logger.info(f"📝 Préparation des valeurs d'interpolation...")
             values = gabarit_loader.prepare_interpolation_values(spec)
             
             if not values:
-                logger.warning("Échec préparation des valeurs d'interpolation")
+                logger.warning("❌ Échec préparation des valeurs d'interpolation")
                 return None
+            
+            logger.info(f"✅ Valeurs préparées: {list(values.keys())}")
             
             # 6. Interpoler le template
             enonce_final = cache_manager.interpolate(template, values)
+            logger.info(f"✅ Énoncé interpolé: {enonce_final[:80]}...")
             
             # 7. Créer la génération de texte
             # Note : Pour les gabarits, on ne génère pas de solution rédigée
@@ -1162,11 +1169,11 @@ Résultat : {spec.resultat_final}"""
                 solution_redigee=self._build_solution_from_steps(spec)
             )
             
-            logger.info(f"✅ Énoncé généré depuis gabarit (style: {style.value})")
+            logger.info(f"🎯 ✅ Énoncé généré depuis gabarit (style: {style.value}) - 0 APPEL IA")
             return text_generation
             
         except Exception as e:
-            logger.error(f"❌ Erreur génération depuis gabarit : {e}")
+            logger.error(f"❌ Erreur génération depuis gabarit : {e}", exc_info=True)
             return None
     
     def _build_solution_from_steps(self, spec: MathExerciseSpec) -> str:
