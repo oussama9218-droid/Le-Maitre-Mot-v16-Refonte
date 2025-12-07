@@ -78,6 +78,7 @@ class MathGenerationService:
             "Géométrie - Triangles et quadrilatères": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],
             "Géométrie dans le plan": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],
             "Symétrie axiale": [MathExerciseType.SYMETRIE_AXIALE],  # ✅ Générateur symétrie axiale ajouté
+            "Symétrie centrale": [MathExerciseType.SYMETRIE_CENTRALE],  # ✅ Générateur symétrie centrale ajouté
             
             # ========== Chapitres multi-niveaux (6e, 5e, 4e, 3e) ==========
             "Fractions": [MathExerciseType.CALCUL_FRACTIONS],
