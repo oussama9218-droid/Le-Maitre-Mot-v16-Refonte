@@ -928,7 +928,8 @@ class GeometrySVGRenderer:
                 self.add_point(svg, point, show_label=True)
         
         # 6. Si ce n'est PAS un triangle, dessiner le segment simple entre les deux points
-        if not is_triangle and len(point_objects) >= 2:
+        # MAIS seulement si les deux points sont visibles (version correction uniquement)
+        if not is_triangle and len(point_objects) >= 2 and not points_to_hide_in_question:
             points_list = list(point_objects.values())
             segment_line = Line(points_list[0], points_list[1], color="#0066CC", width=1.5)
             self.add_line(svg, segment_line)
