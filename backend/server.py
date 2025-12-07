@@ -2362,6 +2362,11 @@ async def generate_math_exercises_new_architecture(
         
         return exercises
         
+    except ValueError as e:
+        # 🚨 Erreurs de validation (ex: chapitre non mappé) → propager
+        logger.error(f"❌ Erreur de validation: {e}")
+        raise  # Propager l'erreur au lieu de fallback
+        
     except Exception as e:
         logger.error(f"❌ Erreur nouvelle architecture: {e}", exc_info=True)
         logger.info("🔄 Fallback vers ancien système")
