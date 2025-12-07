@@ -172,7 +172,7 @@ class TestChapterMapping:
         print("="*80)
         
         chapitre = "Symétrie centrale"
-        types = self.math_service._get_exercise_types_for_chapter(chapitre)
+        types = self.math_service._map_chapter_to_types(chapitre, "5e")
         
         assert len(types) > 0, f"'{chapitre}' doit être mappé"
         assert MathExerciseType.CALCUL_DECIMAUX not in types, \
