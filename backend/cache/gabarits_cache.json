@@ -1,0 +1,9 @@
+{
+  "cache": {
+    "symetrie_axiale__trouver_valeur__facile__qr": "Question : Quelles sont les coordonnées de {pointA} ?\nRéponse : ({coordA_x}, {coordA_y}).\nQuestion : Quel est l'axe ?\nRéponse : {axeDesc}.\nQuestion : Calcule {pointB}."
+  },
+  "hits": 0,
+  "misses": 1,
+  "total_cost_saved": 0.0,
+  "last_updated": "2025-12-07T22:12:31.574917"
+}
