@@ -265,12 +265,22 @@ class GeometryRenderService:
         # GRILLE SYSTÉMATIQUE pour tous les exercices de symétrie centrale (collège)
         with_grid = True  # Toujours activée pour cohérence pédagogique
         
+        # Identifier les points à cacher dans la version question
+        # Pour les exercices simples (non-triangles), cacher le troisième point (point image)
+        points_list = figure.points if figure.points else []
+        points_to_hide_in_question = []
+        if not is_triangle and len(points_list) >= 3:
+            # Le troisième point est le point symétrique (à trouver)
+            # points_list = [point_original, centre, point_image]
+            points_to_hide_in_question.append(points_list[2])
+        
         # Construire les données pour le renderer
         data = {
             "points_coords": coords,
-            "points_labels": figure.points if figure.points else [],
+            "points_labels": points_list,
             "is_triangle": is_triangle,
-            "with_grid": with_grid
+            "with_grid": with_grid,
+            "points_to_hide_in_question": points_to_hide_in_question
         }
         
         # Générer les deux versions (question et correction)
