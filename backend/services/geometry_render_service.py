@@ -241,9 +241,11 @@ class GeometryRenderService:
         for key, val in figure.longueurs_connues.items():
             coords[key] = val
         
-        # Vérifier si c'est un triangle et si on veut la grille
+        # Vérifier si c'est un triangle
         is_triangle = "triangle" in figure.proprietes
-        with_grid = "with_grid" in figure.proprietes
+        
+        # GRILLE SYSTÉMATIQUE pour tous les exercices de symétrie centrale (collège)
+        with_grid = True  # Toujours activée pour cohérence pédagogique
         
         # Construire les données pour le renderer
         data = {
