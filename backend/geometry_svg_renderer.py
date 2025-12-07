@@ -970,3 +970,5 @@ class GeometrySVGRenderer:
                 self.add_line(svg, full_segment)
         
         return ET.tostring(svg, encoding='unicode')
+# Instance globale
+geometry_svg_renderer = GeometrySVGRenderer()
