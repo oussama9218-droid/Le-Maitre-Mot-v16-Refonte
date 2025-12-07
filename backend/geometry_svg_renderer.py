@@ -749,6 +749,7 @@ class GeometrySVGRenderer:
         points_labels = data.get('points_labels', [])
         is_triangle = data.get('is_triangle', False)
         with_grid = data.get('with_grid', False)
+        hide_image_triangle = data.get('hide_image_triangle', False)  # Pour version question
         
         # Système de coordonnées : taille du repère
         grid_size = 14  # Grille de 0 à 14 (pour accommoder les coordonnées mathématiques)
