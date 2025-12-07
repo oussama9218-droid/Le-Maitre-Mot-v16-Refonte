@@ -68,42 +68,63 @@ class MathGenerationService:
         # Pour des chapitres présents dans plusieurs niveaux, 
         # le mapping s'applique à tous les niveaux
         mapping = {
-            # 6e
+            # ========== 6e ==========
             "Nombres entiers et décimaux": [MathExerciseType.CALCUL_DECIMAUX],
+            "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX],
+            "Longueurs, masses, durées": [MathExerciseType.CALCUL_DECIMAUX],
             "Périmètres et aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.RECTANGLE],
             "Aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.CERCLE],
+            "Angles": [MathExerciseType.TRIANGLE_QUELCONQUE],  # Angles dans triangles
             "Géométrie - Triangles et quadrilatères": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],
+            "Géométrie dans le plan": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],
+            "Symétrie axiale": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],  # ✅ AJOUTÉ
             
-            # Chapitres multi-niveaux (6e, 4e, 5e, 3e)
+            # ========== Chapitres multi-niveaux (6e, 5e, 4e, 3e) ==========
             "Fractions": [MathExerciseType.CALCUL_FRACTIONS],
             "Proportionnalité": [MathExerciseType.PROPORTIONNALITE],
             "Nombres relatifs": [MathExerciseType.CALCUL_RELATIFS],
+            "Nombres rationnels": [MathExerciseType.CALCUL_FRACTIONS],
             "Statistiques": [MathExerciseType.STATISTIQUES],
             "Géométrie dans l'espace": [MathExerciseType.VOLUME],
             "Volumes": [MathExerciseType.VOLUME],
             "Puissances": [MathExerciseType.PUISSANCES],
             "Calcul littéral": [MathExerciseType.EQUATION_1ER_DEGRE, MathExerciseType.CALCUL_DECIMAUX],
             
-            # 5e  
+            # ========== 5e ==========
             "Triangles": [MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.TRIANGLE_RECTANGLE],
             "Aires et périmètres": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.CERCLE, MathExerciseType.RECTANGLE],
+            "Angles et triangles": [MathExerciseType.TRIANGLE_QUELCONQUE],
+            "Parallélogrammes": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],  # ✅ AJOUTÉ
+            "Symétrie centrale": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],  # ✅ AJOUTÉ
+            "Homothétie": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],  # ✅ AJOUTÉ
             
-            # 4e
+            # ========== 4e ==========
             "Théorème de Pythagore": [MathExerciseType.TRIANGLE_RECTANGLE],
             "Équations": [MathExerciseType.EQUATION_1ER_DEGRE],
             "Cosinus": [MathExerciseType.TRIGONOMETRIE],
             
-            # 3e et géométrie avancée
+            # ========== 3e et géométrie avancée ==========
             "Probabilités": [MathExerciseType.PROBABILITES],
             "Statistiques et probabilités": [MathExerciseType.STATISTIQUES, MathExerciseType.PROBABILITES],
             "Aires et volumes": [MathExerciseType.VOLUME, MathExerciseType.PERIMETRE_AIRE],
             "Théorème de Thalès": [MathExerciseType.THALES],
             "Trigonométrie": [MathExerciseType.TRIGONOMETRIE],
             "Le cercle": [MathExerciseType.CERCLE],
-            "Cercle": [MathExerciseType.CERCLE]
+            "Cercle": [MathExerciseType.CERCLE],
+            "Organisation et gestion de données, fonctions": [MathExerciseType.STATISTIQUES, MathExerciseType.PROPORTIONNALITE]
         }
         
-        return mapping.get(chapitre, [MathExerciseType.CALCUL_DECIMAUX])
+        # 🚨 SÉCURITÉ CRITIQUE : Lever une erreur si chapitre inconnu
+        if chapitre not in mapping:
+            raise ValueError(
+                f"❌ CHAPITRE NON MAPPÉ : '{chapitre}'\n"
+                f"   Niveau : {niveau if 'niveau' in locals() else 'N/A'}\n"
+                f"   Le chapitre existe dans le curriculum mais aucun générateur n'est défini.\n"
+                f"   → Ajoutez ce chapitre au mapping dans _get_exercise_types_for_chapter()\n"
+                f"   Chapitres disponibles : {sorted(mapping.keys())}"
+            )
+        
+        return mapping[chapitre]
     
     def _generate_spec_by_type(
         self, 
