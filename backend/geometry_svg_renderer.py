@@ -817,3 +817,159 @@ class GeometrySVGRenderer:
 
 # Instance globale
 geometry_svg_renderer = GeometrySVGRenderer()
+    
+    def render_symetrie_centrale(self, data: Dict[str, Any]) -> str:
+        """
+        Rendu SVG pour la symétrie centrale
+        
+        Args:
+            data: {
+                "points_coords": {"A_x": 3, "A_y": 5, "O_x": 6, "O_y": 6, "A_prime_x": 9, "A_prime_y": 7, ...},
+                "points_labels": ["A", "O", "A'"] ou ["M", "O", "M'"]
+            }
+        """
+        svg = self.create_svg_root()
+        
+        points_coords = data.get('points_coords', {})
+        points_labels = data.get('points_labels', [])
+        
+        # Système de coordonnées
+        grid_size = 14
+        cell_size = min((self.width - 2 * self.margin) / grid_size, 
+                       (self.height - 2 * self.margin) / grid_size)
+        
+        offset_x = self.margin
+        offset_y = self.margin
+        
+        # Fonction de conversion math -> SVG
+        def math_to_svg(x_math, y_math):
+            x_svg = offset_x + x_math * cell_size
+            y_svg = self.height - offset_y - y_math * cell_size
+            return x_svg, y_svg
+        
+        # 1. Dessiner le repère (axes X et Y)
+        x_axis_start = Point(offset_x, self.height - offset_y, "")
+        x_axis_end = Point(self.width - offset_x, self.height - offset_y, "")
+        x_axis_line = Line(x_axis_start, x_axis_end, color="#CCCCCC", width=1)
+        self.add_line(svg, x_axis_line)
+        
+        y_axis_start = Point(offset_x, offset_y, "")
+        y_axis_end = Point(offset_x, self.height - offset_y, "")
+        y_axis_line = Line(y_axis_start, y_axis_end, color="#CCCCCC", width=1)
+        self.add_line(svg, y_axis_line)
+        
+        # Labels des axes
+        ET.SubElement(svg, 'text', {
+            'x': str(self.width - offset_x + 5),
+            'y': str(self.height - offset_y + 5),
+            'class': 'geometry-text',
+            'font-size': '12'
+        }).text = "x"
+        
+        ET.SubElement(svg, 'text', {
+            'x': str(offset_x - 10),
+            'y': str(offset_y - 5),
+            'class': 'geometry-text',
+            'font-size': '12'
+        }).text = "y"
+        
+        # 2. Regrouper les coordonnées par point
+        points_dict = {}
+        for key, value in points_coords.items():
+            parts = key.rsplit('_', 1)
+            if len(parts) == 2:
+                point_name, coord = parts
+                if point_name not in points_dict:
+                    points_dict[point_name] = {}
+                points_dict[point_name][coord] = value
+        
+        # 3. Identifier le centre (généralement nommé O ou le deuxième point)
+        centre_name = None
+        centre_coords = None
+        
+        # Stratégie 1 : Chercher un point nommé "O"
+        if "O" in points_dict:
+            centre_name = "O"
+            centre_coords = points_dict["O"]
+        # Stratégie 2 : Le centre est le deuxième point dans la liste
+        elif len(points_labels) >= 2:
+            centre_name = points_labels[1]
+            if centre_name in points_dict:
+                centre_coords = points_dict[centre_name]
+        # Stratégie 3 : Prendre le premier point disponible comme centre par défaut
+        if centre_coords is None and len(points_dict) > 0:
+            centre_name = list(points_dict.keys())[0]
+            centre_coords = points_dict[centre_name]
+        
+        # 4. Dessiner tous les points
+        point_objects = {}
+        for point_name, coords in points_dict.items():
+            if 'x' in coords and 'y' in coords:
+                x_svg, y_svg = math_to_svg(coords['x'], coords['y'])
+                point = Point(x_svg, y_svg, point_name)
+                point_objects[point_name] = point
+                
+                # Dessiner le centre différemment (plus gros, rouge)
+                if point_name == centre_name:
+                    # Centre : cercle plus gros + croix
+                    ET.SubElement(svg, 'circle', {
+                        'cx': str(x_svg),
+                        'cy': str(y_svg),
+                        'r': '5',
+                        'fill': '#FF0000',
+                        'stroke': '#FF0000',
+                        'stroke-width': '2'
+                    })
+                    
+                    # Croix pour marquer le centre
+                    cross_size = 8
+                    ET.SubElement(svg, 'line', {
+                        'x1': str(x_svg - cross_size),
+                        'y1': str(y_svg),
+                        'x2': str(x_svg + cross_size),
+                        'y2': str(y_svg),
+                        'stroke': '#FF0000',
+                        'stroke-width': '2'
+                    })
+                    ET.SubElement(svg, 'line', {
+                        'x1': str(x_svg),
+                        'y1': str(y_svg - cross_size),
+                        'x2': str(x_svg),
+                        'y2': str(y_svg + cross_size),
+                        'stroke': '#FF0000',
+                        'stroke-width': '2'
+                    })
+                    
+                    # Label du centre
+                    ET.SubElement(svg, 'text', {
+                        'x': str(x_svg + 10),
+                        'y': str(y_svg - 10),
+                        'class': 'geometry-text',
+                        'font-size': '14',
+                        'font-weight': 'bold',
+                        'fill': '#FF0000'
+                    }).text = point_name
+                else:
+                    # Autres points : points noirs normaux
+                    self.add_point(svg, point, show_label=True)
+        
+        # 5. Dessiner les segments reliant les points au centre
+        if centre_name and centre_name in point_objects:
+            centre_point = point_objects[centre_name]
+            
+            for point_name, point in point_objects.items():
+                if point_name != centre_name:
+                    # Segment du point au centre
+                    segment_line = Line(point, centre_point, color="#0066CC", width=1.5)
+                    self.add_line(svg, segment_line)
+        
+        # 6. Si on a exactement 2 points + centre, tracer le segment complet
+        if len(point_objects) == 3 and centre_name:
+            other_points = [p for name, p in point_objects.items() if name != centre_name]
+            if len(other_points) == 2:
+                # Segment entre les deux points (passant par le centre)
+                full_segment = Line(other_points[0], other_points[1], 
+                                   color="#666666", width=1, style="dashed")
+                self.add_line(svg, full_segment)
+        
+        return ET.tostring(svg, encoding='unicode')
