@@ -156,7 +156,7 @@ class TestChapterMapping:
         ]
         
         for chapitre in chapitres_geometriques:
-            types = self.math_service._get_exercise_types_for_chapter(chapitre)
+            types = self.math_service._map_chapter_to_types(chapitre, "4e")  # Niveau générique
             
             assert MathExerciseType.CALCUL_DECIMAUX not in types, \
                 f"❌ '{chapitre}' ne doit PAS fallback vers CALCUL_DECIMAUX"
