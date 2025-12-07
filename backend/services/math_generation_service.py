@@ -1445,3 +1445,333 @@ class MathGenerationService:
             resultat_final=f"{resultat} cm",
             figure_geometrique=figure
         )
+    
+    def _gen_symetrie_axiale(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice de symétrie axiale
+        Concepts :
+        - Trouver le symétrique d'un point par rapport à un axe
+        - Vérifier si deux points sont symétriques
+        - Propriétés : distances égales à l'axe, perpendiculaire à l'axe
+        """
+        
+        points = self._get_next_geometry_points()
+        
+        # Types d'exercices possibles
+        types_exercices = ["trouver_symetrique", "verifier_symetrie", "completer_figure"]
+        
+        if difficulte == "facile":
+            type_exercice = "trouver_symetrique"
+            # Axe simple (vertical ou horizontal)
+            axe_type = random.choice(["vertical", "horizontal"])
+        else:
+            type_exercice = random.choice(types_exercices)
+            # Peut inclure des axes obliques
+            axe_type = random.choice(["vertical", "horizontal", "oblique"])
+        
+        if type_exercice == "trouver_symetrique":
+            # Point original
+            point_original = points[0]
+            point_image = points[1]
+            
+            if axe_type == "vertical":
+                # Axe vertical (ex: x = 3)
+                axe_position = random.randint(3, 8)
+                # Point original à gauche ou droite de l'axe
+                point_x = random.randint(0, axe_position - 1) if random.random() < 0.5 else random.randint(axe_position + 1, 12)
+                point_y = random.randint(2, 10)
+                
+                # Calcul du symétrique
+                distance_axe = abs(point_x - axe_position)
+                if point_x < axe_position:
+                    image_x = axe_position + distance_axe
+                else:
+                    image_x = axe_position - distance_axe
+                image_y = point_y
+                
+                axe_description = f"l'axe vertical passant par x = {axe_position}"
+                etapes = [
+                    f"Point {point_original}({point_x}, {point_y})",
+                    f"Axe de symétrie : droite verticale x = {axe_position}",
+                    f"Distance de {point_original} à l'axe : |{point_x} - {axe_position}| = {distance_axe}",
+                    f"Le symétrique {point_image} est à la même distance de l'autre côté de l'axe",
+                    f"Coordonnées de {point_image} : ({image_x}, {image_y})"
+                ]
+                
+            elif axe_type == "horizontal":
+                # Axe horizontal (ex: y = 5)
+                axe_position = random.randint(4, 8)
+                point_x = random.randint(2, 10)
+                # Point original au-dessus ou en-dessous de l'axe
+                point_y = random.randint(0, axe_position - 1) if random.random() < 0.5 else random.randint(axe_position + 1, 12)
+                
+                # Calcul du symétrique
+                distance_axe = abs(point_y - axe_position)
+                image_x = point_x
+                if point_y < axe_position:
+                    image_y = axe_position + distance_axe
+                else:
+                    image_y = axe_position - distance_axe
+                
+                axe_description = f"l'axe horizontal passant par y = {axe_position}"
+                etapes = [
+                    f"Point {point_original}({point_x}, {point_y})",
+                    f"Axe de symétrie : droite horizontale y = {axe_position}",
+                    f"Distance de {point_original} à l'axe : |{point_y} - {axe_position}| = {distance_axe}",
+                    f"Le symétrique {point_image} est à la même distance de l'autre côté de l'axe",
+                    f"Coordonnées de {point_image} : ({image_x}, {image_y})"
+                ]
+                
+            else:  # oblique (niveau difficile)
+                # Axe oblique simplifié : première diagonale (y = x)
+                point_x = random.randint(2, 10)
+                point_y = random.randint(2, 10)
+                # Symétrique par rapport à y = x : on échange x et y
+                image_x = point_y
+                image_y = point_x
+                
+                axe_description = "la première bissectrice (y = x)"
+                etapes = [
+                    f"Point {point_original}({point_x}, {point_y})",
+                    f"Axe de symétrie : première bissectrice (y = x)",
+                    f"Propriété : le symétrique d'un point par rapport à y = x s'obtient en échangeant x et y",
+                    f"Coordonnées de {point_image} : ({image_x}, {image_y})"
+                ]
+            
+            # Créer la figure géométrique
+            figure = GeometricFigure(
+                type="symetrie_axiale",
+                points=[point_original, point_image],
+                longueurs_connues={
+                    f"{point_original}_x": point_x,
+                    f"{point_original}_y": point_y,
+                    f"{point_image}_x": image_x,
+                    f"{point_image}_y": image_y
+                },
+                proprietes=[f"axe_{axe_type}", f"axe_position_{axe_position if axe_type != 'oblique' else 'y=x'}"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.SYMETRIE_AXIALE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "trouver_symetrique",
+                    "point_original": point_original,
+                    "point_image": point_image,
+                    "axe_type": axe_type,
+                    "axe_description": axe_description,
+                    "point_original_coords": {"x": point_x, "y": point_y}
+                },
+                solution_calculee={
+                    "image_coords": {"x": image_x, "y": image_y},
+                    "distance_axe": distance_axe if axe_type != "oblique" else "N/A"
+                },
+                etapes_calculees=etapes,
+                resultat_final=f"{point_image}({image_x}, {image_y})",
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Identification de l'axe", "points": 1.0},
+                    {"etape": "Calcul de la distance à l'axe", "points": 1.5},
+                    {"etape": "Construction du symétrique", "points": 1.5}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève trace bien la perpendiculaire à l'axe",
+                    "Vérifier que les distances de part et d'autre de l'axe sont égales"
+                ]
+            )
+        
+        elif type_exercice == "verifier_symetrie":
+            # Vérifier si deux points sont symétriques par rapport à un axe
+            point_a = points[0]
+            point_b = points[1]
+            
+            # Créer deux cas : symétriques ou non
+            sont_symetriques = random.choice([True, False])
+            
+            if axe_type == "vertical":
+                axe_position = random.randint(4, 8)
+                point_a_x = random.randint(1, axe_position - 1)
+                point_a_y = random.randint(3, 10)
+                
+                if sont_symetriques:
+                    distance = axe_position - point_a_x
+                    point_b_x = axe_position + distance
+                    point_b_y = point_a_y
+                else:
+                    # Créer un point non symétrique
+                    point_b_x = random.randint(axe_position + 1, 12)
+                    point_b_y = point_a_y + random.randint(1, 3)  # Différent en y
+                
+                axe_description = f"l'axe vertical x = {axe_position}"
+                
+                distance_a = abs(point_a_x - axe_position)
+                distance_b = abs(point_b_x - axe_position)
+                
+                etapes = [
+                    f"Points : {point_a}({point_a_x}, {point_a_y}) et {point_b}({point_b_x}, {point_b_y})",
+                    f"Axe : droite verticale x = {axe_position}",
+                    f"Distance de {point_a} à l'axe : {distance_a}",
+                    f"Distance de {point_b} à l'axe : {distance_b}",
+                    f"Ordonnées : {point_a_y} et {point_b_y}"
+                ]
+                
+                if sont_symetriques:
+                    etapes.append(f"Les distances sont égales ({distance_a} = {distance_b}) et les ordonnées identiques")
+                    etapes.append(f"Conclusion : {point_a} et {point_b} sont symétriques par rapport à l'axe")
+                else:
+                    if distance_a != distance_b:
+                        etapes.append(f"Les distances sont différentes ({distance_a} ≠ {distance_b})")
+                    if point_a_y != point_b_y:
+                        etapes.append(f"Les ordonnées sont différentes ({point_a_y} ≠ {point_b_y})")
+                    etapes.append(f"Conclusion : {point_a} et {point_b} ne sont PAS symétriques par rapport à l'axe")
+            
+            else:  # horizontal
+                axe_position = random.randint(4, 8)
+                point_a_x = random.randint(3, 10)
+                point_a_y = random.randint(1, axe_position - 1)
+                
+                if sont_symetriques:
+                    distance = axe_position - point_a_y
+                    point_b_x = point_a_x
+                    point_b_y = axe_position + distance
+                else:
+                    point_b_x = point_a_x + random.randint(1, 3)
+                    point_b_y = random.randint(axe_position + 1, 12)
+                
+                axe_description = f"l'axe horizontal y = {axe_position}"
+                
+                distance_a = abs(point_a_y - axe_position)
+                distance_b = abs(point_b_y - axe_position)
+                
+                etapes = [
+                    f"Points : {point_a}({point_a_x}, {point_a_y}) et {point_b}({point_b_x}, {point_b_y})",
+                    f"Axe : droite horizontale y = {axe_position}",
+                    f"Distance de {point_a} à l'axe : {distance_a}",
+                    f"Distance de {point_b} à l'axe : {distance_b}",
+                    f"Abscisses : {point_a_x} et {point_b_x}"
+                ]
+                
+                if sont_symetriques:
+                    etapes.append(f"Les distances sont égales ({distance_a} = {distance_b}) et les abscisses identiques")
+                    etapes.append(f"Conclusion : {point_a} et {point_b} sont symétriques par rapport à l'axe")
+                else:
+                    if distance_a != distance_b:
+                        etapes.append(f"Les distances sont différentes ({distance_a} ≠ {distance_b})")
+                    if point_a_x != point_b_x:
+                        etapes.append(f"Les abscisses sont différentes ({point_a_x} ≠ {point_b_x})")
+                    etapes.append(f"Conclusion : {point_a} et {point_b} ne sont PAS symétriques par rapport à l'axe")
+            
+            figure = GeometricFigure(
+                type="symetrie_axiale",
+                points=[point_a, point_b],
+                longueurs_connues={
+                    f"{point_a}_x": point_a_x,
+                    f"{point_a}_y": point_a_y,
+                    f"{point_b}_x": point_b_x,
+                    f"{point_b}_y": point_b_y
+                },
+                proprietes=[f"axe_{axe_type}", f"axe_position_{axe_position}", f"symetriques_{sont_symetriques}"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.SYMETRIE_AXIALE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "verifier_symetrie",
+                    "point_a": point_a,
+                    "point_b": point_b,
+                    "axe_type": axe_type,
+                    "axe_description": axe_description,
+                    "coords_a": {"x": point_a_x, "y": point_a_y},
+                    "coords_b": {"x": point_b_x, "y": point_b_y}
+                },
+                solution_calculee={
+                    "sont_symetriques": sont_symetriques,
+                    "distance_a": distance_a,
+                    "distance_b": distance_b
+                },
+                etapes_calculees=etapes,
+                resultat_final="Oui, ils sont symétriques" if sont_symetriques else "Non, ils ne sont pas symétriques",
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Calcul des distances à l'axe", "points": 2.0},
+                    {"etape": "Vérification coordonnée constante", "points": 1.0},
+                    {"etape": "Conclusion", "points": 1.0}
+                ]
+            )
+        
+        else:  # completer_figure
+            # Compléter une figure par symétrie
+            # Triangle ou quadrilatère dont on donne la moitié
+            point_a = points[0]
+            point_b = points[1]
+            point_c = points[2]
+            
+            axe_type = "vertical"
+            axe_position = 6
+            
+            # Points d'un triangle à gauche de l'axe
+            coords = {
+                point_a: {"x": 2, "y": 3},
+                point_b: {"x": 4, "y": 7},
+                point_c: {"x": 3, "y": 5}
+            }
+            
+            # Symétriques
+            point_a_prime = f"{point_a}'"
+            point_b_prime = f"{point_b}'"
+            point_c_prime = f"{point_c}'"
+            
+            coords_symetriques = {
+                point_a_prime: {"x": 2 * axe_position - coords[point_a]["x"], "y": coords[point_a]["y"]},
+                point_b_prime: {"x": 2 * axe_position - coords[point_b]["x"], "y": coords[point_b]["y"]},
+                point_c_prime: {"x": 2 * axe_position - coords[point_c]["x"], "y": coords[point_c]["y"]}
+            }
+            
+            etapes = [
+                f"Triangle {point_a}{point_b}{point_c} avec {point_a}({coords[point_a]['x']}, {coords[point_a]['y']}), "
+                f"{point_b}({coords[point_b]['x']}, {coords[point_b]['y']}), {point_c}({coords[point_c]['x']}, {coords[point_c]['y']})",
+                f"Axe de symétrie : droite verticale x = {axe_position}",
+                f"Pour chaque point, calculer son symétrique :",
+                f"{point_a}' ({coords_symetriques[point_a_prime]['x']}, {coords_symetriques[point_a_prime]['y']})",
+                f"{point_b}' ({coords_symetriques[point_b_prime]['x']}, {coords_symetriques[point_b_prime]['y']})",
+                f"{point_c}' ({coords_symetriques[point_c_prime]['x']}, {coords_symetriques[point_c_prime]['y']})"
+            ]
+            
+            all_points = [point_a, point_b, point_c]
+            all_coords = {**coords, **coords_symetriques}
+            
+            figure = GeometricFigure(
+                type="symetrie_axiale",
+                points=all_points,
+                longueurs_connues=all_coords,
+                proprietes=[f"axe_vertical", f"axe_position_{axe_position}"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.SYMETRIE_AXIALE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "completer_figure",
+                    "figure": "triangle",
+                    "points_initiaux": all_points,
+                    "axe_position": axe_position
+                },
+                solution_calculee={
+                    "points_symetriques": coords_symetriques
+                },
+                etapes_calculees=etapes,
+                resultat_final=f"Triangle symétrique : {point_a}'{point_b}'{point_c}'",
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Construction des symétriques", "points": 3.0},
+                    {"etape": "Tracé de la figure complète", "points": 1.0}
+                ]
+            )
+        )
