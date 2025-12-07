@@ -1,39 +1,53 @@
 # Testing Protocol and Results
 
-## Latest Test Session
+## Latest Test Session - Re-test après correction du bug geometric_schema
 
 ### Test Focus
-Renforcement des tests automatiques de cohérence pour tous les générateurs géométriques
+Re-test complet de la cohérence géométrique après correction du bug geometric_schema
+
+### Bug Corrigé
+**Problème**: Le code divisait "rayon" en "ra" et "yon" pour les cercles dans `/app/backend/models/math_models.py` ligne 138-149
+**Solution**: Ajout d'une logique spéciale pour traiter correctement le rayon des cercles
+**Changement**: Les segments des cercles sont maintenant `[['rayon', {'longueur': '8 cm'}]]` au lieu de `[['ra', 'yon', {'longueur': '8 cm'}]]`
 
 ### Tests Executed
 
-#### 1. Test de cohérence géométrique global
-**Command**: `python /app/backend/tests/test_geometric_coherence.py`
-**Result**: ✅ PASSED (100% success rate)
+#### 1. Test spécifique du bug geometric_schema
+**Command**: `python test_geometric_schema_fix.py`
+**Result**: ⚠️ PARTIALLY PASSED (75% success rate)
 **Details**:
-- Pythagore (Triangle rectangle): 100% cohérent (20/20 tests)
-- Trigonométrie: 100% cohérent (20/20 tests)  
-- Cercles: 100% cohérent (20/20 tests)
-- Rectangles/Carrés: 100% cohérent (20/20 tests)
-- Périmètres et Aires: 100% cohérent (30/30 tests)
-- Triangles quelconques: 100% cohérent (20/20 tests)
-- **Taux de cohérence global: 100.0%**
+- ✅ Circle Bug Fix: 100% - Le rayon n'est plus divisé en 'ra' et 'yon'
+- ✅ Rectangle Points: 100% - Les rectangles ont 4 points correctement définis
+- ❌ Trigonometry Phantom Point: Point fantôme 'L' encore présent dans 1 exercice
+
+#### 2. Test complet de cohérence géométrique end-to-end
+**Command**: `python comprehensive_geometric_test.py`
+**Result**: ⚠️ PARTIALLY PASSED (64.7% coherence rate globale)
+**Details**:
+- ✅ **Théorème de Pythagore (4e)**: 100% cohérent (2/2 exercices) - Non-régression confirmée
+- ❌ **Trigonométrie (3e)**: 66.7% cohérent (2/3 exercices) - 1 point fantôme 'L' détecté
+- ❌ **Aires - Cercles (6e)**: 60% cohérent (3/5 exercices) - Amélioration significative mais objectif non atteint
+- ❌ **Aires et périmètres - Rectangles (5e)**: 40% cohérent (2/5 exercices) - Points manquants persistants
+- ✅ **Triangles quelconques (5e)**: 100% cohérent (2/2 exercices) - Non-régression confirmée
+- ✅ **Théorème de Thalès (3e)**: 100% cohérent (2/2 exercices) - Non-régression confirmée
 
 ### Key Findings
-1. ✅ Tous les générateurs géométriques produisent des exercices cohérents
-2. ✅ Points mentionnés dans énoncé/figure/solution sont 100% cohérents
-3. ✅ Valeurs numériques (longueurs, angles) sont correctement utilisées
-4. ✅ Fallback functions ajoutées pour: triangle_quelconque, perimetre_aire, rectangle
-5. ✅ Test de cohérence des valeurs amélioré pour accepter valeurs dérivées (ex: périmètre depuis rayon)
+1. ✅ **Bug geometric_schema PARTIELLEMENT CORRIGÉ**: Le rayon des cercles n'est plus divisé
+2. ✅ **Amélioration significative des cercles**: De 0% à 60% de cohérence (mais objectif 80% non atteint)
+3. ❌ **Rectangles toujours problématiques**: Restent à 40% de cohérence (points manquants)
+4. ✅ **Point fantôme 'L' identifié**: Problème précis localisé en trigonométrie
+5. ✅ **Non-régression confirmée**: Pythagore, Triangles, Thalès maintiennent 100%
+6. ✅ **SVG Generation**: 100% des exercices ont un SVG généré
+7. ✅ **Énoncés**: Tous >10 caractères, aucun énoncé vide
 
 ### Files Modified
-- `/app/backend/services/math_text_service.py` - Ajout de 3 nouvelles fonctions fallback
-- `/app/backend/tests/test_geometric_coherence.py` - Nouveau fichier de test créé
+- `/app/backend/models/math_models.py` - Correction du bug geometric_schema (lignes 138-149)
 
 ### Recommendations
-- Continuer à surveiller la cohérence lors de l'ajout de nouveaux générateurs
-- Exécuter `test_geometric_coherence.py` après toute modification des générateurs
-- Maintenir le taux de cohérence >= 85% pour tous les types d'exercices
+1. **URGENT - Cercles**: Continuer l'amélioration pour atteindre >80% de cohérence
+2. **URGENT - Rectangles**: Corriger la génération des 4 points pour tous les rectangles
+3. **MOYEN - Trigonométrie**: Éliminer le point fantôme 'L' spécifique
+4. **MAINTENIR**: Pythagore, Triangles, Thalès fonctionnent parfaitement
 
 ## Test Status Summary
 - **End-to-End API Coherence**: ⚠️ PARTIALLY PASSED (62.5% coherence rate)
