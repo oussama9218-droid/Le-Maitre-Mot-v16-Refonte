@@ -458,7 +458,10 @@ class Exercise(BaseModel):
     # CRITICAL: Base64 schema image for frontend display
     schema_img: Optional[str] = None  # Base64 PNG image for web display
     # NEW: SVG figure for geometry rendering
-    figure_svg: Optional[str] = None  # SVG string for geometric figures
+    figure_svg: Optional[str] = None  # SVG string for geometric figures (compatibility field)
+    # NEW: Separate SVG fields for question and correction (for symmetries and construction exercises)
+    figure_svg_question: Optional[str] = None  # SVG without the solution (for statement)
+    figure_svg_correction: Optional[str] = None  # SVG with the complete solution (for correction)
     # NEW: Geographic document for Geography exercises
     document: Optional[dict] = None  # Educational document metadata for Geography
     # NEW: Mathematical specification for new architecture
