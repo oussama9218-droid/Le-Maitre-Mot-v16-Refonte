@@ -1,0 +1,274 @@
+"""
+GABARIT LOADER - Le Maître Mot
+
+Service de chargement et gestion des gabarits pré-générés.
+
+ARCHITECTURE :
+    - Charge les gabarits depuis les fichiers JSON
+    - Fournit des gabarits aléatoires par style
+    - Interface avec le cache_manager
+    - Prépare les valeurs d'interpolation depuis les specs mathématiques
+"""
+
+import json
+import random
+import logging
+from pathlib import Path
+from typing import Dict, List, Optional, Any
+from models.math_models import MathExerciseSpec
+from style_manager import StyleFormulation
+from pedagogie_rules import ExerciseType
+
+logger = logging.getLogger(__name__)
+
+
+class GabaritLoader:
+    """
+    Gestionnaire de gabarits pré-générés.
+    
+    Responsabilités :
+        - Charger les gabarits depuis les fichiers JSON
+        - Sélectionner un gabarit aléatoire selon style et type
+        - Préparer les valeurs d'interpolation depuis les specs
+        - Interface avec le cache pour éviter la régénération
+    """
+    
+    def __init__(self, gabarits_dir: str = "/app/backend/gabarits"):
+        """
+        Initialise le loader de gabarits.
+        
+        Args:
+            gabarits_dir: Répertoire contenant les fichiers JSON de gabarits
+        """
+        self.gabarits_dir = Path(gabarits_dir)
+        self._gabarits_cache: Dict[str, Dict] = {}
+        
+        # Charger tous les gabarits au démarrage
+        self._load_all_gabarits()
+    
+    def _load_all_gabarits(self):
+        """Charge tous les fichiers de gabarits JSON."""
+        if not self.gabarits_dir.exists():
+            logger.warning(f"Gabarits directory not found: {self.gabarits_dir}")
+            return
+        
+        for json_file in self.gabarits_dir.glob("*.json"):
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    
+                    # Clé : "chapitre__type_exercice"
+                    chapitre = data.get("chapitre", "").lower().replace(" ", "_").replace("é", "e").replace("è", "e")
+                    type_ex = data.get("type_exercice", "")
+                    key = f"{chapitre}__{type_ex}"
+                    
+                    self._gabarits_cache[key] = data
+                    logger.info(f"✅ Loaded gabarits: {json_file.name} → {key}")
+                    
+            except Exception as e:
+                logger.error(f"❌ Failed to load gabarit file {json_file}: {e}")
+        
+        logger.info(f"📚 Total gabarit sets loaded: {len(self._gabarits_cache)}")
+    
+    def has_gabarit(self, chapitre: str, type_exercice: str) -> bool:
+        """
+        Vérifie si des gabarits existent pour un chapitre/type donné.
+        
+        Args:
+            chapitre: Nom du chapitre (ex: "Symétrie axiale")
+            type_exercice: Type d'exercice (ex: "trouver_valeur")
+        
+        Returns:
+            True si des gabarits existent
+        """
+        key = self._build_key(chapitre, type_exercice)
+        return key in self._gabarits_cache
+    
+    def get_random_gabarit(
+        self, 
+        chapitre: str, 
+        type_exercice: str, 
+        style: StyleFormulation
+    ) -> Optional[str]:
+        """
+        Retourne un gabarit aléatoire pour un chapitre, type et style donnés.
+        
+        Args:
+            chapitre: Nom du chapitre
+            type_exercice: Type d'exercice
+            style: Style de formulation souhaité
+        
+        Returns:
+            Un template de gabarit avec placeholders, ou None si non trouvé
+        """
+        key = self._build_key(chapitre, type_exercice)
+        
+        if key not in self._gabarits_cache:
+            logger.warning(f"No gabarits found for: {key}")
+            return None
+        
+        gabarit_data = self._gabarits_cache[key]
+        gabarits_list = gabarit_data.get("gabarits", [])
+        
+        # Trouver les gabarits pour ce style
+        style_gabarits = None
+        for g in gabarits_list:
+            if g.get("style") == style.value:
+                style_gabarits = g.get("templates", [])
+                break
+        
+        if not style_gabarits:
+            logger.warning(f"No templates found for style {style.value} in {key}")
+            return None
+        
+        # Retourner un template aléatoire
+        return random.choice(style_gabarits)
+    
+    def prepare_interpolation_values(self, spec: MathExerciseSpec) -> Dict[str, Any]:
+        """
+        Prépare les valeurs d'interpolation depuis une spec mathématique.
+        
+        Cette fonction extrait les valeurs concrètes de la spec et les mappe
+        aux placeholders attendus par les gabarits.
+        
+        Args:
+            spec: Spécification mathématique de l'exercice
+        
+        Returns:
+            Dict des valeurs pour interpolation
+        
+        Examples:
+            >>> spec = MathExerciseSpec(
+            ...     chapitre="Symétrie axiale",
+            ...     parametres={
+            ...         "point_initial": "M",
+            ...         "point_symetrique": "M'",
+            ...         "coord_initial": (3, 5),
+            ...         "axe_type": "vertical",
+            ...         "axe_value": 7
+            ...     }
+            ... )
+            >>> prepare_interpolation_values(spec)
+            {
+                "pointA": "M",
+                "pointB": "M'",
+                "coordA_x": 3,
+                "coordA_y": 5,
+                "axeDesc": "l'axe vertical x = 7"
+            }
+        """
+        params = spec.parametres
+        values = {}
+        
+        # Détecter le type de chapitre
+        chapitre_lower = spec.chapitre.lower()
+        
+        if "symétrie axiale" in chapitre_lower or "symetrie axiale" in chapitre_lower:
+            values = self._prepare_symetrie_axiale_values(params, spec.type_exercice.value)
+        
+        elif "symétrie centrale" in chapitre_lower or "symetrie centrale" in chapitre_lower:
+            values = self._prepare_symetrie_centrale_values(params, spec.type_exercice.value)
+        
+        else:
+            logger.warning(f"Unknown chapter for interpolation: {spec.chapitre}")
+        
+        return values
+    
+    def _prepare_symetrie_axiale_values(self, params: Dict[str, Any], type_ex: str) -> Dict[str, Any]:
+        """Prépare les valeurs pour symétrie axiale."""
+        values = {}
+        
+        # Points
+        values["pointA"] = params.get("point_initial", "M")
+        values["pointB"] = params.get("point_symetrique", "M'")
+        
+        # Coordonnées du point initial
+        coord_initial = params.get("coord_initial", (0, 0))
+        if isinstance(coord_initial, (list, tuple)) and len(coord_initial) >= 2:
+            values["coordA_x"] = coord_initial[0]
+            values["coordA_y"] = coord_initial[1]
+        else:
+            values["coordA_x"] = 0
+            values["coordA_y"] = 0
+        
+        # Pour verifier_propriete, ajouter les coordonnées du second point
+        if type_ex == "verifier_propriete":
+            coord_second = params.get("coord_second", (0, 0))
+            if isinstance(coord_second, (list, tuple)) and len(coord_second) >= 2:
+                values["coordB_x"] = coord_second[0]
+                values["coordB_y"] = coord_second[1]
+            else:
+                values["coordB_x"] = 0
+                values["coordB_y"] = 0
+        
+        # Description de l'axe
+        axe_type = params.get("axe_type", "vertical")
+        axe_value = params.get("axe_value", 0)
+        
+        if axe_type == "vertical":
+            values["axeDesc"] = f"l'axe vertical x = {axe_value}"
+        elif axe_type == "horizontal":
+            values["axeDesc"] = f"l'axe horizontal y = {axe_value}"
+        elif axe_type == "ox":
+            values["axeDesc"] = "l'axe des abscisses"
+        elif axe_type == "oy":
+            values["axeDesc"] = "l'axe des ordonnées"
+        else:
+            values["axeDesc"] = f"l'axe {axe_type}"
+        
+        return values
+    
+    def _prepare_symetrie_centrale_values(self, params: Dict[str, Any], type_ex: str) -> Dict[str, Any]:
+        """Prépare les valeurs pour symétrie centrale."""
+        values = {}
+        
+        # Points
+        values["pointA"] = params.get("point_initial", "M")
+        values["pointB"] = params.get("point_symetrique", "M'")
+        values["pointO"] = params.get("centre_symetrie", "O")
+        
+        # Coordonnées du point initial
+        coord_initial = params.get("coord_initial", (0, 0))
+        if isinstance(coord_initial, (list, tuple)) and len(coord_initial) >= 2:
+            values["coordA_x"] = coord_initial[0]
+            values["coordA_y"] = coord_initial[1]
+        else:
+            values["coordA_x"] = 0
+            values["coordA_y"] = 0
+        
+        # Pour verifier_propriete, ajouter les coordonnées du second point
+        if type_ex == "verifier_propriete":
+            coord_second = params.get("coord_second", (0, 0))
+            if isinstance(coord_second, (list, tuple)) and len(coord_second) >= 2:
+                values["coordB_x"] = coord_second[0]
+                values["coordB_y"] = coord_second[1]
+            else:
+                values["coordB_x"] = 0
+                values["coordB_y"] = 0
+        
+        # Coordonnées du centre
+        coord_centre = params.get("coord_centre", (0, 0))
+        if isinstance(coord_centre, (list, tuple)) and len(coord_centre) >= 2:
+            values["centreX"] = coord_centre[0]
+            values["centreY"] = coord_centre[1]
+        else:
+            values["centreX"] = 0
+            values["centreY"] = 0
+        
+        return values
+    
+    def _build_key(self, chapitre: str, type_exercice: str) -> str:
+        """Construit la clé de recherche pour les gabarits."""
+        chapitre_clean = chapitre.lower().replace(" ", "_").replace("é", "e").replace("è", "e")
+        return f"{chapitre_clean}__{type_exercice}"
+
+
+# Instance globale
+gabarit_loader = GabaritLoader()
+
+
+# Export des symboles publics
+__all__ = [
+    "GabaritLoader",
+    "gabarit_loader"
+]
