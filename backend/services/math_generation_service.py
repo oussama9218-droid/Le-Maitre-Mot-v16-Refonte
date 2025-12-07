@@ -77,7 +77,7 @@ class MathGenerationService:
             "Angles": [MathExerciseType.TRIANGLE_QUELCONQUE],  # Angles dans triangles
             "Géométrie - Triangles et quadrilatères": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],
             "Géométrie dans le plan": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],
-            # ❌ "Symétrie axiale" RETIRÉ : Pas de générateur disponible (sera implémenté dans v2)
+            "Symétrie axiale": [MathExerciseType.SYMETRIE_AXIALE],  # ✅ Générateur symétrie axiale ajouté
             
             # ========== Chapitres multi-niveaux (6e, 5e, 4e, 3e) ==========
             "Fractions": [MathExerciseType.CALCUL_FRACTIONS],
