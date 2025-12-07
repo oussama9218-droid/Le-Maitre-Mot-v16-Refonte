@@ -311,7 +311,10 @@ class GeometryRenderService:
             "points_labels": points_list,
             "is_triangle": is_triangle,
             "with_grid": with_grid,
-            "points_to_hide_in_question": points_to_hide_in_question
+            "points_to_hide_in_question": hiding_rules["points_to_hide"],
+            "hide_image_shapes": hiding_rules["hide_image_shapes"],
+            "hide_construction_lines": hiding_rules["hide_construction_lines"],
+            "exercise_type_detected": hiding_rules["exercise_type"]
         }
         
         # Générer les deux versions (question et correction)
