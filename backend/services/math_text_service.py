@@ -166,7 +166,35 @@ Tu réponds UNIQUEMENT en JSON avec les champs : "enonce", "explication_prof", "
 """
         
         # Instructions spécifiques selon le type
-        if spec.type_exercice.value.startswith("triangle"):
+        if spec.type_exercice.value == "cercle":
+            # ✅ PROMPT SPÉCIALISÉ CERCLES (réactivation IA progressive)
+            rayon = spec.parametres.get("rayon", "?")
+            type_calcul = spec.parametres.get("type", "perimetre")
+            centre = spec.figure_geometrique.points[0] if spec.figure_geometrique and spec.figure_geometrique.points else "O"
+            
+            prompt += f"""
+**CERCLE - CONTRAINTES STRICTES :**
+- Centre du cercle : {centre}
+- Rayon : {rayon} cm
+- Type de calcul : {type_calcul}
+- Formules à utiliser :
+  • Périmètre : P = 2πr
+  • Aire : A = πr²
+
+**CONSIGNES DE RÉDACTION :**
+1. Mentionne UNIQUEMENT le point {centre} comme centre
+2. Utilise EXACTEMENT le rayon {rayon} cm (ne pas inventer d'autre valeur)
+3. Donne la formule appropriée selon le type de calcul
+4. Utilise π (pi) dans la solution, pas une valeur décimale
+5. Arrondis le résultat final à 2 décimales si nécessaire
+
+⚠️ INTERDICTIONS ABSOLUES :
+❌ Inventer un autre rayon que {rayon} cm
+❌ Utiliser un autre point que {centre} pour le centre
+❌ Mélanger les formules périmètre/aire
+"""
+        
+        elif spec.type_exercice.value.startswith("triangle"):
             prompt += f"""
 **GÉOMÉTRIE - CONTRAINTES STRICTES :**
 - Points autorisés : {spec.figure_geometrique.points}
