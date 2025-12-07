@@ -1101,13 +1101,18 @@ Résultat : {spec.resultat_final}"""
             MathTextGeneration si succès, None si échec (→ appel IA)
         """
         try:
+            # 1. Détecter le type pédagogique depuis les paramètres
+            # Pour symétries, le type est dans parametres["type"]
+            pedagogical_type = self._detect_pedagogical_type(spec)
+            
+            logger.info(f"🔍 Check gabarit pour: {spec.chapitre} / {pedagogical_type}")
+            
             # 1. Vérifier si des gabarits existent
-            logger.info(f"🔍 Check gabarit pour: {spec.chapitre} / {spec.type_exercice.value}")
-            if not gabarit_loader.has_gabarit(spec.chapitre, spec.type_exercice.value):
-                logger.info(f"❌ Pas de gabarits pour {spec.chapitre} / {spec.type_exercice.value}")
+            if not gabarit_loader.has_gabarit(spec.chapitre, pedagogical_type):
+                logger.info(f"❌ Pas de gabarits pour {spec.chapitre} / {pedagogical_type}")
                 return None
             
-            logger.info(f"✅ Gabarits trouvés pour {spec.chapitre} / {spec.type_exercice.value}")
+            logger.info(f"✅ Gabarits trouvés pour {spec.chapitre} / {pedagogical_type}")
             
             # 2. Sélectionner un style aléatoire
             style = style_manager.get_random_style()
