@@ -1,14 +1,97 @@
 """
 Service de rendu SVG pour les figures géométriques
 Convertit les objets GeometricFigure en images SVG affichables
+
+RÈGLE PÉDAGOGIQUE UNIVERSELLE (appliquée à toutes les transformations géométriques) :
+    - SUJET = données connues uniquement
+    - CORRIGÉ = données connues + données à trouver
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from models.math_models import GeometricFigure
 from geometry_svg_renderer import GeometrySVGRenderer
 
 logger = logging.getLogger(__name__)
+
+
+def determine_elements_to_hide_in_question(exercise_type: str, figure: GeometricFigure) -> Dict[str, Any]:
+    """
+    📌 FONCTION CENTRALE : Règle pédagogique universelle
+    
+    Détermine quels éléments doivent être cachés dans le SUJET selon le type d'exercice.
+    
+    Règle officielle (manuels scolaires, brevet, prescriptions IPR) :
+        - SUJET : données connues uniquement
+        - CORRIGÉ : données connues + données à trouver
+    
+    Types d'exercices :
+        1. trouver_symetrique : L'élève doit trouver le point/figure image
+           → Cacher : point M' ou triangle A'B'C'
+           
+        2. verifier_symetrie : L'élève vérifie si deux points DONNÉS sont symétriques
+           → Ne rien cacher (tous les points sont des données connues)
+           
+        3. completer_figure : L'élève doit compléter une figure (triangle)
+           → Cacher : le triangle image A'B'C'
+    
+    Args:
+        exercise_type: Type d'exercice (extrait des propriétés de la figure)
+        figure: Objet GeometricFigure
+    
+    Returns:
+        Dict avec :
+            - points_to_hide: List[str] - Noms des points à cacher
+            - hide_image_shapes: bool - Cacher les formes images (triangles, etc.)
+            - hide_construction_lines: bool - Cacher les segments de construction
+    """
+    
+    # Extraire le type d'exercice des propriétés
+    # Les propriétés contiennent "symetriques_True/False" pour verifier_symetrie
+    is_verification = any("symetriques_" in prop for prop in figure.proprietes)
+    is_triangle = "triangle" in figure.proprietes
+    
+    # Déterminer le type d'exercice
+    if is_verification:
+        # Type 2 : verifier_symetrie
+        # → NE RIEN CACHER (tous les éléments sont des données connues)
+        return {
+            "points_to_hide": [],
+            "hide_image_shapes": False,
+            "hide_construction_lines": False,
+            "exercise_type": "verifier_symetrie"
+        }
+    
+    elif is_triangle:
+        # Type 3 : completer_figure
+        # → Cacher le triangle image A'B'C'
+        return {
+            "points_to_hide": [],  # Géré par hide_image_shapes
+            "hide_image_shapes": True,
+            "hide_construction_lines": True,
+            "exercise_type": "completer_figure"
+        }
+    
+    else:
+        # Type 1 : trouver_symetrique
+        # → Cacher le point image M'
+        points_list = figure.points if figure.points else []
+        
+        # Pour symétrie axiale : [point_original, point_image]
+        # Pour symétrie centrale : [point_original, centre, point_image]
+        if figure.type.lower() == "symetrie_axiale" and len(points_list) >= 2:
+            points_to_hide = [points_list[1]]  # Le 2ème point est l'image
+        elif figure.type.lower() == "symetrie_centrale" and len(points_list) >= 3:
+            points_to_hide = [points_list[2]]  # Le 3ème point est l'image
+        else:
+            points_to_hide = []
+        
+        return {
+            "points_to_hide": points_to_hide,
+            "hide_image_shapes": False,
+            "hide_construction_lines": True,
+            "exercise_type": "trouver_symetrique"
+        }
 
 class GeometryRenderService:
     """Service de rendu SVG pour figures géométriques"""
