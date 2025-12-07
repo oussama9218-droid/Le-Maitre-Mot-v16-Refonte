@@ -128,7 +128,7 @@ class TestChapterMapping:
         chapitre_invalide = "Chapitre Inexistant XYZ"
         
         with pytest.raises(ValueError) as exc_info:
-            self.math_service._get_exercise_types_for_chapter(chapitre_invalide)
+            self.math_service._map_chapter_to_types(chapitre_invalide, "6e")
         
         error_message = str(exc_info.value)
         
