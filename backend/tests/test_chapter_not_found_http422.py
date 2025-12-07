@@ -92,10 +92,10 @@ class TestChapterNotFoundHTTP422:
         
         print("✅ Test réussi : HTTP 422 retourné pour Symétrie centrale")
     
-    def test_existing_chapter_proportionnalite_returns_200(self):
-        """Test NON-RÉGRESSION : Proportionnalité (chapitre existant) doit retourner HTTP 200"""
+    def test_existing_chapter_aires_returns_200(self):
+        """Test NON-RÉGRESSION : Aires (chapitre existant) doit retourner HTTP 200"""
         print("\n" + "="*80)
-        print("TEST NON-RÉGRESSION : PROPORTIONNALITÉ → HTTP 200 (chapitre existant)")
+        print("TEST NON-RÉGRESSION : AIRES → HTTP 200 (chapitre existant)")
         print("="*80)
         
         response = requests.post(
@@ -103,11 +103,11 @@ class TestChapterNotFoundHTTP422:
             json={
                 "matiere": "Mathématiques",
                 "niveau": "6e",
-                "chapitre": "Proportionnalité",
+                "chapitre": "Aires",
                 "type_doc": "exercices",
                 "difficulte": "facile",
                 "nb_exercices": 1,
-                "guest_id": "test_proportionnalite_200"
+                "guest_id": "test_aires_200"
             },
             timeout=60
         )
@@ -115,19 +115,20 @@ class TestChapterNotFoundHTTP422:
         print(f"Status code: {response.status_code}")
         
         assert response.status_code == 200, \
-            f"❌ Chapitre existant 'Proportionnalité' doit retourner 200, got {response.status_code}"
+            f"❌ Chapitre existant 'Aires' doit retourner 200, got {response.status_code}"
         
         data = response.json()
         assert "document" in data, "La réponse doit contenir 'document'"
         assert "exercises" in data["document"], "Le document doit contenir 'exercises'"
         assert len(data["document"]["exercises"]) > 0, "Il doit y avoir au moins 1 exercice"
         
-        # Vérifier que l'exercice est bien du bon type (Proportionnalité)
+        # Vérifier que l'exercice est bien du bon type
         ex = data["document"]["exercises"][0]
         assert "spec_mathematique" in ex, "L'exercice doit contenir 'spec_mathematique'"
         type_ex = ex["spec_mathematique"]["type_exercice"]
-        assert type_ex == "proportionnalite", \
-            f"Type d'exercice doit être 'proportionnalite', got '{type_ex}'"
+        # Aires peut générer différents types (perimetre_aire, cercle)
+        assert type_ex in ["perimetre_aire", "cercle"], \
+            f"Type d'exercice pour Aires doit être perimetre_aire ou cercle, got '{type_ex}'"
         
         print(f"✅ Exercice généré avec succès : type={type_ex}")
         print("✅ Test réussi : Chapitre existant fonctionne correctement")
