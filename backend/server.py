@@ -3856,6 +3856,17 @@ async def export_pdf(request: ExportRequest, http_request: Request):
                     # Convert LaTeX math to MathML for PDF rendering
                     exercise['enonce'] = process_math_content_for_pdf(exercise['enonce'])
                 
+                # 🔧 FIX CRITIQUE : Copier figure_svg → schema_svg pour templates PDF
+                if exercise.get('figure_svg'):
+                    exercise['schema_svg'] = exercise['figure_svg']
+                    logger.info(
+                        "✅ SVG figure copié vers schema_svg pour PDF",
+                        module_name="export",
+                        func_name="copy_figure_svg",
+                        doc_id=request.document_id,
+                        svg_length=len(exercise['figure_svg'])
+                    )
+                
                 # NEW: Generate SVG for schema if present in donnees
                 if exercise.get('donnees') and isinstance(exercise['donnees'], dict):
                     schema_data = exercise['donnees'].get('schema')
