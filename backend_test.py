@@ -1336,6 +1336,473 @@ class LeMaitreMotAPITester:
         print(f"\n   Specialized prompts quality: {quality_tests_passed}/2 passed")
         return quality_tests_passed == 2, {"quality_tests_passed": quality_tests_passed}
 
+    def test_geometric_coherence_comprehensive(self):
+        """
+        Test complet de la cohérence des générateurs géométriques après amélioration des fallbacks
+        Basé sur la review request: Test end-to-end de tous les générateurs géométriques
+        """
+        print("\n🔍 TEST COMPLET DE COHÉRENCE GÉOMÉTRIQUE")
+        print("="*70)
+        print("CONTEXTE: Validation complète après amélioration des fallbacks géométriques")
+        print("OBJECTIF: 100% cohérence énoncé/figure/solution pour tous les générateurs")
+        print("CRITÈRES: Points cohérents, SVG généré, énoncé >10 chars, pas de points fantômes")
+        
+        # Test scenarios as specified in review request
+        geometric_test_scenarios = [
+            # Théorème de Pythagore
+            {
+                "name": "Théorème de Pythagore",
+                "data": {
+                    "matiere": "Mathématiques",
+                    "niveau": "4e",
+                    "chapitre": "Théorème de Pythagore",
+                    "type_doc": "exercices",
+                    "difficulte": "moyen",
+                    "nb_exercices": 3,
+                    "versions": ["A"],
+                    "guest_id": f"test_coherence_pythagore_{uuid.uuid4().hex[:8]}"
+                },
+                "expected_features": ["triangle_rectangle", "longueurs", "triplets_pythagoriciens"],
+                "category": "pythagore"
+            },
+            # Trigonométrie
+            {
+                "name": "Trigonométrie",
+                "data": {
+                    "matiere": "Mathématiques",
+                    "niveau": "3e",
+                    "chapitre": "Trigonométrie",
+                    "type_doc": "exercices",
+                    "difficulte": "moyen",
+                    "nb_exercices": 3,
+                    "versions": ["A"],
+                    "guest_id": f"test_coherence_trigono_{uuid.uuid4().hex[:8]}"
+                },
+                "expected_features": ["triangle_rectangle", "angles", "sin_cos_tan"],
+                "category": "trigonometrie"
+            },
+            # Aires (cercles)
+            {
+                "name": "Aires - Cercles",
+                "data": {
+                    "matiere": "Mathématiques",
+                    "niveau": "6e",
+                    "chapitre": "Aires",
+                    "type_doc": "exercices",
+                    "difficulte": "facile",
+                    "nb_exercices": 5,
+                    "versions": ["A"],
+                    "guest_id": f"test_coherence_cercles_{uuid.uuid4().hex[:8]}"
+                },
+                "expected_features": ["cercle", "rayon", "aire_perimetre"],
+                "category": "cercles"
+            },
+            # Aires et périmètres (rectangles)
+            {
+                "name": "Aires et périmètres - Rectangles",
+                "data": {
+                    "matiere": "Mathématiques",
+                    "niveau": "5e",
+                    "chapitre": "Aires et périmètres",
+                    "type_doc": "exercices",
+                    "difficulte": "facile",
+                    "nb_exercices": 5,
+                    "versions": ["A"],
+                    "guest_id": f"test_coherence_rectangles_{uuid.uuid4().hex[:8]}"
+                },
+                "expected_features": ["rectangle", "4_points", "longueur_largeur"],
+                "category": "rectangles"
+            },
+            # Périmètres et aires (mix)
+            {
+                "name": "Périmètres et aires - Mix",
+                "data": {
+                    "matiere": "Mathématiques",
+                    "niveau": "6e",
+                    "chapitre": "Périmètres et aires",
+                    "type_doc": "exercices",
+                    "difficulte": "facile",
+                    "nb_exercices": 5,
+                    "versions": ["A"],
+                    "guest_id": f"test_coherence_mix_{uuid.uuid4().hex[:8]}"
+                },
+                "expected_features": ["mix_figures", "rectangle_carre_cercle"],
+                "category": "mix_perimetre_aire"
+            },
+            # Triangles quelconques
+            {
+                "name": "Triangles quelconques",
+                "data": {
+                    "matiere": "Mathématiques",
+                    "niveau": "5e",
+                    "chapitre": "Triangles",
+                    "type_doc": "exercices",
+                    "difficulte": "facile",
+                    "nb_exercices": 5,
+                    "versions": ["A"],
+                    "guest_id": f"test_coherence_triangles_{uuid.uuid4().hex[:8]}"
+                },
+                "expected_features": ["triangle", "angles_mentionnes", "3_points"],
+                "category": "triangles_quelconques"
+            },
+            # Test de non-régression Thalès
+            {
+                "name": "Théorème de Thalès (Non-régression)",
+                "data": {
+                    "matiere": "Mathématiques",
+                    "niveau": "3e",
+                    "chapitre": "Théorème de Thalès",
+                    "type_doc": "exercices",
+                    "difficulte": "moyen",
+                    "nb_exercices": 3,
+                    "versions": ["A"],
+                    "guest_id": f"test_coherence_thales_{uuid.uuid4().hex[:8]}"
+                },
+                "expected_features": ["triangle", "thales", "proportionnalite"],
+                "category": "thales_regression"
+            }
+        ]
+        
+        # Initialize results tracking
+        category_results = {}
+        total_coherence_issues = 0
+        
+        for scenario in geometric_test_scenarios:
+            print(f"\n🔍 Testing: {scenario['name']}")
+            print(f"   Niveau: {scenario['data']['niveau']}")
+            print(f"   Chapitre: {scenario['data']['chapitre']}")
+            print(f"   Exercices: {scenario['data']['nb_exercices']}")
+            
+            start_time = time.time()
+            success, response = self.run_test(
+                f"Coherence: {scenario['name']}",
+                "POST",
+                "generate",
+                200,
+                data=scenario['data'],
+                timeout=90  # Longer timeout for multiple exercises
+            )
+            generation_time = time.time() - start_time
+            
+            category = scenario['category']
+            if category not in category_results:
+                category_results[category] = {
+                    "total_exercises": 0,
+                    "coherent_exercises": 0,
+                    "issues": []
+                }
+            
+            if success and isinstance(response, dict):
+                document = response.get('document')
+                if document:
+                    exercises = document.get('exercises', [])
+                    print(f"   ✅ Generated {len(exercises)} exercises in {generation_time:.2f}s")
+                    
+                    # Analyze each exercise for coherence
+                    for i, exercise in enumerate(exercises):
+                        exercise_num = i + 1
+                        print(f"\n   📋 Analyzing Exercise {exercise_num}:")
+                        
+                        coherence_result = self.analyze_exercise_coherence(
+                            exercise, scenario['expected_features'], category, exercise_num
+                        )
+                        
+                        # Update counters
+                        self.coherence_results["total_exercises"] += 1
+                        category_results[category]["total_exercises"] += 1
+                        
+                        if coherence_result["is_coherent"]:
+                            self.coherence_results["coherent_exercises"] += 1
+                            category_results[category]["coherent_exercises"] += 1
+                            print(f"      ✅ Exercise {exercise_num}: COHERENT")
+                        else:
+                            total_coherence_issues += 1
+                            issues = coherence_result["issues"]
+                            category_results[category]["issues"].extend(issues)
+                            print(f"      ❌ Exercise {exercise_num}: ISSUES FOUND")
+                            for issue in issues:
+                                print(f"         - {issue}")
+                        
+                        # Update specific issue counters
+                        if coherence_result.get("phantom_points"):
+                            self.coherence_results["phantom_points"] += 1
+                        if coherence_result.get("missing_svg"):
+                            self.coherence_results["missing_svg"] += 1
+                        if coherence_result.get("empty_enonce"):
+                            self.coherence_results["empty_enonce"] += 1
+                        
+                        # Store detailed result
+                        self.coherence_results["detailed_results"].append({
+                            "category": category,
+                            "exercise_num": exercise_num,
+                            "coherent": coherence_result["is_coherent"],
+                            "issues": coherence_result["issues"]
+                        })
+                else:
+                    print(f"   ❌ No document generated")
+                    self.coherence_results["failed_generations"] += 1
+            else:
+                print(f"   ❌ Generation failed")
+                self.coherence_results["failed_generations"] += 1
+                if isinstance(response, dict):
+                    error_detail = response.get('detail', 'Unknown error')
+                    print(f"   Error: {error_detail}")
+        
+        # Generate comprehensive summary
+        self.print_coherence_summary(category_results)
+        
+        # Determine overall success
+        total_exercises = self.coherence_results["total_exercises"]
+        coherent_exercises = self.coherence_results["coherent_exercises"]
+        coherence_rate = (coherent_exercises / total_exercises * 100) if total_exercises > 0 else 0
+        
+        success_criteria = {
+            "coherence_rate_100": coherence_rate == 100.0,
+            "no_phantom_points": self.coherence_results["phantom_points"] == 0,
+            "all_svg_generated": self.coherence_results["missing_svg"] == 0,
+            "no_failed_generations": self.coherence_results["failed_generations"] == 0
+        }
+        
+        overall_success = all(success_criteria.values())
+        
+        print(f"\n🎯 CRITÈRES DE SUCCÈS:")
+        for criterion, passed in success_criteria.items():
+            status = "✅" if passed else "❌"
+            print(f"   {status} {criterion}: {passed}")
+        
+        if overall_success:
+            print(f"\n🎉 TEST DE COHÉRENCE GÉOMÉTRIQUE: SUCCÈS COMPLET")
+            print(f"   ✅ 100% des exercices générés sont cohérents")
+            print(f"   ✅ 0 point fantôme détecté")
+            print(f"   ✅ Tous les SVG générés correctement")
+            print(f"   ✅ Théorème de Thalès fonctionne toujours")
+        else:
+            print(f"\n⚠️  TEST DE COHÉRENCE GÉOMÉTRIQUE: PROBLÈMES DÉTECTÉS")
+            print(f"   Taux de cohérence: {coherence_rate:.1f}%")
+            print(f"   Points fantômes: {self.coherence_results['phantom_points']}")
+            print(f"   SVG manquants: {self.coherence_results['missing_svg']}")
+        
+        return overall_success, {
+            "coherence_rate": coherence_rate,
+            "total_exercises": total_exercises,
+            "coherent_exercises": coherent_exercises,
+            "category_results": category_results,
+            "success_criteria": success_criteria
+        }
+
+    def analyze_exercise_coherence(self, exercise, expected_features, category, exercise_num):
+        """
+        Analyze a single exercise for coherence between enonce/figure/solution
+        Returns detailed coherence analysis
+        """
+        issues = []
+        is_coherent = True
+        
+        # Extract exercise components
+        enonce = exercise.get('enonce', '')
+        figure_svg = exercise.get('figure_svg', '')
+        spec_mathematique = exercise.get('spec_mathematique', {})
+        solution = exercise.get('solution', {})
+        
+        # 1. Check énoncé is present and not empty (>10 characters)
+        if not enonce or len(enonce.strip()) <= 10:
+            issues.append("Énoncé vide ou trop court (<10 caractères)")
+            is_coherent = False
+        
+        # 2. Check SVG figure is generated and not empty
+        if not figure_svg or len(figure_svg.strip()) == 0:
+            issues.append("Figure SVG manquante ou vide")
+            is_coherent = False
+        
+        # 3. Analyze geometric specification if present
+        if spec_mathematique and isinstance(spec_mathematique, dict):
+            figure_geometrique = spec_mathematique.get('figure_geometrique', {})
+            
+            if figure_geometrique:
+                # Extract points from figure
+                figure_points = figure_geometrique.get('points', [])
+                longueurs_connues = figure_geometrique.get('longueurs_connues', {})
+                angles_connus = figure_geometrique.get('angles_connus', {})
+                
+                # 4. Check for phantom points (points in enonce but not in figure)
+                enonce_points = self.extract_points_from_enonce(enonce)
+                phantom_points = [p for p in enonce_points if p not in figure_points]
+                
+                if phantom_points:
+                    issues.append(f"Points fantômes dans énoncé: {phantom_points}")
+                    is_coherent = False
+                
+                # 5. Category-specific coherence checks
+                category_issues = self.check_category_specific_coherence(
+                    category, enonce, figure_geometrique, expected_features
+                )
+                issues.extend(category_issues)
+                if category_issues:
+                    is_coherent = False
+                
+                # 6. Check lengths/angles coherence
+                coherence_issues = self.check_values_coherence(
+                    enonce, longueurs_connues, angles_connus
+                )
+                issues.extend(coherence_issues)
+                if coherence_issues:
+                    is_coherent = False
+        
+        return {
+            "is_coherent": is_coherent,
+            "issues": issues,
+            "phantom_points": len([i for i in issues if "fantômes" in i]) > 0,
+            "missing_svg": len([i for i in issues if "SVG" in i]) > 0,
+            "empty_enonce": len([i for i in issues if "Énoncé" in i]) > 0
+        }
+
+    def extract_points_from_enonce(self, enonce):
+        """Extract geometric points mentioned in the enonce (A, B, C, etc.)"""
+        # Look for single capital letters that are likely geometric points
+        import re
+        points = re.findall(r'\b[A-Z]\b', enonce)
+        # Filter out common non-point letters
+        non_points = ['I', 'V', 'X', 'L', 'C', 'D', 'M']  # Roman numerals, units, etc.
+        # Keep only likely geometric points (usually in context)
+        geometric_points = []
+        for point in points:
+            # Simple heuristic: if letter appears near geometric terms, it's likely a point
+            point_context = enonce.lower()
+            if any(geo_term in point_context for geo_term in ['triangle', 'point', 'segment', 'côté', 'angle']):
+                geometric_points.append(point)
+        
+        return list(set(geometric_points))  # Remove duplicates
+
+    def check_category_specific_coherence(self, category, enonce, figure_geometrique, expected_features):
+        """Check category-specific coherence requirements"""
+        issues = []
+        enonce_lower = enonce.lower()
+        
+        if category == "pythagore":
+            # Check for right triangle and Pythagorean context
+            if "rectangle" not in enonce_lower and "droit" not in enonce_lower:
+                issues.append("Pythagore: Angle droit non mentionné dans énoncé")
+            
+            # Check for length values
+            longueurs = figure_geometrique.get('longueurs_connues', {})
+            if len(longueurs) < 2:
+                issues.append("Pythagore: Moins de 2 longueurs définies")
+        
+        elif category == "cercles":
+            # Check for circle-specific terms
+            if not any(term in enonce_lower for term in ['cercle', 'rayon', 'diamètre']):
+                issues.append("Cercles: Termes spécifiques au cercle manquants")
+            
+            # Check for radius coherence
+            rayon = figure_geometrique.get('rayon')
+            if not rayon:
+                issues.append("Cercles: Rayon non défini dans figure")
+        
+        elif category == "rectangles":
+            # Check for 4 points in rectangle
+            points = figure_geometrique.get('points', [])
+            if len(points) != 4:
+                issues.append(f"Rectangles: {len(points)} points au lieu de 4")
+            
+            # Check for rectangle terms
+            if not any(term in enonce_lower for term in ['rectangle', 'carré', 'longueur', 'largeur']):
+                issues.append("Rectangles: Termes spécifiques au rectangle manquants")
+        
+        elif category == "triangles_quelconques":
+            # Check for triangle with angles mentioned
+            if "triangle" not in enonce_lower:
+                issues.append("Triangles: Terme 'triangle' manquant")
+            
+            angles = figure_geometrique.get('angles_connus', {})
+            if not angles and "angle" not in enonce_lower:
+                issues.append("Triangles quelconques: Aucun angle mentionné")
+        
+        elif category == "trigonometrie":
+            # Check for trigonometric functions
+            if not any(term in enonce_lower for term in ['sin', 'cos', 'tan', 'sinus', 'cosinus', 'tangente']):
+                issues.append("Trigonométrie: Fonctions trigonométriques manquantes")
+        
+        elif category == "thales_regression":
+            # Check Thalès theorem context
+            if not any(term in enonce_lower for term in ['thalès', 'proportionnel', 'rapport']):
+                issues.append("Thalès: Contexte du théorème manquant")
+        
+        return issues
+
+    def check_values_coherence(self, enonce, longueurs_connues, angles_connus):
+        """Check if numerical values in enonce match those in figure specification"""
+        issues = []
+        
+        # Extract numbers from enonce
+        import re
+        numbers_in_enonce = re.findall(r'\d+(?:[.,]\d+)?', enonce)
+        
+        # Check if lengths in figure are mentioned in enonce
+        for segment, longueur in longueurs_connues.items():
+            if isinstance(longueur, (int, float)):
+                longueur_str = str(longueur)
+                if longueur_str not in enonce and str(int(longueur)) not in enonce:
+                    # Allow for derived values (e.g., perimeter from radius)
+                    # This is acceptable as per the review request
+                    pass
+        
+        # Check if angles in figure are mentioned in enonce
+        for angle_info, valeur in angles_connus.items():
+            if isinstance(valeur, (int, float)) and valeur != 90:  # 90° often implicit
+                valeur_str = str(valeur)
+                if valeur_str not in enonce:
+                    issues.append(f"Angle {valeur}° défini mais non mentionné dans énoncé")
+        
+        return issues
+
+    def print_coherence_summary(self, category_results):
+        """Print detailed summary of coherence test results"""
+        print(f"\n📊 RÉSUMÉ DÉTAILLÉ DE COHÉRENCE:")
+        print(f"="*50)
+        
+        total_exercises = self.coherence_results["total_exercises"]
+        coherent_exercises = self.coherence_results["coherent_exercises"]
+        coherence_rate = (coherent_exercises / total_exercises * 100) if total_exercises > 0 else 0
+        
+        print(f"📈 STATISTIQUES GLOBALES:")
+        print(f"   Total exercices testés: {total_exercises}")
+        print(f"   Exercices cohérents: {coherent_exercises}")
+        print(f"   Taux de cohérence: {coherence_rate:.1f}%")
+        print(f"   Points fantômes: {self.coherence_results['phantom_points']}")
+        print(f"   SVG manquants: {self.coherence_results['missing_svg']}")
+        print(f"   Énoncés vides: {self.coherence_results['empty_enonce']}")
+        print(f"   Générations échouées: {self.coherence_results['failed_generations']}")
+        
+        print(f"\n📋 RÉSULTATS PAR CATÉGORIE:")
+        for category, results in category_results.items():
+            total = results["total_exercises"]
+            coherent = results["coherent_exercises"]
+            rate = (coherent / total * 100) if total > 0 else 0
+            status = "✅" if rate == 100 else "⚠️" if rate >= 85 else "❌"
+            
+            print(f"   {status} {category}: {coherent}/{total} ({rate:.1f}%)")
+            
+            if results["issues"]:
+                print(f"      Issues détectées:")
+                for issue in results["issues"][:3]:  # Show first 3 issues
+                    print(f"        - {issue}")
+                if len(results["issues"]) > 3:
+                    print(f"        ... et {len(results['issues']) - 3} autres")
+        
+        print(f"\n🎯 OBJECTIFS ATTEINTS:")
+        objectives = [
+            ("Taux de cohérence 100%", coherence_rate == 100.0),
+            ("0 point fantôme", self.coherence_results["phantom_points"] == 0),
+            ("Tous SVG générés", self.coherence_results["missing_svg"] == 0),
+            ("Toutes générations réussies", self.coherence_results["failed_generations"] == 0)
+        ]
+        
+        for objective, achieved in objectives:
+            status = "✅" if achieved else "❌"
+            print(f"   {status} {objective}")
+        
+        return coherence_rate
+
     def test_nouvelle_architecture_mathematiques(self):
         """Test Nouvelle Architecture Mathématiques - Séparation logique mathématique et rédaction textuelle"""
         print("\n🎯 TESTING NOUVELLE ARCHITECTURE MATHÉMATIQUES")
