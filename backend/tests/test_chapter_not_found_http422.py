@@ -16,10 +16,10 @@ class TestChapterNotFoundHTTP422:
     
     BASE_URL = "http://localhost:8001"
     
-    def test_symetrie_axiale_returns_422(self):
-        """Test CRITIQUE : Symétrie axiale doit retourner HTTP 422, pas 200"""
+    def test_symetrie_axiale_returns_200(self):
+        """Test : Symétrie axiale doit maintenant retourner HTTP 200 (générateur implémenté)"""
         print("\n" + "="*80)
-        print("TEST CRITIQUE : SYMÉTRIE AXIALE → HTTP 422")
+        print("TEST : SYMÉTRIE AXIALE → HTTP 200 (GÉNÉRATEUR IMPLÉMENTÉ)")
         print("="*80)
         
         response = requests.post(
@@ -31,39 +31,31 @@ class TestChapterNotFoundHTTP422:
                 "type_doc": "exercices",
                 "difficulte": "facile",
                 "nb_exercices": 1,
-                "guest_id": "test_symetrie_422"
+                "guest_id": "test_symetrie_200"
             },
             timeout=60
         )
         
         print(f"Status code: {response.status_code}")
-        print(f"Response: {response.json()}")
         
-        # Vérifier que le status code est 422 (Unprocessable Entity)
-        assert response.status_code == 422, \
-            f"❌ Expected 422, got {response.status_code}. " \
-            f"Chapitre non mappé doit retourner 422, pas 200 avec exercice incorrect !"
+        # APRÈS implémentation du générateur : doit retourner 200
+        assert response.status_code == 200, \
+            f"❌ Symétrie axiale doit maintenant retourner 200 (générateur implémenté), got {response.status_code}"
         
-        # Vérifier que le message d'erreur est clair
+        # Vérifier que l'exercice est du bon type
         data = response.json()
-        assert "detail" in data, "La réponse doit contenir un champ 'detail'"
+        assert "document" in data, "La réponse doit contenir 'document'"
+        assert "exercises" in data["document"], "Le document doit contenir 'exercises'"
         
-        detail = data["detail"]
-        if isinstance(detail, dict):
-            assert "error" in detail, "detail doit contenir 'error'"
-            assert detail["error"] == "chapter_not_implemented", \
-                f"error doit être 'chapter_not_implemented', got {detail['error']}"
-            assert "message" in detail, "detail doit contenir 'message'"
-            message = detail["message"]
-        else:
-            message = str(detail)
+        ex = data["document"]["exercises"][0]
+        type_ex = ex["spec_mathematique"]["type_exercice"]
         
-        # Vérifier que le message mentionne le chapitre
-        assert "Symétrie axiale" in message or "chapitre" in message.lower() or "générateur" in message.lower(), \
-            f"Le message d'erreur doit mentionner le chapitre ou l'absence de générateur: {message}"
+        print(f"Type d'exercice généré : {type_ex}")
         
-        print(f"✅ Message d'erreur clair: {message}")
-        print("✅ Test réussi : HTTP 422 retourné correctement")
+        assert type_ex == "symetrie_axiale", \
+            f"Type doit être 'symetrie_axiale', got '{type_ex}'"
+        
+        print("✅ Test réussi : HTTP 200 avec exercice de symétrie axiale correct")
     
     def test_symetrie_centrale_returns_422(self):
         """Test : Symétrie centrale (5e) doit aussi retourner HTTP 422"""
