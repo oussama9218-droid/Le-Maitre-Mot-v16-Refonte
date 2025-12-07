@@ -208,9 +208,11 @@ class GeometryRenderService:
         # Récupérer les points
         points_list = figure.points if figure.points else []
         
-        # Vérifier si c'est un triangle et si on veut la grille
+        # Vérifier si c'est un triangle
         is_triangle = "triangle" in figure.proprietes
-        with_grid = "with_grid" in figure.proprietes
+        
+        # GRILLE SYSTÉMATIQUE pour tous les exercices de symétrie axiale (collège)
+        with_grid = True  # Toujours activée pour cohérence pédagogique
         
         # Construire les données pour le renderer
         data = {
