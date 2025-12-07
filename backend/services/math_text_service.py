@@ -102,6 +102,12 @@ class MathTextService:
                 logger.warning("⚠️ Réponse IA invalide détectée, utilisation du fallback")
                 return self._generate_fallback_text(spec)
             
+            # ✅ VALIDATION SPÉCIFIQUE CERCLES (réactivation progressive)
+            if spec.type_exercice.value == "cercle":
+                if not self._validate_cercle_specifique(text_generation, spec):
+                    logger.warning("⚠️ Validation Cercle échouée, utilisation du fallback")
+                    return self._generate_fallback_text(spec)
+            
             # Normaliser les symboles mathématiques
             text_generation.enonce = normalizer.normalize_math_symbols(text_generation.enonce)
             text_generation.solution_redigee = normalizer.normalize_math_symbols(text_generation.solution_redigee)
