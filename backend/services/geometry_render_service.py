@@ -240,9 +240,6 @@ class GeometryRenderService:
         }
         
         return self.renderer.render_symetrie_centrale(data)
-        }
-        
-        return self.renderer.render_symetrie_axiale(data)
 
 
 # Instance globale
