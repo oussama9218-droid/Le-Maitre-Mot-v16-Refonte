@@ -1745,7 +1745,7 @@ class MathGenerationService:
         
         else:  # completer_figure
             # Compléter une figure par symétrie
-            # Triangle ou quadrilatère dont on donne la moitié
+            # Triangle dont on donne la moitié
             point_a = points[0]
             point_b = points[1]
             point_c = points[2]
@@ -1753,11 +1753,13 @@ class MathGenerationService:
             axe_type = "vertical"
             axe_position = 6
             
-            # Points d'un triangle à gauche de l'axe
+            # Générer un vrai triangle non aligné à gauche de l'axe
+            x1, y1, x2, y2, x3, y3 = self._generate_non_aligned_triangle_points(min_coord=2, max_coord=axe_position-1)
+            
             coords = {
-                point_a: {"x": 2, "y": 3},
-                point_b: {"x": 4, "y": 7},
-                point_c: {"x": 3, "y": 5}
+                point_a: {"x": x1, "y": y1},
+                point_b: {"x": x2, "y": y2},
+                point_c: {"x": x3, "y": y3}
             }
             
             # Symétriques
