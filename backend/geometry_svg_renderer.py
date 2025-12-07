@@ -914,13 +914,17 @@ class GeometrySVGRenderer:
         Args:
             data: {
                 "points_coords": {"A_x": 3, "A_y": 5, "O_x": 6, "O_y": 6, "A_prime_x": 9, "A_prime_y": 7, ...},
-                "points_labels": ["A", "O", "A'"] ou ["M", "O", "M'"]
+                "points_labels": ["A", "O", "A'"] ou ["M", "O", "M'"],
+                "is_triangle": bool,
+                "with_grid": bool
             }
         """
         svg = self.create_svg_root()
         
         points_coords = data.get('points_coords', {})
         points_labels = data.get('points_labels', [])
+        is_triangle = data.get('is_triangle', False)
+        with_grid = data.get('with_grid', False)
         
         # Système de coordonnées
         grid_size = 14
