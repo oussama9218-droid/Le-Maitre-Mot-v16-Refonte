@@ -92,22 +92,22 @@ class TestChapterNotFoundHTTP422:
         
         print("✅ Test réussi : HTTP 422 retourné pour Symétrie centrale")
     
-    def test_existing_chapter_cercle_returns_200(self):
-        """Test NON-RÉGRESSION : Le cercle (chapitre existant) doit retourner HTTP 200"""
+    def test_existing_chapter_proportionnalite_returns_200(self):
+        """Test NON-RÉGRESSION : Proportionnalité (chapitre existant) doit retourner HTTP 200"""
         print("\n" + "="*80)
-        print("TEST NON-RÉGRESSION : LE CERCLE → HTTP 200 (chapitre existant)")
+        print("TEST NON-RÉGRESSION : PROPORTIONNALITÉ → HTTP 200 (chapitre existant)")
         print("="*80)
         
         response = requests.post(
             f"{self.BASE_URL}/api/generate",
             json={
                 "matiere": "Mathématiques",
-                "niveau": "3e",
-                "chapitre": "Le cercle",
+                "niveau": "6e",
+                "chapitre": "Proportionnalité",
                 "type_doc": "exercices",
                 "difficulte": "facile",
                 "nb_exercices": 1,
-                "guest_id": "test_cercle_200"
+                "guest_id": "test_proportionnalite_200"
             },
             timeout=60
         )
@@ -115,19 +115,19 @@ class TestChapterNotFoundHTTP422:
         print(f"Status code: {response.status_code}")
         
         assert response.status_code == 200, \
-            f"❌ Chapitre existant 'Le cercle' doit retourner 200, got {response.status_code}"
+            f"❌ Chapitre existant 'Proportionnalité' doit retourner 200, got {response.status_code}"
         
         data = response.json()
         assert "document" in data, "La réponse doit contenir 'document'"
         assert "exercises" in data["document"], "Le document doit contenir 'exercises'"
         assert len(data["document"]["exercises"]) > 0, "Il doit y avoir au moins 1 exercice"
         
-        # Vérifier que l'exercice est bien du bon type (Cercle)
+        # Vérifier que l'exercice est bien du bon type (Proportionnalité)
         ex = data["document"]["exercises"][0]
         assert "spec_mathematique" in ex, "L'exercice doit contenir 'spec_mathematique'"
         type_ex = ex["spec_mathematique"]["type_exercice"]
-        assert type_ex == "cercle", \
-            f"Type d'exercice doit être 'cercle', got '{type_ex}'"
+        assert type_ex == "proportionnalite", \
+            f"Type d'exercice doit être 'proportionnalite', got '{type_ex}'"
         
         print(f"✅ Exercice généré avec succès : type={type_ex}")
         print("✅ Test réussi : Chapitre existant fonctionne correctement")
