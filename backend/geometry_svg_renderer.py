@@ -1106,6 +1106,10 @@ class GeometrySVGRenderer:
         point_objects = {}
         for point_name, coords in points_dict.items():
             if 'x' in coords and 'y' in coords:
+                # Dans la version question, ne pas dessiner les points images
+                if hide_image_triangle and point_name != centre_name and ("'" in point_name or "_prime" in point_name):
+                    continue  # Sauter les points images dans la version question
+                
                 x_svg, y_svg = math_to_svg(coords['x'], coords['y'])
                 point = Point(x_svg, y_svg, point_name)
                 point_objects[point_name] = point
