@@ -159,6 +159,18 @@ class MathTextService:
             # Supprimer les prénoms personnels si présents
             text_generation.enonce = normalizer.remove_personal_names(text_generation.enonce)
             
+            # 📊 Monitoring : IA acceptée avec succès
+            ia_monitoring.log_generation(
+                type_exercice=spec.type_exercice.value,
+                niveau=spec.niveau,
+                chapitre=spec.chapitre,
+                ia_utilisee=True,
+                ia_acceptee=True,
+                fallback_utilise=False,
+                cause_rejet=None,
+                temps_generation_ms=(time.time() - start_time) * 1000
+            )
+            
             return text_generation
                 
         except Exception as e:
