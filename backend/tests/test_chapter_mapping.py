@@ -216,7 +216,7 @@ class TestChapterMapping:
             for chapitre in chapitres:
                 total += 1
                 try:
-                    types = self.math_service._get_exercise_types_for_chapter(chapitre)
+                    types = self.math_service._map_chapter_to_types(chapitre, niveau)
                     
                     if len(types) > 0 and MathExerciseType.CALCUL_DECIMAUX not in types:
                         succes += 1
