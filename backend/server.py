@@ -4089,6 +4089,11 @@ async def export_pdf(request: ExportRequest, http_request: Request):
         # Generate SVG schemas for each exercise (before template render)
         exercises = document_dict.get('exercises', [])
         for i, exercise in enumerate(exercises, start=1):
+            # 🔧 FIX CRITIQUE : Copier figure_svg → schema_svg pour templates PDF
+            if exercise.get('figure_svg'):
+                exercise['schema_svg'] = exercise['figure_svg']
+                logger.info(f"✅ [EXPORT][PDF] SVG figure copié vers schema_svg - Exercice {i} - length = {len(exercise['figure_svg'])}")
+            
             schema_data = None
             
             # Check for schema in donnees
