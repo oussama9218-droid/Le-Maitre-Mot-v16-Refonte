@@ -14109,6 +14109,22 @@ if __name__ == "__main__":
                 for issue in results.get('all_issues', []):
                     print(f"   - {issue}")
             sys.exit(0 if success else 1)
+        elif test_mode == "coherence":
+            # Run Geometric Coherence tests
+            print("🔍 RUNNING GEOMETRIC COHERENCE TESTS")
+            success, results = tester.test_geometric_coherence_comprehensive()
+            print(f"\n🔍 Geometric Coherence Test: {'PASSED' if success else 'FAILED'}")
+            if success:
+                coherence_rate = results.get('coherence_rate', 0)
+                total_exercises = results.get('total_exercises', 0)
+                print(f"✅ Coherence rate: {coherence_rate:.1f}% ({results.get('coherent_exercises', 0)}/{total_exercises} exercises)")
+            else:
+                print("🚨 COHERENCE ISSUES DETECTED:")
+                category_results = results.get('category_results', {})
+                for category, data in category_results.items():
+                    if data['issues']:
+                        print(f"   {category}: {len(data['issues'])} issues")
+            sys.exit(0 if success else 1)
         elif test_mode == "race-condition":
             # Legacy support for race condition tests
             run_magic_link_race_condition_tests()
