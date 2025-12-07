@@ -328,6 +328,7 @@ class GeometryRenderService:
         points_list = figure.points if figure.points else []
         
         # 📌 APPLIQUER LA RÈGLE PÉDAGOGIQUE UNIVERSELLE
+        # Le type d'exercice sera détecté automatiquement depuis les propriétés
         hiding_rules = determine_elements_to_hide_in_question("", figure)
         
         # GRILLE SYSTÉMATIQUE pour tous les exercices de symétrie axiale (collège)
@@ -375,6 +376,7 @@ class GeometryRenderService:
             coords[key] = val
         
         # 📌 APPLIQUER LA RÈGLE PÉDAGOGIQUE UNIVERSELLE
+        # Le type d'exercice sera détecté automatiquement depuis les propriétés
         hiding_rules = determine_elements_to_hide_in_question("", figure)
         
         # GRILLE SYSTÉMATIQUE pour tous les exercices de symétrie centrale (collège)
