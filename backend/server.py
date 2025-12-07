@@ -3132,6 +3132,17 @@ async def generate_document(request: GenerateRequest):
         
     except HTTPException:
         raise
+    except ValueError as e:
+        # 🚨 Erreurs de validation (ex: chapitre non mappé)
+        logger.error(f"Validation error: {e}")
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "chapter_not_implemented",
+                "message": str(e),
+                "type": "ValueError"
+            }
+        )
     except Exception as e:
         logger.error(f"Error generating document: {e}")
         raise HTTPException(status_code=500, detail="Erreur lors de la génération du document")
