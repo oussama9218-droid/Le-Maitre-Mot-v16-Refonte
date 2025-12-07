@@ -104,7 +104,7 @@ class TestChapterMapping:
         
         for chapitre in chapitres_6e:
             try:
-                types = self.math_service._get_exercise_types_for_chapter(chapitre)
+                types = self.math_service._map_chapter_to_types(chapitre, "6e")
                 if len(types) == 0:
                     manquants.append(chapitre)
                     print(f"❌ {chapitre} : Aucun type mappé")
