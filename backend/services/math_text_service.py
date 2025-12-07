@@ -1076,4 +1076,105 @@ Résultat : {spec.resultat_final}"""
         except Exception as e:
             logger.error(f"❌ Erreur validation Cercle : {e}")
             return False  # En cas d'erreur, rejeter par sécurité
+    
+    def _try_generate_from_gabarit(self, spec: MathExerciseSpec) -> Optional[MathTextGeneration]:
+        """
+        🎯 SYSTÈME D'OPTIMISATION IA - Le Maître Mot
+        
+        Tente de générer l'énoncé depuis un gabarit pré-existant.
+        Si réussi : 0 appel IA, coût = 0, génération instantanée.
+        
+        FLUX :
+            1. Vérifier si des gabarits existent pour ce chapitre/type
+            2. Sélectionner un style aléatoire
+            3. Construire la clé de cache
+            4. Vérifier le cache
+            5. Si cache HIT : interpoler et retourner
+            6. Si cache MISS : charger gabarit, interpoler, cacher, retourner
+            7. Si échec : retourner None → appel IA classique
+        
+        Args:
+            spec: Spécification mathématique de l'exercice
+        
+        Returns:
+            MathTextGeneration si succès, None si échec (→ appel IA)
+        """
+        try:
+            # 1. Vérifier si des gabarits existent
+            if not gabarit_loader.has_gabarit(spec.chapitre, spec.type_exercice.value):
+                logger.debug(f"Pas de gabarits pour {spec.chapitre} / {spec.type_exercice.value}")
+                return None
+            
+            # 2. Sélectionner un style aléatoire
+            style = style_manager.get_random_style()
+            
+            # 3. Construire la clé de cache
+            cache_key = style_manager.build_cache_key(
+                chapitre=spec.chapitre,
+                type_exercice=spec.type_exercice.value,
+                difficulte=spec.difficulte.value,
+                style=style
+            )
+            
+            # 4. Vérifier le cache
+            cached_template = cache_manager.get(cache_key)
+            
+            if cached_template:
+                # 📊 Cache HIT : interpoler directement
+                logger.info(f"💚 CACHE HIT : {cache_key}")
+                template = cached_template
+            else:
+                # 📊 Cache MISS : charger le gabarit
+                logger.info(f"💛 CACHE MISS : {cache_key} → Chargement gabarit")
+                template = gabarit_loader.get_random_gabarit(
+                    chapitre=spec.chapitre,
+                    type_exercice=spec.type_exercice.value,
+                    style=style
+                )
+                
+                if not template:
+                    logger.warning(f"Aucun gabarit trouvé pour style {style.value}")
+                    return None
+                
+                # Stocker dans le cache pour le futur
+                cache_manager.set(cache_key, template)
+            
+            # 5. Préparer les valeurs d'interpolation
+            values = gabarit_loader.prepare_interpolation_values(spec)
+            
+            if not values:
+                logger.warning("Échec préparation des valeurs d'interpolation")
+                return None
+            
+            # 6. Interpoler le template
+            enonce_final = cache_manager.interpolate(template, values)
+            
+            # 7. Créer la génération de texte
+            # Note : Pour les gabarits, on ne génère pas de solution rédigée
+            # (la solution calculée existe déjà dans la spec)
+            text_generation = MathTextGeneration(
+                enonce=enonce_final,
+                explication_prof=None,
+                solution_redigee=self._build_solution_from_steps(spec)
+            )
+            
+            logger.info(f"✅ Énoncé généré depuis gabarit (style: {style.value})")
+            return text_generation
+            
+        except Exception as e:
+            logger.error(f"❌ Erreur génération depuis gabarit : {e}")
+            return None
+    
+    def _build_solution_from_steps(self, spec: MathExerciseSpec) -> str:
+        """
+        Construit une solution rédigée simple depuis les étapes calculées.
+        
+        Utilisé quand on génère depuis un gabarit (sans appel IA).
+        """
+        if not spec.etapes_calculees:
+            return f"Résultat : {spec.resultat_final}"
+        
+        solution = "\n".join(spec.etapes_calculees)
+        solution += f"\n\nRésultat final : {spec.resultat_final}"
+        return solution
 
