@@ -542,8 +542,10 @@ class IAOptimizationTester:
             "matiere": "Mathématiques",
             "niveau": "4e",
             "chapitre": "Théorème de Pythagore",  # Pas de gabarit pour ce chapitre
+            "type_doc": "exercices",
             "difficulte": "moyen",
             "nb_exercices": 2,
+            "versions": ["A"],
             "guest_id": self.guest_id
         }
         
