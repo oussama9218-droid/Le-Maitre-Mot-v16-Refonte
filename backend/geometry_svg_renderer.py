@@ -998,6 +998,51 @@ class GeometrySVGRenderer:
             centre_name = list(points_dict.keys())[0]
             centre_coords = points_dict[centre_name]
         
+        # 3.5. Séparer les points initiaux et leurs images pour les triangles
+        points_initiaux = {}
+        points_images = {}
+        for point_name, coords in points_dict.items():
+            if point_name != centre_name:
+                if "'" in point_name or "_prime" in point_name:
+                    points_images[point_name] = coords
+                else:
+                    points_initiaux[point_name] = coords
+        
+        # 3.6. Si c'est un triangle, dessiner les triangles ABC et A'B'C'
+        if is_triangle and len(points_initiaux) >= 3 and len(points_images) >= 3:
+            # Triangle initial (bleu)
+            initial_points_svg = []
+            for coords in list(points_initiaux.values())[:3]:
+                if 'x' in coords and 'y' in coords:
+                    x_svg, y_svg = math_to_svg(coords['x'], coords['y'])
+                    initial_points_svg.append(f"{x_svg},{y_svg}")
+            
+            if len(initial_points_svg) == 3:
+                ET.SubElement(svg, 'polygon', {
+                    'points': ' '.join(initial_points_svg),
+                    'fill': 'none',
+                    'stroke': '#0066CC',
+                    'stroke-width': '2',
+                    'class': 'triangle-initial'
+                })
+            
+            # Triangle image (gris/bleu clair)
+            image_points_svg = []
+            for coords in list(points_images.values())[:3]:
+                if 'x' in coords and 'y' in coords:
+                    x_svg, y_svg = math_to_svg(coords['x'], coords['y'])
+                    image_points_svg.append(f"{x_svg},{y_svg}")
+            
+            if len(image_points_svg) == 3:
+                ET.SubElement(svg, 'polygon', {
+                    'points': ' '.join(image_points_svg),
+                    'fill': 'none',
+                    'stroke': '#99BBDD',
+                    'stroke-width': '2',
+                    'stroke-dasharray': '3,3',
+                    'class': 'triangle-image'
+                })
+        
         # 4. Dessiner tous les points
         point_objects = {}
         for point_name, coords in points_dict.items():
