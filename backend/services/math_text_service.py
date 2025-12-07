@@ -1199,6 +1199,12 @@ Résultat : {spec.resultat_final}"""
         
         # Mapping des types spécifiques vers types pédagogiques universels
         TYPE_MAPPING = {
+            # Types universels (identité)
+            "trouver_valeur": "trouver_valeur",
+            "verifier_propriete": "verifier_propriete",
+            "completer_structure": "completer_structure",
+            "probleme_redige": "probleme_redige",
+            
             # Symétrie axiale / centrale
             "trouver_symetrique": "trouver_valeur",
             "verifier_symetrie": "verifier_propriete",
