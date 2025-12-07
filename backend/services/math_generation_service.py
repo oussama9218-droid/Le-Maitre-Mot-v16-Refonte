@@ -1783,4 +1783,305 @@ class MathGenerationService:
                     {"etape": "Construction des symétriques", "points": 3.0},
                     {"etape": "Tracé de la figure complète", "points": 1.0}
                 ]
+
+    
+    def _gen_symetrie_centrale(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice de symétrie centrale (5e)
+        
+        Concepts :
+        - Trouver le symétrique d'un point par rapport à un centre
+        - Le centre est le milieu du segment [MM']
+        - Formule : M' = 2*O - M où O est le centre de symétrie
+        """
+        
+        points = self._get_next_geometry_points()
+        
+        # Types d'exercices possibles
+        types_exercices = ["trouver_symetrique", "verifier_symetrie", "completer_figure"]
+        
+        if difficulte == "facile":
+            type_exercice = "trouver_symetrique"
+        else:
+            type_exercice = random.choice(types_exercices)
+        
+        if type_exercice == "trouver_symetrique":
+            # Trouver le symétrique d'un point par rapport à un centre
+            point_original = points[0]
+            centre = points[1]
+            point_image = points[2]
+            
+            # Coordonnées du centre
+            centre_x = random.randint(4, 8)
+            centre_y = random.randint(4, 8)
+            
+            # Coordonnées du point original
+            # Choisir un point pas trop loin du centre
+            point_x = random.randint(max(1, centre_x - 4), min(12, centre_x + 4))
+            point_y = random.randint(max(1, centre_y - 4), min(12, centre_y + 4))
+            
+            # Éviter que le point soit sur le centre
+            if point_x == centre_x and point_y == centre_y:
+                point_x += 2
+            
+            # Calcul du symétrique par symétrie centrale
+            # Formule : M' = 2*O - M
+            image_x = 2 * centre_x - point_x
+            image_y = 2 * centre_y - point_y
+            
+            # Vérifier que l'image est dans les limites
+            if image_x < 0 or image_x > 14 or image_y < 0 or image_y > 14:
+                # Recalculer avec un point plus proche du centre
+                point_x = centre_x + random.choice([-2, -1, 1, 2])
+                point_y = centre_y + random.choice([-2, -1, 1, 2])
+                image_x = 2 * centre_x - point_x
+                image_y = 2 * centre_y - point_y
+            
+            # Calcul des distances (pour vérification pédagogique)
+            distance_M_O = ((point_x - centre_x)**2 + (point_y - centre_y)**2)**0.5
+            distance_O_M_prime = ((image_x - centre_x)**2 + (image_y - centre_y)**2)**0.5
+            
+            etapes = [
+                f"Point {point_original}({point_x}, {point_y})",
+                f"Centre de symétrie {centre}({centre_x}, {centre_y})",
+                f"Formule : {point_image} = 2 × {centre} - {point_original}",
+                f"Coordonnée x de {point_image} : 2 × {centre_x} - {point_x} = {image_x}",
+                f"Coordonnée y de {point_image} : 2 × {centre_y} - {point_y} = {image_y}",
+                f"Vérification : {centre} est le milieu de [{point_original}{point_image}]",
+                f"Distance {point_original}{centre} = {distance_M_O:.2f}",
+                f"Distance {centre}{point_image} = {distance_O_M_prime:.2f}",
+                f"Coordonnées de {point_image} : ({image_x}, {image_y})"
+            ]
+            
+            # Créer la figure géométrique
+            figure = GeometricFigure(
+                type="symetrie_centrale",
+                points=[point_original, centre, point_image],
+                longueurs_connues={
+                    f"{point_original}_x": point_x,
+                    f"{point_original}_y": point_y,
+                    f"{centre}_x": centre_x,
+                    f"{centre}_y": centre_y,
+                    f"{point_image}_x": image_x,
+                    f"{point_image}_y": image_y
+                },
+                proprietes=["centre_symetrie"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.SYMETRIE_CENTRALE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "trouver_symetrique",
+                    "point_original": point_original,
+                    "centre": centre,
+                    "point_image": point_image,
+                    "point_original_coords": {"x": point_x, "y": point_y},
+                    "centre_coords": {"x": centre_x, "y": centre_y}
+                },
+                solution_calculee={
+                    "image_coords": {"x": image_x, "y": image_y},
+                    "distance_M_O": round(distance_M_O, 2),
+                    "distance_O_M_prime": round(distance_O_M_prime, 2)
+                },
+                etapes_calculees=etapes,
+                resultat_final=f"{point_image}({image_x}, {image_y})",
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Identification du centre", "points": 1.0},
+                    {"etape": "Application de la formule", "points": 2.0},
+                    {"etape": "Coordonnées correctes", "points": 1.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève utilise bien la formule M' = 2O - M",
+                    "S'assurer que l'élève vérifie que O est le milieu"
+                ]
+            )
+        
+        elif type_exercice == "verifier_symetrie":
+            # Vérifier si deux points sont symétriques par rapport à un centre
+            point_a = points[0]
+            centre = points[1]
+            point_b = points[2]
+            
+            # Créer deux cas : symétriques ou non
+            sont_symetriques = random.choice([True, False])
+            
+            # Centre
+            centre_x = random.randint(5, 9)
+            centre_y = random.randint(5, 9)
+            
+            # Point A
+            point_a_x = random.randint(2, centre_x - 1)
+            point_a_y = random.randint(2, centre_y - 1)
+            
+            if sont_symetriques:
+                # Calculer le vrai symétrique
+                point_b_x = 2 * centre_x - point_a_x
+                point_b_y = 2 * centre_y - point_a_y
+            else:
+                # Créer un point non symétrique (décalé)
+                point_b_x = 2 * centre_x - point_a_x + random.randint(1, 2)
+                point_b_y = 2 * centre_y - point_a_y + random.randint(1, 2)
+            
+            # Calcul du milieu de [AB]
+            milieu_x = (point_a_x + point_b_x) / 2
+            milieu_y = (point_a_y + point_b_y) / 2
+            
+            # Distances
+            distance_A_O = ((point_a_x - centre_x)**2 + (point_a_y - centre_y)**2)**0.5
+            distance_O_B = ((point_b_x - centre_x)**2 + (point_b_y - centre_y)**2)**0.5
+            
+            etapes = [
+                f"Points : {point_a}({point_a_x}, {point_a_y}) et {point_b}({point_b_x}, {point_b_y})",
+                f"Centre proposé : {centre}({centre_x}, {centre_y})",
+                f"Pour que {point_a} et {point_b} soient symétriques par rapport à {centre} :",
+                f"  → {centre} doit être le milieu de [{point_a}{point_b}]",
+                f"Milieu de [{point_a}{point_b}] : ({milieu_x}, {milieu_y})",
+                f"Coordonnées de {centre} : ({centre_x}, {centre_y})"
+            ]
+            
+            if sont_symetriques:
+                etapes.append(f"Le milieu correspond à {centre} ✓")
+                etapes.append(f"Distance {point_a}{centre} = {distance_A_O:.2f}")
+                etapes.append(f"Distance {centre}{point_b} = {distance_O_B:.2f}")
+                etapes.append(f"Les distances sont égales ✓")
+                etapes.append(f"Conclusion : {point_a} et {point_b} sont symétriques par rapport à {centre}")
+            else:
+                if milieu_x != centre_x or milieu_y != centre_y:
+                    etapes.append(f"Le milieu ({milieu_x}, {milieu_y}) ≠ {centre}({centre_x}, {centre_y}) ✗")
+                etapes.append(f"Conclusion : {point_a} et {point_b} ne sont PAS symétriques par rapport à {centre}")
+            
+            figure = GeometricFigure(
+                type="symetrie_centrale",
+                points=[point_a, centre, point_b],
+                longueurs_connues={
+                    f"{point_a}_x": point_a_x,
+                    f"{point_a}_y": point_a_y,
+                    f"{centre}_x": centre_x,
+                    f"{centre}_y": centre_y,
+                    f"{point_b}_x": point_b_x,
+                    f"{point_b}_y": point_b_y
+                },
+                proprietes=[f"centre_symetrie", f"symetriques_{sont_symetriques}"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.SYMETRIE_CENTRALE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "verifier_symetrie",
+                    "point_a": point_a,
+                    "centre": centre,
+                    "point_b": point_b,
+                    "coords_a": {"x": point_a_x, "y": point_a_y},
+                    "coords_centre": {"x": centre_x, "y": centre_y},
+                    "coords_b": {"x": point_b_x, "y": point_b_y}
+                },
+                solution_calculee={
+                    "sont_symetriques": sont_symetriques,
+                    "milieu": {"x": milieu_x, "y": milieu_y},
+                    "distance_A_O": round(distance_A_O, 2),
+                    "distance_O_B": round(distance_O_B, 2)
+                },
+                etapes_calculees=etapes,
+                resultat_final="Oui, ils sont symétriques" if sont_symetriques else "Non, ils ne sont pas symétriques",
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Calcul du milieu", "points": 2.0},
+                    {"etape": "Vérification distances", "points": 1.0},
+                    {"etape": "Conclusion", "points": 1.0}
+                ]
+            )
+        
+        else:  # completer_figure
+            # Compléter une figure par symétrie centrale
+            point_a = points[0]
+            point_b = points[1]
+            centre = points[2]
+            
+            # Centre
+            centre_x = 7
+            centre_y = 6
+            
+            # Points d'un segment
+            coords_originaux = {
+                point_a: {"x": 4, "y": 3},
+                point_b: {"x": 5, "y": 8}
+            }
+            
+            # Symétriques
+            point_a_prime = f"{point_a}'"
+            point_b_prime = f"{point_b}'"
+            
+            coords_symetriques = {
+                point_a_prime: {
+                    "x": 2 * centre_x - coords_originaux[point_a]["x"],
+                    "y": 2 * centre_y - coords_originaux[point_a]["y"]
+                },
+                point_b_prime: {
+                    "x": 2 * centre_x - coords_originaux[point_b]["x"],
+                    "y": 2 * centre_y - coords_originaux[point_b]["y"]
+                }
+            }
+            
+            etapes = [
+                f"Segment [{point_a}{point_b}] avec {point_a}({coords_originaux[point_a]['x']}, {coords_originaux[point_a]['y']}), "
+                f"{point_b}({coords_originaux[point_b]['x']}, {coords_originaux[point_b]['y']})",
+                f"Centre de symétrie {centre}({centre_x}, {centre_y})",
+                f"Pour chaque point, calculer son symétrique avec la formule M' = 2O - M :",
+                f"{point_a_prime} : (2×{centre_x} - {coords_originaux[point_a]['x']}, "
+                f"2×{centre_y} - {coords_originaux[point_a]['y']}) = "
+                f"({coords_symetriques[point_a_prime]['x']}, {coords_symetriques[point_a_prime]['y']})",
+                f"{point_b_prime} : (2×{centre_x} - {coords_originaux[point_b]['x']}, "
+                f"2×{centre_y} - {coords_originaux[point_b]['y']}) = "
+                f"({coords_symetriques[point_b_prime]['x']}, {coords_symetriques[point_b_prime]['y']})"
+            ]
+            
+            # Convertir coords en format plat
+            longueurs_converties = {}
+            for pt, coord in coords_originaux.items():
+                longueurs_converties[f"{pt}_x"] = coord["x"]
+                longueurs_converties[f"{pt}_y"] = coord["y"]
+            for pt, coord in coords_symetriques.items():
+                longueurs_converties[f"{pt}_x"] = coord["x"]
+                longueurs_converties[f"{pt}_y"] = coord["y"]
+            longueurs_converties[f"{centre}_x"] = centre_x
+            longueurs_converties[f"{centre}_y"] = centre_y
+            
+            all_points = [point_a, point_b, centre]
+            
+            figure = GeometricFigure(
+                type="symetrie_centrale",
+                points=all_points,
+                longueurs_connues=longueurs_converties,
+                proprietes=["centre_symetrie", "figure_complete"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.SYMETRIE_CENTRALE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "completer_figure",
+                    "figure": "segment",
+                    "points_initiaux": all_points,
+                    "centre": centre
+                },
+                solution_calculee={
+                    "points_symetriques": coords_symetriques
+                },
+                etapes_calculees=etapes,
+                resultat_final=f"Segment symétrique : [{point_a_prime}{point_b_prime}]",
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Construction des symétriques", "points": 3.0},
+                    {"etape": "Tracé de la figure complète", "points": 1.0}
+                ]
+            )
             )
