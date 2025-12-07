@@ -1798,7 +1798,7 @@ class MathGenerationService:
                 type="symetrie_axiale",
                 points=all_points,
                 longueurs_connues=longueurs_converties,
-                proprietes=[f"axe_vertical", f"axe_position_{axe_position}"]
+                proprietes=[f"axe_vertical", f"axe_position_{axe_position}", "triangle", "with_grid"]
             )
             
             return MathExerciseSpec(
