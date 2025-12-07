@@ -341,24 +341,17 @@ class GeometryRenderService:
         for key, val in figure.longueurs_connues.items():
             coords[key] = val
         
-        # Vérifier si c'est un triangle
-        is_triangle = "triangle" in figure.proprietes
+        # 📌 APPLIQUER LA RÈGLE PÉDAGOGIQUE UNIVERSELLE
+        hiding_rules = determine_elements_to_hide_in_question("", figure)
         
         # GRILLE SYSTÉMATIQUE pour tous les exercices de symétrie centrale (collège)
         with_grid = True  # Toujours activée pour cohérence pédagogique
         
-        # Identifier les points à cacher dans la version question
-        # Pour les exercices simples (non-triangles), déterminer si on cache le point image
+        # Récupérer les points
         points_list = figure.points if figure.points else []
-        points_to_hide_in_question = []
         
-        # Vérifier si c'est un exercice "verifier_symetrie" (tous les points doivent être visibles)
-        is_verification_exercise = any("symetriques_" in prop for prop in figure.proprietes)
-        
-        if not is_triangle and len(points_list) >= 3 and not is_verification_exercise:
-            # Pour "trouver_symetrique" : le troisième point est la réponse (à cacher)
-            # points_list = [point_original, centre, point_image]
-            points_to_hide_in_question.append(points_list[2])
+        # Vérifier si c'est un triangle
+        is_triangle = "triangle" in figure.proprietes
         
         # Construire les données pour le renderer
         data = {
