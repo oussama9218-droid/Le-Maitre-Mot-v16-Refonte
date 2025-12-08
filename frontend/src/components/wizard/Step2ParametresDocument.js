@@ -151,34 +151,6 @@ const Step2ParametresDocument = ({
           )}
         </CardContent>
       </Card>
-
-      {/* Template Settings pour utilisateurs Pro */}
-      <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-        <CardHeader className="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-t-lg">
-          <CardTitle className="flex items-center">
-            <Crown className="mr-2 h-5 w-5" />
-            Personnalisation des templates
-            {!isPro && (
-              <Badge variant="secondary" className="ml-2 text-xs bg-white/20 text-white border-white/30">
-                Pro uniquement
-              </Badge>
-            )}
-          </CardTitle>
-          <CardDescription className="text-amber-50">
-            {isPro 
-              ? "Personnalisez l'apparence de vos documents PDF" 
-              : "Passez à Pro pour personnaliser vos templates"
-            }
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-6">
-          <TemplateSettings 
-            isPro={isPro}
-            sessionToken={sessionToken}
-            onTemplateChange={onTemplateChange}
-          />
-        </CardContent>
-      </Card>
     </div>
   );
 };
