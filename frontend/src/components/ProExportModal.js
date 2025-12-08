@@ -276,33 +276,59 @@ function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) 
           </div>
         </CardContent>
 
-        {/* Footer */}
-        <div className="border-t p-4 flex gap-2">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="flex-1"
-            disabled={isExporting}
-          >
-            Annuler
-          </Button>
-          <Button
-            onClick={handleProExport}
-            disabled={isExporting}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-          >
-            {isExporting ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Export en cours...
-              </>
-            ) : (
-              <>
-                <Download className="h-4 w-4 mr-2" />
-                Exporter en PDF Pro
-              </>
-            )}
-          </Button>
+        {/* Footer - 2 boutons d'export */}
+        <div className="border-t p-4">
+          <div className="space-y-2">
+            {/* Bouton Sujet Pro */}
+            <Button
+              onClick={handleExportSubjectPro}
+              disabled={isExportingSubject || isExportingCorrection}
+              className="w-full bg-green-600 hover:bg-green-700"
+              size="lg"
+            >
+              {isExportingSubject ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Export en cours...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  Exporter Sujet Pro PDF
+                </>
+              )}
+            </Button>
+
+            {/* Bouton Corrigé Pro */}
+            <Button
+              onClick={handleExportCorrectionPro}
+              disabled={isExportingSubject || isExportingCorrection}
+              className="w-full bg-red-600 hover:bg-red-700"
+              size="lg"
+            >
+              {isExportingCorrection ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Export en cours...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  Exporter Corrigé Pro PDF
+                </>
+              )}
+            </Button>
+
+            {/* Bouton Annuler */}
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="w-full"
+              disabled={isExportingSubject || isExportingCorrection}
+            >
+              Annuler
+            </Button>
+          </div>
         </div>
       </Card>
     </div>
