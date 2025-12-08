@@ -141,6 +141,7 @@ CURRICULUM_DATA = {
             "Grandeurs et mesures": [
                 "Longueurs, masses, durées",
                 "Aires",
+                "Périmètres et aires",
                 "Volumes",
                 "Angles"
             ],
@@ -148,6 +149,9 @@ CURRICULUM_DATA = {
                 "Géométrie dans l'espace",
                 "Géométrie dans le plan",
                 "Symétrie axiale"
+            ],
+            "Organisation et gestion de données": [
+                "Proportionnalité"
             ]
         },
         "5e": {
