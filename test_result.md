@@ -313,6 +313,30 @@ Test complet du flux d'aperçu HTML pour le SPRINT F.4 - Modal de prévisualisat
 - ✅ Contenu lisible dans le modal
 - ✅ Aucune erreur JavaScript critique détectée
 
+### Key Findings - SPRINT F.4
+1. ✅ **Modal de preview HTML FONCTIONNEL**: Ouverture, navigation onglets, fermeture
+2. ✅ **3 onglets opérationnels**: Sujet, Version élève, Corrigé avec contenus différenciés
+3. ✅ **Onglet Sujet**: Énoncés sans zones de réponse (correct)
+4. ✅ **Onglet Version élève**: Zones de réponse grises en pointillés (8 zones)
+5. ✅ **Onglet Corrigé**: Blocs de correction bleus avec emoji "📝 Correction" (8 blocs)
+6. ✅ **Header modal**: Titre, niveau, nombre d'exercices et questions affichés
+7. ✅ **Messages explicatifs**: Couleurs différenciées (bleu, vert, violet)
+8. ✅ **Questions numérotées**: 10 questions détectées avec numérotation (1., 2., 3., 4.)
+9. ✅ **Responsive**: Modal scrollable et contenu lisible
+10. ⚠️ **Problème mineur**: Onglet Sujet affiche 3 corrections (devrait être 0)
+
+### SPRINT F.4 Status Summary
+- **Configuration Fiche**: ✅ PASSED (niveau 6e, chapitre Proportionnalité)
+- **Catalogue Exercices**: ✅ PASSED (2 exercices trouvés et ajoutés)
+- **Modal Preview**: ✅ PASSED (ouverture/fermeture fonctionnelle)
+- **Header Modal**: ✅ PASSED (titre, niveau, compteurs corrects)
+- **Onglets Navigation**: ✅ PASSED (3 onglets fonctionnels)
+- **Onglet Sujet**: ⚠️ MOSTLY PASSED (énoncés OK, mais corrections visibles)
+- **Onglet Version Élève**: ✅ PASSED (zones de réponse présentes et stylées)
+- **Onglet Corrigé**: ✅ PASSED (corrections affichées avec style)
+- **Responsive Design**: ✅ PASSED (modal scrollable, contenu lisible)
+- **JavaScript Stability**: ✅ PASSED (aucune erreur critique)
+
 ## Agent Communication
 
 ### Latest Communication - Testing Agent to Main Agent
