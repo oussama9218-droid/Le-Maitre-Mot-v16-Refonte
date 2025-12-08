@@ -222,6 +222,40 @@ class ExerciseSheet(ExerciseSheetBase):
 
 
 # ============================================================================
+# MODÈLE: ExerciseItemConfig (Configuration standardisée pour SheetItem)
+# ============================================================================
+
+class ExerciseItemConfig(BaseModel):
+    """
+    Configuration standardisée pour un SheetItem
+    
+    Cette structure définit exactement comment générer un exercice
+    à partir d'un ExerciseType dans une feuille.
+    """
+    nb_questions: int = Field(..., ge=1, description="Nombre de questions")
+    difficulty: Optional[str] = Field(None, description="Niveau de difficulté")
+    seed: int = Field(..., description="Graine pour reproductibilité")
+    options: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Options spécifiques à l'exercice"
+    )
+    ai_enonce: bool = Field(False, description="Utiliser l'IA pour l'énoncé")
+    ai_correction: bool = Field(False, description="Utiliser l'IA pour la correction")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "nb_questions": 5,
+                "difficulty": "moyen",
+                "seed": 42,
+                "options": {},
+                "ai_enonce": False,
+                "ai_correction": False
+            }
+        }
+
+
+# ============================================================================
 # MODÈLE: SheetItem (Item dans une feuille)
 # ============================================================================
 
@@ -229,15 +263,7 @@ class SheetItemBase(BaseModel):
     """Base pour les items d'une feuille"""
     sheet_id: str = Field(..., description="ID de la feuille parente")
     exercise_type_id: str = Field(..., description="ID du type d'exercice")
-    nb_questions: int = Field(5, ge=1, description="Nombre de questions")
-    difficulty: str = Field("moyen", description="Niveau de difficulté")
-    seed: Optional[int] = Field(None, description="Graine pour reproductibilité")
-    options: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Options spécifiques à l'exercice"
-    )
-    ai_enonce: bool = Field(False, description="Utiliser l'IA pour l'énoncé")
-    ai_correction: bool = Field(False, description="Utiliser l'IA pour la correction")
+    config: ExerciseItemConfig = Field(..., description="Configuration de l'exercice")
 
 
 class SheetItemCreate(SheetItemBase):
@@ -247,12 +273,7 @@ class SheetItemCreate(SheetItemBase):
 
 class SheetItemUpdate(BaseModel):
     """Modèle pour mise à jour d'un item de feuille"""
-    nb_questions: Optional[int] = None
-    difficulty: Optional[str] = None
-    seed: Optional[int] = None
-    options: Optional[Dict[str, Any]] = None
-    ai_enonce: Optional[bool] = None
-    ai_correction: Optional[bool] = None
+    config: Optional[ExerciseItemConfig] = None
 
 
 class SheetItem(SheetItemBase):
@@ -266,11 +287,14 @@ class SheetItem(SheetItemBase):
                 "id": "880e8400-e29b-41d4-a716-446655440000",
                 "sheet_id": "770e8400-e29b-41d4-a716-446655440000",
                 "exercise_type_id": "660e8400-e29b-41d4-a716-446655440000",
-                "nb_questions": 5,
-                "difficulty": "moyen",
-                "seed": 12345,
-                "ai_enonce": False,
-                "ai_correction": False,
+                "config": {
+                    "nb_questions": 5,
+                    "difficulty": "moyen",
+                    "seed": 12345,
+                    "options": {},
+                    "ai_enonce": False,
+                    "ai_correction": False
+                },
                 "order": 1
             }
         }
