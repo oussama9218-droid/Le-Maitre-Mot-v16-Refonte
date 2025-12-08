@@ -10,33 +10,47 @@ function PdfDownloadModal({ isOpen, onClose, pdfResult }) {
 
   /**
    * Fonction helper pour télécharger un PDF depuis base64
-   * Compatible avec tous les navigateurs (desktop + mobile)
+   * Compatible avec tous les navigateurs (desktop + mobile + iOS Safari)
    */
   const downloadPdfFromBase64 = (base64Data, filename) => {
+    if (!base64Data) {
+      console.error('Pas de données base64 à télécharger');
+      return;
+    }
+    
     try {
       // Décoder base64 en bytes
-      const binaryString = window.atob(base64Data);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
+      const byteCharacters = window.atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
+      const byteArray = new Uint8Array(byteNumbers);
       
-      // Créer blob et télécharger
-      const blob = new Blob([bytes], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
+      // Créer blob avec le bon type MIME
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      
+      // Créer un lien de téléchargement
       const link = document.createElement('a');
       link.href = url;
-      link.download = filename;
+      link.download = filename || 'document.pdf';
       
-      // Déclencher le téléchargement
+      // IMPORTANT pour iOS : ne pas ouvrir dans un nouvel onglet
+      // Ne pas utiliser target="_blank" qui pourrait causer une navigation
+      
+      // Style pour rendre le lien invisible
+      link.style.display = 'none';
+      
+      // Ajouter au DOM, cliquer, puis retirer
       document.body.appendChild(link);
       link.click();
       
-      // Nettoyage
+      // Nettoyage après un délai (important pour iOS)
       setTimeout(() => {
         document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 100);
+        URL.revokeObjectURL(url);
+      }, 1000);
       
       console.log('📥 PDF téléchargé:', filename);
     } catch (error) {
