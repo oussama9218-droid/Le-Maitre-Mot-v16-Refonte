@@ -925,6 +925,7 @@ async def generate_sheet_pdf(sheet_id: str):
 @router.post("/sheets/{sheet_id}/generate-pdf-pro")
 async def generate_pro_pdf(
     sheet_id: str,
+    template: str = "classique",
     x_session_token: str = Header(None, alias="X-Session-Token")
 ):
     """
@@ -937,6 +938,7 @@ async def generate_pro_pdf(
     
     Args:
         sheet_id: ID de la fiche
+        template: Template à utiliser ("classique" ou "academique")
         x_session_token: Token de session Pro (requis)
     
     Returns:
@@ -951,7 +953,7 @@ async def generate_pro_pdf(
         404: Si la fiche n'existe pas
         500: En cas d'erreur de génération
     """
-    logger.info(f"📝 Demande de génération PDF Pro pour la fiche {sheet_id}")
+    logger.info(f"📝 Demande de génération PDF Pro pour la fiche {sheet_id} (template: {template})")
     
     # VÉRIFICATION PRO (Simplified pour MVP - à améliorer avec vraie vérification Pro)
     # Pour l'instant, on accepte si un token de session est fourni
