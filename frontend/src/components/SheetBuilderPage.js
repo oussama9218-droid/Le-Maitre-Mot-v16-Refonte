@@ -1,0 +1,687 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Badge } from "./ui/badge";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Alert, AlertDescription } from "./ui/alert";
+import { Separator } from "./ui/separator";
+import { 
+  BookOpen, 
+  Plus, 
+  Trash2, 
+  Download, 
+  Eye, 
+  Loader2, 
+  ChevronUp, 
+  ChevronDown,
+  Crown,
+  AlertCircle,
+  Sparkles,
+  FileText,
+  ArrowLeft
+} from "lucide-react";
+import { Switch } from "./ui/switch";
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+function SheetBuilderPage() {
+  const navigate = useNavigate();
+  
+  // États pour le catalogue
+  const [levels, setLevels] = useState([]);
+  const [selectedLevel, setSelectedLevel] = useState("");
+  const [chapters, setChapters] = useState([]);
+  const [selectedChapter, setSelectedChapter] = useState("");
+  const [exercises, setExercises] = useState([]);
+  const [loadingCatalogue, setLoadingCatalogue] = useState(false);
+  
+  // États pour la fiche (panier)
+  const [sheetTitle, setSheetTitle] = useState("Nouvelle fiche d'exercices");
+  const [sheetItems, setSheetItems] = useState([]);
+  
+  // États pour l'utilisateur et Pro
+  const [userEmail, setUserEmail] = useState("");
+  const [isPro, setIsPro] = useState(false);
+  const [sessionToken, setSessionToken] = useState("");
+  
+  // États pour génération/export
+  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [sheetId, setSheetId] = useState(null);
+  
+  // États pour filtres
+  const [selectedDomain, setSelectedDomain] = useState("");
+  const [selectedGeneratorKind, setSelectedGeneratorKind] = useState("");
+
+  // Initialiser l'authentification
+  useEffect(() => {
+    const storedSessionToken = localStorage.getItem('lemaitremot_session_token');
+    const storedEmail = localStorage.getItem('lemaitremot_user_email');
+    const loginMethod = localStorage.getItem('lemaitremot_login_method');
+    
+    if (storedSessionToken && storedEmail && loginMethod === 'session') {
+      setSessionToken(storedSessionToken);
+      setUserEmail(storedEmail);
+      setIsPro(true);
+      console.log('✅ Session Pro détectée:', storedEmail);
+    }
+  }, []);
+
+  // Charger les niveaux au montage
+  useEffect(() => {
+    loadLevels();
+  }, []);
+
+  // Charger les chapitres quand le niveau change
+  useEffect(() => {
+    if (selectedLevel) {
+      loadChapters(selectedLevel);
+    }
+  }, [selectedLevel]);
+
+  // Charger les exercices quand le chapitre change
+  useEffect(() => {
+    if (selectedLevel && selectedChapter) {
+      loadExercises(selectedLevel, selectedChapter);
+    }
+  }, [selectedLevel, selectedChapter, selectedDomain, selectedGeneratorKind]);
+
+  const loadLevels = async () => {
+    try {
+      const response = await axios.get(`${API}/catalogue/levels`);
+      setLevels(response.data);
+      console.log('📚 Niveaux chargés:', response.data);
+    } catch (error) {
+      console.error('Erreur chargement niveaux:', error);
+    }
+  };
+
+  const loadChapters = async (niveau) => {
+    try {
+      setLoadingCatalogue(true);
+      const response = await axios.get(`${API}/catalogue/levels/${niveau}/chapters`);
+      setChapters(response.data);
+      console.log('📖 Chapitres chargés pour', niveau, ':', response.data.length);
+    } catch (error) {
+      console.error('Erreur chargement chapitres:', error);
+    } finally {
+      setLoadingCatalogue(false);
+    }
+  };
+
+  const loadExercises = async (niveau, chapitreId) => {
+    try {
+      setLoadingCatalogue(true);
+      
+      let url = `${API}/catalogue/exercise-types?niveau=${niveau}&chapitre_id=${chapitreId}`;
+      
+      if (selectedDomain) {
+        url += `&domaine=${encodeURIComponent(selectedDomain)}`;
+      }
+      
+      if (selectedGeneratorKind) {
+        url += `&generator_kind=${selectedGeneratorKind}`;
+      }
+      
+      const response = await axios.get(url);
+      setExercises(response.data);
+      console.log('📝 Exercices chargés:', response.data.length);
+    } catch (error) {
+      console.error('Erreur chargement exercices:', error);
+      setExercises([]);
+    } finally {
+      setLoadingCatalogue(false);
+    }
+  };
+
+  const addExerciseToSheet = (exercise) => {
+    const newItem = {
+      id: `item_${Date.now()}_${Math.random()}`,
+      exercise_type_id: exercise.id,
+      exercise: exercise,
+      config: {
+        nb_questions: exercise.default_questions || 5,
+        difficulty: "moyen",
+        seed: Math.floor(Math.random() * 100000),
+        options: {},
+        ai_enonce: false,
+        ai_correction: false
+      },
+      order: sheetItems.length
+    };
+    
+    setSheetItems([...sheetItems, newItem]);
+    console.log('➕ Exercice ajouté:', exercise.titre);
+  };
+
+  const removeItemFromSheet = (itemId) => {
+    setSheetItems(sheetItems.filter(item => item.id !== itemId));
+  };
+
+  const moveItemUp = (index) => {
+    if (index === 0) return;
+    const newItems = [...sheetItems];
+    [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
+    newItems.forEach((item, idx) => item.order = idx);
+    setSheetItems(newItems);
+  };
+
+  const moveItemDown = (index) => {
+    if (index === sheetItems.length - 1) return;
+    const newItems = [...sheetItems];
+    [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
+    newItems.forEach((item, idx) => item.order = idx);
+    setSheetItems(newItems);
+  };
+
+  const updateItemConfig = (itemId, field, value) => {
+    setSheetItems(sheetItems.map(item => {
+      if (item.id === itemId) {
+        return {
+          ...item,
+          config: {
+            ...item.config,
+            [field]: value
+          }
+        };
+      }
+      return item;
+    }));
+  };
+
+  const createSheet = async () => {
+    try {
+      const response = await axios.post(`${API}/mathalea/sheets`, {
+        titre: sheetTitle,
+        niveau: selectedLevel,
+        description: `Fiche créée avec Le Maître Mot`,
+        owner_id: userEmail || localStorage.getItem('lemaitremot_guest_id') || 'anonymous'
+      });
+      
+      const newSheetId = response.data.id;
+      setSheetId(newSheetId);
+      
+      // Créer les items
+      for (const item of sheetItems) {
+        await axios.post(`${API}/mathalea/sheets/${newSheetId}/items`, {
+          sheet_id: newSheetId,
+          exercise_type_id: item.exercise_type_id,
+          config: item.config
+        });
+      }
+      
+      console.log('✅ Fiche créée:', newSheetId);
+      return newSheetId;
+    } catch (error) {
+      console.error('Erreur création fiche:', error);
+      throw error;
+    }
+  };
+
+  const handlePreview = async () => {
+    if (sheetItems.length === 0) {
+      alert('Veuillez ajouter au moins un exercice à la fiche');
+      return;
+    }
+    
+    setIsGeneratingPreview(true);
+    
+    try {
+      const currentSheetId = sheetId || await createSheet();
+      
+      const response = await axios.post(`${API}/mathalea/sheets/${currentSheetId}/preview`);
+      
+      console.log('👁️ Preview généré:', response.data);
+      alert('Preview généré avec succès ! (Affichage détaillé à venir)');
+      
+    } catch (error) {
+      console.error('Erreur preview:', error);
+      alert('Erreur lors de la génération du preview');
+    } finally {
+      setIsGeneratingPreview(false);
+    }
+  };
+
+  const handleGeneratePDF = async (pdfType) => {
+    if (sheetItems.length === 0) {
+      alert('Veuillez ajouter au moins un exercice à la fiche');
+      return;
+    }
+    
+    setIsGeneratingPDF(true);
+    
+    try {
+      const currentSheetId = sheetId || await createSheet();
+      
+      const config = {};
+      if (sessionToken) {
+        config.headers = {
+          'X-Session-Token': sessionToken
+        };
+      }
+      
+      const response = await axios.post(
+        `${API}/mathalea/sheets/${currentSheetId}/generate-pdf`,
+        {},
+        {
+          ...config,
+          responseType: 'blob'
+        }
+      );
+      
+      // Le backend retourne un JSON avec les 3 PDFs en base64
+      // Pour l'instant, on télécharge le premier PDF
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `LeMaitreMot_${sheetTitle}_${pdfType}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      console.log('📥 PDF téléchargé:', pdfType);
+      
+    } catch (error) {
+      console.error('Erreur génération PDF:', error);
+      alert('Erreur lors de la génération du PDF');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
+  // Obtenir les domaines uniques des exercices disponibles
+  const availableDomains = [...new Set(exercises.map(ex => ex.domaine))];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header avec navigation */}
+        <div className="mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/')}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour à l'accueil
+          </Button>
+          
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              Le Maître Mot — Générateur de fiches
+            </h1>
+            <p className="text-lg text-gray-600">
+              Créez des fiches d'exercices personnalisées
+            </p>
+            
+            {isPro && userEmail && (
+              <Alert className="max-w-md mx-auto mt-4 border-blue-200 bg-blue-50">
+                <Crown className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-800">
+                  <strong>Mode Pro :</strong> Fonctionnalités IA disponibles
+                  <span className="block text-xs mt-1">({userEmail})</span>
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Colonne gauche : Catalogue */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+                <CardTitle>Catalogue d'exercices</CardTitle>
+                <CardDescription className="text-blue-50">
+                  Sélectionnez le niveau et le chapitre
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6">
+                {/* Sélecteurs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div className="space-y-2">
+                    <Label>Niveau</Label>
+                    <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choisir un niveau" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {levels.map(level => (
+                          <SelectItem key={level} value={level}>
+                            {level}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Chapitre</Label>
+                    <Select 
+                      value={selectedChapter} 
+                      onValueChange={setSelectedChapter}
+                      disabled={!selectedLevel}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choisir un chapitre" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {chapters.map(chapter => (
+                          <SelectItem key={chapter.id} value={chapter.id}>
+                            {chapter.titre} ({chapter.nb_exercises} exercices)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Filtres additionnels */}
+                {selectedChapter && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div className="space-y-2">
+                      <Label>Domaine</Label>
+                      <Select value={selectedDomain} onValueChange={setSelectedDomain}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Tous les domaines" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">Tous les domaines</SelectItem>
+                          {availableDomains.map(domain => (
+                            <SelectItem key={domain} value={domain}>
+                              {domain}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Type de générateur</Label>
+                      <Select value={selectedGeneratorKind} onValueChange={setSelectedGeneratorKind}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Tous les types" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">Tous les types</SelectItem>
+                          <SelectItem value="template">Template</SelectItem>
+                          <SelectItem value="legacy">Legacy</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                )}
+
+                <Separator className="my-6" />
+
+                {/* Liste des exercices */}
+                {loadingCatalogue ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                    <span className="ml-3 text-gray-600">Chargement...</span>
+                  </div>
+                ) : exercises.length > 0 ? (
+                  <div className="space-y-3">
+                    {exercises.map(exercise => (
+                      <Card key={exercise.id} className="border hover:border-blue-300 transition-colors">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h4 className="font-semibold text-gray-900">{exercise.titre}</h4>
+                                <Badge variant="outline" className="text-xs">
+                                  {exercise.code_ref}
+                                </Badge>
+                              </div>
+                              
+                              <div className="flex flex-wrap gap-2 mb-2">
+                                <Badge variant="secondary" className="text-xs">
+                                  {exercise.is_legacy ? '🔧 Legacy' : '📝 Template'}
+                                </Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  📐 {exercise.domaine}
+                                </Badge>
+                                {exercise.supports_ai_enonce && isPro && (
+                                  <Badge className="text-xs bg-purple-100 text-purple-700">
+                                    <Sparkles className="h-3 w-3 mr-1" />
+                                    IA disponible
+                                  </Badge>
+                                )}
+                              </div>
+                              
+                              <p className="text-xs text-gray-500">
+                                {exercise.min_questions}-{exercise.max_questions} questions • Niveau: {exercise.niveau}
+                              </p>
+                            </div>
+                            
+                            <Button
+                              size="sm"
+                              onClick={() => addExerciseToSheet(exercise)}
+                              className="ml-4"
+                            >
+                              <Plus className="h-4 w-4 mr-1" />
+                              Ajouter
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : selectedChapter ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                    <p>Aucun exercice disponible pour cette sélection</p>
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-gray-500">
+                    <BookOpen className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                    <p>Sélectionnez un niveau et un chapitre pour voir les exercices disponibles</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Colonne droite : Panier (Fiche en cours) */}
+          <div className="space-y-6">
+            <Card className="shadow-lg sticky top-4">
+              <CardHeader className="bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-t-lg">
+                <CardTitle>Ma fiche</CardTitle>
+                <CardDescription className="text-green-50">
+                  {sheetItems.length} exercice(s)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4">
+                {/* Titre de la fiche */}
+                <div className="mb-4">
+                  <Label>Titre de la fiche</Label>
+                  <Input
+                    value={sheetTitle}
+                    onChange={(e) => setSheetTitle(e.target.value)}
+                    placeholder="Titre de votre fiche"
+                    className="mt-1"
+                  />
+                </div>
+
+                <Separator className="my-4" />
+
+                {/* Liste des items */}
+                {sheetItems.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <p className="text-sm">Votre fiche est vide</p>
+                    <p className="text-xs mt-1">Ajoutez des exercices depuis le catalogue</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                    {sheetItems.map((item, index) => (
+                      <Card key={item.id} className="border">
+                        <CardContent className="p-3">
+                          <div className="space-y-3">
+                            {/* En-tête */}
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <p className="font-medium text-sm text-gray-900">
+                                  {index + 1}. {item.exercise.titre}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {item.exercise.niveau} • {item.exercise.domaine}
+                                </p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeItemFromSheet(item.id)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+
+                            {/* Configuration */}
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs">Questions:</Label>
+                                <Input
+                                  type="number"
+                                  value={item.config.nb_questions}
+                                  onChange={(e) => updateItemConfig(item.id, 'nb_questions', parseInt(e.target.value) || 1)}
+                                  min={item.exercise.min_questions}
+                                  max={item.exercise.max_questions}
+                                  className="h-7 w-16 text-xs"
+                                />
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <Label className="text-xs">Seed:</Label>
+                                <Input
+                                  type="number"
+                                  value={item.config.seed}
+                                  onChange={(e) => updateItemConfig(item.id, 'seed', parseInt(e.target.value) || 0)}
+                                  className="h-7 w-20 text-xs"
+                                />
+                              </div>
+
+                              {/* Options IA */}
+                              {item.exercise.supports_ai_enonce && (
+                                <div className="flex items-center justify-between">
+                                  <Label className="text-xs flex items-center">
+                                    <Sparkles className="h-3 w-3 mr-1 text-purple-600" />
+                                    IA Énoncé
+                                  </Label>
+                                  <Switch
+                                    checked={item.config.ai_enonce}
+                                    onCheckedChange={(checked) => updateItemConfig(item.id, 'ai_enonce', checked)}
+                                    disabled={!isPro}
+                                  />
+                                  {!isPro && (
+                                    <Crown className="h-3 w-3 text-yellow-600 ml-1" title="Pro uniquement" />
+                                  )}
+                                </div>
+                              )}
+                              
+                              {item.exercise.supports_ai_correction && (
+                                <div className="flex items-center justify-between">
+                                  <Label className="text-xs flex items-center">
+                                    <Sparkles className="h-3 w-3 mr-1 text-purple-600" />
+                                    IA Correction
+                                  </Label>
+                                  <Switch
+                                    checked={item.config.ai_correction}
+                                    onCheckedChange={(checked) => updateItemConfig(item.id, 'ai_correction', checked)}
+                                    disabled={!isPro}
+                                  />
+                                  {!isPro && (
+                                    <Crown className="h-3 w-3 text-yellow-600 ml-1" title="Pro uniquement" />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Boutons de réordonnancement */}
+                            <div className="flex gap-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => moveItemUp(index)}
+                                disabled={index === 0}
+                                className="h-6 text-xs"
+                              >
+                                <ChevronUp className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => moveItemDown(index)}
+                                disabled={index === sheetItems.length - 1}
+                                className="h-6 text-xs"
+                              >
+                                <ChevronDown className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Actions */}
+                {sheetItems.length > 0 && (
+                  <>
+                    <Separator className="my-4" />
+                    <div className="space-y-2">
+                      <Button
+                        onClick={handlePreview}
+                        disabled={isGeneratingPreview}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        {isGeneratingPreview ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Eye className="h-4 w-4 mr-2" />
+                        )}
+                        Prévisualiser
+                      </Button>
+                      
+                      <Button
+                        onClick={() => handleGeneratePDF('complete')}
+                        disabled={isGeneratingPDF}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                      >
+                        {isGeneratingPDF ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Download className="h-4 w-4 mr-2" />
+                        )}
+                        Générer PDF
+                      </Button>
+                    </div>
+
+                    {!isPro && (
+                      <Alert className="mt-4 border-orange-200 bg-orange-50">
+                        <AlertCircle className="h-4 w-4 text-orange-600" />
+                        <AlertDescription className="text-orange-800 text-xs">
+                          Les fonctionnalités IA nécessitent un compte Pro
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default SheetBuilderPage;
