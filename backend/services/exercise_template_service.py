@@ -506,63 +506,21 @@ class ExerciseTemplateService:
         
         for i in range(nb_questions):
             try:
-                # Pour les générateurs legacy, on ne peut pas utiliser MathExerciseSpec
-                # car ils n'ont pas tous les champs obligatoires
-                # On passe plutôt un dict de configuration simple
+                # Pour l'instant, les générateurs legacy ne sont pas complètement implémentés
+                # On génère des questions de fallback professionnelles
                 
                 # Utiliser une seed unique par question pour variété
                 question_seed = seed + i
                 question_rng = random.Random(question_seed)
                 
-                # Créer une configuration legacy simple
-                legacy_config = {
-                    "type": legacy_type.value,
-                    "niveau": exercise_type.niveau,
-                    "difficulte": difficulty or "moyen",
-                    "chapitre": exercise_type.chapitre_code or "geometrie",
-                    "seed": question_seed
-                }
-                
-                # Générer l'exercice legacy
-                # Note: On passe None pour spec car les legacy generators utilisent un format différent
-                legacy_result = await legacy_service.generate_exercise_legacy(
-                    config=legacy_config,
-                    count=1,  # 1 exercice à la fois
-                    seed=question_seed
+                # Générer une question de fallback basée sur le type d'exercice
+                question = self._generate_legacy_fallback_question(
+                    exercise_type=exercise_type,
+                    question_number=i+1,
+                    seed=question_seed,
+                    difficulty=difficulty,
+                    rng=question_rng
                 )
-                
-                if not legacy_result or not legacy_result.get("exercices"):
-                    logger.warning(f"Legacy generator returned empty result for question {i+1}")
-                    # Créer une question par défaut
-                    question = {
-                        "id": f"q{i+1}",
-                        "enonce_brut": f"Question {i+1} (générateur legacy temporairement indisponible)",
-                        "data": {},
-                        "solution_brut": "Solution non disponible",
-                        "metadata": {
-                            "generator": "legacy",
-                            "legacy_type": legacy_type.value,
-                            "seed": question_seed
-                        }
-                    }
-                else:
-                    # Extraire la première (et seule) question
-                    legacy_exercise = legacy_result["exercices"][0]
-                    
-                    # Convertir au format standardisé
-                    question = {
-                        "id": f"q{i+1}",
-                        "enonce_brut": legacy_exercise.get("enonce", ""),
-                        "data": legacy_exercise.get("data", {}),
-                        "solution_brut": legacy_exercise.get("correction", ""),
-                        "metadata": {
-                            "generator": "legacy",
-                            "legacy_type": legacy_type.value,
-                            "seed": question_seed,
-                            "difficulty": difficulty,
-                            "figure_svg": legacy_exercise.get("figure_svg")
-                        }
-                    }
                 
                 questions.append(question)
                 
