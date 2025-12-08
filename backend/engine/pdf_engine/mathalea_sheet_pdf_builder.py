@@ -690,6 +690,240 @@ def _build_html_pro_classique(legacy_format: dict, user_config: dict = None) -> 
     return html
 
 
+
+def _build_html_pro_academique(legacy_format: dict, user_config: dict = None) -> str:
+    """Génère le HTML pour le PDF Pro avec template académique (style formel)"""
+    
+    titre = legacy_format.get("titre", "Feuille d'exercices")
+    niveau = legacy_format.get("niveau", "")
+    etablissement = legacy_format.get("etablissement", "")
+    logo_url = legacy_format.get("logo_url")
+    primary_color = legacy_format.get("primary_color", "#2c5282")  # Bleu plus sombre pour style académique
+    exercices = legacy_format.get("exercices", [])
+    
+    # Header formel avec cadre
+    header_html = f"""
+    <div class="header">
+        <div class="header-top">
+            {"<img src='" + logo_url + "' class='logo' />" if logo_url else ""}
+            <div class="institution-info">
+                {"<p class='etablissement'>" + etablissement + "</p>" if etablissement else ""}
+                <p class="date">{datetime.now().strftime("%d/%m/%Y")}</p>
+            </div>
+        </div>
+        <div class="header-center">
+            <h1>{titre}</h1>
+            <p class="niveau">{niveau}</p>
+        </div>
+    </div>
+    """
+    
+    # Exercices avec style académique
+    exercices_html = ""
+    for exercice in exercices:
+        numero = exercice.get("numero", "")
+        titre_ex = exercice.get("titre", "")
+        enonce = exercice.get("enonce", "")
+        correction = exercice.get("correction", "")
+        metadata = exercice.get("metadata", {})
+        domaine = metadata.get("domaine", "")
+        
+        exercices_html += f"""
+        <div class="exercise">
+            <div class="exercise-header">
+                <div class="exercise-number">EXERCICE {numero}</div>
+                <div class="exercise-meta">
+                    <span class="exercise-title">{titre_ex}</span>
+                    {"<span class='exercise-domain'> — " + domaine + "</span>" if domaine else ""}
+                </div>
+            </div>
+            
+            <div class="exercise-section">
+                <div class="section-label">ÉNONCÉ</div>
+                <div class="section-content">
+                    {enonce.replace(chr(10), '<br/>')}
+                </div>
+            </div>
+            
+            <div class="exercise-section correction-section">
+                <div class="section-label">ÉLÉMENTS DE CORRECTION</div>
+                <div class="section-content">
+                    {correction.replace(chr(10), '<br/>')}
+                </div>
+            </div>
+        </div>
+        """
+    
+    # CSS Académique formel
+    css = f"""
+    <style>
+        @page {{
+            size: A4;
+            margin: 25mm 20mm;
+            @top-right {{
+                content: "{etablissement}";
+                font-size: 8pt;
+                color: #666;
+                font-style: italic;
+            }}
+            @bottom-center {{
+                content: "Page " counter(page) " / " counter(pages);
+                font-size: 8pt;
+                color: #666;
+            }}
+        }}
+        
+        body {{
+            font-family: 'Times New Roman', 'Georgia', serif;
+            font-size: 11pt;
+            line-height: 1.7;
+            color: #1a1a1a;
+        }}
+        
+        .header {{
+            border: 2px solid {primary_color};
+            padding: 15px;
+            margin-bottom: 30px;
+        }}
+        
+        .header-top {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }}
+        
+        .logo {{
+            max-height: 50px;
+            max-width: 80px;
+        }}
+        
+        .institution-info {{
+            text-align: right;
+        }}
+        
+        .etablissement {{
+            font-size: 11pt;
+            font-weight: bold;
+            color: {primary_color};
+            margin: 0 0 5px 0;
+        }}
+        
+        .date {{
+            font-size: 9pt;
+            color: #666;
+            margin: 0;
+        }}
+        
+        .header-center {{
+            text-align: center;
+        }}
+        
+        .header-center h1 {{
+            color: {primary_color};
+            font-size: 18pt;
+            margin: 0 0 5px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }}
+        
+        .niveau {{
+            font-size: 11pt;
+            color: #333;
+            margin: 0;
+            font-weight: 500;
+        }}
+        
+        .exercise {{
+            margin-bottom: 35px;
+            page-break-inside: avoid;
+        }}
+        
+        .exercise-header {{
+            border-bottom: 2px solid {primary_color};
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+        }}
+        
+        .exercise-number {{
+            color: {primary_color};
+            font-size: 13pt;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }}
+        
+        .exercise-meta {{
+            font-size: 10pt;
+            color: #333;
+        }}
+        
+        .exercise-title {{
+            font-weight: 600;
+        }}
+        
+        .exercise-domain {{
+            font-style: italic;
+            color: #666;
+        }}
+        
+        .exercise-section {{
+            margin-bottom: 20px;
+            padding-left: 15px;
+        }}
+        
+        .section-label {{
+            font-size: 10pt;
+            font-weight: bold;
+            color: {primary_color};
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            border-left: 3px solid {primary_color};
+            padding-left: 8px;
+        }}
+        
+        .section-content {{
+            padding-left: 12px;
+            line-height: 1.8;
+            text-align: justify;
+        }}
+        
+        .correction-section {{
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 3px solid #5a7a3d;
+            margin-left: 0;
+        }}
+        
+        .correction-section .section-label {{
+            color: #5a7a3d;
+            border-left-color: #5a7a3d;
+        }}
+    </style>
+    """
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{titre}</title>
+        {css}
+    </head>
+    <body>
+        {header_html}
+        {exercices_html}
+    </body>
+    </html>
+    """
+    
+    return html
+
+
 # Export des fonctions publiques
 __all__ = [
     "build_sheet_subject_pdf",
