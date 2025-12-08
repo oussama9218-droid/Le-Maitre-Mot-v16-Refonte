@@ -34,14 +34,15 @@ Test complet du flux de création de fiche avec preview et génération PDF dans
 7. ✅ **Configuration exercices avancée** (questions, seeds, options IA)
 8. ✅ **Intégration frontend/backend stable** (aucun crash serveur)
 
-### Frontend Status Summary
-- **Page Loading**: ✅ PASSED (toutes les pages se chargent correctement)
-- **Navigation**: ✅ PASSED (navigation complète fonctionnelle)
-- **Level/Chapter Selection**: ✅ PASSED (sélection dynamique opérationnelle)
-- **Exercise Catalog**: ✅ PASSED (affichage et interaction fonctionnels)
-- **Cart/Sheet Management**: ✅ PASSED (ajout, configuration, compteur)
-- **Empty States**: ✅ PASSED (gestion correcte des états vides)
-- **Error Handling**: ✅ PASSED (aucune erreur détectée)
+### SPRINT F.3-FIX Status Summary
+- **Configuration Fiche**: ✅ PASSED (niveau 6e, chapitre Proportionnalité)
+- **Catalogue Exercices**: ✅ PASSED (2 exercices LEGACY trouvés et affichés)
+- **Ajout Exercices**: ✅ PASSED (2 exercices ajoutés, panier mis à jour)
+- **Configuration Avancée**: ✅ PASSED (questions modifiées, seeds générés)
+- **Preview Generation**: ✅ PASSED (HTTP 200 OK, pas d'erreur critique)
+- **PDF Generation**: ✅ PASSED (HTTP 200 OK, pas d'onglet gris vide)
+- **Backend Stability**: ✅ PASSED (aucun 500 error, collections MongoDB OK)
+- **LEGACY Exercises**: ✅ PASSED (Proportionnalité et Pourcentages fonctionnels)
 
 ## Latest Test Session - Re-test après correction du bug geometric_schema
 
