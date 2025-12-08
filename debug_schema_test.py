@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 
 def debug_schema_processing():
-    base_url = "https://lesson-generator-1.preview.emergentagent.com"
+    base_url = "https://mathsheet-engine.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     guest_id = f"debug-{datetime.now().strftime('%H%M%S')}"
     

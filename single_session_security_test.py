@@ -9,7 +9,7 @@ import uuid
 import threading
 
 class SingleSessionSecurityTester:
-    def __init__(self, base_url="https://lesson-generator-1.preview.emergentagent.com"):
+    def __init__(self, base_url="https://mathsheet-engine.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
