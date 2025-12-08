@@ -288,22 +288,39 @@ function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) 
               <h3 className="font-semibold text-gray-900 mb-3">
                 Votre configuration
               </h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Établissement :</span>
-                  <span className="font-medium">Le Maître Mot</span>
+              {loadingConfig ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                  <span className="ml-2 text-sm text-gray-500">Chargement...</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Template :</span>
-                  <Badge variant="outline">
-                    {selectedTemplate === "classique" ? "Classique" : "Académique"}
-                  </Badge>
+              ) : (
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Établissement :</span>
+                    <span className="font-medium">
+                      {proConfig?.school_name || 'Le Maître Mot'}
+                    </span>
+                  </div>
+                  {proConfig?.professor_name && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Professeur :</span>
+                      <span className="font-medium">{proConfig.professor_name}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Template :</span>
+                    <Badge variant="outline">
+                      {selectedTemplate === "classique" ? "Classique" : "Académique"}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Logo :</span>
+                    <span className="text-gray-500 text-xs italic">
+                      {proConfig?.logo_url ? 'Personnalisé' : 'Par défaut'}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Logo :</span>
-                  <span className="text-gray-500 text-xs italic">Par défaut</span>
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Info */}
