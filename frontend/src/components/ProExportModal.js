@@ -1,392 +1,389 @@
-import React, { useState } from "react";
-import { X, Crown, Download, Loader2, Building2, Palette } from "lucide-react";
-import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
-import { Badge } from "./ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+// app/frontend/src/components/ProExportModal.js
+
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || "";
 
-function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) {
+/**
+ * ProExportModal
+ *
+ * Props attendues :
+ * - isOpen        : bool        → la modale est-elle ouverte ?
+ * - onClose       : () => void  → callback pour fermer la modale
+ * - sheetId       : string      → ID de la fiche à exporter
+ * - sessionToken  : string      → email / token de session (X-Session-Token)
+ * - defaultDocType: string      → "exercices" | "controle" | "evaluation" | "dm" (optionnel)
+ *
+ * NOTE :
+ * - Le backend retourne :
+ *   {
+ *     pro_subject_pdf: "<base64>",
+ *     pro_correction_pdf: "<base64>",
+ *     base_filename: "LeMaitreMot_<NomFiche>_Pro",
+ *     template: "classique" | "academique",
+ *     ...
+ *   }
+ */
+
+function downloadPdfFromBase64(base64Data, filename) {
+  try {
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i += 1) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: "application/pdf" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename || "document.pdf";
+
+    // iOS / Safari friendly
+    link.style.position = "fixed";
+    link.style.top = "-1000px";
+    link.style.left = "-1000px";
+    link.style.zIndex = "-1";
+
+    document.body.appendChild(link);
+
+    const clickEvent = new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+    });
+    link.dispatchEvent(clickEvent);
+
+    setTimeout(() => {
+      if (link.parentNode) {
+        document.body.removeChild(link);
+      }
+      URL.revokeObjectURL(url);
+    }, 1000);
+  } catch (err) {
+    console.error("Erreur téléchargement PDF Pro :", err);
+    alert("Impossible de télécharger le PDF Pro. Réessayez plus tard.");
+  }
+}
+
+const ProExportModal = ({
+  isOpen,
+  onClose,
+  sheetId,
+  sessionToken,
+  defaultDocType = "exercices",
+}) => {
+  const [proConfig, setProConfig] = useState(null);
+  const [configError, setConfigError] = useState("");
+  const [loadingConfig, setLoadingConfig] = useState(false);
+
+  const [selectedTemplate, setSelectedTemplate] = useState("classique");
+
   const [isExportingSubject, setIsExportingSubject] = useState(false);
   const [isExportingCorrection, setIsExportingCorrection] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState("classique");
-  const [proConfig, setProConfig] = useState(null);
-  const [loadingConfig, setLoadingConfig] = useState(true);
+  const [exportError, setExportError] = useState("");
 
-  // Charger la config Pro au montage de la modale
-  React.useEffect(() => {
-    if (isOpen && sessionToken) {
-      loadProConfig();
-    }
+  // Charger la config Pro lorsque la modale s'ouvre
+  useEffect(() => {
+    if (!isOpen || !sessionToken) return;
+
+    const fetchConfig = async () => {
+      setLoadingConfig(true);
+      setConfigError("");
+
+      try {
+        const res = await axios.get(
+          `${API_BASE_URL}/api/mathalea/pro/config`,
+          {
+            headers: {
+              "X-Session-Token": sessionToken,
+            },
+          }
+        );
+
+        const cfg = res.data || null;
+        setProConfig(cfg);
+
+        // si l'utilisateur a déjà un template préféré → on le met par défaut
+        if (cfg && cfg.template_choice) {
+          setSelectedTemplate(cfg.template_choice);
+        }
+      } catch (err) {
+        console.error("Erreur chargement config Pro :", err);
+        setConfigError(
+          "Impossible de charger votre configuration Pro. Les valeurs par défaut seront utilisées."
+        );
+      } finally {
+        setLoadingConfig(false);
+      }
+    };
+
+    fetchConfig();
   }, [isOpen, sessionToken]);
 
-  const loadProConfig = async () => {
-    setLoadingConfig(true);
-    try {
-      const response = await axios.get(
-        `${API}/mathalea/pro/config`,
-        {
-          headers: {
-            'X-Session-Token': sessionToken
-          }
-        }
-      );
-      
-      setProConfig(response.data);
-      
-      // Utiliser le template préféré de l'utilisateur
-      if (response.data.template_choice) {
-        setSelectedTemplate(response.data.template_choice);
-      }
-      
-      console.log('✅ Config Pro chargée dans modale:', response.data);
-    } catch (error) {
-      console.error('Erreur chargement config Pro:', error);
-      // Garder la modale fonctionnelle même si le chargement échoue
-    } finally {
-      setLoadingConfig(false);
-    }
+  const canClose = !isExportingSubject && !isExportingCorrection;
+
+  const handleClose = () => {
+    if (!canClose) return;
+    setExportError("");
+    onClose && onClose();
   };
 
-  if (!isOpen) return null;
-
-  /**
-   * Helper pour télécharger un PDF depuis base64
-   */
-  const downloadPdfFromBase64 = (base64Data, filename) => {
-    if (!base64Data) {
-      console.error('Pas de données base64 à télécharger');
-      return;
+  const callGenerateProPdf = async () => {
+    if (!sheetId) {
+      throw new Error("SheetId manquant pour l'export Pro.");
     }
-    
-    try {
-      const byteCharacters = window.atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      
-      setTimeout(() => {
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      }, 1000);
-      
-      console.log('📥 PDF Pro téléchargé:', filename);
-    } catch (error) {
-      console.error('Erreur téléchargement PDF Pro:', error);
-      alert('Erreur lors du téléchargement du PDF. Veuillez réessayer.');
+    if (!sessionToken) {
+      throw new Error("SessionToken manquant pour l'export Pro.");
     }
-  };
 
-  /**
-   * Exporte le Sujet Pro
-   */
-  const handleExportSubjectPro = async () => {
-    setIsExportingSubject(true);
-    
-    try {
-      const response = await axios.post(
-        `${API}/mathalea/sheets/${sheetId}/generate-pdf-pro`,
-        {
-          template: selectedTemplate
+    const payload = {
+      template: selectedTemplate || "classique",
+      type_doc: defaultDocType || "exercices",
+    };
+
+    const res = await axios.post(
+      `${API_BASE_URL}/api/mathalea/sheets/${sheetId}/generate-pdf-pro`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Session-Token": sessionToken,
         },
-        {
-          headers: {
-            'X-Session-Token': sessionToken
-          }
-        }
+      }
+    );
+
+    if (!res.data) {
+      throw new Error("Réponse vide du serveur lors de l'export Pro.");
+    }
+
+    return res.data;
+  };
+
+  const handleExportSubject = async () => {
+    setExportError("");
+    setIsExportingSubject(true);
+    try {
+      const data = await callGenerateProPdf();
+      if (!data.pro_subject_pdf) {
+        throw new Error("PDF Sujet Pro manquant dans la réponse.");
+      }
+
+      const baseFilename =
+        data.base_filename || "LeMaitreMot_Fiche_Pro_Sujet";
+      const filename = `${baseFilename}_Sujet_${selectedTemplate}.pdf`;
+      downloadPdfFromBase64(data.pro_subject_pdf, filename);
+      // on NE ferme PAS la modale
+      alert("Sujet Pro téléchargé avec succès ✅");
+    } catch (err) {
+      console.error("Erreur export Sujet Pro :", err);
+      setExportError(
+        err?.message ||
+          "Une erreur est survenue lors de l'export du Sujet Pro."
       );
-      
-      const { pro_subject_pdf, base_filename } = response.data;
-      
-      if (!pro_subject_pdf) {
-        throw new Error('PDF Sujet Pro non reçu du serveur');
-      }
-      
-      const filename = `${base_filename}_SujetPro_${selectedTemplate}.pdf`;
-      downloadPdfFromBase64(pro_subject_pdf, filename);
-      alert('✅ Sujet Pro téléchargé avec succès !');
-      
-    } catch (error) {
-      console.error('Erreur export Sujet Pro:', error);
-      
-      let errorMessage = 'Erreur lors de l\'export du Sujet Pro. ';
-      
-      if (error.response) {
-        if (error.response.status === 403) {
-          errorMessage = 'Un compte Pro est nécessaire pour cette fonctionnalité.';
-        } else if (error.response.status >= 500) {
-          errorMessage += 'Erreur serveur. Merci de réessayer plus tard.';
-        } else {
-          errorMessage += error.response.data?.detail || 'Merci de réessayer.';
-        }
-      } else if (error.request) {
-        errorMessage += 'Impossible de contacter le serveur.';
-      } else {
-        errorMessage += error.message || 'Une erreur inattendue s\'est produite.';
-      }
-      
-      alert(errorMessage);
     } finally {
       setIsExportingSubject(false);
     }
   };
 
-  /**
-   * Exporte le Corrigé Pro
-   */
-  const handleExportCorrectionPro = async () => {
+  const handleExportCorrection = async () => {
+    setExportError("");
     setIsExportingCorrection(true);
-    
     try {
-      const response = await axios.post(
-        `${API}/mathalea/sheets/${sheetId}/generate-pdf-pro`,
-        {
-          template: selectedTemplate
-        },
-        {
-          headers: {
-            'X-Session-Token': sessionToken
-          }
-        }
+      const data = await callGenerateProPdf();
+      if (!data.pro_correction_pdf) {
+        throw new Error("PDF Corrigé Pro manquant dans la réponse.");
+      }
+
+      const baseFilename =
+        data.base_filename || "LeMaitreMot_Fiche_Pro_Corrige";
+      const filename = `${baseFilename}_Corrige_${selectedTemplate}.pdf`;
+      downloadPdfFromBase64(data.pro_correction_pdf, filename);
+      // on NE ferme PAS la modale
+      alert("Corrigé Pro téléchargé avec succès ✅");
+    } catch (err) {
+      console.error("Erreur export Corrigé Pro :", err);
+      setExportError(
+        err?.message ||
+          "Une erreur est survenue lors de l'export du Corrigé Pro."
       );
-      
-      const { pro_correction_pdf, base_filename } = response.data;
-      
-      if (!pro_correction_pdf) {
-        throw new Error('PDF Corrigé Pro non reçu du serveur');
-      }
-      
-      const filename = `${base_filename}_CorrigePro_${selectedTemplate}.pdf`;
-      downloadPdfFromBase64(pro_correction_pdf, filename);
-      alert('✅ Corrigé Pro téléchargé avec succès !');
-      
-    } catch (error) {
-      console.error('Erreur export Corrigé Pro:', error);
-      
-      let errorMessage = 'Erreur lors de l\'export du Corrigé Pro. ';
-      
-      if (error.response) {
-        if (error.response.status === 403) {
-          errorMessage = 'Un compte Pro est nécessaire pour cette fonctionnalité.';
-        } else if (error.response.status >= 500) {
-          errorMessage += 'Erreur serveur. Merci de réessayer plus tard.';
-        } else {
-          errorMessage += error.response.data?.detail || 'Merci de réessayer.';
-        }
-      } else if (error.request) {
-        errorMessage += 'Impossible de contacter le serveur.';
-      } else {
-        errorMessage += error.message || 'Une erreur inattendue s\'est produite.';
-      }
-      
-      alert(errorMessage);
     } finally {
       setIsExportingCorrection(false);
     }
   };
 
+  if (!isOpen) return null;
+
+  const schoolName =
+    proConfig && proConfig.school_name
+      ? proConfig.school_name
+      : "Le Maître Mot";
+
+  const professorName =
+    proConfig && proConfig.professor_name ? proConfig.professor_name : "";
+
+  const schoolYear =
+    proConfig && proConfig.school_year
+      ? proConfig.school_year
+      : "2024-2025";
+
+  const logoConfigured =
+    proConfig && proConfig.logo_url && proConfig.logo_url.trim().length > 0;
+
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <Card className="bg-white rounded-lg shadow-2xl w-full max-w-md">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-blue-50 to-purple-50">
-          <div className="flex items-center">
-            <Crown className="h-6 w-6 text-blue-600 mr-3" />
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">
-                Export Pro personnalisé
-              </h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Fiche : <span className="font-medium">{sheetTitle}</span>
-              </p>
-            </div>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        {/* HEADER */}
+        <div className="flex justify-between items-center p-6 border-b">
+          <h2 className="text-2xl font-bold text-gray-900">Export Pro personnalisé</h2>
+          <button
+            type="button"
+            onClick={handleClose}
+            disabled={!canClose}
+            className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            aria-label="Fermer"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* BODY */}
+        <div className="p-6 space-y-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="font-semibold text-blue-900 mb-2">Fonctionnalités Pro incluses</p>
+            <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+              <li>Logo et nom de votre établissement</li>
+              <li>Template personnalisé avec vos couleurs</li>
+              <li>PDF de qualité professionnelle</li>
+            </ul>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+
+          {/* Choix du template */}
+          <div className="space-y-2">
+            <label htmlFor="template-select" className="block font-semibold text-gray-900">
+              Choisissez votre template
+            </label>
+            <select
+              id="template-select"
+              value={selectedTemplate}
+              onChange={(e) => setSelectedTemplate(e.target.value)}
+              disabled={isExportingSubject || isExportingCorrection}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <option value="classique">Classique - Style moderne et coloré</option>
+              <option value="academique">Académique - Style formel et structuré</option>
+            </select>
+          </div>
+
+          {/* Config utilisateur */}
+          <div className="border border-gray-200 rounded-lg p-4">
+            <p className="font-semibold text-gray-900 mb-3">Votre configuration</p>
+            {loadingConfig && (
+              <div className="flex items-center justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-600">Chargement de votre configuration…</span>
+              </div>
+            )}
+            {configError && (
+              <p className="text-red-600 text-sm">{configError}</p>
+            )}
+            {!loadingConfig && (
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Établissement :</span>
+                  <span className="font-medium text-gray-900">{schoolName}</span>
+                </div>
+                {professorName && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Professeur :</span>
+                    <span className="font-medium text-gray-900">{professorName}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Année scolaire :</span>
+                  <span className="font-medium text-gray-900">{schoolYear}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Template préféré :</span>
+                  <span className="font-medium text-gray-900">
+                    {proConfig?.template_choice
+                      ? proConfig.template_choice === "academique"
+                        ? "Académique"
+                        : "Classique"
+                      : selectedTemplate === "academique"
+                      ? "Académique"
+                      : "Classique"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Logo :</span>
+                  <span className="text-gray-500 text-xs italic">
+                    {logoConfigured ? "Personnalisé" : "Par défaut"}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {exportError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-800 text-sm">{exportError}</p>
+            </div>
+          )}
+        </div>
+
+        {/* FOOTER */}
+        <div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
+          <button
+            type="button"
+            className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleClose}
+            disabled={!canClose}
+          >
+            Fermer
+          </button>
+
+          <button
+            type="button"
+            className="px-4 py-2 text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleExportSubject}
             disabled={isExportingSubject || isExportingCorrection}
           >
-            <X className="h-5 w-5" />
-          </Button>
+            {isExportingSubject ? (
+              <span className="flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Export Sujet…
+              </span>
+            ) : (
+              "Exporter Sujet Pro PDF"
+            )}
+          </button>
+
+          <button
+            type="button"
+            className="px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleExportCorrection}
+            disabled={isExportingSubject || isExportingCorrection}
+          >
+            {isExportingCorrection ? (
+              <span className="flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Export Corrigé…
+              </span>
+            ) : (
+              "Exporter Corrigé Pro PDF"
+            )}
+          </button>
         </div>
-
-        {/* Content */}
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            {/* Pro Features */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-900 mb-2 flex items-center">
-                <Crown className="h-4 w-4 mr-2" />
-                Fonctionnalités Pro incluses
-              </h3>
-              <ul className="text-sm text-blue-800 space-y-2">
-                <li className="flex items-start">
-                  <Building2 className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>Logo et nom de votre établissement</span>
-                </li>
-                <li className="flex items-start">
-                  <Palette className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>Template personnalisé avec vos couleurs</span>
-                </li>
-                <li className="flex items-start">
-                  <Download className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>PDF de qualité professionnelle</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Template Selector */}
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">
-                Choisissez votre template
-              </h3>
-              <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionner un template" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="classique">
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">Classique</span>
-                      <span className="text-xs text-gray-500">Style moderne et coloré</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="academique">
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">Académique</span>
-                      <span className="text-xs text-gray-500">Style formel et structuré</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Current Config */}
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">
-                Votre configuration
-              </h3>
-              {loadingConfig ? (
-                <div className="flex items-center justify-center py-4">
-                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-                  <span className="ml-2 text-sm text-gray-500">Chargement...</span>
-                </div>
-              ) : (
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Établissement :</span>
-                    <span className="font-medium">
-                      {proConfig?.school_name || 'Le Maître Mot'}
-                    </span>
-                  </div>
-                  {proConfig?.professor_name && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Professeur :</span>
-                      <span className="font-medium">{proConfig.professor_name}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Template :</span>
-                    <Badge variant="outline">
-                      {selectedTemplate === "classique" ? "Classique" : "Académique"}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Logo :</span>
-                    <span className="text-gray-500 text-xs italic">
-                      {proConfig?.logo_url ? 'Personnalisé' : 'Par défaut'}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Info */}
-            <p className="text-xs text-gray-500 text-center">
-              💡 Le PDF Pro inclut les énoncés et les corrections dans un seul document
-            </p>
-          </div>
-        </CardContent>
-
-        {/* Footer - 2 boutons d'export */}
-        <div className="border-t p-4">
-          <div className="space-y-2">
-            {/* Bouton Sujet Pro */}
-            <Button
-              onClick={handleExportSubjectPro}
-              disabled={isExportingSubject || isExportingCorrection}
-              className="w-full bg-green-600 hover:bg-green-700"
-              size="lg"
-            >
-              {isExportingSubject ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Export en cours...
-                </>
-              ) : (
-                <>
-                  <Download className="h-4 w-4 mr-2" />
-                  Exporter Sujet Pro PDF
-                </>
-              )}
-            </Button>
-
-            {/* Bouton Corrigé Pro */}
-            <Button
-              onClick={handleExportCorrectionPro}
-              disabled={isExportingSubject || isExportingCorrection}
-              className="w-full bg-red-600 hover:bg-red-700"
-              size="lg"
-            >
-              {isExportingCorrection ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Export en cours...
-                </>
-              ) : (
-                <>
-                  <Download className="h-4 w-4 mr-2" />
-                  Exporter Corrigé Pro PDF
-                </>
-              )}
-            </Button>
-
-            {/* Bouton Annuler */}
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="w-full"
-              disabled={isExportingSubject || isExportingCorrection}
-            >
-              Annuler
-            </Button>
-          </div>
-        </div>
-      </Card>
+      </div>
     </div>
   );
-}
+};
 
 export default ProExportModal;
