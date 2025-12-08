@@ -409,12 +409,12 @@ function SheetBuilderPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div className="space-y-2">
                       <Label>Domaine</Label>
-                      <Select value={selectedDomain} onValueChange={setSelectedDomain}>
+                      <Select value={selectedDomain || "all"} onValueChange={(val) => setSelectedDomain(val === "all" ? "" : val)}>
                         <SelectTrigger>
                           <SelectValue placeholder="Tous les domaines" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Tous les domaines</SelectItem>
+                          <SelectItem value="all">Tous les domaines</SelectItem>
                           {availableDomains.map(domain => (
                             <SelectItem key={domain} value={domain}>
                               {domain}
@@ -426,12 +426,12 @@ function SheetBuilderPage() {
                     
                     <div className="space-y-2">
                       <Label>Type de générateur</Label>
-                      <Select value={selectedGeneratorKind} onValueChange={setSelectedGeneratorKind}>
+                      <Select value={selectedGeneratorKind || "all"} onValueChange={(val) => setSelectedGeneratorKind(val === "all" ? "" : val)}>
                         <SelectTrigger>
                           <SelectValue placeholder="Tous les types" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Tous les types</SelectItem>
+                          <SelectItem value="all">Tous les types</SelectItem>
                           <SelectItem value="template">Template</SelectItem>
                           <SelectItem value="legacy">Legacy</SelectItem>
                         </SelectContent>
