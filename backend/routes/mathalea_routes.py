@@ -5,12 +5,15 @@ CRUD pour Competence et ExerciseType
 Architecture non-destructive - N'affecte pas les routes existantes
 """
 
-from fastapi import APIRouter, HTTPException, Query, Header
+from fastapi import APIRouter, HTTPException, Query, Header, File, UploadFile
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import uuid
+import shutil
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
