@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Header from './Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
