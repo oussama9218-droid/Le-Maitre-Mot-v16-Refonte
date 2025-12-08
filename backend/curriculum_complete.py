@@ -134,12 +134,15 @@ CURRICULUM_DATA_COMPLETE = {
             ], "Grandeurs et mesures": [
                 "Longueurs, masses, durées",
                 "Aires",
+                "Périmètres et aires",
                 "Volumes", 
                 "Angles"
             ], "Espace et géométrie": [
                 "Géométrie dans l'espace",
                 "Géométrie dans le plan",
                 "Symétrie axiale"
+            ], "Organisation et gestion de données": [
+                "Proportionnalité"
             ]},
             "5e": {"Nombres et calculs": [
                 "Nombres relatifs",
