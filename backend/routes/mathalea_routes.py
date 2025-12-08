@@ -310,9 +310,33 @@ async def create_sheet_item(item: SheetItemCreate):
         raise HTTPException(status_code=404, detail="ExerciseSheet not found")
     
     # Vérifier que le type d'exercice existe
-    exercise_type = await exercise_types_collection.find_one({"id": item.exercise_type_id})
-    if not exercise_type:
+    exercise_type_dict = await exercise_types_collection.find_one({"id": item.exercise_type_id}, {"_id": 0})
+    if not exercise_type_dict:
         raise HTTPException(status_code=404, detail="ExerciseType not found")
+    
+    exercise_type = ExerciseType(**exercise_type_dict)
+    
+    # Valider la configuration
+    config = item.config
+    
+    # Vérifier nb_questions dans les limites
+    if config.nb_questions < exercise_type.min_questions:
+        raise HTTPException(
+            status_code=422,
+            detail=f"nb_questions ({config.nb_questions}) must be >= min_questions ({exercise_type.min_questions})"
+        )
+    if config.nb_questions > exercise_type.max_questions:
+        raise HTTPException(
+            status_code=422,
+            detail=f"nb_questions ({config.nb_questions}) must be <= max_questions ({exercise_type.max_questions})"
+        )
+    
+    # Vérifier difficulty si spécifiée
+    if config.difficulty and config.difficulty not in exercise_type.difficulty_levels:
+        raise HTTPException(
+            status_code=422,
+            detail=f"difficulty '{config.difficulty}' not in available levels: {exercise_type.difficulty_levels}"
+        )
     
     # Obtenir le prochain ordre
     max_order = await sheet_items_collection.find_one(
