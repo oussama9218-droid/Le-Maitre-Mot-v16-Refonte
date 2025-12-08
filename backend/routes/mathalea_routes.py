@@ -443,6 +443,202 @@ async def delete_sheet_item(item_id: str):
 
 
 # ============================================================================
+# ENDPOINTS: SheetItem (via sheets/{sheet_id}/items)
+# ============================================================================
+
+@router.post("/sheets/{sheet_id}/items", response_model=SheetItem, status_code=201)
+async def add_item_to_sheet(sheet_id: str, item_data: Dict[str, Any]):
+    """
+    Ajouter un item à une feuille
+    
+    Body attendu:
+    {
+        "exercise_type_id": "...",
+        "config": {
+            "nb_questions": 5,
+            "difficulty": "moyen",
+            "seed": 12345,
+            "options": {},
+            "ai_enonce": false,
+            "ai_correction": false
+        },
+        "order": 1  // optionnel
+    }
+    """
+    # Vérifier que la feuille existe
+    sheet = await exercise_sheets_collection.find_one({"id": sheet_id})
+    if not sheet:
+        raise HTTPException(status_code=404, detail="ExerciseSheet not found")
+    
+    # Extraire et valider les données
+    exercise_type_id = item_data.get("exercise_type_id")
+    if not exercise_type_id:
+        raise HTTPException(status_code=400, detail="exercise_type_id is required")
+    
+    config_data = item_data.get("config")
+    if not config_data:
+        raise HTTPException(status_code=400, detail="config is required")
+    
+    # Vérifier que le type d'exercice existe
+    exercise_type_dict = await exercise_types_collection.find_one({"id": exercise_type_id}, {"_id": 0})
+    if not exercise_type_dict:
+        raise HTTPException(status_code=404, detail="ExerciseType not found")
+    
+    exercise_type = ExerciseType(**exercise_type_dict)
+    
+    # Valider la configuration
+    try:
+        config = ExerciseItemConfig(**config_data)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=f"Invalid config: {str(e)}")
+    
+    # Vérifier nb_questions dans les limites
+    if config.nb_questions < exercise_type.min_questions:
+        raise HTTPException(
+            status_code=422,
+            detail=f"nb_questions ({config.nb_questions}) must be >= min_questions ({exercise_type.min_questions})"
+        )
+    if config.nb_questions > exercise_type.max_questions:
+        raise HTTPException(
+            status_code=422,
+            detail=f"nb_questions ({config.nb_questions}) must be <= max_questions ({exercise_type.max_questions})"
+        )
+    
+    # Vérifier difficulty si spécifiée
+    if config.difficulty and config.difficulty not in exercise_type.difficulty_levels:
+        raise HTTPException(
+            status_code=422,
+            detail=f"difficulty '{config.difficulty}' not in available levels: {exercise_type.difficulty_levels}"
+        )
+    
+    # Obtenir l'ordre (fourni ou automatique)
+    order = item_data.get("order")
+    if order is None:
+        max_order = await sheet_items_collection.find_one(
+            {"sheet_id": sheet_id},
+            sort=[("order", -1)]
+        )
+        order = (max_order.get("order", 0) + 1) if max_order else 1
+    
+    # Créer l'item
+    item = SheetItem(
+        sheet_id=sheet_id,
+        exercise_type_id=exercise_type_id,
+        config=config,
+        order=order
+    )
+    
+    item_dict = item.dict()
+    await sheet_items_collection.insert_one(item_dict)
+    return SheetItem(**item_dict)
+
+
+@router.get("/sheets/{sheet_id}/items", response_model=SheetItemListResponse)
+async def get_sheet_items(
+    sheet_id: str,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=500)
+):
+    """Récupérer tous les items d'une feuille (triés par order)"""
+    # Vérifier que la feuille existe
+    sheet = await exercise_sheets_collection.find_one({"id": sheet_id})
+    if not sheet:
+        raise HTTPException(status_code=404, detail="ExerciseSheet not found")
+    
+    query = {"sheet_id": sheet_id}
+    cursor = sheet_items_collection.find(query, {"_id": 0}).sort("order", 1).skip(skip).limit(limit)
+    items = await cursor.to_list(length=limit)
+    total = await sheet_items_collection.count_documents(query)
+    
+    return SheetItemListResponse(
+        total=total,
+        items=[SheetItem(**item) for item in items]
+    )
+
+
+@router.patch("/sheets/{sheet_id}/items/{item_id}", response_model=SheetItem)
+async def update_sheet_item_in_sheet(sheet_id: str, item_id: str, update_data: Dict[str, Any]):
+    """
+    Mettre à jour un item d'une feuille
+    
+    Body attendu:
+    {
+        "config": { ... },  // optionnel
+        "order": 2          // optionnel
+    }
+    """
+    # Vérifier que l'item existe et appartient à la feuille
+    item = await sheet_items_collection.find_one({"id": item_id, "sheet_id": sheet_id}, {"_id": 0})
+    if not item:
+        raise HTTPException(status_code=404, detail="SheetItem not found in this sheet")
+    
+    update_fields = {}
+    
+    # Si config est mis à jour
+    if "config" in update_data:
+        exercise_type_dict = await exercise_types_collection.find_one(
+            {"id": item["exercise_type_id"]}, 
+            {"_id": 0}
+        )
+        if not exercise_type_dict:
+            raise HTTPException(status_code=404, detail="ExerciseType not found")
+        
+        exercise_type = ExerciseType(**exercise_type_dict)
+        
+        try:
+            config = ExerciseItemConfig(**update_data["config"])
+        except Exception as e:
+            raise HTTPException(status_code=422, detail=f"Invalid config: {str(e)}")
+        
+        # Valider nb_questions
+        if config.nb_questions < exercise_type.min_questions:
+            raise HTTPException(
+                status_code=422,
+                detail=f"nb_questions ({config.nb_questions}) must be >= min_questions ({exercise_type.min_questions})"
+            )
+        if config.nb_questions > exercise_type.max_questions:
+            raise HTTPException(
+                status_code=422,
+                detail=f"nb_questions ({config.nb_questions}) must be <= max_questions ({exercise_type.max_questions})"
+            )
+        
+        # Valider difficulty
+        if config.difficulty and config.difficulty not in exercise_type.difficulty_levels:
+            raise HTTPException(
+                status_code=422,
+                detail=f"difficulty '{config.difficulty}' not in available levels: {exercise_type.difficulty_levels}"
+            )
+        
+        update_fields["config"] = config.dict()
+    
+    # Si order est mis à jour
+    if "order" in update_data:
+        update_fields["order"] = update_data["order"]
+    
+    if not update_fields:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    result = await sheet_items_collection.update_one(
+        {"id": item_id},
+        {"$set": update_fields}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="SheetItem not found")
+    
+    updated = await sheet_items_collection.find_one({"id": item_id}, {"_id": 0})
+    return SheetItem(**updated)
+
+
+@router.delete("/sheets/{sheet_id}/items/{item_id}", status_code=204)
+async def delete_item_from_sheet(sheet_id: str, item_id: str):
+    """Supprimer un item d'une feuille"""
+    result = await sheet_items_collection.delete_one({"id": item_id, "sheet_id": sheet_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="SheetItem not found in this sheet")
+
+
+# ============================================================================
 # ENDPOINT: Génération d'Exercices (TEMPLATE)
 # ============================================================================
 
