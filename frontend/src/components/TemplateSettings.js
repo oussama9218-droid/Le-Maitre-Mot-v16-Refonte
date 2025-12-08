@@ -91,36 +91,43 @@ const TemplateSettings = ({ isPro, sessionToken, onTemplateChange }) => {
     
     setSaving(true);
     try {
-      const formData = new FormData();
-      if (professorName) formData.append('professor_name', professorName);
-      if (schoolName) formData.append('school_name', schoolName);
-      if (schoolYear) formData.append('school_year', schoolYear);
-      if (footerText) formData.append('footer_text', footerText);
-      formData.append('template_style', selectedStyle);
+      // Préparer les données de config Pro
+      const configData = {
+        professor_name: professorName || '',
+        school_name: schoolName || '',
+        school_year: schoolYear || '2024-2025',
+        footer_text: footerText || '',
+        template_choice: selectedStyle
+      };
       
-      if (logoFile) {
-        formData.append('logo', logoFile);
-      }
+      // TODO: Gérer l'upload du logo séparément si nécessaire
+      // Pour l'instant, on ne modifie pas le logo
+      
+      console.log('💾 Sauvegarde config Pro:', configData);
 
-      const response = await axios.post(`${API}/api/template/save`, formData, {
+      // Nouvelle route API pour sauvegarder la config Pro
+      const response = await axios.put(`${API}/api/mathalea/pro/config`, configData, {
         headers: { 
           'X-Session-Token': sessionToken,
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         }
       });
 
-      setTemplate(response.data.template);
+      console.log('✅ Config Pro sauvegardée avec succès');
+      
+      // Recharger la config pour confirmer
+      await loadUserTemplate();
       
       // Notify parent component
       if (onTemplateChange) {
-        onTemplateChange(response.data.template);
+        onTemplateChange(configData);
       }
       
-      console.log('✅ Template saved successfully');
+      alert('✅ Vos préférences Pro ont été sauvegardées !');
       
     } catch (error) {
-      console.error('Error saving template:', error);
-      alert('Erreur lors de la sauvegarde du template');
+      console.error('❌ Erreur sauvegarde config Pro:', error);
+      alert('Erreur lors de la sauvegarde. Vérifiez votre connexion.');
     } finally {
       setSaving(false);
     }
