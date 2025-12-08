@@ -1,6 +1,46 @@
 # Testing Protocol and Results
 
-## Latest Test Session - SPRINT F.3-FIX Complete Flow Testing
+## Latest Test Session - API Pro PDF Export avec Templates Testing
+
+### Test Focus
+Test complet de l'API Pro PDF Export avec sélecteur de templates - Validation des fonctionnalités Pro
+
+### Tests Executed
+
+#### 1. Test API Pro PDF Export avec Templates
+**Command**: `python backend_test.py pdf-pro`
+**Result**: ✅ SUCCÈS COMPLET (7/7 tests - 100%)
+**Details**:
+- ✅ Test 1: Export Pro avec template "classique" - PDF valide (18,571 bytes)
+- ✅ Test 2: Export Pro avec template "academique" - PDF valide (20,814 bytes)
+- ✅ Test 3: Export Pro avec template par défaut - "classique" correctement appliqué
+- ✅ Test 4: Export Pro sans token de session - Erreur 403 avec message "PRO_REQUIRED"
+- ✅ Test 5: Export Pro avec fiche inexistante - Erreur 404 appropriée
+- ✅ Test 6: Validation tailles PDFs - Les deux templates génèrent des PDFs valides de tailles différentes
+- ✅ Test 7: Test avec exercices LEGACY et TEMPLATE - PDF généré avec succès (18,569 bytes)
+
+### Key Findings - API Pro PDF Export
+1. ✅ **API Pro PDF Export FONCTIONNELLE**: Tous les tests passent (100%)
+2. ✅ **Templates "classique" et "academique"**: Les deux templates génèrent des PDFs valides
+3. ✅ **Tailles différentes**: Template "academique" (20,814 bytes) > "classique" (18,571 bytes)
+4. ✅ **Template par défaut**: "classique" correctement appliqué quand aucun template spécifié
+5. ✅ **Sécurité Pro**: Erreur 403 appropriée sans token de session Pro
+6. ✅ **Gestion d'erreurs**: Erreur 404 appropriée pour fiche inexistante
+7. ✅ **Exercices mixtes**: Support LEGACY et TEMPLATE dans le même PDF
+8. ✅ **Validation PDF**: Tous les PDFs générés sont valides (commencent par %PDF)
+9. ✅ **Champs de réponse**: Tous les champs requis présents (pro_pdf, filename, template, etablissement)
+10. ✅ **Performance**: Génération rapide (< 60s par test)
+
+### API Pro PDF Export Status Summary
+- **Template Classique**: ✅ PASSED (PDF valide 18,571 bytes)
+- **Template Académique**: ✅ PASSED (PDF valide 20,814 bytes)
+- **Template Par Défaut**: ✅ PASSED ("classique" appliqué)
+- **Sécurité Pro**: ✅ PASSED (403 sans token)
+- **Gestion Erreurs**: ✅ PASSED (404 fiche inexistante)
+- **Validation PDFs**: ✅ PASSED (tailles différentes, PDFs valides)
+- **Exercices Mixtes**: ✅ PASSED (LEGACY + TEMPLATE supportés)
+
+## Previous Test Session - SPRINT F.3-FIX Complete Flow Testing
 
 ### Test Focus
 Test complet du flux de création de fiche avec preview et génération PDF dans "Le Maître Mot" - Scénario SPRINT F.3-FIX
