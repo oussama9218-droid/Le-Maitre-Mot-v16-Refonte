@@ -379,3 +379,48 @@ async def delete_sheet_item(item_id: str):
     result = await sheet_items_collection.delete_one({"id": item_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="SheetItem not found")
+
+
+# ============================================================================
+# ENDPOINT: Génération d'Exercices (TEMPLATE)
+# ============================================================================
+
+from pydantic import BaseModel, Field
+from services.exercise_template_service import exercise_template_service
+
+
+class GenerateExerciseRequest(BaseModel):
+    """Requête pour générer un exercice"""
+    exercise_type_id: str = Field(..., description="ID du type d'exercice")
+    nb_questions: int = Field(..., ge=1, le=50, description="Nombre de questions")
+    seed: int = Field(..., description="Graine pour reproductibilité")
+    difficulty: Optional[str] = Field(None, description="Niveau de difficulté")
+    options: Dict[str, Any] = Field(default_factory=dict, description="Options supplémentaires")
+    use_ai_enonce: bool = Field(False, description="Utiliser l'IA pour l'énoncé")
+    use_ai_correction: bool = Field(False, description="Utiliser l'IA pour la correction")
+
+
+@router.post("/generate-exercise")
+async def generate_exercise_endpoint(request: GenerateExerciseRequest):
+    """
+    Générer un exercice complet à partir d'un ExerciseType
+    
+    Système déterministe : même seed = même exercice
+    """
+    try:
+        result = await exercise_template_service.generate_exercise(
+            exercise_type_id=request.exercise_type_id,
+            nb_questions=request.nb_questions,
+            seed=request.seed,
+            difficulty=request.difficulty,
+            options=request.options,
+            use_ai_enonce=request.use_ai_enonce,
+            use_ai_correction=request.use_ai_correction
+        )
+        
+        return result
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating exercise: {str(e)}")
