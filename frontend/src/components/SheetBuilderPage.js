@@ -33,6 +33,10 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 function SheetBuilderPage() {
+  // Router hooks
+  const { sheetId: urlSheetId } = useParams();
+  const navigate = useNavigate();
+  
   // États pour le catalogue
   const [levels, setLevels] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState("");
@@ -44,6 +48,7 @@ function SheetBuilderPage() {
   // États pour la fiche (panier)
   const [sheetTitle, setSheetTitle] = useState("Nouvelle fiche d'exercices");
   const [sheetItems, setSheetItems] = useState([]);
+  const [isLoadingSheet, setIsLoadingSheet] = useState(false);
   
   // États pour l'utilisateur et Pro
   const [userEmail, setUserEmail] = useState("");
@@ -53,7 +58,7 @@ function SheetBuilderPage() {
   // États pour génération/export
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [sheetId, setSheetId] = useState(null);
+  const [sheetId, setSheetId] = useState(urlSheetId || null);
   
   // États pour le modal de preview
   const [showPreviewModal, setShowPreviewModal] = useState(false);
