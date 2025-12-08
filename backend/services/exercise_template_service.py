@@ -550,6 +550,104 @@ class ExerciseTemplateService:
         
         logger.info(f"✅ {len(questions)} questions legacy générées")
         return questions
+    
+    def _generate_legacy_fallback_question(
+        self,
+        exercise_type: ExerciseType,
+        question_number: int,
+        seed: int,
+        difficulty: str,
+        rng: random.Random
+    ) -> Dict[str, Any]:
+        """
+        Génère une question de fallback pour les exercices legacy
+        en attendant l'implémentation complète des générateurs legacy
+        
+        Cette fonction crée des questions mathématiques réalistes
+        basées sur le type d'exercice et le niveau
+        """
+        legacy_type = exercise_type.legacy_generator_id
+        niveau = exercise_type.niveau
+        
+        # Génération selon le type d'exercice legacy
+        if "PROP" in legacy_type or "proportionnal" in legacy_type.lower():
+            # Proportionnalité
+            a = rng.randint(2, 10)
+            b = rng.randint(2, 15)
+            c = rng.randint(2, 20)
+            d = round((b * c) / a, 2)
+            
+            enonce = f"Dans un tableau de proportionnalité, on sait que {a} correspond à {b}, et {c} correspond à une valeur inconnue. Quelle est cette valeur ?"
+            solution = f"On utilise le produit en croix : (valeur inconnue) × {a} = {b} × {c}\n" \
+                      f"valeur inconnue = ({b} × {c}) / {a} = {d}"
+        
+        elif "SYM" in legacy_type and "AX" in legacy_type:
+            # Symétrie axiale
+            points = ["A", "B", "C", "D"]
+            point = rng.choice(points)
+            x = rng.randint(-10, 10)
+            y = rng.randint(-10, 10)
+            
+            if "x=0" in str(seed) or seed % 2 == 0:
+                # Symétrie par rapport à l'axe des ordonnées
+                enonce = f"Le point {point}({x} ; {y}) a pour symétrique {point}' par rapport à l'axe des ordonnées. Quelles sont les coordonnées de {point}' ?"
+                solution = f"Par symétrie axiale par rapport à l'axe des ordonnées (droite d'équation x = 0), l'abscisse change de signe et l'ordonnée reste identique.\n" \
+                          f"Les coordonnées de {point}' sont ({-x} ; {y})."
+            else:
+                # Symétrie par rapport à l'axe des abscisses
+                enonce = f"Le point {point}({x} ; {y}) a pour symétrique {point}' par rapport à l'axe des abscisses. Quelles sont les coordonnées de {point}' ?"
+                solution = f"Par symétrie axiale par rapport à l'axe des abscisses (droite d'équation y = 0), l'abscisse reste identique et l'ordonnée change de signe.\n" \
+                          f"Les coordonnées de {point}' sont ({x} ; {-y})."
+        
+        elif "POURC" in legacy_type or "percent" in legacy_type.lower():
+            # Pourcentages
+            total = rng.randint(100, 1000)
+            percent = rng.choice([10, 15, 20, 25, 30, 40, 50, 75])
+            result = round((total * percent) / 100, 2)
+            
+            enonce = f"Calculer {percent}% de {total}."
+            solution = f"Pour calculer {percent}% de {total}, on effectue : ({percent} × {total}) / 100 = {result}"
+        
+        elif "CALC" in legacy_type and "DEC" in legacy_type:
+            # Calculs avec décimaux
+            a = round(rng.uniform(1, 50), 1)
+            b = round(rng.uniform(1, 30), 1)
+            operation = rng.choice(["+", "-", "×"])
+            
+            if operation == "+":
+                result = round(a + b, 2)
+                enonce = f"Calculer : {a} + {b}"
+                solution = f"{a} + {b} = {result}"
+            elif operation == "-":
+                result = round(a - b, 2)
+                enonce = f"Calculer : {a} - {b}"
+                solution = f"{a} - {b} = {result}"
+            else:  # multiplication
+                result = round(a * b, 2)
+                enonce = f"Calculer : {a} × {b}"
+                solution = f"{a} × {b} = {result}"
+        
+        else:
+            # Type inconnu ou générique
+            enonce = f"Exercice de type {exercise_type.titre} - Question {question_number}"
+            solution = f"Cette question est en cours de développement pour le type {legacy_type}."
+        
+        return {
+            "id": f"q{question_number}",
+            "enonce_brut": enonce,
+            "data": {
+                "seed": seed,
+                "difficulty": difficulty
+            },
+            "solution_brut": solution,
+            "metadata": {
+                "generator": "legacy_fallback",
+                "legacy_type": legacy_type,
+                "seed": seed,
+                "difficulty": difficulty,
+                "note": "Question générée par fallback en attendant implémentation complète"
+            }
+        }
 
 
 # Instance globale
