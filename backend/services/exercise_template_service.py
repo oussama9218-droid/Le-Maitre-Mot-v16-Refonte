@@ -570,7 +570,10 @@ class ExerciseTemplateService:
         niveau = exercise_type.niveau
         
         # Génération selon le type d'exercice legacy
-        if "PROP" in legacy_type or "proportionnal" in legacy_type.lower():
+        # Normaliser le legacy_type pour faciliter la détection
+        legacy_type_lower = legacy_type.lower() if legacy_type else ""
+        
+        if "prop" in legacy_type_lower:
             # Proportionnalité
             a = rng.randint(2, 10)
             b = rng.randint(2, 15)
@@ -581,14 +584,14 @@ class ExerciseTemplateService:
             solution = f"On utilise le produit en croix : (valeur inconnue) × {a} = {b} × {c}\n" \
                       f"valeur inconnue = ({b} × {c}) / {a} = {d}"
         
-        elif "SYM" in legacy_type and "AX" in legacy_type:
+        elif "sym" in legacy_type_lower and "ax" in legacy_type_lower:
             # Symétrie axiale
-            points = ["A", "B", "C", "D"]
+            points = ["A", "B", "C", "D", "E", "F"]
             point = rng.choice(points)
             x = rng.randint(-10, 10)
             y = rng.randint(-10, 10)
             
-            if "x=0" in str(seed) or seed % 2 == 0:
+            if seed % 2 == 0:
                 # Symétrie par rapport à l'axe des ordonnées
                 enonce = f"Le point {point}({x} ; {y}) a pour symétrique {point}' par rapport à l'axe des ordonnées. Quelles sont les coordonnées de {point}' ?"
                 solution = f"Par symétrie axiale par rapport à l'axe des ordonnées (droite d'équation x = 0), l'abscisse change de signe et l'ordonnée reste identique.\n" \
