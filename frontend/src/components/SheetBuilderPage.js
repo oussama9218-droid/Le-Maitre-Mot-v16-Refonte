@@ -57,6 +57,10 @@ function SheetBuilderPage() {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [previewData, setPreviewData] = useState(null);
   
+  // États pour le modal de téléchargement PDF
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [pdfResult, setPdfResult] = useState(null);
+  
   // États pour filtres
   const [selectedDomain, setSelectedDomain] = useState("");
   const [selectedGeneratorKind, setSelectedGeneratorKind] = useState("");
