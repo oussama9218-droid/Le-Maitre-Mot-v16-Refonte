@@ -20,6 +20,7 @@ class GeneratorKind(str, Enum):
     TEMPLATE = "template"  # Gabarits pré-définis
     IA = "ia"  # Génération par IA
     HYBRID = "hybrid"  # Combinaison des deux
+    LEGACY = "legacy"  # Générateurs du système legacy (Sprint F.1)
 
 
 # ============================================================================
