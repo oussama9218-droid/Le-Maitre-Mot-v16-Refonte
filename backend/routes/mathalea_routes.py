@@ -920,3 +920,158 @@ async def generate_sheet_pdf(sheet_id: str):
             status_code=500,
             detail=f"Error generating PDFs: {str(e)}"
         )
+
+
+@router.post("/sheets/{sheet_id}/generate-pdf-pro")
+async def generate_pro_pdf(
+    sheet_id: str,
+    x_session_token: str = Header(None, alias="X-Session-Token")
+):
+    """
+    Génère un PDF Pro personnalisé pour une fiche d'exercices
+    
+    ROUTE PRO UNIQUEMENT
+    - Vérifie que l'utilisateur est Pro
+    - Utilise le template Pro et le logo de l'établissement
+    - Retourne 1 PDF personnalisé (énoncés + corrections)
+    
+    Args:
+        sheet_id: ID de la fiche
+        x_session_token: Token de session Pro (requis)
+    
+    Returns:
+        JSON avec le PDF en base64:
+        {
+            "pro_pdf": "base64...",
+            "filename": "LeMaitreMot_Pro_NomFiche.pdf"
+        }
+    
+    Raises:
+        403: Si l'utilisateur n'est pas Pro
+        404: Si la fiche n'existe pas
+        500: En cas d'erreur de génération
+    """
+    logger.info(f"📝 Demande de génération PDF Pro pour la fiche {sheet_id}")
+    
+    # VÉRIFICATION PRO (Simplified pour MVP - à améliorer avec vraie vérification Pro)
+    # Pour l'instant, on accepte si un token de session est fourni
+    if not x_session_token:
+        logger.warning("⚠️ Tentative d'accès PDF Pro sans token de session")
+        raise HTTPException(
+            status_code=403,
+            detail="PRO_REQUIRED: Un compte Pro est nécessaire pour cette fonctionnalité"
+        )
+    
+    # TODO: Vérifier que le token correspond bien à un compte Pro actif
+    # Pour le MVP, on considère que tout token valide = Pro
+    
+    try:
+        # 1. Récupérer la fiche
+        sheet = await exercise_sheets_collection.find_one({"id": sheet_id}, {"_id": 0})
+        if not sheet:
+            logger.error(f"❌ Fiche {sheet_id} introuvable")
+            raise HTTPException(status_code=404, detail=f"Sheet {sheet_id} not found")
+        
+        # 2. Récupérer les items de la fiche
+        items = await sheet_items_collection.find({"sheet_id": sheet_id}, {"_id": 0}).to_list(1000)
+        
+        if not items:
+            logger.warning(f"⚠️ Fiche {sheet_id} sans exercices")
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot generate PDF for empty sheet"
+            )
+        
+        # 3. Générer le preview JSON (nécessaire pour l'adapter)
+        preview_items = []
+        for item in items:
+            # Générer les exercices
+            exercise_type_id = item.get("exercise_type_id")
+            exercise_type = await exercise_types_collection.find_one(
+                {"id": exercise_type_id},
+                {"_id": 0}
+            )
+            
+            if not exercise_type:
+                logger.warning(f"⚠️ ExerciseType {exercise_type_id} not found")
+                continue
+            
+            config = item.get("config", {})
+            nb_questions = config.get("nb_questions", 5)
+            seed = config.get("seed", 0)
+            difficulty = config.get("difficulty", "moyen")
+            
+            # Générer l'exercice
+            generated_exercise = await exercise_template_service.generate_exercise(
+                exercise_type=exercise_type,
+                nb_questions=nb_questions,
+                seed=seed,
+                difficulty=difficulty
+            )
+            
+            preview_item = {
+                "item_id": item.get("id"),
+                "exercise_type_id": exercise_type_id,
+                "exercise_type_summary": {
+                    "code_ref": exercise_type.get("code_ref"),
+                    "titre": exercise_type.get("titre"),
+                    "niveau": exercise_type.get("niveau"),
+                    "domaine": exercise_type.get("domaine"),
+                    "generator_kind": exercise_type.get("generator_kind")
+                },
+                "config": config,
+                "generated": generated_exercise
+            }
+            
+            preview_items.append(preview_item)
+        
+        preview_json = {
+            "sheet_id": sheet_id,
+            "titre": sheet.get("titre", "Fiche d'exercices"),
+            "niveau": sheet.get("niveau", ""),
+            "description": sheet.get("description", ""),
+            "items": preview_items
+        }
+        
+        # 4. Configuration Pro (MOCK pour le MVP - à remplacer par vraie config DB)
+        user_pro_config = {
+            "etablissement": "Le Maître Mot",
+            "logo_url": None,  # TODO: Récupérer le vrai logo depuis la config utilisateur
+            "template_name": "classique",
+            "primary_color": "#1a56db"
+        }
+        
+        # 5. Convertir vers le format legacy via l'adapter
+        from engine.pdf_engine.pro_export_adapter import convert_sheet_preview_to_legacy_format
+        
+        legacy_format = convert_sheet_preview_to_legacy_format(
+            preview_json=preview_json,
+            user_pro_config=user_pro_config
+        )
+        
+        # 6. Générer le PDF Pro
+        from engine.pdf_engine.mathalea_sheet_pdf_builder import build_sheet_pro_pdf
+        
+        pro_pdf_bytes = build_sheet_pro_pdf(legacy_format)
+        
+        # 7. Encoder en base64
+        import base64
+        pro_pdf_b64 = base64.b64encode(pro_pdf_bytes).decode('utf-8')
+        
+        logger.info(f"✅ PDF Pro généré avec succès pour la fiche {sheet_id}")
+        
+        return {
+            "pro_pdf": pro_pdf_b64,
+            "filename": f"LeMaitreMot_Pro_{sheet.get('titre', 'Fiche')}.pdf",
+            "etablissement": user_pro_config.get("etablissement"),
+            "template": user_pro_config.get("template_name")
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error generating Pro PDF: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating Pro PDF: {str(e)}"
+        )
