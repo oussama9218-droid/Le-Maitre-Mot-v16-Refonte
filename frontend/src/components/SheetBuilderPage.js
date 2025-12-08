@@ -297,38 +297,62 @@ function SheetBuilderPage() {
   // Obtenir les domaines uniques des exercices disponibles
   const availableDomains = [...new Set(exercises.map(ex => ex.domaine))];
 
+  const handleLogin = () => {
+    window.location.href = '/';
+  };
+
+  const handleLogout = async () => {
+    try {
+      if (sessionToken) {
+        await axios.post(`${API}/auth/logout`, {}, {
+          headers: {
+            'X-Session-Token': sessionToken
+          }
+        });
+      }
+      
+      localStorage.removeItem('lemaitremot_session_token');
+      localStorage.removeItem('lemaitremot_user_email');
+      localStorage.removeItem('lemaitremot_login_method');
+      
+      setSessionToken("");
+      setUserEmail("");
+      setIsPro(false);
+      
+      console.log('✅ Déconnexion réussie');
+      
+    } catch (error) {
+      console.error('Erreur déconnexion:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <Header 
+        isPro={isPro}
+        userEmail={userEmail}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+      />
+      
       <div className="container mx-auto px-4 py-8">
-        {/* Header avec navigation */}
-        <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/')}
-            className="mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour à l'accueil
-          </Button>
+        {/* Page title */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Générateur de fiches
+          </h1>
+          <p className="text-lg text-gray-600">
+            Créez des fiches d'exercices personnalisées
+          </p>
           
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              Le Maître Mot — Générateur de fiches
-            </h1>
-            <p className="text-lg text-gray-600">
-              Créez des fiches d'exercices personnalisées
-            </p>
-            
-            {isPro && userEmail && (
-              <Alert className="max-w-md mx-auto mt-4 border-blue-200 bg-blue-50">
-                <Crown className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-800">
-                  <strong>Mode Pro :</strong> Fonctionnalités IA disponibles
-                  <span className="block text-xs mt-1">({userEmail})</span>
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
+          {isPro && userEmail && (
+            <Alert className="max-w-md mx-auto mt-4 border-blue-200 bg-blue-50">
+              <Crown className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-blue-800">
+                <strong>Mode Pro :</strong> Fonctionnalités IA disponibles
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
