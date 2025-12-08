@@ -1003,7 +1003,7 @@ async def generate_pro_pdf(
             
             # Générer l'exercice
             generated_exercise = await exercise_template_service.generate_exercise(
-                exercise_type=exercise_type,
+                exercise_type_id=exercise_type_id,
                 nb_questions=nb_questions,
                 seed=seed,
                 difficulty=difficulty
