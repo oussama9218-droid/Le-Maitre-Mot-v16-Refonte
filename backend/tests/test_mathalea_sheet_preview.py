@@ -43,11 +43,12 @@ async def test_competence(client):
         )
         assert response.status_code == 201
         return response.json()
-    
-    @pytest.fixture
-    async def test_exercise_type(self, async_client: AsyncClient, test_competence):
-        """Créer un ExerciseType de test"""
-        response = await async_client.post(
+
+
+@pytest.fixture
+async def test_exercise_type(client, test_competence):
+    """Créer un ExerciseType de test"""
+    response = await client.post(
             "/api/mathalea/exercise-types",
             json={
                 "code_ref": "TEST_EX_01",
