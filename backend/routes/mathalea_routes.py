@@ -742,6 +742,7 @@ async def preview_exercise_sheet(sheet_id: str):
 
 from pydantic import BaseModel, Field
 from services.exercise_template_service import exercise_template_service
+import base64
 
 
 class GenerateExerciseRequest(BaseModel):
