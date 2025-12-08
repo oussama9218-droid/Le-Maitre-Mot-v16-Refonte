@@ -839,15 +839,15 @@ function MainApp() {
             Générateur de documents pédagogiques personnalisés pour les enseignants français
           </p>
           
-          {/* Link to MathALÉA */}
+          {/* Link to Sheet Builder */}
           <div className="mt-4">
             <Button 
               variant="outline" 
-              onClick={() => window.location.href = '/mathalea'}
+              onClick={() => window.location.href = '/builder'}
               className="mx-auto"
             >
               <BookOpen className="h-4 w-4 mr-2" />
-              Nouveau : Fiche automatique MathALÉA
+              Créer une fiche d'exercices
             </Button>
           </div>
           
