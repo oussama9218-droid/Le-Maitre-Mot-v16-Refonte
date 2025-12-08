@@ -90,7 +90,7 @@ async def test_sheet(client):
         return response.json()
     
     @pytest.mark.asyncio
-    async def test_preview_empty_sheet(self, async_client: AsyncClient, test_sheet):
+    async def test_preview_empty_sheet(self, client, test_sheet):
         """
         TEST 1: Création d'une fiche avec 0 item
         → preview renvoie une structure avec items = []
@@ -98,7 +98,7 @@ async def test_sheet(client):
         sheet_id = test_sheet["id"]
         
         # Appeler le preview
-        response = await async_client.post(f"/api/mathalea/sheets/{sheet_id}/preview")
+        response = await client.post(f"/api/mathalea/sheets/{sheet_id}/preview")
         
         assert response.status_code == 200
         data = response.json()
@@ -112,7 +112,7 @@ async def test_sheet(client):
     @pytest.mark.asyncio
     async def test_preview_with_two_items(
         self,
-        async_client: AsyncClient,
+        client,
         test_sheet,
         test_exercise_type
     ):
@@ -124,7 +124,7 @@ async def test_sheet(client):
         exercise_type_id = test_exercise_type["id"]
         
         # Ajouter 2 items avec des seeds différentes
-        item1_response = await async_client.post(
+        item1_response = await client.post(
             f"/api/mathalea/sheets/{sheet_id}/items",
             json={
                 "exercise_type_id": exercise_type_id,
@@ -141,7 +141,7 @@ async def test_sheet(client):
         assert item1_response.status_code == 201
         item1 = item1_response.json()
         
-        item2_response = await async_client.post(
+        item2_response = await client.post(
             f"/api/mathalea/sheets/{sheet_id}/items",
             json={
                 "exercise_type_id": exercise_type_id,
@@ -159,7 +159,7 @@ async def test_sheet(client):
         item2 = item2_response.json()
         
         # Appeler le preview
-        preview_response = await async_client.post(
+        preview_response = await client.post(
             f"/api/mathalea/sheets/{sheet_id}/preview"
         )
         
@@ -192,7 +192,7 @@ async def test_sheet(client):
     @pytest.mark.asyncio
     async def test_preview_reproducibility(
         self,
-        async_client: AsyncClient,
+        client,
         test_sheet,
         test_exercise_type
     ):
@@ -205,7 +205,7 @@ async def test_sheet(client):
         exercise_type_id = test_exercise_type["id"]
         
         # Ajouter un item avec un seed fixe
-        await async_client.post(
+        await client.post(
             f"/api/mathalea/sheets/{sheet_id}/items",
             json={
                 "exercise_type_id": exercise_type_id,
@@ -221,10 +221,10 @@ async def test_sheet(client):
         )
         
         # Appeler le preview deux fois
-        preview1_response = await async_client.post(
+        preview1_response = await client.post(
             f"/api/mathalea/sheets/{sheet_id}/preview"
         )
-        preview2_response = await async_client.post(
+        preview2_response = await client.post(
             f"/api/mathalea/sheets/{sheet_id}/preview"
         )
         
@@ -259,7 +259,7 @@ async def test_sheet(client):
     @pytest.mark.asyncio
     async def test_preview_nb_questions_below_min(
         self,
-        async_client: AsyncClient,
+        client,
         test_sheet,
         test_exercise_type
     ):
@@ -272,7 +272,7 @@ async def test_sheet(client):
         
         # test_exercise_type a min_questions = 1
         # Essayer d'ajouter un item avec nb_questions = 0
-        response = await async_client.post(
+        response = await client.post(
             f"/api/mathalea/sheets/{sheet_id}/items",
             json={
                 "exercise_type_id": exercise_type_id,
@@ -293,7 +293,7 @@ async def test_sheet(client):
     @pytest.mark.asyncio
     async def test_preview_nb_questions_above_max(
         self,
-        async_client: AsyncClient,
+        client,
         test_sheet,
         test_exercise_type
     ):
@@ -306,7 +306,7 @@ async def test_sheet(client):
         
         # test_exercise_type a max_questions = 10
         # Essayer d'ajouter un item avec nb_questions = 20
-        response = await async_client.post(
+        response = await client.post(
             f"/api/mathalea/sheets/{sheet_id}/items",
             json={
                 "exercise_type_id": exercise_type_id,
@@ -327,7 +327,7 @@ async def test_sheet(client):
     @pytest.mark.asyncio
     async def test_preview_exercise_type_not_found(
         self,
-        async_client: AsyncClient,
+        client,
         test_sheet
     ):
         """
@@ -338,7 +338,7 @@ async def test_sheet(client):
         fake_exercise_type_id = str(uuid4())
         
         # Essayer d'ajouter un item avec un ExerciseType inexistant
-        response = await async_client.post(
+        response = await client.post(
             f"/api/mathalea/sheets/{sheet_id}/items",
             json={
                 "exercise_type_id": fake_exercise_type_id,
@@ -359,7 +359,7 @@ async def test_sheet(client):
     @pytest.mark.asyncio
     async def test_preview_exercise_type_deleted_after_item_creation(
         self,
-        async_client: AsyncClient,
+        client,
         test_sheet,
         test_exercise_type,
         test_competence
@@ -372,7 +372,7 @@ async def test_sheet(client):
         exercise_type_id = test_exercise_type["id"]
         
         # Ajouter un item
-        await async_client.post(
+        await client.post(
             f"/api/mathalea/sheets/{sheet_id}/items",
             json={
                 "exercise_type_id": exercise_type_id,
@@ -388,13 +388,13 @@ async def test_sheet(client):
         )
         
         # Supprimer l'ExerciseType
-        delete_response = await async_client.delete(
+        delete_response = await client.delete(
             f"/api/mathalea/exercise-types/{exercise_type_id}"
         )
         assert delete_response.status_code == 204
         
         # Essayer de générer le preview → doit échouer
-        preview_response = await async_client.post(
+        preview_response = await client.post(
             f"/api/mathalea/sheets/{sheet_id}/preview"
         )
         
@@ -404,7 +404,7 @@ async def test_sheet(client):
     @pytest.mark.asyncio
     async def test_preview_calls_generate_once_per_item(
         self,
-        async_client: AsyncClient,
+        client,
         test_sheet,
         test_exercise_type,
         mocker
@@ -422,7 +422,7 @@ async def test_sheet(client):
         
         # Ajouter 3 items
         for i in range(3):
-            await async_client.post(
+            await client.post(
                 f"/api/mathalea/sheets/{sheet_id}/items",
                 json={
                     "exercise_type_id": exercise_type_id,
@@ -438,7 +438,7 @@ async def test_sheet(client):
             )
         
         # Appeler le preview
-        preview_response = await async_client.post(
+        preview_response = await client.post(
             f"/api/mathalea/sheets/{sheet_id}/preview"
         )
         
@@ -461,7 +461,7 @@ async def test_sheet(client):
     @pytest.mark.asyncio
     async def test_preview_invalid_difficulty(
         self,
-        async_client: AsyncClient,
+        client,
         test_sheet,
         test_exercise_type
     ):
@@ -474,7 +474,7 @@ async def test_sheet(client):
         
         # test_exercise_type a difficulty_levels = ["facile", "moyen", "difficile"]
         # Essayer d'ajouter un item avec une difficulté invalide
-        response = await async_client.post(
+        response = await client.post(
             f"/api/mathalea/sheets/{sheet_id}/items",
             json={
                 "exercise_type_id": exercise_type_id,
@@ -496,7 +496,7 @@ async def test_sheet(client):
     @pytest.mark.asyncio
     async def test_get_sheet_with_items(
         self,
-        async_client: AsyncClient,
+        client,
         test_sheet,
         test_exercise_type
     ):
@@ -508,7 +508,7 @@ async def test_sheet(client):
         exercise_type_id = test_exercise_type["id"]
         
         # Ajouter un item
-        await async_client.post(
+        await client.post(
             f"/api/mathalea/sheets/{sheet_id}/items",
             json={
                 "exercise_type_id": exercise_type_id,
@@ -524,7 +524,7 @@ async def test_sheet(client):
         )
         
         # Récupérer la feuille
-        response = await async_client.get(f"/api/mathalea/sheets/{sheet_id}")
+        response = await client.get(f"/api/mathalea/sheets/{sheet_id}")
         
         assert response.status_code == 200
         data = response.json()
@@ -534,7 +534,7 @@ async def test_sheet(client):
     @pytest.mark.asyncio
     async def test_get_sheet_items(
         self,
-        async_client: AsyncClient,
+        client,
         test_sheet,
         test_exercise_type
     ):
@@ -547,7 +547,7 @@ async def test_sheet(client):
         
         # Ajouter 3 items
         for i in range(3):
-            await async_client.post(
+            await client.post(
                 f"/api/mathalea/sheets/{sheet_id}/items",
                 json={
                     "exercise_type_id": exercise_type_id,
@@ -563,7 +563,7 @@ async def test_sheet(client):
             )
         
         # Récupérer les items
-        response = await async_client.get(f"/api/mathalea/sheets/{sheet_id}/items")
+        response = await client.get(f"/api/mathalea/sheets/{sheet_id}/items")
         
         assert response.status_code == 200
         data = response.json()
