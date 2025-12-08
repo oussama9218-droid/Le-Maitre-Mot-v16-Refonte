@@ -33,7 +33,13 @@ const ProSettingsPage = () => {
   const location = useLocation();
   
   // Récupérer le contexte de navigation (d'où vient l'utilisateur)
-  const { from, sheetId } = location.state || {};
+  // Priorité : query params (pour les nouveaux onglets) > state (pour navigation react-router)
+  const queryParams = new URLSearchParams(location.search);
+  const fromQuery = queryParams.get('from');
+  const sheetIdQuery = queryParams.get('sheetId');
+  
+  const from = fromQuery || location.state?.from;
+  const sheetId = sheetIdQuery || location.state?.sheetId;
   
   // Auth states
   const [sessionToken, setSessionToken] = useState('');
