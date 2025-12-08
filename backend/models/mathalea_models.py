@@ -108,7 +108,13 @@ class ExerciseTypeBase(BaseModel):
     # Type de générateur
     generator_kind: GeneratorKind = Field(
         default=GeneratorKind.TEMPLATE,
-        description="Type de générateur (template/ia/hybrid)"
+        description="Type de générateur (template/ia/hybrid/legacy)"
+    )
+    
+    # ID du générateur legacy (Sprint F.1)
+    legacy_generator_id: Optional[str] = Field(
+        None,
+        description="ID du générateur legacy (MathExerciseType) si generator_kind=LEGACY"
     )
     
     # Capacités IA
