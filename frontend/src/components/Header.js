@@ -73,7 +73,7 @@ function Header({ isPro, userEmail, onLogin, onLogout }) {
             <Button
               variant={isActive('/sheets') ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/sheets')}
             >
               <FolderOpen className="h-4 w-4 mr-2" />
               Mes fiches
