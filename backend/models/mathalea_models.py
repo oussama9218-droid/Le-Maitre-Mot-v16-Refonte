@@ -346,3 +346,30 @@ class ProPdfRequest(BaseModel):
         default="classique",
         description="Template à utiliser: 'classique' ou 'academique'"
     )
+
+
+# ============================================================================
+# MODÈLE: Pro User Configuration
+# ============================================================================
+
+class ProUserConfig(BaseModel):
+    """Configuration Pro pour un utilisateur"""
+    user_email: str = Field(..., description="Email de l'utilisateur Pro")
+    professor_name: str = Field(default="", description="Nom du professeur")
+    school_name: str = Field(default="", description="Nom de l'établissement")
+    school_year: str = Field(default="", description="Année scolaire (ex: 2024-2025)")
+    footer_text: str = Field(default="", description="Texte du pied de page")
+    logo_url: Optional[str] = Field(default=None, description="URL du logo de l'établissement")
+    template_choice: str = Field(default="classique", description="Template préféré: classique ou academique")
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class ProUserConfigCreate(BaseModel):
+    """Modèle pour création/mise à jour de configuration Pro"""
+    professor_name: Optional[str] = None
+    school_name: Optional[str] = None
+    school_year: Optional[str] = None
+    footer_text: Optional[str] = None
+    logo_url: Optional[str] = None
+    template_choice: Optional[str] = "classique"
