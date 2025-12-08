@@ -386,6 +386,42 @@ async def update_sheet_item(item_id: str, update: SheetItemUpdate):
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields to update")
     
+    # Si config est mis à jour, valider
+    if "config" in update_data:
+        # Récupérer l'item pour obtenir l'exercise_type_id
+        item = await sheet_items_collection.find_one({"id": item_id}, {"_id": 0})
+        if not item:
+            raise HTTPException(status_code=404, detail="SheetItem not found")
+        
+        exercise_type_dict = await exercise_types_collection.find_one(
+            {"id": item["exercise_type_id"]}, 
+            {"_id": 0}
+        )
+        if not exercise_type_dict:
+            raise HTTPException(status_code=404, detail="ExerciseType not found")
+        
+        exercise_type = ExerciseType(**exercise_type_dict)
+        config = ExerciseItemConfig(**update_data["config"])
+        
+        # Valider nb_questions
+        if config.nb_questions < exercise_type.min_questions:
+            raise HTTPException(
+                status_code=422,
+                detail=f"nb_questions ({config.nb_questions}) must be >= min_questions ({exercise_type.min_questions})"
+            )
+        if config.nb_questions > exercise_type.max_questions:
+            raise HTTPException(
+                status_code=422,
+                detail=f"nb_questions ({config.nb_questions}) must be <= max_questions ({exercise_type.max_questions})"
+            )
+        
+        # Valider difficulty
+        if config.difficulty and config.difficulty not in exercise_type.difficulty_levels:
+            raise HTTPException(
+                status_code=422,
+                detail=f"difficulty '{config.difficulty}' not in available levels: {exercise_type.difficulty_levels}"
+            )
+    
     result = await sheet_items_collection.update_one(
         {"id": item_id},
         {"$set": update_data}
