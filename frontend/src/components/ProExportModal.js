@@ -329,15 +329,22 @@ const ProExportModal = ({
                     <span className="text-gray-600">Logo :</span>
                     {logoConfigured && proConfig.logo_url ? (
                       <img 
-                        src={proConfig.logo_url.startsWith('http') ? proConfig.logo_url : `${API_BASE_URL}${proConfig.logo_url}`} 
+                        src={proConfig.logo_url.startsWith('http') ? proConfig.logo_url : `${API_BASE_URL}${proConfig.logo_url}`}
                         alt="Logo" 
                         className="h-8 w-auto object-contain"
+                        onError={(e) => {
+                          console.error('Logo load error, URL:', e.target.src);
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'inline';
+                        }}
                       />
-                    ) : (
-                      <span className="text-gray-500 text-xs italic">
-                        Par défaut
-                      </span>
-                    )}
+                    ) : null}
+                    <span 
+                      className="text-gray-500 text-xs italic"
+                      style={{ display: logoConfigured && proConfig.logo_url ? 'none' : 'inline' }}
+                    >
+                      {logoConfigured ? "Erreur de chargement" : "Par défaut"}
+                    </span>
                   </div>
                 </div>
                 
