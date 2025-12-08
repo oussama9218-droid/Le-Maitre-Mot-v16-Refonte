@@ -1,0 +1,459 @@
+"""
+PDF Builder pour les fiches MathALÉA
+Sprint D - Génération PDF à partir du preview JSON
+
+Architecture:
+- Utilise WeasyPrint (comme le système existant)
+- Génère 3 types de PDF: sujet, élève, corrigé
+- Compatible avec les données du preview Sprint C
+"""
+
+import weasyprint
+from datetime import datetime
+from typing import Dict, Any, List
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def build_sheet_subject_pdf(sheet_preview: dict) -> bytes:
+    """
+    Génère le PDF "sujet" (sans réponses, pour le professeur)
+    
+    Contient:
+    - Titre de la fiche
+    - Métadonnées (niveau, date)
+    - Tous les exercices avec leurs énoncés
+    - Pas de solutions
+    
+    Args:
+        sheet_preview: Dict contenant le preview complet de la fiche
+        
+    Returns:
+        bytes: Contenu du PDF
+    """
+    html_content = _build_html_subject(sheet_preview)
+    pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
+    
+    logger.info(f"✅ PDF Sujet généré: {len(pdf_bytes)} bytes")
+    return pdf_bytes
+
+
+def build_sheet_student_pdf(sheet_preview: dict) -> bytes:
+    """
+    Génère le PDF "élève" (pour distribution aux élèves)
+    
+    Contient:
+    - Titre de la fiche
+    - Métadonnées (niveau, date)
+    - Tous les exercices avec leurs énoncés
+    - Espace pour les réponses
+    - Pas de solutions
+    
+    Args:
+        sheet_preview: Dict contenant le preview complet de la fiche
+        
+    Returns:
+        bytes: Contenu du PDF
+    """
+    html_content = _build_html_student(sheet_preview)
+    pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
+    
+    logger.info(f"✅ PDF Élève généré: {len(pdf_bytes)} bytes")
+    return pdf_bytes
+
+
+def build_sheet_correction_pdf(sheet_preview: dict) -> bytes:
+    """
+    Génère le PDF "corrigé" (avec toutes les solutions)
+    
+    Contient:
+    - Titre de la fiche
+    - Métadonnées (niveau, date)
+    - Tous les exercices avec leurs énoncés
+    - Toutes les solutions détaillées
+    
+    Args:
+        sheet_preview: Dict contenant le preview complet de la fiche
+        
+    Returns:
+        bytes: Contenu du PDF
+    """
+    html_content = _build_html_correction(sheet_preview)
+    pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
+    
+    logger.info(f"✅ PDF Corrigé généré: {len(pdf_bytes)} bytes")
+    return pdf_bytes
+
+
+# ============================================================================
+# Fonctions internes de génération HTML
+# ============================================================================
+
+def _build_html_subject(sheet_preview: dict) -> str:
+    """Génère le HTML pour le PDF sujet (prof)"""
+    
+    titre = sheet_preview.get("titre", "Feuille d'exercices")
+    niveau = sheet_preview.get("niveau", "")
+    items = sheet_preview.get("items", [])
+    
+    # Header
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            {_get_base_css()}
+            .answer-space {{
+                display: none;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>{titre}</h1>
+            <div class="metadata">
+                <span class="niveau">Niveau: {niveau}</span>
+                <span class="date">Date: {datetime.now().strftime("%d/%m/%Y")}</span>
+                <span class="type">Sujet (Professeur)</span>
+            </div>
+        </div>
+        
+        <div class="content">
+    """
+    
+    # Exercises
+    for ex_idx, item in enumerate(items, 1):
+        html += _render_exercise(item, ex_idx, include_solutions=False, is_student=False)
+    
+    html += """
+        </div>
+    </body>
+    </html>
+    """
+    
+    return html
+
+
+def _build_html_student(sheet_preview: dict) -> str:
+    """Génère le HTML pour le PDF élève"""
+    
+    titre = sheet_preview.get("titre", "Feuille d'exercices")
+    niveau = sheet_preview.get("niveau", "")
+    items = sheet_preview.get("items", [])
+    
+    # Header
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            {_get_base_css()}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>{titre}</h1>
+            <div class="metadata">
+                <span class="niveau">Niveau: {niveau}</span>
+                <span class="date">Date: {datetime.now().strftime("%d/%m/%Y")}</span>
+            </div>
+            <div class="student-info">
+                <p>Nom: ________________  Prénom: ________________  Classe: ________</p>
+            </div>
+        </div>
+        
+        <div class="content">
+    """
+    
+    # Exercises
+    for ex_idx, item in enumerate(items, 1):
+        html += _render_exercise(item, ex_idx, include_solutions=False, is_student=True)
+    
+    html += """
+        </div>
+    </body>
+    </html>
+    """
+    
+    return html
+
+
+def _build_html_correction(sheet_preview: dict) -> str:
+    """Génère le HTML pour le PDF corrigé"""
+    
+    titre = sheet_preview.get("titre", "Feuille d'exercices")
+    niveau = sheet_preview.get("niveau", "")
+    items = sheet_preview.get("items", [])
+    
+    # Header
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            {_get_base_css()}
+            .solution {{
+                background-color: #f0f8ff;
+                border-left: 4px solid #4CAF50;
+                padding: 10px;
+                margin-top: 10px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>{titre}</h1>
+            <div class="metadata">
+                <span class="niveau">Niveau: {niveau}</span>
+                <span class="date">Date: {datetime.now().strftime("%d/%m/%Y")}</span>
+                <span class="type">Corrigé</span>
+            </div>
+        </div>
+        
+        <div class="content">
+    """
+    
+    # Exercises
+    for ex_idx, item in enumerate(items, 1):
+        html += _render_exercise(item, ex_idx, include_solutions=True, is_student=False)
+    
+    html += """
+        </div>
+    </body>
+    </html>
+    """
+    
+    return html
+
+
+def _render_exercise(item: dict, ex_number: int, include_solutions: bool, is_student: bool) -> str:
+    """
+    Rendu HTML d'un exercice complet
+    
+    Args:
+        item: Item du preview contenant generated
+        ex_number: Numéro de l'exercice
+        include_solutions: Inclure les solutions
+        is_student: Version élève (avec espace de réponse)
+    """
+    exercise_type_summary = item.get("exercise_type_summary", {})
+    generated = item.get("generated", {})
+    questions = generated.get("questions", [])
+    
+    titre = exercise_type_summary.get("titre", f"Exercice {ex_number}")
+    domaine = exercise_type_summary.get("domaine", "")
+    
+    html = f"""
+    <div class="exercise">
+        <div class="exercise-header">
+            <h2>Exercice {ex_number}</h2>
+            <p class="exercise-title">{titre}</p>
+            {f'<p class="exercise-domain">{domaine}</p>' if domaine else ''}
+        </div>
+        
+        <div class="questions">
+    """
+    
+    # Questions
+    for q_idx, question in enumerate(questions, 1):
+        html += _render_question(question, q_idx, include_solutions, is_student)
+    
+    html += """
+        </div>
+    </div>
+    """
+    
+    return html
+
+
+def _render_question(question: dict, q_number: int, include_solution: bool, is_student: bool) -> str:
+    """
+    Rendu HTML d'une question
+    
+    Args:
+        question: Question du preview
+        q_number: Numéro de la question
+        include_solution: Inclure la solution
+        is_student: Version élève (avec espace de réponse)
+    """
+    enonce = question.get("enonce_brut", "")
+    solution = question.get("solution_brut", "")
+    data = question.get("data", {})
+    
+    # Nettoyer et formater l'énoncé
+    enonce_html = _format_text(enonce)
+    
+    html = f"""
+    <div class="question">
+        <div class="question-header">
+            <strong>Question {q_number}:</strong>
+        </div>
+        <div class="question-enonce">
+            {enonce_html}
+        </div>
+    """
+    
+    # Espace de réponse pour version élève
+    if is_student:
+        html += """
+        <div class="answer-space">
+            <p><em>Réponse:</em></p>
+            <div style="height: 80px; border: 1px dashed #ccc; margin: 10px 0;"></div>
+        </div>
+        """
+    
+    # Solution (uniquement pour corrigé)
+    if include_solution:
+        solution_html = _format_text(solution)
+        html += f"""
+        <div class="solution">
+            <strong>Solution:</strong><br>
+            {solution_html}
+        </div>
+        """
+    
+    html += """
+    </div>
+    """
+    
+    return html
+
+
+def _format_text(text: str) -> str:
+    """Formate le texte brut en HTML (gestion des sauts de ligne, etc.)"""
+    if not text:
+        return ""
+    
+    # Remplacer les sauts de ligne par <br>
+    text = text.replace("\n", "<br>")
+    
+    # Gérer les caractères spéciaux HTML
+    text = text.replace("<", "&lt;").replace(">", "&gt;")
+    
+    # Remettre les <br> après l'échappement
+    text = text.replace("&lt;br&gt;", "<br>")
+    
+    return text
+
+
+def _get_base_css() -> str:
+    """CSS de base pour tous les PDFs"""
+    return """
+        @page {
+            size: A4;
+            margin: 2cm 1.5cm;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #333;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 15px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 22pt;
+            margin-bottom: 10px;
+        }
+        
+        .metadata {
+            font-size: 10pt;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .metadata span {
+            margin: 0 15px;
+        }
+        
+        .student-info {
+            margin-top: 15px;
+            font-size: 10pt;
+            text-align: left;
+        }
+        
+        .exercise {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+        
+        .exercise-header {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .exercise-header h2 {
+            color: #2c3e50;
+            font-size: 14pt;
+            margin: 0 0 5px 0;
+        }
+        
+        .exercise-title {
+            font-weight: bold;
+            color: #34495e;
+            margin: 5px 0;
+        }
+        
+        .exercise-domain {
+            font-size: 9pt;
+            color: #7f8c8d;
+            font-style: italic;
+            margin: 0;
+        }
+        
+        .questions {
+            padding-left: 10px;
+        }
+        
+        .question {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        
+        .question-header {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .question-enonce {
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .answer-space {
+            margin: 15px 0 15px 20px;
+        }
+        
+        .solution {
+            margin: 15px 0 15px 20px;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .solution strong {
+            color: #27ae60;
+        }
+    """
+
+
+# Export des fonctions publiques
+__all__ = [
+    "build_sheet_subject_pdf",
+    "build_sheet_student_pdf",
+    "build_sheet_correction_pdf"
+]
