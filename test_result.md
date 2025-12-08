@@ -279,46 +279,37 @@ Validation E2E complète du système d'optimisation IA qui réduit drastiquement
 ## Agent Communication
 
 ### Latest Communication - Testing Agent to Main Agent
-**Date**: 2025-12-08 13:20:00
+**Date**: 2025-12-08 14:30:00
 **Agent**: testing
 **Message**: 
-VALIDATION E2E COMPLÈTE DU FLUX FRONTEND "LE MAÎTRE MOT" - RÉSULTATS EXCELLENTS:
+VALIDATION SPRINT F.3-FIX COMPLÈTE - FLUX PREVIEW ET PDF FONCTIONNEL:
 
-🎉 **FLUX COMPLET DE CRÉATION DE FICHE D'EXERCICES FONCTIONNEL**:
-- Page builder accessible et fonctionnelle
-- Navigation complète entre toutes les pages
-- Sélection niveau/chapitre opérationnelle
-- Catalogue d'exercices chargé correctement
-- Ajout d'exercices au panier fonctionnel
-- Configuration des exercices (questions, seed) opérationnelle
-- États vides gérés correctement
+🎉 **SCÉNARIO SPRINT F.3-FIX VALIDÉ AVEC SUCCÈS**:
+- Configuration fiche: Niveau "6e" + Chapitre "Proportionnalité (2 exercices)" ✅
+- Exercices LEGACY: 2 exercices trouvés (Proportionnalité 6e, Pourcentages 6e) ✅
+- Ajout au panier: 2 exercices ajoutés, compteur "2 exercice(s)" correct ✅
+- Configuration avancée: Questions modifiées (4 et 3), seeds générés automatiquement ✅
+- Preview: HTTP 200 OK, pas d'alert d'erreur critique ✅
+- PDF: HTTP 200 OK, aucun onglet gris vide ouvert ✅
 
-✅ **TESTS FRONTEND E2E RÉUSSIS** (13/13 étapes validées):
-1. **Page Loading**: Chargement correct de /builder
-2. **Header & Navigation**: "Le Maître Mot" + 5 éléments de navigation visibles
-3. **Sélection Niveau**: "6e" sélectionné avec succès
-4. **Chargement Chapitres**: "Nombres décimaux (1 exercices)" chargé
-5. **Catalogue Exercices**: 1 exercice trouvé et affiché
-6. **Ajout Panier**: Exercice ajouté, compteur "1 exercice(s)" mis à jour
-7. **Détails Exercice**: Titre, questions (5), seed affichés dans le panier
-8. **Configuration**: Modification du nombre de questions de 5 à 3 réussie
-9. **Navigation "Mes fiches"**: Page chargée correctement
-10. **État Vide**: Message "Aucune fiche créée" affiché correctement
-11. **Retour Accueil**: Navigation vers page d'accueil réussie
-12. **Bouton Création**: "Créer une fiche d'exercices" présent sur l'accueil
-13. **Vérification Erreurs**: Aucune erreur détectée sur les pages
+✅ **TESTS CRITIQUES RÉUSSIS** (8/8 étapes SPRINT F.3-FIX):
+1. **Configuration Fiche**: Niveau "6e" et chapitre "Proportionnalité" sélectionnés
+2. **Catalogue Exercices**: 2 exercices LEGACY affichés correctement
+3. **Ajout Exercices**: Les 2 exercices ajoutés au panier avec succès
+4. **Configuration**: Questions modifiées (Ex1: 4, Ex2: 3), seeds générés
+5. **Preview Test**: Statut HTTP 200 OK (pas de 400/404 comme redouté)
+6. **PDF Test**: Statut HTTP 200 OK, pas d'onglet gris vide
+7. **Backend Stability**: Aucun 500 Internal Server Error
+8. **Collections MongoDB**: exercise_types utilisées correctement
 
-🔍 **FONCTIONNALITÉS VALIDÉES**:
-- Interface utilisateur responsive et intuitive
-- Sélecteurs de niveau/chapitre avec chargement dynamique
-- Catalogue d'exercices avec boutons "Ajouter" fonctionnels
-- Panier/fiche avec configuration d'exercices (questions, seed, options IA)
-- Navigation fluide entre pages (builder, mes fiches, accueil)
-- Gestion des états vides (aucune fiche créée)
-- Intégration frontend/backend opérationnelle
+🔍 **CORRECTIONS VALIDÉES**:
+- Backend corrigé: Utilise mathalea_db.exercise_types (pas mathalea_exercise_types)
+- Exercices LEGACY fonctionnels: generator_kind="legacy" opérationnel
+- Service exercise_template_service: Collections MongoDB correctes
+- Pas de régression: Preview et PDF génèrent HTTP 200 OK
 
-🎯 **RÉSULTAT FINAL**:
-**TOUTES LES FONCTIONNALITÉS CORE DU FLUX DE CRÉATION DE FICHE SONT OPÉRATIONNELLES**
+🎯 **RÉSULTAT FINAL SPRINT F.3-FIX**:
+**LE FLUX COMPLET DE CRÉATION DE FICHE AVEC PREVIEW ET PDF EST OPÉRATIONNEL**
 
-Le système frontend est pleinement fonctionnel et prêt pour les utilisateurs.
+Tous les objectifs du SPRINT F.3-FIX sont atteints. Le système est stable et prêt.
 
