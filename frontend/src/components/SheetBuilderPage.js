@@ -30,8 +30,6 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 function SheetBuilderPage() {
-  const navigate = useNavigate();
-  
   // États pour le catalogue
   const [levels, setLevels] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState("");
