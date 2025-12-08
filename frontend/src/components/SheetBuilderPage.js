@@ -276,7 +276,7 @@ function SheetBuilderPage() {
     }
   };
 
-  const handleGeneratePDF = async (pdfType) => {
+  const handleGeneratePDF = async () => {
     if (sheetItems.length === 0) {
       alert('Veuillez ajouter au moins un exercice à la fiche');
       return;
@@ -298,63 +298,43 @@ function SheetBuilderPage() {
       const response = await axios.post(
         `${API}/mathalea/sheets/${currentSheetId}/generate-pdf`,
         {},
-        config  // Pas de responseType: 'blob' car on attend du JSON
+        config
       );
       
       // Le backend retourne { subject_pdf, student_pdf, correction_pdf } en base64
       const { subject_pdf, student_pdf, correction_pdf } = response.data;
       
-      // Fonction helper pour télécharger un PDF depuis base64
-      const downloadPdfFromBase64 = (base64Data, filename) => {
-        // Décoder base64 en bytes
-        const binaryString = window.atob(base64Data);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        
-        // Créer blob et télécharger
-        const blob = new Blob([bytes], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(url);
-      };
+      // Vérifier que les 3 PDFs sont présents
+      if (!subject_pdf || !student_pdf || !correction_pdf) {
+        throw new Error('PDFs incomplets reçus du serveur');
+      }
       
-      // Télécharger les 3 PDFs avec un petit délai entre chaque
-      downloadPdfFromBase64(subject_pdf, `LeMaitreMot_${sheetTitle}_Sujet.pdf`);
-      setTimeout(() => {
-        downloadPdfFromBase64(student_pdf, `LeMaitreMot_${sheetTitle}_Eleve.pdf`);
-      }, 500);
-      setTimeout(() => {
-        downloadPdfFromBase64(correction_pdf, `LeMaitreMot_${sheetTitle}_Corrige.pdf`);
-      }, 1000);
+      // Stocker les résultats et ouvrir la modale
+      setPdfResult({
+        subject_pdf,
+        student_pdf,
+        correction_pdf,
+        sheetTitle
+      });
+      setShowPdfModal(true);
       
-      console.log('📥 3 PDFs téléchargés: Sujet, Élève, Corrigé');
-      alert('3 PDFs générés avec succès : Sujet, Élève, Corrigé !');
+      console.log('✅ 3 PDFs générés et prêts à télécharger');
       
     } catch (error) {
       console.error('Erreur génération PDF:', error);
       
-      // Improved error handling - DO NOT open blank tab
+      // Improved error handling
       let errorMessage = 'Erreur lors de la génération du PDF. ';
       
       if (error.response) {
-        // Server responded with error status
         if (error.response.status >= 400 && error.response.status < 500) {
           errorMessage += error.response.data?.detail || 'Merci de vérifier la configuration des exercices.';
         } else if (error.response.status >= 500) {
           errorMessage += 'Erreur serveur. Merci de réessayer plus tard.';
         }
       } else if (error.request) {
-        // Request was made but no response received
         errorMessage += 'Impossible de contacter le serveur. Vérifiez votre connexion.';
       } else {
-        // Something else happened
         errorMessage += error.message || 'Une erreur inattendue s\'est produite.';
       }
       
