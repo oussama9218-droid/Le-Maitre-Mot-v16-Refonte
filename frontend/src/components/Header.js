@@ -79,6 +79,19 @@ function Header({ isPro, userEmail, onLogin, onLogout }) {
               <FolderOpen className="h-4 w-4 mr-2" />
               Mes fiches
             </Button>
+
+            {isPro && (
+              <Button
+                variant={isActive('/pro/settings') ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => navigate('/pro/settings')}
+                className="relative"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Paramètres Pro
+                <Badge className="ml-2 bg-blue-600 text-white text-xs">Pro</Badge>
+              </Button>
+            )}
           </nav>
 
           {/* User section */}
