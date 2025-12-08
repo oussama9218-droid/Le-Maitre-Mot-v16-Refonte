@@ -302,3 +302,37 @@ class SheetItemListResponse(BaseModel):
     """Réponse pour liste d'items de feuille"""
     total: int
     items: List[SheetItem]
+
+
+# ============================================================================
+# MODÈLE: ExerciseItemConfig (Configuration standardisée pour SheetItem)
+# ============================================================================
+
+class ExerciseItemConfig(BaseModel):
+    """
+    Configuration standardisée pour un SheetItem
+    
+    Cette structure définit exactement comment générer un exercice
+    à partir d'un ExerciseType dans une feuille.
+    """
+    nb_questions: int = Field(..., ge=1, description="Nombre de questions")
+    difficulty: Optional[str] = Field(None, description="Niveau de difficulté")
+    seed: int = Field(..., description="Graine pour reproductibilité")
+    options: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Options spécifiques à l'exercice"
+    )
+    ai_enonce: bool = Field(False, description="Utiliser l'IA pour l'énoncé")
+    ai_correction: bool = Field(False, description="Utiliser l'IA pour la correction")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "nb_questions": 5,
+                "difficulty": "moyen",
+                "seed": 42,
+                "options": {},
+                "ai_enonce": False,
+                "ai_correction": False
+            }
+        }
