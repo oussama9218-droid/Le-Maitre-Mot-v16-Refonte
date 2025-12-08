@@ -15,7 +15,7 @@ import { Alert, AlertDescription } from "./components/ui/alert";
 import { BookOpen, FileText, Download, Shuffle, Loader2, GraduationCap, AlertCircle, CheckCircle, Crown, CreditCard, LogIn, LogOut, Mail } from "lucide-react";
 import TemplateSettings from "./components/TemplateSettings";
 import DocumentWizard from "./components/wizard/DocumentWizard";
-import MathAleaPage from "./components/MathAleaPage";
+import SheetBuilderPage from "./components/SheetBuilderPage";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
