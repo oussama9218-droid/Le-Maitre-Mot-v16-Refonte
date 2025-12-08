@@ -286,6 +286,12 @@ function SheetBuilderPage() {
       const newSheetId = response.data.id;
       setSheetId(newSheetId);
       
+      // Mettre à jour l'URL pour inclure le sheetId
+      navigate(`/builder/${newSheetId}`, { replace: true });
+      
+      // Sauvegarder dans localStorage comme secours
+      localStorage.setItem('current_sheet_id', newSheetId);
+      
       // Créer les items
       for (const item of sheetItems) {
         await axios.post(`${API}/mathalea/sheets/${newSheetId}/items`, {
