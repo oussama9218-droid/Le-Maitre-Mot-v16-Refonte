@@ -14363,6 +14363,28 @@ if __name__ == "__main__":
                 for issue in results.get('all_issues', []):
                     print(f"   - {issue}")
             sys.exit(0 if success else 1)
+        elif test_mode == "pdf-pro":
+            # Run PDF Pro Export tests
+            print("📄 RUNNING PDF PRO EXPORT TESTS")
+            success, results = tester.test_pdf_pro_export_with_templates()
+            print(f"\n📄 PDF Pro Export Test: {'PASSED' if success else 'FAILED'}")
+            if success:
+                passed_tests = results.get('passed_tests', 0)
+                total_tests = results.get('total_tests', 0)
+                print(f"✅ Success rate: {(passed_tests/total_tests)*100:.1f}% ({passed_tests}/{total_tests} tests)")
+                
+                # Show PDF sizes if available
+                pdf_sizes = results.get('pdf_sizes', {})
+                if pdf_sizes:
+                    print("📄 PDF Sizes:")
+                    for template, size in pdf_sizes.items():
+                        print(f"   - {template}: {size} bytes")
+            else:
+                print("🚨 PDF PRO EXPORT ISSUES DETECTED:")
+                failed_tests = results.get('failed_tests', [])
+                for failure in failed_tests:
+                    print(f"   - {failure}")
+            sys.exit(0 if success else 1)
         elif test_mode == "coherence":
             # Run Geometric Coherence tests
             print("🔍 RUNNING GEOMETRIC COHERENCE TESTS")
