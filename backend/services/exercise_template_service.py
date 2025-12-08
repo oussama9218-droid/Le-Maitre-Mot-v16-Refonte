@@ -581,3 +581,12 @@ exercise_template_service = ExerciseTemplateService()
         logger.info(f"✅ {len(questions)} questions legacy générées")
         return questions
 
+
+# Instance globale
+exercise_template_service = ExerciseTemplateService()
+
+# Export
+__all__ = [
+    "ExerciseTemplateService",
+    "exercise_template_service"
+]
