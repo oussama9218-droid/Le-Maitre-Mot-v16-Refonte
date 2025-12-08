@@ -48,10 +48,15 @@
     "symetrie_centrale__trouver_valeur__moyen__concis": "Donnés : {pointA}({coordA_x}, {coordA_y}), centre {pointO}({centreX}, {centreY}). Calcule {pointB}.",
     "symetrie_centrale__trouver_valeur__moyen__etapes": "Étape 1 : Repère le point {pointA}({coordA_x}, {coordA_y})\nÉtape 2 : Identifie le centre {pointO}({centreX}, {centreY})\nÉtape 3 : Utilise la formule du milieu pour calculer {pointB}",
     "symetrie_centrale__verifier_propriete__moyen__etapes": "Étape 1 : Note les coordonnées : {pointA}({coordA_x}, {coordA_y}), {pointB}({coordB_x}, {coordB_y}), {pointO}({centreX}, {centreY})\nÉtape 2 : Calcule le milieu de [{pointA}{pointB}]\nÉtape 3 : Compare avec {pointO}",
-    "perimetres_et_aires__trouver_valeur__facile__concis": "{figureType} : {dim1Val} {unite} × {dim2Val} {unite}. Calcule {quoiCalculer}."
+    "perimetres_et_aires__trouver_valeur__facile__concis": "{figureType} : {dim1Val} {unite} × {dim2Val} {unite}. Calcule {quoiCalculer}.",
+    "proportionnalite__trouver_valeur__facile__concis": "Proportionnalité : {val1}/{res1} = {val2}/{res2}. Trouve x si {val3}/x.",
+    "proportionnalite__trouver_valeur__facile__etapes": "1) Tableau : {val1} donne {res1}, {val2} donne {res2}\n2) Vérifie la proportionnalité\n3) Utilise le produit en croix pour {val3}",
+    "proportionnalite__trouver_valeur__facile__qr": "Q : Première relation ?\nR : {val1} → {res1}.\nQ : Deuxième relation ?\nR : {val2} → {res2}.\nQ : Valeur pour {val3} ?",
+    "proportionnalite__trouver_valeur__facile__oral": "Regarde : {val1} c'est {res1}, {val2} c'est {res2}. Donc pour {val3}, tu trouves quoi ?",
+    "proportionnalite__trouver_valeur__facile__defi": "Mission math : {val1}/{res1} = {val2}/{res2}. Calcule x dans {val3}/x. Go !"
   },
   "hits": 38,
-  "misses": 49,
+  "misses": 54,
   "total_cost_saved": 1480.0,
-  "last_updated": "2025-12-08T09:21:20.910405"
+  "last_updated": "2025-12-08T09:21:30.147197"
 }
