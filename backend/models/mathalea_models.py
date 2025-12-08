@@ -11,7 +11,7 @@ Respecte:
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
 
