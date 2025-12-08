@@ -189,7 +189,7 @@ function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) 
             size="sm"
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
-            disabled={isExporting}
+            disabled={isExportingSubject || isExportingCorrection}
           >
             <X className="h-5 w-5" />
           </Button>
