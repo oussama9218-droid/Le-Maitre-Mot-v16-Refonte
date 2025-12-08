@@ -17,6 +17,7 @@ import TemplateSettings from "./components/TemplateSettings";
 import DocumentWizard from "./components/wizard/DocumentWizard";
 import SheetBuilderPage from "./components/SheetBuilderPage";
 import MySheetsPage from "./components/MySheetsPage";
+import ProSettingsPage from "./components/ProSettingsPage";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
