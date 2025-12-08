@@ -1271,6 +1271,7 @@ function App() {
         <Route path="/cancel" element={<PaymentCancel />} />
         <Route path="/login/verify" element={<LoginVerify />} />
         <Route path="/builder" element={<SheetBuilderPage />} />
+        <Route path="/builder/:sheetId" element={<SheetBuilderPage />} />
         <Route path="/sheets" element={<MySheetsPage />} />
         <Route path="/pro/settings" element={<ProSettingsPage />} />
         <Route path="/*" element={<MainApp />} />
