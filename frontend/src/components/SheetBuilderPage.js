@@ -89,6 +89,13 @@ function SheetBuilderPage() {
     }
   }, []);
 
+  // Charger une fiche existante depuis l'URL
+  useEffect(() => {
+    if (urlSheetId) {
+      loadExistingSheet(urlSheetId);
+    }
+  }, [urlSheetId]);
+
   // Charger les niveaux au montage
   useEffect(() => {
     loadLevels();
