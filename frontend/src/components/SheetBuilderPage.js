@@ -290,8 +290,15 @@ function SheetBuilderPage() {
         }
       );
       
-      // Le backend retourne un JSON avec les 3 PDFs en base64
-      // Pour l'instant, on télécharge le premier PDF
+      // Check if response is actually a PDF (not an error JSON)
+      if (response.data.type === 'application/json') {
+        // Server returned JSON error instead of PDF
+        const text = await response.data.text();
+        const errorData = JSON.parse(text);
+        throw new Error(errorData.detail || 'Erreur lors de la génération du PDF');
+      }
+      
+      // Download the PDF
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -303,10 +310,30 @@ function SheetBuilderPage() {
       window.URL.revokeObjectURL(url);
       
       console.log('📥 PDF téléchargé:', pdfType);
+      alert('PDF généré avec succès !');
       
     } catch (error) {
       console.error('Erreur génération PDF:', error);
-      alert('Erreur lors de la génération du PDF');
+      
+      // Improved error handling - DO NOT open blank tab
+      let errorMessage = 'Erreur lors de la génération du PDF. ';
+      
+      if (error.response) {
+        // Server responded with error status
+        if (error.response.status >= 400 && error.response.status < 500) {
+          errorMessage += 'Merci de vérifier la configuration des exercices ou réessayer.';
+        } else if (error.response.status >= 500) {
+          errorMessage += 'Erreur serveur. Merci de réessayer plus tard.';
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage += 'Impossible de contacter le serveur. Vérifiez votre connexion.';
+      } else {
+        // Something else happened
+        errorMessage += error.message || 'Une erreur inattendue s\'est produite.';
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsGeneratingPDF(false);
     }
