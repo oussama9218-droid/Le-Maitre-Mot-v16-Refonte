@@ -52,6 +52,10 @@ class LeMaitreMotAPITester:
                 response = requests.get(url, headers=default_headers, timeout=timeout)
             elif method == 'POST':
                 response = requests.post(url, json=data, headers=default_headers, timeout=timeout)
+            elif method == 'PUT':
+                response = requests.put(url, json=data, headers=default_headers, timeout=timeout)
+            elif method == 'DELETE':
+                response = requests.delete(url, headers=default_headers, timeout=timeout)
 
             print(f"   Status: {response.status_code}")
             
