@@ -30,6 +30,10 @@ const API = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKE
 
 const ProSettingsPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Récupérer le contexte de navigation (d'où vient l'utilisateur)
+  const { from, sheetId } = location.state || {};
   
   // Auth states
   const [sessionToken, setSessionToken] = useState('');
