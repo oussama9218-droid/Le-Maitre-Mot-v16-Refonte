@@ -10,7 +10,8 @@ import {
   LogIn, 
   LogOut,
   Crown,
-  Home
+  Home,
+  Settings
 } from "lucide-react";
 
 function Header({ isPro, userEmail, onLogin, onLogout }) {
