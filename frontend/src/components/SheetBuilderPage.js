@@ -759,6 +759,13 @@ function SheetBuilderPage() {
         onClose={() => setShowPreviewModal(false)}
         previewData={previewData}
       />
+      
+      {/* PDF Download Modal */}
+      <PdfDownloadModal
+        isOpen={showPdfModal}
+        onClose={() => setShowPdfModal(false)}
+        pdfResult={pdfResult}
+      />
     </div>
   );
 }
