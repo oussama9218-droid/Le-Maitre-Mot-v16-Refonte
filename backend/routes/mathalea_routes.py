@@ -780,3 +780,125 @@ async def generate_exercise_endpoint(request: GenerateExerciseRequest):
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating exercise: {str(e)}")
+
+
+# ============================================================================
+# ENDPOINT: Génération PDF pour Fiches
+# ============================================================================
+
+@router.post("/sheets/{sheet_id}/generate-pdf")
+async def generate_sheet_pdf(sheet_id: str):
+    """
+    Générer les 3 PDFs pour une feuille d'exercices
+    
+    Sprint D - Pipeline PDF complet:
+    1. Récupère la feuille et génère le preview
+    2. Génère 3 PDFs: sujet, élève, corrigé
+    3. Retourne les PDFs en base64
+    
+    Returns:
+        Dict avec 3 clés contenant les PDFs en base64:
+        - subject_pdf: PDF sujet (pour professeur)
+        - student_pdf: PDF élève (pour distribution)
+        - correction_pdf: PDF corrigé (avec solutions)
+    """
+    from engine.pdf_engine.mathalea_sheet_pdf_builder import (
+        build_sheet_subject_pdf,
+        build_sheet_student_pdf,
+        build_sheet_correction_pdf
+    )
+    
+    try:
+        # 1. Vérifier que la feuille existe
+        sheet = await exercise_sheets_collection.find_one({"id": sheet_id}, {"_id": 0})
+        if not sheet:
+            raise HTTPException(status_code=404, detail="ExerciseSheet not found")
+        
+        # 2. Générer le preview (réutilise la logique du endpoint /preview)
+        cursor = sheet_items_collection.find({"sheet_id": sheet_id}, {"_id": 0}).sort("order", 1)
+        items = await cursor.to_list(length=1000)
+        
+        preview_items = []
+        for item_dict in items:
+            try:
+                item = SheetItem(**item_dict)
+                
+                # Récupérer l'ExerciseType
+                exercise_type_dict = await exercise_types_collection.find_one(
+                    {"id": item.exercise_type_id},
+                    {"_id": 0}
+                )
+                
+                if not exercise_type_dict:
+                    raise HTTPException(
+                        status_code=404,
+                        detail=f"ExerciseType {item.exercise_type_id} not found"
+                    )
+                
+                exercise_type = ExerciseType(**exercise_type_dict)
+                
+                # Générer l'exercice
+                generated = await exercise_template_service.generate_exercise(
+                    exercise_type_id=item.exercise_type_id,
+                    nb_questions=item.config.nb_questions,
+                    seed=item.config.seed,
+                    difficulty=item.config.difficulty,
+                    options=item.config.options,
+                    use_ai_enonce=False,
+                    use_ai_correction=False
+                )
+                
+                preview_item = {
+                    "item_id": item.id,
+                    "exercise_type_id": item.exercise_type_id,
+                    "exercise_type_summary": {
+                        "code_ref": exercise_type.code_ref,
+                        "titre": exercise_type.titre,
+                        "niveau": exercise_type.niveau,
+                        "domaine": exercise_type.domaine
+                    },
+                    "config": item.config.dict(),
+                    "generated": generated
+                }
+                
+                preview_items.append(preview_item)
+                
+            except ValueError as e:
+                raise HTTPException(status_code=400, detail=str(e))
+        
+        preview = {
+            "sheet_id": sheet_id,
+            "titre": sheet["titre"],
+            "niveau": sheet["niveau"],
+            "description": sheet.get("description"),
+            "items": preview_items
+        }
+        
+        # 3. Générer les 3 PDFs
+        subject_pdf_bytes = build_sheet_subject_pdf(preview)
+        student_pdf_bytes = build_sheet_student_pdf(preview)
+        correction_pdf_bytes = build_sheet_correction_pdf(preview)
+        
+        # 4. Encoder en base64
+        response = {
+            "subject_pdf": base64.b64encode(subject_pdf_bytes).decode('utf-8'),
+            "student_pdf": base64.b64encode(student_pdf_bytes).decode('utf-8'),
+            "correction_pdf": base64.b64encode(correction_pdf_bytes).decode('utf-8'),
+            "metadata": {
+                "sheet_id": sheet_id,
+                "titre": sheet["titre"],
+                "niveau": sheet["niveau"],
+                "nb_exercises": len(preview_items),
+                "generated_at": datetime.now(timezone.utc).isoformat()
+            }
+        }
+        
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating PDFs: {str(e)}"
+        )
