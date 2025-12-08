@@ -12,10 +12,6 @@ const Step2ParametresDocument = ({
   onTypeDocChange,
   onDifficulteChange,
   onNbExercicesChange,
-  // Template Settings props
-  isPro,
-  sessionToken,
-  onTemplateChange,
   isLoading = false
 }) => {
   const typesDoc = [
