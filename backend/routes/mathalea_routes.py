@@ -639,6 +639,104 @@ async def delete_item_from_sheet(sheet_id: str, item_id: str):
 
 
 # ============================================================================
+# ENDPOINT: Preview de Feuille d'Exercices
+# ============================================================================
+
+@router.post("/sheets/{sheet_id}/preview")
+async def preview_exercise_sheet(sheet_id: str):
+    """
+    Générer un aperçu JSON complet d'une feuille d'exercices
+    
+    Pour chaque SheetItem:
+    - Récupère l'ExerciseType associé
+    - Appelle generate_exercise() avec les paramètres du config
+    - Retourne le JSON structuré avec tous les exercices générés
+    
+    Note: Aucune IA n'est appelée ici (ai_enonce/ai_correction ignorés)
+    """
+    from services.exercise_template_service import exercise_template_service
+    
+    # 1. Récupérer la feuille
+    sheet = await exercise_sheets_collection.find_one({"id": sheet_id}, {"_id": 0})
+    if not sheet:
+        raise HTTPException(status_code=404, detail="ExerciseSheet not found")
+    
+    # 2. Récupérer tous les items, triés par order
+    cursor = sheet_items_collection.find({"sheet_id": sheet_id}, {"_id": 0}).sort("order", 1)
+    items = await cursor.to_list(length=1000)
+    
+    # 3. Générer les exercices pour chaque item
+    preview_items = []
+    
+    for item_dict in items:
+        try:
+            item = SheetItem(**item_dict)
+            
+            # Récupérer l'ExerciseType
+            exercise_type_dict = await exercise_types_collection.find_one(
+                {"id": item.exercise_type_id},
+                {"_id": 0}
+            )
+            
+            if not exercise_type_dict:
+                # Si l'ExerciseType n'existe plus
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"ExerciseType {item.exercise_type_id} not found for item {item.id}"
+                )
+            
+            exercise_type = ExerciseType(**exercise_type_dict)
+            
+            # Appeler le générateur (en interne, pas via HTTP)
+            generated = await exercise_template_service.generate_exercise(
+                exercise_type_id=item.exercise_type_id,
+                nb_questions=item.config.nb_questions,
+                seed=item.config.seed,
+                difficulty=item.config.difficulty,
+                options=item.config.options,
+                use_ai_enonce=False,  # Pas d'IA dans le preview
+                use_ai_correction=False
+            )
+            
+            # Construire l'item de preview
+            preview_item = {
+                "item_id": item.id,
+                "exercise_type_id": item.exercise_type_id,
+                "exercise_type_summary": {
+                    "code_ref": exercise_type.code_ref,
+                    "titre": exercise_type.titre,
+                    "niveau": exercise_type.niveau,
+                    "domaine": exercise_type.domaine
+                },
+                "config": item.config.dict(),
+                "generated": generated
+            }
+            
+            preview_items.append(preview_item)
+            
+        except ValueError as e:
+            # Erreur de validation (nb_questions hors limites, etc.)
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            # Erreur inattendue
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error generating exercise for item {item.id}: {str(e)}"
+            )
+    
+    # 4. Construire la réponse finale
+    response = {
+        "sheet_id": sheet_id,
+        "titre": sheet["titre"],
+        "niveau": sheet["niveau"],
+        "description": sheet.get("description"),
+        "items": preview_items
+    }
+    
+    return response
+
+
+# ============================================================================
 # ENDPOINT: Génération d'Exercices (TEMPLATE)
 # ============================================================================
 
