@@ -923,6 +923,138 @@ async def generate_sheet_pdf(sheet_id: str):
         )
 
 
+
+@router.post("/sheets/{sheet_id}/export-standard")
+async def export_standard_pdf(sheet_id: str):
+    """
+    Export Standard - Génère 2 PDFs simplifiés (Élève + Corrigé)
+    
+    SPRINT FUSION PDF - Export standard simplifié:
+    1. Génère le preview de la feuille
+    2. Crée 2 PDFs uniquement:
+       - student_pdf: Énoncé + zones de réponse (pour distribution aux élèves)
+       - correction_pdf: Énoncé + corrections détaillées
+    3. Pas de logo, pas de personnalisation, design simple et clair
+    
+    Returns:
+        Dict avec 2 clés contenant les PDFs en base64:
+        {
+            "student_pdf": "<base64>",
+            "correction_pdf": "<base64>",
+            "filename_base": "LeMaitreMot_<NomFiche>"
+        }
+    """
+    from engine.pdf_engine.mathalea_sheet_pdf_builder import (
+        build_sheet_student_pdf,
+        build_sheet_correction_pdf
+    )
+    
+    try:
+        # 1. Vérifier que la feuille existe
+        sheet = await exercise_sheets_collection.find_one({"id": sheet_id}, {"_id": 0})
+        if not sheet:
+            raise HTTPException(status_code=404, detail="ExerciseSheet not found")
+        
+        # 2. Générer le preview
+        cursor = sheet_items_collection.find({"sheet_id": sheet_id}, {"_id": 0}).sort("order", 1)
+        items = await cursor.to_list(length=1000)
+        
+        if not items:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot generate PDF for empty sheet"
+            )
+        
+        preview_items = []
+        for item_dict in items:
+            try:
+                item = SheetItem(**item_dict)
+                
+                # Récupérer l'ExerciseType
+                exercise_type_dict = await exercise_types_collection.find_one(
+                    {"id": item.exercise_type_id},
+                    {"_id": 0}
+                )
+                
+                if not exercise_type_dict:
+                    logger.warning(f"⚠️ ExerciseType {item.exercise_type_id} not found")
+                    continue
+                
+                exercise_type = ExerciseType(**exercise_type_dict)
+                
+                # Générer l'exercice
+                generated = await exercise_template_service.generate_exercise(
+                    exercise_type_id=item.exercise_type_id,
+                    nb_questions=item.config.nb_questions,
+                    seed=item.config.seed,
+                    difficulty=item.config.difficulty,
+                    options=item.config.options,
+                    use_ai_enonce=False,
+                    use_ai_correction=False
+                )
+                
+                preview_item = {
+                    "item_id": item.id,
+                    "exercise_type_id": item.exercise_type_id,
+                    "exercise_type_summary": {
+                        "code_ref": exercise_type.code_ref,
+                        "titre": exercise_type.titre,
+                        "niveau": exercise_type.niveau,
+                        "domaine": exercise_type.domaine
+                    },
+                    "config": item.config.dict(),
+                    "generated": generated
+                }
+                
+                preview_items.append(preview_item)
+                
+            except Exception as e:
+                logger.error(f"❌ Error generating exercise: {e}")
+                continue
+        
+        preview = {
+            "sheet_id": sheet_id,
+            "titre": sheet["titre"],
+            "niveau": sheet["niveau"],
+            "description": sheet.get("description"),
+            "items": preview_items
+        }
+        
+        # 3. Générer les 2 PDFs uniquement
+        logger.info(f"📄 Génération export standard pour la feuille {sheet_id}")
+        student_pdf_bytes = build_sheet_student_pdf(preview)
+        correction_pdf_bytes = build_sheet_correction_pdf(preview)
+        
+        # 4. Créer le nom de fichier base
+        filename_base = f"LeMaitreMot_{sheet['titre'].replace(' ', '_')}"
+        
+        # 5. Encoder en base64 et retourner
+        response = {
+            "student_pdf": base64.b64encode(student_pdf_bytes).decode('utf-8'),
+            "correction_pdf": base64.b64encode(correction_pdf_bytes).decode('utf-8'),
+            "filename_base": filename_base,
+            "metadata": {
+                "sheet_id": sheet_id,
+                "titre": sheet["titre"],
+                "niveau": sheet["niveau"],
+                "nb_exercises": len(preview_items),
+                "generated_at": datetime.now(timezone.utc).isoformat()
+            }
+        }
+        
+        logger.info(f"✅ Export standard généré: 2 PDFs pour la feuille {sheet_id}")
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error generating standard PDF export: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating standard PDF export: {str(e)}"
+        )
+
+
 @router.post("/sheets/{sheet_id}/generate-pdf-pro")
 async def generate_pro_pdf(
     sheet_id: str,
