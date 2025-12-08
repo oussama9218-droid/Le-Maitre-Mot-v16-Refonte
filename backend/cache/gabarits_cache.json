@@ -53,10 +53,16 @@
     "proportionnalite__trouver_valeur__facile__etapes": "1) Tableau : {val1} donne {res1}, {val2} donne {res2}\n2) Vérifie la proportionnalité\n3) Utilise le produit en croix pour {val3}",
     "proportionnalite__trouver_valeur__facile__qr": "Q : Première relation ?\nR : {val1} → {res1}.\nQ : Deuxième relation ?\nR : {val2} → {res2}.\nQ : Valeur pour {val3} ?",
     "proportionnalite__trouver_valeur__facile__oral": "Regarde : {val1} c'est {res1}, {val2} c'est {res2}. Donc pour {val3}, tu trouves quoi ?",
-    "proportionnalite__trouver_valeur__facile__defi": "Mission math : {val1}/{res1} = {val2}/{res2}. Calcule x dans {val3}/x. Go !"
+    "proportionnalite__trouver_valeur__facile__defi": "Mission math : {val1}/{res1} = {val2}/{res2}. Calcule x dans {val3}/x. Go !",
+    "theoreme_de_pythagore__trouver_valeur__moyen__etapes": "Procédure :\n→ Triangle {triangle}, rectangle en {angleD}\n→ {cote1} = {long1} cm, {cote2} = {long2} cm\n→ Théorème de Pythagore : trouve {coteACalculer}",
+    "theoreme_de_pythagore__trouver_valeur__moyen__narratif": "Léa doit calculer la longueur {coteACalculer} d'un triangle {triangle} rectangle en {angleD}. Elle connaît {cote1} = {long1} cm et {cote2} = {long2} cm. Peux-tu l'aider ?",
+    "theoreme_de_pythagore__trouver_valeur__moyen__guide": "Observe le triangle {triangle} rectangle en {angleD}. Tu connais {cote1} = {long1} cm et {cote2} = {long2} cm. Pour trouver {coteACalculer}, utilise le théorème de Pythagore.",
+    "theoreme_de_pythagore__trouver_valeur__moyen__scolaire": "Soit le triangle {triangle} rectangle en {angleD}. On donne {cote1} = {long1} cm et {cote2} = {long2} cm. Calcule la longueur {coteACalculer}.",
+    "theoreme_de_pythagore__trouver_valeur__moyen__inductif": "Tu connais le théorème de Pythagore. Applique-le au triangle {triangle} rectangle en {angleD} avec {cote1} = {long1} cm et {cote2} = {long2} cm. Que trouves-tu pour {coteACalculer} ?",
+    "theoreme_de_pythagore__trouver_valeur__moyen__concis": "{triangle} rectangle en {angleD}. Données : {cote1} = {long1} cm, {cote2} = {long2} cm. {coteACalculer} = ?"
   },
   "hits": 38,
-  "misses": 54,
+  "misses": 60,
   "total_cost_saved": 1480.0,
-  "last_updated": "2025-12-08T09:21:30.147197"
+  "last_updated": "2025-12-08T10:38:17.844678"
 }
