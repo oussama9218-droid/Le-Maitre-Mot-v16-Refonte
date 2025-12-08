@@ -1,9 +1,9 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Frontend E2E Flow Testing Complete
+## Latest Test Session - SPRINT F.3-FIX Complete Flow Testing
 
 ### Test Focus
-Test complet du flux de création de fiche d'exercices dans l'interface utilisateur "Le Maître Mot"
+Test complet du flux de création de fiche avec preview et génération PDF dans "Le Maître Mot" - Scénario SPRINT F.3-FIX
 
 ### Tests Executed
 
