@@ -18,7 +18,9 @@ if not mongo_url:
 
 client = AsyncIOMotorClient(mongo_url)
 db = client.mathalea_db
-pro_user_configs_collection = db.pro_user_configs
+
+# Utiliser la collection user_templates de l'ancien système (migration sans rupture)
+user_templates_collection = db.user_templates
 
 
 async def get_pro_config_for_user(user_email: str) -> Dict[str, Any]:
