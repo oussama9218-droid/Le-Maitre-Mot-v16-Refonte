@@ -148,7 +148,7 @@ class ExerciseTypeUpdate(BaseModel):
     min_questions: Optional[int] = None
     max_questions: Optional[int] = None
     default_questions: Optional[int] = None
-    difficulty_levels: Optional[List[str] = None
+    difficulty_levels: Optional[List[str]] = None
     question_kinds: Optional[Dict[str, Any]] = None
     random_config: Optional[Dict[str, Any]] = None
     generator_kind: Optional[GeneratorKind] = None
