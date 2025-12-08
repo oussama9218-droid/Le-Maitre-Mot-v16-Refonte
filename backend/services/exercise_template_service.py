@@ -97,17 +97,29 @@ class ExerciseTemplateService:
         # 4. Initialiser le générateur aléatoire avec la seed
         rng = random.Random(seed)
         
-        # 5. Générer les questions
-        questions = []
-        for i in range(nb_questions):
-            question = self._generate_question(
+        # 5. Générer les questions selon le type de générateur
+        if exercise_type.generator_kind.value == "legacy":
+            # Générateur LEGACY (Sprint F.1)
+            questions = await self._generate_legacy_questions(
                 exercise_type=exercise_type,
-                question_number=i + 1,
+                nb_questions=nb_questions,
                 difficulty=difficulty,
+                seed=seed,
                 rng=rng,
                 options=options or {}
             )
-            questions.append(question)
+        else:
+            # Générateur TEMPLATE standard
+            questions = []
+            for i in range(nb_questions):
+                question = self._generate_question(
+                    exercise_type=exercise_type,
+                    question_number=i + 1,
+                    difficulty=difficulty,
+                    rng=rng,
+                    options=options or {}
+                )
+                questions.append(question)
         
         # 6. Construire la réponse standardisée
         result = {
