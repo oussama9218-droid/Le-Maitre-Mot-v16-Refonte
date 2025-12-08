@@ -74,7 +74,12 @@ const TemplateSettings = ({ isPro, sessionToken, onTemplateChange }) => {
       setSelectedStyle(userTemplate.template_style || userTemplate.template_choice || 'classique');
       
       if (userTemplate.logo_url) {
-        setLogoPreview(userTemplate.logo_url);
+        // Construire l'URL complète du logo
+        const logoUrl = userTemplate.logo_url.startsWith('http') 
+          ? userTemplate.logo_url 
+          : `${API}${userTemplate.logo_url}`;
+        setLogoPreview(logoUrl);
+        console.log('📸 Logo chargé:', logoUrl);
       }
       
       console.log('✅ Config Pro chargée:', userTemplate);
