@@ -90,7 +90,8 @@ async def test_sheet(client):
         return response.json()
     
 @pytest.mark.asyncio
-    async def test_preview_empty_sheet(self, client, test_sheet):
+@pytest.mark.asyncio
+async def test_preview_empty_sheet(self, client, test_sheet):
         """
         TEST 1: Création d'une fiche avec 0 item
         → preview renvoie une structure avec items = []
@@ -110,7 +111,8 @@ async def test_sheet(client):
         assert data["items"] == []
     
 @pytest.mark.asyncio
-    async def test_preview_with_two_items(
+@pytest.mark.asyncio
+async def test_preview_with_two_items(
         self,
         client,
         test_sheet,
@@ -190,7 +192,8 @@ async def test_sheet(client):
         assert preview_item2["generated"]["seed"] == 200
     
 @pytest.mark.asyncio
-    async def test_preview_reproducibility(
+@pytest.mark.asyncio
+async def test_preview_reproducibility(
         self,
         client,
         test_sheet,
@@ -257,7 +260,8 @@ async def test_sheet(client):
                 assert q1["data"] == q2["data"]
     
 @pytest.mark.asyncio
-    async def test_preview_nb_questions_below_min(
+@pytest.mark.asyncio
+async def test_preview_nb_questions_below_min(
         self,
         client,
         test_sheet,
@@ -291,7 +295,8 @@ async def test_sheet(client):
         assert "min_questions" in response.json()["detail"]
     
 @pytest.mark.asyncio
-    async def test_preview_nb_questions_above_max(
+@pytest.mark.asyncio
+async def test_preview_nb_questions_above_max(
         self,
         client,
         test_sheet,
@@ -325,7 +330,8 @@ async def test_sheet(client):
         assert "max_questions" in response.json()["detail"]
     
 @pytest.mark.asyncio
-    async def test_preview_exercise_type_not_found(
+@pytest.mark.asyncio
+async def test_preview_exercise_type_not_found(
         self,
         client,
         test_sheet
@@ -357,7 +363,8 @@ async def test_sheet(client):
         assert "ExerciseType not found" in response.json()["detail"]
     
 @pytest.mark.asyncio
-    async def test_preview_exercise_type_deleted_after_item_creation(
+@pytest.mark.asyncio
+async def test_preview_exercise_type_deleted_after_item_creation(
         self,
         client,
         test_sheet,
@@ -402,7 +409,8 @@ async def test_sheet(client):
         assert "ExerciseType" in preview_response.json()["detail"]
     
 @pytest.mark.asyncio
-    async def test_preview_calls_generate_once_per_item(
+@pytest.mark.asyncio
+async def test_preview_calls_generate_once_per_item(
         self,
         client,
         test_sheet,
@@ -459,7 +467,8 @@ async def test_sheet(client):
             assert kwargs["use_ai_correction"] == False
     
 @pytest.mark.asyncio
-    async def test_preview_invalid_difficulty(
+@pytest.mark.asyncio
+async def test_preview_invalid_difficulty(
         self,
         client,
         test_sheet,
@@ -494,7 +503,8 @@ async def test_sheet(client):
         assert "available levels" in response.json()["detail"]
     
 @pytest.mark.asyncio
-    async def test_get_sheet_with_items(
+@pytest.mark.asyncio
+async def test_get_sheet_with_items(
         self,
         client,
         test_sheet,
@@ -532,7 +542,8 @@ async def test_sheet(client):
         assert data["titre"] == "Feuille de test"
     
 @pytest.mark.asyncio
-    async def test_get_sheet_items(
+@pytest.mark.asyncio
+async def test_get_sheet_items(
         self,
         client,
         test_sheet,
