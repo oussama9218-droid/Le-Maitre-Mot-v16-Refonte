@@ -1268,7 +1268,7 @@ function App() {
         <Route path="/success" element={<PaymentSuccess />} />
         <Route path="/cancel" element={<PaymentCancel />} />
         <Route path="/login/verify" element={<LoginVerify />} />
-        <Route path="/mathalea" element={<MathAleaPage />} />
+        <Route path="/builder" element={<SheetBuilderPage />} />
         <Route path="/*" element={<MainApp />} />
       </Routes>
     </BrowserRouter>
