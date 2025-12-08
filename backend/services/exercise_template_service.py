@@ -506,20 +506,27 @@ class ExerciseTemplateService:
         
         for i in range(nb_questions):
             try:
-                # Créer une spec pour le générateur legacy
-                spec = MathExerciseSpec(
-                    type=legacy_type.value,
-                    niveau=exercise_type.niveau,
-                    difficulte=difficulty or "moyen"
-                )
+                # Pour les générateurs legacy, on ne peut pas utiliser MathExerciseSpec
+                # car ils n'ont pas tous les champs obligatoires
+                # On passe plutôt un dict de configuration simple
                 
                 # Utiliser une seed unique par question pour variété
                 question_seed = seed + i
                 question_rng = random.Random(question_seed)
                 
+                # Créer une configuration legacy simple
+                legacy_config = {
+                    "type": legacy_type.value,
+                    "niveau": exercise_type.niveau,
+                    "difficulte": difficulty or "moyen",
+                    "chapitre": exercise_type.chapitre_code or "geometrie",
+                    "seed": question_seed
+                }
+                
                 # Générer l'exercice legacy
-                legacy_result = await legacy_service.generate_exercise(
-                    spec=spec,
+                # Note: On passe None pour spec car les legacy generators utilisent un format différent
+                legacy_result = await legacy_service.generate_exercise_legacy(
+                    config=legacy_config,
                     count=1,  # 1 exercice à la fois
                     seed=question_seed
                 )
