@@ -1169,42 +1169,49 @@ async def generate_pro_pdf(
             "items": preview_items
         }
         
-        # 4. Configuration Pro (MOCK pour le MVP - à remplacer par vraie config DB)
-        user_pro_config = {
-            "etablissement": "Le Maître Mot",
-            "logo_url": None,  # TODO: Récupérer le vrai logo depuis la config utilisateur
-            "template_name": "classique",
-            "primary_color": "#1a56db"
+        # 4. Récupérer la configuration Pro de l'utilisateur depuis MongoDB
+        # TODO: Récupérer via email/token, pour l'instant config par défaut
+        template_config = {
+            "professor_name": "Le Maître Mot",
+            "school_name": "Le Maître Mot",
+            "school_year": "2024-2025",
+            "footer_text": "Document généré par Le Maître Mot",
+            "logo_url": None  # Sera ajouté plus tard via config DB
         }
         
-        # 5. Convertir vers le format legacy via l'adapter
-        from engine.pdf_engine.pro_export_adapter import convert_sheet_preview_to_legacy_format
+        # 5. Convertir le preview Builder vers le format Legacy attendu par les templates
+        from engine.pdf_engine.builder_to_legacy_converter import convert_builder_to_legacy_pro_format
         
-        legacy_format = convert_sheet_preview_to_legacy_format(
+        document_data = convert_builder_to_legacy_pro_format(
             preview_json=preview_json,
-            user_pro_config=user_pro_config
+            template_config=template_config
         )
         
-        # 6. Générer le PDF Pro
-        from engine.pdf_engine.mathalea_sheet_pdf_builder import build_sheet_pro_pdf
+        # 6. Rendre le HTML via Jinja2 avec les templates historiques
+        from engine.pdf_engine.template_renderer import render_pro_corrige
+        import weasyprint
         
-        pro_pdf_bytes = build_sheet_pro_pdf(
-            legacy_format=legacy_format,
-            template=template,
-            user_config=user_pro_config
+        # On génère le corrigé Pro (qui contient énoncés + solutions)
+        html_content = render_pro_corrige(
+            template_style=template,
+            document_data=document_data,
+            template_config=template_config
         )
         
-        # 7. Encoder en base64
+        # 7. Convertir HTML → PDF avec WeasyPrint
+        pro_pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
+        
+        # 8. Encoder en base64
         import base64
         pro_pdf_b64 = base64.b64encode(pro_pdf_bytes).decode('utf-8')
         
-        logger.info(f"✅ PDF Pro généré avec succès pour la fiche {sheet_id}")
+        logger.info(f"✅ PDF Pro généré avec succès pour la fiche {sheet_id} (template: {template})")
         
         return {
             "pro_pdf": pro_pdf_b64,
             "filename": f"LeMaitreMot_Pro_{sheet.get('titre', 'Fiche')}.pdf",
-            "etablissement": user_pro_config.get("etablissement"),
-            "template": template
+            "template": template,
+            "school_name": template_config.get("school_name")
         }
         
     except HTTPException:
