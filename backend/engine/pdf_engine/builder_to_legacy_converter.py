@@ -97,7 +97,7 @@ def convert_builder_to_legacy_pro_format(
     
     # Construire le document Legacy
     document = {
-        "type_doc": "exercices",  # Peut être "controle", "dm", "exercices"
+        "type_doc": type_doc,  # "exercices", "controle", "evaluation", "dm"
         "matiere": "Mathématiques",
         "niveau": niveau,
         "chapitre": titre,  # On utilise le titre de la fiche comme chapitre
