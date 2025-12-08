@@ -107,6 +107,12 @@ const ProExportModal = ({
 
         const cfg = res.data || null;
         setProConfig(cfg);
+        
+        // Debug logo URL
+        if (cfg && cfg.logo_url) {
+          console.log('📸 Logo URL reçue:', cfg.logo_url);
+          console.log('📸 Logo URL complète:', cfg.logo_url.startsWith('http') ? cfg.logo_url : `${API_BASE_URL}${cfg.logo_url}`);
+        }
 
         // si l'utilisateur a déjà un template préféré → on le met par défaut
         if (cfg && cfg.template_choice) {
