@@ -9,13 +9,16 @@ import os
 def check_package_installed(package_name: str) -> bool:
     """Vérifie si un package système est installé."""
     try:
+        # Utilise dpkg-query qui est plus fiable pour vérifier l'installation
         result = subprocess.run(
-            ["dpkg", "-l", package_name],
+            ["dpkg-query", "-W", "-f='${Status}'", package_name],
             capture_output=True,
             text=True,
             check=False
         )
-        return result.returncode == 0 and f"ii  {package_name}" in result.stdout
+        # Le package est installé si le statut contient "install ok installed"
+        is_installed = result.returncode == 0 and "install ok installed" in result.stdout
+        return is_installed
     except Exception as e:
         print(f"Erreur lors de la vérification de {package_name}: {e}")
         return False
