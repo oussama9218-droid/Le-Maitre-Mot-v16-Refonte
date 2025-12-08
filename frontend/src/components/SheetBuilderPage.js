@@ -163,6 +163,62 @@ function SheetBuilderPage() {
     }
   };
 
+  // NOUVELLE FONCTION : Charger une fiche existante depuis le backend
+  const loadExistingSheet = async (id) => {
+    try {
+      setIsLoadingSheet(true);
+      console.log('🔄 Chargement de la fiche:', id);
+      
+      // Charger les infos de la fiche
+      const sheetResponse = await axios.get(`${API}/mathalea/sheets/${id}`);
+      const sheet = sheetResponse.data;
+      
+      console.log('✅ Fiche chargée:', sheet);
+      setSheetTitle(sheet.title || "Fiche d'exercices");
+      setSheetId(id);
+      
+      // Charger les items de la fiche
+      const itemsResponse = await axios.get(`${API}/mathalea/sheets/${id}/items`);
+      const items = itemsResponse.data.items || [];
+      
+      console.log('✅ Items chargés:', items.length);
+      
+      // Transformer les items pour le format attendu par le builder
+      const transformedItems = items.map(item => ({
+        id: item.id,
+        exercise_type_id: item.exercise_type_id,
+        exercise: item.exercise_type_summary || {
+          id: item.exercise_type_id,
+          titre: item.exercise_type_summary?.titre || "Exercice",
+          domaine: item.exercise_type_summary?.domaine || "",
+          niveau: item.exercise_type_summary?.niveau || ""
+        },
+        config: {
+          nb_questions: item.config?.nb_questions || 5,
+          difficulty: item.config?.difficulty || "moyen",
+          seed: item.config?.seed || Math.floor(Math.random() * 100000),
+          options: item.config?.options || {},
+          ai_enonce: item.config?.ai_enonce || false,
+          ai_correction: item.config?.ai_correction || false
+        },
+        order: item.order
+      }));
+      
+      setSheetItems(transformedItems);
+      
+      // Mettre à jour localStorage comme secours
+      localStorage.setItem('current_sheet_id', id);
+      
+    } catch (error) {
+      console.error('❌ Erreur chargement fiche:', error);
+      alert('Impossible de charger cette fiche. Elle a peut-être été supprimée.');
+      navigate('/builder');
+    } finally {
+      setIsLoadingSheet(false);
+    }
+  };
+
+
   const addExerciseToSheet = (exercise) => {
     const newItem = {
       id: `item_${Date.now()}_${Math.random()}`,
