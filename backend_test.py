@@ -14693,6 +14693,14 @@ if __name__ == "__main__":
         elif test_mode == "logo":
             # Run only logo investigation
             tester.run_logo_investigation_only()
+        elif test_mode == "logo-persistence":
+            # Run logo persistence flow tests
+            print("🎯 RUNNING LOGO PERSISTENCE FLOW TESTS")
+            success, results = tester.test_logo_persistence_flow_comprehensive()
+            if success:
+                print("✅ Logo Persistence Flow: PASSED")
+            else:
+                print("❌ Logo Persistence Flow: FAILED")
         elif test_mode == "magic":
             # Run magic link investigation
             tester.run_magic_link_investigation()
