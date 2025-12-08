@@ -16,6 +16,7 @@ import { BookOpen, FileText, Download, Shuffle, Loader2, GraduationCap, AlertCir
 import TemplateSettings from "./components/TemplateSettings";
 import DocumentWizard from "./components/wizard/DocumentWizard";
 import SheetBuilderPage from "./components/SheetBuilderPage";
+import MySheetsPage from "./components/MySheetsPage";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
