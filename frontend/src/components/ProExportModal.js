@@ -281,9 +281,12 @@ const ProExportModal = ({
             </select>
           </div>
 
-          {/* Config utilisateur */}
-          <div className="border border-gray-200 rounded-lg p-4">
-            <p className="font-semibold text-gray-900 mb-3">Votre configuration</p>
+          {/* Config utilisateur - En lecture seule */}
+          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <div className="flex items-center justify-between mb-3">
+              <p className="font-semibold text-gray-900">Votre configuration</p>
+              <span className="text-xs text-gray-500 italic">Lecture seule</span>
+            </div>
             {loadingConfig && (
               <div className="flex items-center justify-center py-4">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -294,38 +297,61 @@ const ProExportModal = ({
               <p className="text-red-600 text-sm">{configError}</p>
             )}
             {!loadingConfig && (
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Établissement :</span>
-                  <span className="font-medium text-gray-900">{schoolName}</span>
-                </div>
-                {professorName && (
+              <div className="space-y-3">
+                <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Professeur :</span>
-                    <span className="font-medium text-gray-900">{professorName}</span>
+                    <span className="text-gray-600">Établissement :</span>
+                    <span className="font-medium text-gray-900">{schoolName}</span>
                   </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Année scolaire :</span>
-                  <span className="font-medium text-gray-900">{schoolYear}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Template préféré :</span>
-                  <span className="font-medium text-gray-900">
-                    {proConfig?.template_choice
-                      ? proConfig.template_choice === "academique"
+                  {professorName && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Professeur :</span>
+                      <span className="font-medium text-gray-900">{professorName}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Année scolaire :</span>
+                    <span className="font-medium text-gray-900">{schoolYear}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Template préféré :</span>
+                    <span className="font-medium text-gray-900">
+                      {proConfig?.template_choice
+                        ? proConfig.template_choice === "academique"
+                          ? "Académique"
+                          : "Classique"
+                        : selectedTemplate === "academique"
                         ? "Académique"
-                        : "Classique"
-                      : selectedTemplate === "academique"
-                      ? "Académique"
-                      : "Classique"}
-                  </span>
+                        : "Classique"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Logo :</span>
+                    {logoConfigured && proConfig.logo_url ? (
+                      <img 
+                        src={proConfig.logo_url.startsWith('http') ? proConfig.logo_url : `${API_BASE_URL}${proConfig.logo_url}`} 
+                        alt="Logo" 
+                        className="h-8 w-auto object-contain"
+                      />
+                    ) : (
+                      <span className="text-gray-500 text-xs italic">
+                        Par défaut
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Logo :</span>
-                  <span className="text-gray-500 text-xs italic">
-                    {logoConfigured ? "Personnalisé" : "Par défaut"}
-                  </span>
+                
+                {/* Lien vers la page de paramètres */}
+                <div className="pt-3 border-t border-gray-200">
+                  <a 
+                    href="/pro/settings"
+                    className="flex items-center justify-center text-sm text-blue-600 hover:text-blue-700 hover:underline"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    Modifier mes paramètres Pro
+                  </a>
                 </div>
               </div>
             )}
