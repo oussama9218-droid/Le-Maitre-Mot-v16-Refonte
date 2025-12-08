@@ -60,7 +60,8 @@ const TemplateSettings = ({ isPro, sessionToken, onTemplateChange }) => {
     
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/api/template/get`, {
+      // Nouvelle route API pour la config Pro
+      const response = await axios.get(`${API}/api/mathalea/pro/config`, {
         headers: { 'X-Session-Token': sessionToken }
       });
       
@@ -70,11 +71,13 @@ const TemplateSettings = ({ isPro, sessionToken, onTemplateChange }) => {
       setSchoolName(userTemplate.school_name || '');
       setSchoolYear(userTemplate.school_year || '');
       setFooterText(userTemplate.footer_text || '');
-      setSelectedStyle(userTemplate.template_style || 'minimaliste');
+      setSelectedStyle(userTemplate.template_style || userTemplate.template_choice || 'classique');
       
       if (userTemplate.logo_url) {
         setLogoPreview(userTemplate.logo_url);
       }
+      
+      console.log('✅ Config Pro chargée:', userTemplate);
       
     } catch (error) {
       console.error('Error loading user template:', error);
