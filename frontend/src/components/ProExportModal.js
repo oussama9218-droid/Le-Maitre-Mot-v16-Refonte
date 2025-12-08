@@ -19,6 +19,43 @@ function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) 
   const [isExportingSubject, setIsExportingSubject] = useState(false);
   const [isExportingCorrection, setIsExportingCorrection] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState("classique");
+  const [proConfig, setProConfig] = useState(null);
+  const [loadingConfig, setLoadingConfig] = useState(true);
+
+  // Charger la config Pro au montage de la modale
+  React.useEffect(() => {
+    if (isOpen && sessionToken) {
+      loadProConfig();
+    }
+  }, [isOpen, sessionToken]);
+
+  const loadProConfig = async () => {
+    setLoadingConfig(true);
+    try {
+      const response = await axios.get(
+        `${API}/mathalea/pro/config`,
+        {
+          headers: {
+            'X-Session-Token': sessionToken
+          }
+        }
+      );
+      
+      setProConfig(response.data);
+      
+      // Utiliser le template préféré de l'utilisateur
+      if (response.data.template_choice) {
+        setSelectedTemplate(response.data.template_choice);
+      }
+      
+      console.log('✅ Config Pro chargée dans modale:', response.data);
+    } catch (error) {
+      console.error('Erreur chargement config Pro:', error);
+      // Garder la modale fonctionnelle même si le chargement échoue
+    } finally {
+      setLoadingConfig(false);
+    }
+  };
 
   if (!isOpen) return null;
 
