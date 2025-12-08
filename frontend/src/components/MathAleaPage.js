@@ -354,12 +354,11 @@ function MathAleaPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Niveau</Label>
-                  <Select value={niveauFiltre} onValueChange={setNiveauFiltre}>
+                  <Select value={niveauFiltre || undefined} onValueChange={(val) => setNiveauFiltre(val || '')}>
                     <SelectTrigger>
                       <SelectValue placeholder="Tous les niveaux" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Tous les niveaux</SelectItem>
                       {NIVEAUX.map(n => (
                         <SelectItem key={n} value={n}>{n}</SelectItem>
                       ))}
@@ -369,13 +368,12 @@ function MathAleaPage() {
                 
                 <div>
                   <Label>Domaine</Label>
-                  <Select value={domaineFiltre} onValueChange={setDomaineFiltre}>
+                  <Select value={domaineFiltre || undefined} onValueChange={(val) => setDomaineFiltre(val || '')}>
                     <SelectTrigger>
                       <SelectValue placeholder="Tous les domaines" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Tous les domaines</SelectItem>
-                      {domaines.map(d => (
+                      {domaines.filter(d => d && d.trim() !== "").map(d => (
                         <SelectItem key={d} value={d}>{d}</SelectItem>
                       ))}
                     </SelectContent>
