@@ -451,9 +451,250 @@ def _get_base_css() -> str:
     """
 
 
+def build_sheet_pro_pdf(legacy_format: dict) -> bytes:
+    """
+    Génère un PDF Pro personnalisé à partir du format legacy
+    
+    Ce PDF inclut:
+    - Logo de l'établissement
+    - Template personnalisé
+    - Couleur primaire personnalisée
+    - Énoncés et corrections
+    
+    Args:
+        legacy_format: Dict au format legacy Pro generator
+            {
+                "titre": "...",
+                "etablissement": "...",
+                "logo_url": "...",
+                "template": "classique",
+                "primary_color": "#1a56db",
+                "exercices": [...]
+            }
+    
+    Returns:
+        bytes: Contenu du PDF Pro personnalisé
+    """
+    html_content = _build_html_pro(legacy_format)
+    pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
+    
+    logger.info(f"✅ PDF Pro généré: {len(pdf_bytes)} bytes")
+    return pdf_bytes
+
+
+def _build_html_pro(legacy_format: dict) -> str:
+    """Génère le HTML pour le PDF Pro personnalisé"""
+    
+    titre = legacy_format.get("titre", "Feuille d'exercices")
+    niveau = legacy_format.get("niveau", "")
+    etablissement = legacy_format.get("etablissement", "")
+    logo_url = legacy_format.get("logo_url")
+    primary_color = legacy_format.get("primary_color", "#1a56db")
+    exercices = legacy_format.get("exercices", [])
+    
+    # Header avec logo
+    header_html = f"""
+    <div class="header">
+        <div class="header-content">
+            {"<img src='" + logo_url + "' class='logo' />" if logo_url else ""}
+            <div class="header-text">
+                <h1>{titre}</h1>
+                {"<p class='etablissement'>" + etablissement + "</p>" if etablissement else ""}
+                <p class="niveau">{niveau}</p>
+            </div>
+        </div>
+        <div class="date">{datetime.now().strftime("%d/%m/%Y")}</div>
+    </div>
+    """
+    
+    # Exercices
+    exercices_html = ""
+    for exercice in exercices:
+        numero = exercice.get("numero", "")
+        titre_ex = exercice.get("titre", "")
+        enonce = exercice.get("enonce", "")
+        correction = exercice.get("correction", "")
+        metadata = exercice.get("metadata", {})
+        domaine = metadata.get("domaine", "")
+        
+        exercices_html += f"""
+        <div class="exercise">
+            <div class="exercise-header">
+                <h2 class="exercise-number">Exercice {numero}</h2>
+                <p class="exercise-title">{titre_ex}</p>
+                {"<p class='exercise-domain'>" + domaine + "</p>" if domaine else ""}
+            </div>
+            
+            <div class="exercise-enonce">
+                <h3>Énoncé</h3>
+                <div class="content">
+                    {enonce.replace(chr(10), '<br/>')}
+                </div>
+            </div>
+            
+            <div class="exercise-correction">
+                <h3>Correction</h3>
+                <div class="content">
+                    {correction.replace(chr(10), '<br/>')}
+                </div>
+            </div>
+        </div>
+        """
+    
+    # CSS Pro personnalisé
+    css = f"""
+    <style>
+        @page {{
+            size: A4;
+            margin: 20mm;
+            @top-center {{
+                content: "Le Maître Mot - {etablissement}";
+                font-size: 9pt;
+                color: #7f8c8d;
+            }}
+            @bottom-center {{
+                content: "Page " counter(page);
+                font-size: 9pt;
+                color: #7f8c8d;
+            }}
+        }}
+        
+        body {{
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #2c3e50;
+        }}
+        
+        .header {{
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid {primary_color};
+        }}
+        
+        .header-content {{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 10px;
+        }}
+        
+        .logo {{
+            max-height: 60px;
+            max-width: 100px;
+        }}
+        
+        .header-text h1 {{
+            color: {primary_color};
+            font-size: 20pt;
+            margin: 0 0 5px 0;
+            font-weight: bold;
+        }}
+        
+        .etablissement {{
+            font-size: 12pt;
+            color: #34495e;
+            margin: 0;
+            font-weight: 500;
+        }}
+        
+        .niveau {{
+            font-size: 10pt;
+            color: #7f8c8d;
+            margin: 0;
+        }}
+        
+        .date {{
+            font-size: 9pt;
+            color: #7f8c8d;
+            font-style: italic;
+        }}
+        
+        .exercise {{
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }}
+        
+        .exercise-header {{
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: {primary_color}15;
+            border-left: 4px solid {primary_color};
+        }}
+        
+        .exercise-number {{
+            color: {primary_color};
+            font-size: 16pt;
+            margin: 0 0 5px 0;
+            font-weight: bold;
+        }}
+        
+        .exercise-title {{
+            color: #2c3e50;
+            font-size: 12pt;
+            margin: 0;
+            font-weight: 500;
+        }}
+        
+        .exercise-domain {{
+            font-size: 9pt;
+            color: #7f8c8d;
+            font-style: italic;
+            margin: 5px 0 0 0;
+        }}
+        
+        .exercise-enonce, .exercise-correction {{
+            margin-bottom: 20px;
+        }}
+        
+        .exercise-enonce h3, .exercise-correction h3 {{
+            color: {primary_color};
+            font-size: 12pt;
+            margin: 10px 0;
+            font-weight: 600;
+        }}
+        
+        .content {{
+            padding-left: 20px;
+            line-height: 1.8;
+        }}
+        
+        .exercise-correction {{
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #27ae60;
+        }}
+        
+        .exercise-correction h3 {{
+            color: #27ae60;
+        }}
+    </style>
+    """
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{titre}</title>
+        {css}
+    </head>
+    <body>
+        {header_html}
+        {exercices_html}
+    </body>
+    </html>
+    """
+    
+    return html
+
+
 # Export des fonctions publiques
 __all__ = [
     "build_sheet_subject_pdf",
     "build_sheet_student_pdf",
-    "build_sheet_correction_pdf"
+    "build_sheet_correction_pdf",
+    "build_sheet_pro_pdf"
 ]
