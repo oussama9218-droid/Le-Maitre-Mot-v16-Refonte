@@ -7,26 +7,22 @@ Test complet du flux de création de fiche avec preview et génération PDF dans
 
 ### Tests Executed
 
-#### 1. Test E2E complet du flux builder (/builder)
-**Command**: Playwright automation script
-**Result**: ✅ SUCCÈS COMPLET (13/13 étapes validées)
+#### 1. Test SPRINT F.3-FIX - Flux complet de création de fiche avec preview et PDF
+**Command**: Playwright automation script (scénario spécifique SPRINT F.3-FIX)
+**Result**: ✅ SUCCÈS COMPLET (8/8 étapes critiques validées)
 **Details**:
-- ✅ Page builder chargée correctement
-- ✅ Header "Le Maître Mot" visible
-- ✅ Navigation complète (Accueil, Créer une fiche, Exercice IA, Mes fiches, Connexion)
-- ✅ Sélection niveau "6e" fonctionnelle
-- ✅ Chargement chapitres dynamique
-- ✅ Sélection chapitre "Nombres décimaux (1 exercices)" réussie
-- ✅ Catalogue exercices affiché (1 exercice trouvé)
-- ✅ Ajout exercice au panier fonctionnel
-- ✅ Compteur panier mis à jour ("1 exercice(s)")
-- ✅ Détails exercice dans panier (titre, questions: 5, seed)
-- ✅ Modification nombre de questions (5 → 3) réussie
-- ✅ Navigation vers "Mes fiches" fonctionnelle
-- ✅ État vide "Aucune fiche créée" affiché correctement
-- ✅ Retour à l'accueil fonctionnel
-- ✅ Bouton "Créer une fiche d'exercices" présent
-- ✅ Aucune erreur détectée
+- ✅ Page builder chargée correctement (https://lemaitremot-2.preview.emergentagent.com/builder)
+- ✅ Header "Le Maître Mot" et navigation complète (5 éléments) visibles
+- ✅ Configuration fiche: Niveau "6e" sélectionné avec succès
+- ✅ Chapitre "Proportionnalité (2 exercices)" sélectionné avec succès
+- ✅ Catalogue: 2 exercices LEGACY trouvés (Proportionnalité 6e, Pourcentages 6e)
+- ✅ Ajout exercices: 2 exercices ajoutés au panier, compteur "2 exercice(s)" correct
+- ✅ Configuration exercices: Questions modifiées (Ex1: 4, Ex2: 3), seeds générés automatiquement
+- ✅ Preview: HTTP 200 OK, aucune alert d'erreur critique
+- ✅ Génération PDF: HTTP 200 OK, aucun onglet gris vide ouvert
+- ✅ Exercices LEGACY (generator_kind="legacy") fonctionnels
+- ✅ Backend stable: Aucun 500 Internal Server Error détecté
+- ✅ Collections MongoDB: exercise_types correctement utilisées
 
 ### Key Findings
 1. ✅ **Interface utilisateur complètement fonctionnelle**
