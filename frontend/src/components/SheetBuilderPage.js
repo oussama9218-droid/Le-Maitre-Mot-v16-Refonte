@@ -755,6 +755,13 @@ function SheetBuilderPage() {
           </div>
         </div>
       </div>
+      
+      {/* Preview Modal */}
+      <SheetPreviewModal
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        previewData={previewData}
+      />
     </div>
   );
 }
