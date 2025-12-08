@@ -1056,7 +1056,11 @@ async def generate_pro_pdf(
         # 6. Générer le PDF Pro
         from engine.pdf_engine.mathalea_sheet_pdf_builder import build_sheet_pro_pdf
         
-        pro_pdf_bytes = build_sheet_pro_pdf(legacy_format)
+        pro_pdf_bytes = build_sheet_pro_pdf(
+            legacy_format=legacy_format,
+            template=template,
+            user_config=user_pro_config
+        )
         
         # 7. Encoder en base64
         import base64
