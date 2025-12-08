@@ -782,6 +782,15 @@ function SheetBuilderPage() {
         onClose={() => setShowPdfModal(false)}
         pdfResult={pdfResult}
       />
+      
+      {/* Pro Export Modal */}
+      <ProExportModal
+        isOpen={showProExportModal}
+        onClose={() => setShowProExportModal(false)}
+        sheetId={sheetId}
+        sheetTitle={sheetTitle}
+        sessionToken={sessionToken}
+      />
     </div>
   );
 }
