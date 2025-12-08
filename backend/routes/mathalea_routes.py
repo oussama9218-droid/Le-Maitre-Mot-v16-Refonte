@@ -1245,3 +1245,77 @@ async def generate_pro_pdf(
             status_code=500,
             detail=f"Error generating Pro PDF: {str(e)}"
         )
+
+
+
+# ============================================================================
+# ENDPOINTS: Pro User Config
+# ============================================================================
+
+@router.get("/pro/config")
+async def get_pro_config(
+    x_session_token: str = Header(None, alias="X-Session-Token")
+):
+    """
+    Récupère la configuration Pro de l'utilisateur connecté
+    
+    Args:
+        x_session_token: Token de session (requis)
+    
+    Returns:
+        Configuration Pro de l'utilisateur
+    
+    Raises:
+        403: Si pas de token
+    """
+    if not x_session_token:
+        raise HTTPException(status_code=403, detail="Session token required")
+    
+    from services.pro_config_service import get_pro_config_for_user
+    
+    # Extraire l'email du token (ou utiliser le token comme identifiant)
+    user_email = x_session_token if "@" in x_session_token else "user@lemaitremot.com"
+    
+    config = await get_pro_config_for_user(user_email)
+    
+    return {
+        "user_email": user_email,
+        **config
+    }
+
+
+@router.put("/pro/config")
+async def update_pro_config_endpoint(
+    updates: Dict[str, Any],
+    x_session_token: str = Header(None, alias="X-Session-Token")
+):
+    """
+    Met à jour la configuration Pro de l'utilisateur
+    
+    Args:
+        updates: Dict avec les champs à mettre à jour
+        x_session_token: Token de session (requis)
+    
+    Returns:
+        Message de succès
+    
+    Raises:
+        403: Si pas de token
+    """
+    if not x_session_token:
+        raise HTTPException(status_code=403, detail="Session token required")
+    
+    from services.pro_config_service import update_pro_config
+    
+    user_email = x_session_token if "@" in x_session_token else "user@lemaitremot.com"
+    
+    # Filtrer les champs autorisés
+    allowed_fields = ["professor_name", "school_name", "school_year", "footer_text", "logo_url", "template_choice"]
+    filtered_updates = {k: v for k, v in updates.items() if k in allowed_fields}
+    
+    success = await update_pro_config(user_email, filtered_updates)
+    
+    if success:
+        return {"message": "Configuration Pro mise à jour avec succès"}
+    else:
+        raise HTTPException(status_code=500, detail="Erreur lors de la mise à jour")
