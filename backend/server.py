@@ -4700,6 +4700,7 @@ app.include_router(api_router)
 
 # Include MathALÉA system router (Sprint A - non-destructive extension)
 from routes.mathalea_routes import router as mathalea_router
+from routes.catalogue_routes import router as catalogue_router
 app.include_router(mathalea_router)
 
 app.add_middleware(
