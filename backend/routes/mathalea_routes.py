@@ -893,7 +893,7 @@ async def generate_sheet_pdf(sheet_id: str):
         student_pdf_bytes = build_sheet_student_pdf(preview)
         correction_pdf_bytes = build_sheet_correction_pdf(preview)
         
-        # 4. Encoder en base64
+        # 5. Encoder en base64
         response = {
             "subject_pdf": base64.b64encode(subject_pdf_bytes).decode('utf-8'),
             "student_pdf": base64.b64encode(student_pdf_bytes).decode('utf-8'),
@@ -903,6 +903,7 @@ async def generate_sheet_pdf(sheet_id: str):
                 "titre": sheet["titre"],
                 "niveau": sheet["niveau"],
                 "nb_exercises": len(preview_items),
+                "ai_enrichment_applied": check_if_ai_needed(preview),
                 "generated_at": datetime.now(timezone.utc).isoformat()
             }
         }
