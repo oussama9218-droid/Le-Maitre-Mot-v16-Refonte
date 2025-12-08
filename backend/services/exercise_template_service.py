@@ -567,16 +567,26 @@ class ExerciseTemplateService:
                 questions.append(question)
                 
             except Exception as e:
-                logger.error(f"Error generating legacy question {i+1}: {e}")
-                # Ajouter une question d'erreur pour ne pas casser le flux
+                # Log détaillé côté serveur uniquement
+                logger.error(
+                    f"Error generating legacy question {i+1} for {exercise_type.code_ref}: {e}",
+                    exc_info=True  # Log la stacktrace complète côté serveur
+                )
+                
+                # JAMAIS afficher de stacktrace ou message technique au professeur
+                # Option A: On ignore la question et continue
+                # Option B: On met une question fallback propre
+                
+                # Pour l'instant, fallback propre (Option B)
                 questions.append({
                     "id": f"q{i+1}",
-                    "enonce_brut": f"Erreur lors de la génération de la question {i+1}",
+                    "enonce_brut": "Exercice temporairement indisponible (erreur technique)",
                     "data": {},
-                    "solution_brut": f"Erreur: {str(e)}",
+                    "solution_brut": "Correction temporairement indisponible",
                     "metadata": {
                         "generator": "legacy",
-                        "error": str(e)
+                        "error_occurred": True,  # Indicateur générique sans détail
+                        "fallback": True
                     }
                 })
         
