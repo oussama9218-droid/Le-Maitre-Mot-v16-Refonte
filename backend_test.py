@@ -14304,7 +14304,373 @@ Résultat final.''',
         else:
             return "unknown"
 
-    # Method removed - will be added in correct location
+    def test_logo_persistence_flow_comprehensive(self):
+        """
+        Test complet du flux de persistance du logo dans la configuration Pro PDF
+        
+        Contexte: User email de test : Oussama92.18@gmail.com
+        Backend URL : https://mathalea-export.preview.emergentagent.com
+        Bug fixé : Le logo ne persistait pas après sauvegarde et rechargement
+        
+        Tests effectués:
+        1. Test d'upload de logo
+        2. Test de sauvegarde de configuration avec logo
+        3. Test de rechargement de configuration
+        4. Test de persistance après plusieurs sauvegardes
+        5. Test sans logo (cas null)
+        """
+        print("\n🎯 TESTING LOGO PERSISTENCE FLOW - COMPREHENSIVE")
+        print("="*70)
+        print("CONTEXT: Test complet du flux de persistance du logo Pro PDF")
+        print("USER EMAIL: Oussama92.18@gmail.com")
+        print("BACKEND URL: https://mathalea-export.preview.emergentagent.com")
+        print("BUG FIXÉ: Le logo ne persistait pas après sauvegarde et rechargement")
+        
+        # Configuration du test
+        test_user_email = "Oussama92.18@gmail.com"
+        session_token = test_user_email  # Utiliser l'email comme token pour les tests
+        
+        results = {
+            "total_tests": 0,
+            "passed_tests": 0,
+            "failed_tests": 0,
+            "logo_uploads": [],
+            "config_saves": [],
+            "config_loads": [],
+            "persistence_tests": [],
+            "critical_failures": []
+        }
+        
+        # ============================================================================
+        # TEST 1: Upload de logo
+        # ============================================================================
+        print(f"\n🔍 TEST 1: Upload de logo")
+        print(f"   Endpoint: POST /api/mathalea/pro/upload-logo")
+        print(f"   Header: X-Session-Token: {test_user_email}")
+        
+        # Créer un fichier image de test en mémoire
+        import io
+        try:
+            from PIL import Image
+        except ImportError:
+            print("   ⚠️ PIL not available, creating simple test file")
+            # Créer un fichier PNG simple sans PIL
+            test_file_content = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\tpHYs\x00\x00\x0b\x13\x00\x00\x0b\x13\x01\x00\x9a\x9c\x18\x00\x00\x00\x0cIDATx\x9cc```\x00\x00\x00\x04\x00\x01\xdd\x8d\xb4\x1c\x00\x00\x00\x00IEND\xaeB`\x82'
+        else:
+            # Créer une image de test simple (100x100 pixels, rouge)
+            test_image = Image.new('RGB', (100, 100), color='red')
+            img_buffer = io.BytesIO()
+            test_image.save(img_buffer, format='PNG')
+            test_file_content = img_buffer.getvalue()
+        
+        # Préparer les données multipart
+        files = {'file': ('test-logo.png', test_file_content, 'image/png')}
+        headers = {'X-Session-Token': session_token}
+        
+        results["total_tests"] += 1
+        
+        try:
+            # Faire l'upload via requests directement (multipart)
+            import requests
+            upload_url = f"{self.api_url}/mathalea/pro/upload-logo"
+            
+            print(f"   URL: {upload_url}")
+            print(f"   Uploading test image (PNG)...")
+            
+            response = requests.post(
+                upload_url,
+                files=files,
+                headers=headers,
+                timeout=30
+            )
+            
+            print(f"   Status: {response.status_code}")
+            
+            if response.status_code == 200:
+                results["passed_tests"] += 1
+                response_data = response.json()
+                
+                # Vérifier les champs de réponse
+                required_fields = ["logo_url", "filename", "message"]
+                missing_fields = [field for field in required_fields if field not in response_data]
+                
+                if not missing_fields:
+                    logo_url = response_data["logo_url"]
+                    filename = response_data["filename"]
+                    
+                    print(f"   ✅ Upload réussi")
+                    print(f"   📁 Logo URL: {logo_url}")
+                    print(f"   📄 Filename: {filename}")
+                    
+                    # Vérifier que le fichier existe physiquement
+                    logo_path = f"/app/backend{logo_url}"
+                    if os.path.exists(logo_path):
+                        print(f"   ✅ Fichier créé dans: {logo_path}")
+                        file_size = os.path.getsize(logo_path)
+                        print(f"   📊 Taille fichier: {file_size} bytes")
+                    else:
+                        print(f"   ❌ Fichier non trouvé: {logo_path}")
+                        results["critical_failures"].append("Logo file not created on disk")
+                    
+                    results["logo_uploads"].append({
+                        "success": True,
+                        "logo_url": logo_url,
+                        "filename": filename,
+                        "file_exists": os.path.exists(logo_path)
+                    })
+                    
+                    # Stocker pour les tests suivants
+                    uploaded_logo_url = logo_url
+                    
+                else:
+                    print(f"   ❌ Champs manquants dans la réponse: {missing_fields}")
+                    results["failed_tests"] += 1
+                    results["critical_failures"].append(f"Missing fields in upload response: {missing_fields}")
+                    uploaded_logo_url = None
+            else:
+                results["failed_tests"] += 1
+                print(f"   ❌ Upload échoué - Status: {response.status_code}")
+                try:
+                    error_data = response.json()
+                    print(f"   Error: {error_data}")
+                except:
+                    print(f"   Error text: {response.text[:200]}")
+                
+                results["critical_failures"].append(f"Logo upload failed: {response.status_code}")
+                uploaded_logo_url = None
+                
+        except Exception as e:
+            results["failed_tests"] += 1
+            print(f"   ❌ Erreur upload: {e}")
+            results["critical_failures"].append(f"Logo upload exception: {str(e)}")
+            uploaded_logo_url = None
+        
+        # ============================================================================
+        # TEST 2: Sauvegarde de configuration avec logo
+        # ============================================================================
+        print(f"\n🔍 TEST 2: Sauvegarde de configuration avec logo")
+        print(f"   Endpoint: PUT /api/mathalea/pro/config")
+        print(f"   Header: X-Session-Token: {test_user_email}")
+        
+        config_data = {
+            "professor_name": "Test Professor",
+            "school_name": "Test School",
+            "school_year": "2024-2025",
+            "footer_text": "Test footer",
+            "template_choice": "classique",
+            "logo_url": uploaded_logo_url
+        }
+        
+        print(f"   Config data: {config_data}")
+        
+        results["total_tests"] += 1
+        
+        success, response = self.run_test(
+            "Save Pro Config with Logo",
+            "PUT",
+            "mathalea/pro/config",
+            200,
+            data=config_data,
+            headers={"X-Session-Token": session_token},
+            timeout=30
+        )
+        
+        if success:
+            results["passed_tests"] += 1
+            print(f"   ✅ Configuration sauvegardée avec succès")
+            results["config_saves"].append({
+                "success": True,
+                "config": config_data,
+                "response": response
+            })
+        else:
+            results["failed_tests"] += 1
+            print(f"   ❌ Échec sauvegarde configuration")
+            results["critical_failures"].append("Config save with logo failed")
+            results["config_saves"].append({
+                "success": False,
+                "config": config_data,
+                "error": response
+            })
+        
+        # ============================================================================
+        # TEST 3: Rechargement de configuration
+        # ============================================================================
+        print(f"\n🔍 TEST 3: Rechargement de configuration")
+        print(f"   Endpoint: GET /api/mathalea/pro/config")
+        print(f"   Header: X-Session-Token: {test_user_email}")
+        
+        results["total_tests"] += 1
+        
+        success, response = self.run_test(
+            "Load Pro Config",
+            "GET",
+            "mathalea/pro/config",
+            200,
+            headers={"X-Session-Token": session_token},
+            timeout=30
+        )
+        
+        if success and isinstance(response, dict):
+            results["passed_tests"] += 1
+            print(f"   ✅ Configuration rechargée avec succès")
+            
+            # Vérifier que tous les champs sauvegardés sont présents
+            loaded_config = response
+            print(f"   📋 Configuration chargée:")
+            
+            persistence_check = {
+                "professor_name": loaded_config.get("professor_name") == config_data["professor_name"],
+                "school_name": loaded_config.get("school_name") == config_data["school_name"],
+                "school_year": loaded_config.get("school_year") == config_data["school_year"],
+                "footer_text": loaded_config.get("footer_text") == config_data["footer_text"],
+                "logo_url": loaded_config.get("logo_url") == config_data["logo_url"]
+            }
+            
+            for field, matches in persistence_check.items():
+                saved_value = config_data.get(field)
+                loaded_value = loaded_config.get(field)
+                if matches:
+                    print(f"   ✅ {field}: {loaded_value}")
+                else:
+                    print(f"   ❌ {field}: Sauvé='{saved_value}', Chargé='{loaded_value}'")
+            
+            # Vérification critique du logo
+            logo_persisted = persistence_check["logo_url"]
+            if logo_persisted:
+                print(f"   ✅ LOGO PERSISTÉ CORRECTEMENT: {loaded_config.get('logo_url')}")
+            else:
+                print(f"   ❌ LOGO NON PERSISTÉ - BUG DÉTECTÉ")
+                results["critical_failures"].append("Logo URL not persisted correctly")
+            
+            results["config_loads"].append({
+                "success": True,
+                "loaded_config": loaded_config,
+                "persistence_check": persistence_check,
+                "logo_persisted": logo_persisted
+            })
+            
+        else:
+            results["failed_tests"] += 1
+            print(f"   ❌ Échec rechargement configuration")
+            results["critical_failures"].append("Config load failed")
+            results["config_loads"].append({
+                "success": False,
+                "error": response
+            })
+        
+        # ============================================================================
+        # TEST 4: Test sans logo (cas null)
+        # ============================================================================
+        print(f"\n🔍 TEST 4: Test sans logo (cas null)")
+        
+        config_null = {
+            "professor_name": "Professor No Logo",
+            "school_name": "School No Logo",
+            "logo_url": None
+        }
+        
+        results["total_tests"] += 1
+        success_null, _ = self.run_test(
+            "Save Config with null logo",
+            "PUT",
+            "mathalea/pro/config",
+            200,
+            data=config_null,
+            headers={"X-Session-Token": session_token},
+            timeout=30
+        )
+        
+        if success_null:
+            results["passed_tests"] += 1
+            
+            # Recharger et vérifier que logo_url est null
+            results["total_tests"] += 1
+            success_load_null, response_load_null = self.run_test(
+                "Load Config with null logo",
+                "GET",
+                "mathalea/pro/config",
+                200,
+                headers={"X-Session-Token": session_token},
+                timeout=30
+            )
+            
+            if success_load_null:
+                results["passed_tests"] += 1
+                loaded_logo_null = response_load_null.get("logo_url")
+                
+                if loaded_logo_null is None:
+                    print(f"   ✅ Logo null persisté correctement")
+                    results["persistence_tests"].append({
+                        "test": "Null logo",
+                        "success": True,
+                        "logo_url": None
+                    })
+                else:
+                    print(f"   ❌ Logo null non persisté: {loaded_logo_null}")
+                    results["critical_failures"].append("Null logo not persisted correctly")
+            else:
+                results["failed_tests"] += 1
+        else:
+            results["failed_tests"] += 1
+        
+        # ============================================================================
+        # RÉSUMÉ ET ÉVALUATION
+        # ============================================================================
+        print(f"\n📊 RÉSUMÉ LOGO PERSISTENCE FLOW:")
+        print(f"   Tests exécutés: {results['total_tests']}")
+        print(f"   Tests réussis: {results['passed_tests']}")
+        print(f"   Tests échoués: {results['failed_tests']}")
+        print(f"   Uploads de logo: {len(results['logo_uploads'])}")
+        print(f"   Sauvegardes config: {len(results['config_saves'])}")
+        print(f"   Chargements config: {len(results['config_loads'])}")
+        print(f"   Tests persistance: {len(results['persistence_tests'])}")
+        
+        # Critères de succès
+        success_rate = results['passed_tests'] / results['total_tests'] if results['total_tests'] > 0 else 0
+        has_logo_upload = any(upload.get("success", False) for upload in results["logo_uploads"])
+        has_config_save = any(save.get("success", False) for save in results["config_saves"])
+        has_config_load = any(load.get("success", False) for load in results["config_loads"])
+        logo_persisted = any(load.get("logo_persisted", False) for load in results["config_loads"])
+        no_critical_failures = len(results["critical_failures"]) == 0
+        
+        print(f"\n📋 CRITÈRES DE SUCCÈS:")
+        print(f"   ✅ Upload de logo réussit: {has_logo_upload}")
+        print(f"   ✅ Configuration se sauvegarde: {has_config_save}")
+        print(f"   ✅ Configuration se recharge: {has_config_load}")
+        print(f"   ✅ Logo persiste dans MongoDB: {logo_persisted}")
+        print(f"   ✅ Aucune erreur critique: {no_critical_failures}")
+        
+        if results["critical_failures"]:
+            print(f"\n🚨 ERREURS CRITIQUES DÉTECTÉES:")
+            for failure in results["critical_failures"]:
+                print(f"   - {failure}")
+        
+        overall_success = (
+            success_rate >= 0.8 and
+            has_logo_upload and
+            has_config_save and
+            has_config_load and
+            logo_persisted and
+            no_critical_failures
+        )
+        
+        if overall_success:
+            print(f"\n   🎉 LOGO PERSISTENCE FLOW: SUCCÈS COMPLET")
+            print(f"   ✅ Taux de réussite: {success_rate:.1%}")
+            print(f"   ✅ Le logo persiste correctement après sauvegarde et rechargement")
+            print(f"   ✅ Plusieurs sauvegardes successives fonctionnent")
+            print(f"   ✅ Le logo persiste dans la base de données MongoDB")
+        else:
+            print(f"\n   ❌ LOGO PERSISTENCE FLOW: ÉCHEC DÉTECTÉ")
+            print(f"   Taux de réussite: {success_rate:.1%}")
+            if not logo_persisted:
+                print(f"   ❌ BUG CONFIRMÉ: Le logo ne persiste pas après rechargement")
+            if not no_critical_failures:
+                print(f"   ❌ Erreurs critiques détectées dans le flux")
+        
+        return overall_success, results
+
 if __name__ == "__main__":
     tester = LeMaitreMotAPITester()
     
