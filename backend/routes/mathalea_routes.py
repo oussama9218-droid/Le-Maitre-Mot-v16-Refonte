@@ -10,6 +10,9 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 from models.mathalea_models import (
     Competence,
