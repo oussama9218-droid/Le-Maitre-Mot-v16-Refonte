@@ -1,6 +1,67 @@
 # Testing Protocol and Results
 
-## Latest Test Session - API Pro PDF Export avec Templates Testing
+## Latest Test Session - Logo Persistence Flow Testing
+
+### Test Focus
+Test complet du flux de persistance du logo dans la configuration Pro PDF - Validation du bug fix
+
+### Tests Executed
+
+#### 1. Test Logo Persistence Flow Comprehensive
+**Command**: `python backend_test.py logo-persistence`
+**Result**: ✅ SUCCÈS COMPLET (5/5 tests - 100%)
+**User Email**: Oussama92.18@gmail.com
+**Backend URL**: https://mathalea-export.preview.emergentagent.com
+
+**Details**:
+- ✅ **TEST 1: Upload de logo** - Logo uploadé avec succès
+  - Endpoint: `POST /api/mathalea/pro/upload-logo`
+  - Status: 200 OK
+  - Logo URL: `/uploads/logos/2d41a8dc-4d30-4f6f-a407-645cfd40a377.png`
+  - Fichier créé sur disque: ✅ (287 bytes)
+
+- ✅ **TEST 2: Sauvegarde de configuration avec logo** - Configuration sauvegardée
+  - Endpoint: `PUT /api/mathalea/pro/config`
+  - Status: 200 OK
+  - Données: professor_name, school_name, school_year, footer_text, template_choice, logo_url
+
+- ✅ **TEST 3: Rechargement de configuration** - Logo persisté correctement
+  - Endpoint: `GET /api/mathalea/pro/config`
+  - Status: 200 OK
+  - ✅ professor_name: Test Professor (persisté)
+  - ✅ school_name: Test School (persisté)
+  - ✅ school_year: 2024-2025 (persisté)
+  - ✅ footer_text: Test footer (persisté)
+  - ✅ **logo_url: `/uploads/logos/2d41a8dc-4d30-4f6f-a407-645cfd40a377.png` (PERSISTÉ CORRECTEMENT)**
+
+- ✅ **TEST 4: Test sans logo (cas null)** - Null logo persisté
+  - Sauvegarde avec logo_url: null
+  - Rechargement: logo_url reste null ✅
+
+### Key Findings - Logo Persistence Flow
+1. ✅ **BUG FIXÉ**: Le logo persiste maintenant correctement après sauvegarde et rechargement
+2. ✅ **Upload fonctionnel**: L'endpoint `/api/mathalea/pro/upload-logo` fonctionne parfaitement
+3. ✅ **Sauvegarde fonctionnelle**: L'endpoint `PUT /api/mathalea/pro/config` sauvegarde le logo_url
+4. ✅ **Persistance MongoDB**: Le logo_url est correctement stocké et récupéré de la base de données
+5. ✅ **Gestion null**: Les valeurs null pour logo_url sont correctement gérées
+6. ✅ **Fichiers sur disque**: Les logos uploadés sont bien créés dans `/app/backend/uploads/logos/`
+7. ✅ **Intégrité des données**: Tous les champs de configuration persistent correctement
+
+### Logo Persistence Status Summary
+- **Upload de logo**: ✅ PASSED (fichier créé sur disque)
+- **Sauvegarde config**: ✅ PASSED (PUT request fonctionne)
+- **Rechargement config**: ✅ PASSED (GET request fonctionne)
+- **Persistance logo**: ✅ PASSED (logo_url identique après rechargement)
+- **Gestion null**: ✅ PASSED (null values correctement persistées)
+- **Intégrité MongoDB**: ✅ PASSED (toutes les données persistent)
+
+### Technical Notes
+- **Fix appliqué**: Ajout du support PUT/DELETE dans la méthode `run_test()` du backend_test.py
+- **Collection MongoDB**: `mathalea_db.user_templates` fonctionne correctement
+- **Service**: `pro_config_service.py` gère correctement la persistance
+- **Routes**: `/api/mathalea/pro/upload-logo` et `/api/mathalea/pro/config` opérationnelles
+
+## Previous Test Session - API Pro PDF Export avec Templates Testing
 
 ### Test Focus
 Test complet de l'API Pro PDF Export avec sélecteur de templates - Validation des fonctionnalités Pro
