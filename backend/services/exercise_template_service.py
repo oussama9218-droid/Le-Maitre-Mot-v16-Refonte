@@ -460,3 +460,131 @@ __all__ = [
     "ExerciseTemplateService",
     "exercise_template_service"
 ]
+
+
+    async def _generate_legacy_questions(
+        self,
+        exercise_type: ExerciseType,
+        nb_questions: int,
+        difficulty: str,
+        seed: int,
+        rng: random.Random,
+        options: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        """
+        Génère des questions en utilisant un générateur legacy
+        
+        Sprint F.1: Intégration des générateurs legacy dans le système MathALÉA
+        
+        Args:
+            exercise_type: ExerciseType avec generator_kind="legacy"
+            nb_questions: Nombre de questions à générer
+            difficulty: Niveau de difficulté
+            seed: Seed pour reproductibilité
+            rng: Générateur aléatoire
+            options: Options supplémentaires
+        
+        Returns:
+            Liste de questions au format standardisé
+        """
+        from services.math_generation_service import MathGenerationService
+        from models.math_models import MathExerciseType, MathExerciseSpec
+        
+        logger.info(
+            f"🔄 Génération legacy: {exercise_type.legacy_generator_id}, "
+            f"{nb_questions} questions, seed={seed}"
+        )
+        
+        if not exercise_type.legacy_generator_id:
+            raise ValueError(
+                f"ExerciseType {exercise_type.id} has generator_kind=LEGACY "
+                f"but no legacy_generator_id"
+            )
+        
+        # Créer le service legacy
+        legacy_service = MathGenerationService()
+        
+        # Mapper le legacy_generator_id vers MathExerciseType
+        try:
+            legacy_type = MathExerciseType(exercise_type.legacy_generator_id)
+        except ValueError:
+            raise ValueError(
+                f"Invalid legacy_generator_id: {exercise_type.legacy_generator_id}"
+            )
+        
+        # Les générateurs legacy génèrent généralement 1 question à la fois
+        # On appelle le générateur nb_questions fois
+        questions = []
+        
+        for i in range(nb_questions):
+            try:
+                # Créer une spec pour le générateur legacy
+                spec = MathExerciseSpec(
+                    type=legacy_type.value,
+                    niveau=exercise_type.niveau,
+                    difficulte=difficulty or "moyen"
+                )
+                
+                # Utiliser une seed unique par question pour variété
+                question_seed = seed + i
+                question_rng = random.Random(question_seed)
+                
+                # Générer l'exercice legacy
+                legacy_result = await legacy_service.generate_exercise(
+                    spec=spec,
+                    count=1,  # 1 exercice à la fois
+                    seed=question_seed
+                )
+                
+                if not legacy_result or not legacy_result.get("exercices"):
+                    logger.warning(f"Legacy generator returned empty result for question {i+1}")
+                    # Créer une question par défaut
+                    question = {
+                        "id": f"q{i+1}",
+                        "enonce_brut": f"Question {i+1} (générateur legacy temporairement indisponible)",
+                        "data": {},
+                        "solution_brut": "Solution non disponible",
+                        "metadata": {
+                            "generator": "legacy",
+                            "legacy_type": legacy_type.value,
+                            "seed": question_seed
+                        }
+                    }
+                else:
+                    # Extraire la première (et seule) question
+                    legacy_exercise = legacy_result["exercices"][0]
+                    
+                    # Convertir au format standardisé
+                    question = {
+                        "id": f"q{i+1}",
+                        "enonce_brut": legacy_exercise.get("enonce", ""),
+                        "data": legacy_exercise.get("data", {}),
+                        "solution_brut": legacy_exercise.get("correction", ""),
+                        "metadata": {
+                            "generator": "legacy",
+                            "legacy_type": legacy_type.value,
+                            "seed": question_seed,
+                            "difficulty": difficulty,
+                            "figure_svg": legacy_exercise.get("figure_svg")
+                        }
+                    }
+                
+                questions.append(question)
+                
+            except Exception as e:
+                logger.error(f"Error generating legacy question {i+1}: {e}")
+                # Ajouter une question d'erreur pour ne pas casser le flux
+                questions.append({
+                    "id": f"q{i+1}",
+                    "enonce_brut": f"Erreur lors de la génération de la question {i+1}",
+                    "data": {},
+                    "solution_brut": f"Erreur: {str(e)}",
+                    "metadata": {
+                        "generator": "legacy",
+                        "error": str(e)
+                    }
+                })
+        
+        logger.info(f"✅ {len(questions)} questions legacy générées")
+        return questions
+
