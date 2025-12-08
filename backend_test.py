@@ -7289,6 +7289,260 @@ class LeMaitreMotAPITester:
         
         print(f"\n📚 New Curriculum Tests: {curriculum_passed}/{curriculum_total} passed")
         return curriculum_passed, curriculum_total
+    def test_pdf_pro_export_with_templates(self):
+        """Test PDF Pro export API with template selection - SPRINT F.3-FIX"""
+        print("\n📄 TESTING PDF PRO EXPORT WITH TEMPLATES")
+        print("="*60)
+        print("CONTEXT: Test API Pro PDF Export avec Templates")
+        print("API: POST /api/mathalea/sheets/{sheet_id}/generate-pdf-pro")
+        print("TEMPLATES: 'classique' et 'academique'")
+        
+        # Test sheet ID from review request
+        test_sheet_id = "6fcc6c1f-e52e-4866-9f37-4a717d378785"
+        pro_session_token = "test-pro-token"
+        
+        test_results = {
+            "total_tests": 7,
+            "passed_tests": 0,
+            "failed_tests": [],
+            "pdf_sizes": {}
+        }
+        
+        # Test 1: Export Pro avec template "classique"
+        print(f"\n🔍 Test 1: Export Pro avec template 'classique'")
+        success, response = self.run_test(
+            "PDF Pro Export - Template Classique",
+            "POST",
+            f"mathalea/sheets/{test_sheet_id}/generate-pdf-pro",
+            200,
+            data={"template": "classique"},
+            headers={"X-Session-Token": pro_session_token},
+            timeout=60
+        )
+        
+        if success and isinstance(response, dict):
+            # Vérifications spécifiques
+            required_fields = ["pro_pdf", "filename", "template", "etablissement"]
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if not missing_fields:
+                template_returned = response.get("template")
+                pro_pdf = response.get("pro_pdf", "")
+                
+                if template_returned == "classique" and pro_pdf:
+                    # Vérifier que le PDF est une string base64 valide
+                    try:
+                        import base64
+                        pdf_bytes = base64.b64decode(pro_pdf)
+                        test_results["pdf_sizes"]["classique"] = len(pdf_bytes)
+                        
+                        # Vérifier que c'est un PDF valide (commence par %PDF)
+                        if pdf_bytes.startswith(b'%PDF'):
+                            print(f"   ✅ Template 'classique': PDF valide ({len(pdf_bytes)} bytes)")
+                            test_results["passed_tests"] += 1
+                        else:
+                            print(f"   ❌ Template 'classique': PDF invalide")
+                            test_results["failed_tests"].append("Test 1: PDF classique invalide")
+                    except Exception as e:
+                        print(f"   ❌ Template 'classique': Erreur décodage base64: {e}")
+                        test_results["failed_tests"].append(f"Test 1: Erreur décodage - {e}")
+                else:
+                    print(f"   ❌ Template incorrect: attendu 'classique', reçu '{template_returned}'")
+                    test_results["failed_tests"].append("Test 1: Template incorrect")
+            else:
+                print(f"   ❌ Champs manquants: {missing_fields}")
+                test_results["failed_tests"].append(f"Test 1: Champs manquants - {missing_fields}")
+        else:
+            test_results["failed_tests"].append("Test 1: Échec de la requête")
+        
+        # Test 2: Export Pro avec template "academique"
+        print(f"\n🔍 Test 2: Export Pro avec template 'academique'")
+        success, response = self.run_test(
+            "PDF Pro Export - Template Académique",
+            "POST",
+            f"mathalea/sheets/{test_sheet_id}/generate-pdf-pro",
+            200,
+            data={"template": "academique"},
+            headers={"X-Session-Token": pro_session_token},
+            timeout=60
+        )
+        
+        if success and isinstance(response, dict):
+            template_returned = response.get("template")
+            pro_pdf = response.get("pro_pdf", "")
+            
+            if template_returned == "academique" and pro_pdf:
+                try:
+                    import base64
+                    pdf_bytes = base64.b64decode(pro_pdf)
+                    test_results["pdf_sizes"]["academique"] = len(pdf_bytes)
+                    
+                    if pdf_bytes.startswith(b'%PDF'):
+                        print(f"   ✅ Template 'academique': PDF valide ({len(pdf_bytes)} bytes)")
+                        test_results["passed_tests"] += 1
+                    else:
+                        print(f"   ❌ Template 'academique': PDF invalide")
+                        test_results["failed_tests"].append("Test 2: PDF académique invalide")
+                except Exception as e:
+                    print(f"   ❌ Template 'academique': Erreur décodage: {e}")
+                    test_results["failed_tests"].append(f"Test 2: Erreur décodage - {e}")
+            else:
+                print(f"   ❌ Template incorrect: attendu 'academique', reçu '{template_returned}'")
+                test_results["failed_tests"].append("Test 2: Template incorrect")
+        else:
+            test_results["failed_tests"].append("Test 2: Échec de la requête")
+        
+        # Test 3: Export Pro avec template par défaut (sans paramètre)
+        print(f"\n🔍 Test 3: Export Pro avec template par défaut")
+        success, response = self.run_test(
+            "PDF Pro Export - Template Défaut",
+            "POST",
+            f"mathalea/sheets/{test_sheet_id}/generate-pdf-pro",
+            200,
+            data={},
+            headers={"X-Session-Token": pro_session_token},
+            timeout=60
+        )
+        
+        if success and isinstance(response, dict):
+            template_returned = response.get("template")
+            if template_returned == "classique":
+                print(f"   ✅ Template par défaut: 'classique' correctement appliqué")
+                test_results["passed_tests"] += 1
+            else:
+                print(f"   ❌ Template par défaut incorrect: attendu 'classique', reçu '{template_returned}'")
+                test_results["failed_tests"].append("Test 3: Template par défaut incorrect")
+        else:
+            test_results["failed_tests"].append("Test 3: Échec de la requête")
+        
+        # Test 4: Export Pro sans token de session (doit échouer avec 403)
+        print(f"\n🔍 Test 4: Export Pro sans token de session")
+        success, response = self.run_test(
+            "PDF Pro Export - Sans Token",
+            "POST",
+            f"mathalea/sheets/{test_sheet_id}/generate-pdf-pro",
+            403,
+            data={"template": "classique"},
+            timeout=30
+        )
+        
+        if success:
+            # Vérifier le message d'erreur
+            if isinstance(response, dict):
+                detail = response.get("detail", "")
+                if "PRO_REQUIRED" in detail:
+                    print(f"   ✅ Erreur 403 avec message approprié: {detail}")
+                    test_results["passed_tests"] += 1
+                else:
+                    print(f"   ⚠️  Erreur 403 mais message inattendu: {detail}")
+                    test_results["passed_tests"] += 1  # Toujours valide si 403
+            else:
+                print(f"   ✅ Erreur 403 reçue correctement")
+                test_results["passed_tests"] += 1
+        else:
+            test_results["failed_tests"].append("Test 4: Devrait retourner 403")
+        
+        # Test 5: Export Pro avec fiche inexistante (doit échouer avec 404)
+        print(f"\n🔍 Test 5: Export Pro avec fiche inexistante")
+        fake_sheet_id = "00000000-0000-0000-0000-000000000000"
+        success, response = self.run_test(
+            "PDF Pro Export - Fiche Inexistante",
+            "POST",
+            f"mathalea/sheets/{fake_sheet_id}/generate-pdf-pro",
+            404,
+            data={"template": "classique"},
+            headers={"X-Session-Token": pro_session_token},
+            timeout=30
+        )
+        
+        if success:
+            print(f"   ✅ Erreur 404 pour fiche inexistante")
+            test_results["passed_tests"] += 1
+        else:
+            test_results["failed_tests"].append("Test 5: Devrait retourner 404")
+        
+        # Test 6: Validation de la taille des PDFs
+        print(f"\n🔍 Test 6: Validation de la taille des PDFs")
+        if "classique" in test_results["pdf_sizes"] and "academique" in test_results["pdf_sizes"]:
+            size_classique = test_results["pdf_sizes"]["classique"]
+            size_academique = test_results["pdf_sizes"]["academique"]
+            
+            print(f"   PDF Classique: {size_classique} bytes")
+            print(f"   PDF Académique: {size_academique} bytes")
+            
+            # Les deux doivent être > 0 et peuvent avoir des tailles différentes
+            if size_classique > 0 and size_academique > 0:
+                print(f"   ✅ Les deux PDFs ont des tailles valides")
+                test_results["passed_tests"] += 1
+                
+                # Comparer les tailles (informatif)
+                if size_classique != size_academique:
+                    print(f"   ℹ️  Tailles différentes (normal pour templates différents)")
+                else:
+                    print(f"   ℹ️  Tailles identiques")
+            else:
+                print(f"   ❌ Tailles invalides")
+                test_results["failed_tests"].append("Test 6: Tailles PDF invalides")
+        else:
+            print(f"   ❌ Impossible de comparer - PDFs manquants")
+            test_results["failed_tests"].append("Test 6: PDFs manquants pour comparaison")
+        
+        # Test 7: Test avec exercices LEGACY et TEMPLATE
+        print(f"\n🔍 Test 7: Test avec exercices LEGACY et TEMPLATE")
+        # Ce test utilise la même fiche qui devrait contenir les deux types
+        success, response = self.run_test(
+            "PDF Pro Export - Exercices Mixtes",
+            "POST",
+            f"mathalea/sheets/{test_sheet_id}/generate-pdf-pro",
+            200,
+            data={"template": "classique"},
+            headers={"X-Session-Token": pro_session_token},
+            timeout=60
+        )
+        
+        if success and isinstance(response, dict):
+            pro_pdf = response.get("pro_pdf", "")
+            if pro_pdf:
+                try:
+                    import base64
+                    pdf_bytes = base64.b64decode(pro_pdf)
+                    if pdf_bytes.startswith(b'%PDF') and len(pdf_bytes) > 1000:
+                        print(f"   ✅ PDF généré avec exercices mixtes ({len(pdf_bytes)} bytes)")
+                        test_results["passed_tests"] += 1
+                    else:
+                        print(f"   ❌ PDF trop petit ou invalide")
+                        test_results["failed_tests"].append("Test 7: PDF invalide")
+                except Exception as e:
+                    print(f"   ❌ Erreur traitement PDF: {e}")
+                    test_results["failed_tests"].append(f"Test 7: Erreur - {e}")
+            else:
+                print(f"   ❌ Pas de PDF dans la réponse")
+                test_results["failed_tests"].append("Test 7: Pas de PDF")
+        else:
+            test_results["failed_tests"].append("Test 7: Échec de la requête")
+        
+        # Résumé des tests PDF Pro
+        print(f"\n📊 RÉSUMÉ TESTS PDF PRO EXPORT:")
+        print(f"   Tests réussis: {test_results['passed_tests']}/{test_results['total_tests']}")
+        print(f"   Taux de réussite: {(test_results['passed_tests']/test_results['total_tests'])*100:.1f}%")
+        
+        if test_results["failed_tests"]:
+            print(f"   ❌ Tests échoués:")
+            for failure in test_results["failed_tests"]:
+                print(f"     - {failure}")
+        
+        if test_results["pdf_sizes"]:
+            print(f"   📄 Tailles des PDFs:")
+            for template, size in test_results["pdf_sizes"].items():
+                print(f"     - {template}: {size} bytes")
+        
+        success_rate = test_results['passed_tests'] / test_results['total_tests']
+        if success_rate >= 0.85:  # 85% de réussite minimum
+            print(f"   🎉 API PDF PRO EXPORT FONCTIONNELLE")
+        else:
+            print(f"   ⚠️  API PDF PRO EXPORT NÉCESSITE DES CORRECTIONS")
+        
+        return success_rate >= 0.85, test_results
 
 def run_magic_link_race_condition_tests():
     """Run specific tests for the magic link race condition bug fix"""
