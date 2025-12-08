@@ -239,7 +239,10 @@ function SheetBuilderPage() {
       const response = await axios.post(`${API}/mathalea/sheets/${currentSheetId}/preview`);
       
       console.log('👁️ Preview généré:', response.data);
-      alert('Preview généré avec succès ! (Affichage détaillé à venir)');
+      
+      // Store preview data and open modal
+      setPreviewData(response.data);
+      setShowPreviewModal(true);
       
     } catch (error) {
       console.error('Erreur preview:', error);
