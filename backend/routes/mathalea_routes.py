@@ -1170,13 +1170,21 @@ async def generate_pro_pdf(
         }
         
         # 4. Récupérer la configuration Pro de l'utilisateur depuis MongoDB
-        # TODO: Récupérer via email/token, pour l'instant config par défaut
+        from services.pro_config_service import get_pro_config_for_user
+        
+        # TODO: Extraire le vrai email depuis le token de session
+        # Pour l'instant, utiliser un email par défaut ou token comme identifiant
+        user_email = x_session_token if "@" in x_session_token else "user@lemaitremot.com"
+        
+        # Récupérer la vraie config Pro depuis MongoDB
+        pro_config = await get_pro_config_for_user(user_email)
+        
         template_config = {
-            "professor_name": "Le Maître Mot",
-            "school_name": "Le Maître Mot",
-            "school_year": "2024-2025",
-            "footer_text": "Document généré par Le Maître Mot",
-            "logo_url": None  # Sera ajouté plus tard via config DB
+            "professor_name": pro_config.get("professor_name", ""),
+            "school_name": pro_config.get("school_name", "Le Maître Mot"),
+            "school_year": pro_config.get("school_year", "2024-2025"),
+            "footer_text": pro_config.get("footer_text", "Document généré par Le Maître Mot"),
+            "logo_url": pro_config.get("logo_url")
         }
         
         # 5. Convertir le preview Builder vers le format Legacy attendu par les templates
