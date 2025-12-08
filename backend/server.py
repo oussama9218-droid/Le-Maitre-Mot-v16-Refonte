@@ -21,6 +21,8 @@ from jinja2 import Template
 from latex_to_svg import latex_renderer
 from geometry_renderer import geometry_renderer
 from render_schema import schema_renderer
+import sys
+import subprocess
 # Nouveaux imports pour l'architecture mathématique structurée (réorganisés)
 from services.math_generation_service import MathGenerationService
 from services.math_text_service import MathTextService
