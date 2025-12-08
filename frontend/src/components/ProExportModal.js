@@ -3,6 +3,13 @@ import { X, Crown, Download, Loader2, Building2, Palette } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import axios from "axios";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -10,6 +17,7 @@ const API = `${BACKEND_URL}/api`;
 
 function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) {
   const [isExporting, setIsExporting] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState("classique");
 
   if (!isOpen) return null;
 
