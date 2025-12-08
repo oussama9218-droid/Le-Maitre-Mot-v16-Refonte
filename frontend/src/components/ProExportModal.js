@@ -145,6 +145,32 @@ function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) 
               </ul>
             </div>
 
+            {/* Template Selector */}
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h3 className="font-semibold text-gray-900 mb-3">
+                Choisissez votre template
+              </h3>
+              <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Sélectionner un template" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="classique">
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">Classique</span>
+                      <span className="text-xs text-gray-500">Style moderne et coloré</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="academique">
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">Académique</span>
+                      <span className="text-xs text-gray-500">Style formel et structuré</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Current Config */}
             <div className="border border-gray-200 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 mb-3">
@@ -157,7 +183,9 @@ function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) 
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Template :</span>
-                  <Badge variant="outline">Classique</Badge>
+                  <Badge variant="outline">
+                    {selectedTemplate === "classique" ? "Classique" : "Académique"}
+                  </Badge>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Logo :</span>
