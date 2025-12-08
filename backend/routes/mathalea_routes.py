@@ -1401,3 +1401,39 @@ async def upload_pro_logo(
         logger.error(f"❌ Erreur upload logo: {e}")
         raise HTTPException(status_code=500, detail="Erreur lors de l'upload du logo")
 
+
+@router.get("/template/styles")
+async def get_template_styles():
+    """
+    Retourne la liste des styles de templates disponibles
+    
+    Returns:
+        Liste des styles avec leurs descriptions et couleurs
+    """
+    try:
+        styles = {
+            "classique": {
+                "name": "Classique",
+                "description": "Style traditionnel élégant avec mise en page moderne",
+                "preview_colors": {
+                    "primary": "#2563eb",
+                    "accent": "#7c3aed"
+                }
+            },
+            "academique": {
+                "name": "Académique",
+                "description": "Style professionnel et sobre pour documents officiels",
+                "preview_colors": {
+                    "primary": "#1e40af",
+                    "accent": "#4b5563"
+                }
+            }
+        }
+        
+        return {"styles": styles}
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur lors de la récupération des styles: {e}")
+        raise HTTPException(status_code=500, detail="Erreur lors de la récupération des styles")
+
+
