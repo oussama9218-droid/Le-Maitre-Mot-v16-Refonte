@@ -31,7 +31,8 @@ from models.mathalea_models import (
     SheetItemCreate,
     SheetItemUpdate,
     SheetItemListResponse,
-    ExerciseItemConfig
+    ExerciseItemConfig,
+    ProPdfRequest
 )
 
 # Router avec préfixe pour isoler du système existant
