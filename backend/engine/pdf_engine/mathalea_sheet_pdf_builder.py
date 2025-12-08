@@ -481,7 +481,7 @@ def build_sheet_pro_pdf(legacy_format: dict, template: str = "classique", user_c
     return pdf_bytes
 
 
-def _build_html_pro(legacy_format: dict) -> str:
+def _build_html_pro_classique(legacy_format: dict, user_config: dict = None) -> str:
     """Génère le HTML pour le PDF Pro personnalisé"""
     
     titre = legacy_format.get("titre", "Feuille d'exercices")
