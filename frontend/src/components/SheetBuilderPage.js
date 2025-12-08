@@ -21,8 +21,7 @@ import {
   Crown,
   AlertCircle,
   Sparkles,
-  FileText,
-  ArrowLeft
+  FileText
 } from "lucide-react";
 import { Switch } from "./ui/switch";
 
