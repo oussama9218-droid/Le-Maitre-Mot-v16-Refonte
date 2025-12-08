@@ -346,6 +346,10 @@ class ProPdfRequest(BaseModel):
         default="classique",
         description="Template à utiliser: 'classique' ou 'academique'"
     )
+    type_doc: str = Field(
+        default="exercices",
+        description="Type de document: 'exercices', 'controle', 'evaluation', 'dm'"
+    )
 
 
 # ============================================================================
