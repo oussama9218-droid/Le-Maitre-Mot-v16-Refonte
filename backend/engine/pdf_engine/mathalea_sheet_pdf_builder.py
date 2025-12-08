@@ -451,34 +451,33 @@ def _get_base_css() -> str:
     """
 
 
-def build_sheet_pro_pdf(legacy_format: dict) -> bytes:
+def build_sheet_pro_pdf(legacy_format: dict, template: str = "classique", user_config: dict = None) -> bytes:
     """
     Génère un PDF Pro personnalisé à partir du format legacy
     
     Ce PDF inclut:
     - Logo de l'établissement
-    - Template personnalisé
+    - Template personnalisé (classique ou académique)
     - Couleur primaire personnalisée
     - Énoncés et corrections
     
     Args:
         legacy_format: Dict au format legacy Pro generator
-            {
-                "titre": "...",
-                "etablissement": "...",
-                "logo_url": "...",
-                "template": "classique",
-                "primary_color": "#1a56db",
-                "exercices": [...]
-            }
+        template: "classique" ou "academique"
+        user_config: Configuration utilisateur (optionnel)
     
     Returns:
         bytes: Contenu du PDF Pro personnalisé
     """
-    html_content = _build_html_pro(legacy_format)
+    # Choisir le template approprié
+    if template == "academique":
+        html_content = _build_html_pro_academique(legacy_format, user_config)
+    else:  # "classique" par défaut
+        html_content = _build_html_pro_classique(legacy_format, user_config)
+    
     pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
     
-    logger.info(f"✅ PDF Pro généré: {len(pdf_bytes)} bytes")
+    logger.info(f"✅ PDF Pro généré ({template}): {len(pdf_bytes)} bytes")
     return pdf_bytes
 
 
