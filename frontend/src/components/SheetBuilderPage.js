@@ -238,7 +238,26 @@ function SheetBuilderPage() {
       
     } catch (error) {
       console.error('Erreur preview:', error);
-      alert('Erreur lors de la génération du preview');
+      
+      // Improved error handling
+      let errorMessage = 'Impossible de générer la prévisualisation. ';
+      
+      if (error.response) {
+        // Server responded with error status
+        if (error.response.status >= 400 && error.response.status < 500) {
+          errorMessage += error.response.data?.detail || 'Merci de vérifier la configuration des exercices.';
+        } else if (error.response.status >= 500) {
+          errorMessage += 'Erreur serveur. Merci de réessayer plus tard.';
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage += 'Impossible de contacter le serveur. Vérifiez votre connexion.';
+      } else {
+        // Something else happened
+        errorMessage += 'Une erreur inattendue s\'est produite.';
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsGeneratingPreview(false);
     }
