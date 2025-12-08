@@ -92,19 +92,9 @@ function PdfDownloadModal({ isOpen, onClose, pdfResult }) {
           </p>
 
           <div className="space-y-3">
-            {/* Bouton Sujet */}
-            <Button
-              onClick={() => downloadPdfFromBase64(subject_pdf, `LeMaitreMot_${sheetTitle}_Sujet.pdf`)}
-              className="w-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center"
-              size="lg"
-            >
-              <FileText className="h-5 w-5 mr-2" />
-              Télécharger le sujet
-            </Button>
-
             {/* Bouton Version élève */}
             <Button
-              onClick={() => downloadPdfFromBase64(student_pdf, `LeMaitreMot_${sheetTitle}_Eleve.pdf`)}
+              onClick={() => downloadPdfFromBase64(student_pdf, `${base_filename || sheetTitle}_Eleve.pdf`)}
               className="w-full bg-green-600 hover:bg-green-700 flex items-center justify-center"
               size="lg"
             >
@@ -114,12 +104,12 @@ function PdfDownloadModal({ isOpen, onClose, pdfResult }) {
 
             {/* Bouton Corrigé */}
             <Button
-              onClick={() => downloadPdfFromBase64(correction_pdf, `LeMaitreMot_${sheetTitle}_Corrige.pdf`)}
-              className="w-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center"
+              onClick={() => downloadPdfFromBase64(correction_pdf, `${base_filename || sheetTitle}_Corrige.pdf`)}
+              className="w-full bg-red-600 hover:bg-red-700 flex items-center justify-center"
               size="lg"
             >
               <Download className="h-5 w-5 mr-2" />
-              Télécharger le corrigé
+              Télécharger la version corrigée
             </Button>
           </div>
 
