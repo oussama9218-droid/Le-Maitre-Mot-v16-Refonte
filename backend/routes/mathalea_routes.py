@@ -879,7 +879,16 @@ async def generate_sheet_pdf(sheet_id: str):
             "items": preview_items
         }
         
-        # 3. Générer les 3 PDFs
+        # 3. Enrichissement IA optionnel (Sprint E)
+        # Vérifier si au moins un item a l'IA activée
+        if check_if_ai_needed(preview):
+            logger.info(f"🎨 IA activée pour la feuille {sheet_id}, enrichissement en cours...")
+            preview = await apply_ai_enrichment_to_sheet_preview(preview)
+            logger.info(f"✅ IA: Enrichissement terminé")
+        else:
+            logger.info(f"⏭️  IA désactivée pour la feuille {sheet_id}, génération directe")
+        
+        # 4. Générer les 3 PDFs
         subject_pdf_bytes = build_sheet_subject_pdf(preview)
         student_pdf_bytes = build_sheet_student_pdf(preview)
         correction_pdf_bytes = build_sheet_correction_pdf(preview)
