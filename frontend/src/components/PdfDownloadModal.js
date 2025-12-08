@@ -6,7 +6,7 @@ import { Card, CardContent } from "./ui/card";
 function PdfDownloadModal({ isOpen, onClose, pdfResult }) {
   if (!isOpen || !pdfResult) return null;
 
-  const { subject_pdf, student_pdf, correction_pdf, sheetTitle } = pdfResult;
+  const { student_pdf, correction_pdf, base_filename, sheetTitle } = pdfResult;
 
   /**
    * Fonction helper pour télécharger un PDF depuis base64
