@@ -112,12 +112,80 @@
             max-width: 100%;
             height: auto;
         }
+        
+        /* Pro header styles */
+        .pro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f6f0;
+            border: 2px solid #8b4513;
+            border-radius: 5px;
+        }
+        
+        .pro-logo {
+            max-height: 60px;
+            max-width: 120px;
+        }
+        
+        .pro-info {
+            text-align: right;
+            font-size: 10pt;
+        }
+        
+        .pro-school {
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 3px;
+        }
+        
+        .pro-professor, .pro-year {
+            color: #654321;
+            margin-bottom: 2px;
+        }
+        
+        /* Pro footer styles */
+        .pro-footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #8b4513;
+            text-align: center;
+            font-size: 9pt;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
+    <!-- Pro header avec infos personnalisées -->
+    {% if template_config %}
+    <div class="pro-header">
+        <div>
+            {% if template_config.logo_url %}
+                <img src="{{ template_config.logo_url }}" class="pro-logo" alt="Logo" />
+            {% endif %}
+        </div>
+        <div class="pro-info">
+            {% if template_config.school_name %}
+                <div class="pro-school">{{ template_config.school_name }}</div>
+            {% endif %}
+            {% if template_config.professor_name %}
+                <div class="pro-professor">{{ template_config.professor_name }}</div>
+            {% endif %}
+            {% if template_config.school_year %}
+                <div class="pro-year">Année scolaire {{ template_config.school_year }}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
     <div class="document-header">
-        <div class="document-title">{{ document.type_doc|title }} - Corrigé</div>
-        <div class="document-subtitle">{{ document.matiere }} • {{ document.niveau }} • {{ document.chapitre }}</div>
+        <div class="document-title">CORRIGÉ — {{ document.type_doc|upper }}</div>
+        <div class="document-subtitle">
+            {{ document.matiere }} — {{ document.niveau }} — {{ document.chapitre }}
+        </div>
     </div>
 
     {% for exercice in document.exercises %}
