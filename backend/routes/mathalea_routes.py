@@ -43,13 +43,13 @@ if not mongo_url:
     raise ValueError("MONGO_URL environment variable is required")
 
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ.get('DB_NAME', 'lemaitremot')]
+db = client.mathalea_db  # Use same DB as catalogue routes
 
 # Collections dédiées (ne perturbent pas les collections existantes)
-competences_collection = db.mathalea_competences
-exercise_types_collection = db.mathalea_exercise_types
-exercise_sheets_collection = db.mathalea_exercise_sheets
-sheet_items_collection = db.mathalea_sheet_items
+competences_collection = db.competences
+exercise_types_collection = db.exercise_types  # Same collection as catalogue
+exercise_sheets_collection = db.exercise_sheets
+sheet_items_collection = db.sheet_items
 
 
 # ============================================================================
