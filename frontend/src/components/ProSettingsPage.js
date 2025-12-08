@@ -346,15 +346,28 @@ const ProSettingsPage = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="mb-6">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/builder')}
-            className="mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour
-          </Button>
+          {/* Bouton de retour intelligent */}
+          {from === 'builder' && sheetId ? (
+            <Button 
+              variant="default"
+              size="sm" 
+              onClick={() => navigate(`/builder/${sheetId}`)}
+              className="mb-4 bg-blue-600 hover:bg-blue-700"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour à ma fiche
+            </Button>
+          ) : (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/builder')}
+              className="mb-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Button>
+          )}
           
           <div className="flex items-center justify-between">
             <div>
@@ -366,6 +379,11 @@ const ProSettingsPage = () => {
               <p className="text-gray-600 mt-2">
                 Personnalisez vos documents PDF avec votre logo et informations
               </p>
+              {from === 'builder' && sheetId && (
+                <p className="text-sm text-blue-600 mt-1">
+                  ✨ Vous éditez vos paramètres depuis une fiche en cours
+                </p>
+              )}
             </div>
           </div>
         </div>
