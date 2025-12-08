@@ -89,7 +89,7 @@ async def test_sheet(client):
         assert response.status_code == 201
         return response.json()
     
-    @pytest.mark.asyncio
+@pytest.mark.asyncio
     async def test_preview_empty_sheet(self, client, test_sheet):
         """
         TEST 1: Création d'une fiche avec 0 item
@@ -109,7 +109,7 @@ async def test_sheet(client):
         assert data["niveau"] == "6e"
         assert data["items"] == []
     
-    @pytest.mark.asyncio
+@pytest.mark.asyncio
     async def test_preview_with_two_items(
         self,
         client,
@@ -189,7 +189,7 @@ async def test_sheet(client):
         assert len(preview_item2["generated"]["questions"]) == 5
         assert preview_item2["generated"]["seed"] == 200
     
-    @pytest.mark.asyncio
+@pytest.mark.asyncio
     async def test_preview_reproducibility(
         self,
         client,
@@ -256,7 +256,7 @@ async def test_sheet(client):
                 assert q1["solution_brut"] == q2["solution_brut"]
                 assert q1["data"] == q2["data"]
     
-    @pytest.mark.asyncio
+@pytest.mark.asyncio
     async def test_preview_nb_questions_below_min(
         self,
         client,
@@ -290,7 +290,7 @@ async def test_sheet(client):
         assert response.status_code == 422
         assert "min_questions" in response.json()["detail"]
     
-    @pytest.mark.asyncio
+@pytest.mark.asyncio
     async def test_preview_nb_questions_above_max(
         self,
         client,
@@ -324,7 +324,7 @@ async def test_sheet(client):
         assert response.status_code == 422
         assert "max_questions" in response.json()["detail"]
     
-    @pytest.mark.asyncio
+@pytest.mark.asyncio
     async def test_preview_exercise_type_not_found(
         self,
         client,
@@ -356,7 +356,7 @@ async def test_sheet(client):
         assert response.status_code == 404
         assert "ExerciseType not found" in response.json()["detail"]
     
-    @pytest.mark.asyncio
+@pytest.mark.asyncio
     async def test_preview_exercise_type_deleted_after_item_creation(
         self,
         client,
@@ -401,7 +401,7 @@ async def test_sheet(client):
         assert preview_response.status_code == 404
         assert "ExerciseType" in preview_response.json()["detail"]
     
-    @pytest.mark.asyncio
+@pytest.mark.asyncio
     async def test_preview_calls_generate_once_per_item(
         self,
         client,
@@ -458,7 +458,7 @@ async def test_sheet(client):
             assert kwargs["use_ai_enonce"] == False
             assert kwargs["use_ai_correction"] == False
     
-    @pytest.mark.asyncio
+@pytest.mark.asyncio
     async def test_preview_invalid_difficulty(
         self,
         client,
@@ -493,7 +493,7 @@ async def test_sheet(client):
         assert "difficulty" in response.json()["detail"]
         assert "available levels" in response.json()["detail"]
     
-    @pytest.mark.asyncio
+@pytest.mark.asyncio
     async def test_get_sheet_with_items(
         self,
         client,
@@ -531,7 +531,7 @@ async def test_sheet(client):
         assert data["id"] == sheet_id
         assert data["titre"] == "Feuille de test"
     
-    @pytest.mark.asyncio
+@pytest.mark.asyncio
     async def test_get_sheet_items(
         self,
         client,
