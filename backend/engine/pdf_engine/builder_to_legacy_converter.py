@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 def convert_builder_to_legacy_pro_format(
     preview_json: Dict[str, Any],
-    template_config: Dict[str, Any] = None
+    template_config: Dict[str, Any] = None,
+    type_doc: str = "exercices"
 ) -> Dict[str, Any]:
     """
     Convertit le preview JSON du Builder vers le format attendu par les templates Pro historiques
