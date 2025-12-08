@@ -91,21 +91,42 @@ const TemplateSettings = ({ isPro, sessionToken, onTemplateChange }) => {
     
     setSaving(true);
     try {
-      // Préparer les données de config Pro
+      let uploadedLogoUrl = logoPreview; // Conserver le logo existant par défaut
+      
+      // 1. Si un nouveau fichier logo a été sélectionné, l'uploader d'abord
+      if (logoFile) {
+        console.log('📤 Upload du nouveau logo...');
+        const formData = new FormData();
+        formData.append('file', logoFile);
+        
+        const uploadResponse = await axios.post(
+          `${API}/api/mathalea/pro/upload-logo`,
+          formData,
+          {
+            headers: {
+              'X-Session-Token': sessionToken,
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+        );
+        
+        uploadedLogoUrl = uploadResponse.data.logo_url;
+        console.log('✅ Logo uploadé:', uploadedLogoUrl);
+      }
+      
+      // 2. Préparer les données de config Pro avec le logo
       const configData = {
         professor_name: professorName || '',
         school_name: schoolName || '',
         school_year: schoolYear || '2024-2025',
         footer_text: footerText || '',
-        template_choice: selectedStyle
+        template_choice: selectedStyle,
+        logo_url: uploadedLogoUrl || null  // Sauvegarder l'URL du logo
       };
-      
-      // TODO: Gérer l'upload du logo séparément si nécessaire
-      // Pour l'instant, on ne modifie pas le logo
       
       console.log('💾 Sauvegarde config Pro:', configData);
 
-      // Nouvelle route API pour sauvegarder la config Pro
+      // 3. Sauvegarder la configuration Pro complète
       const response = await axios.put(`${API}/api/mathalea/pro/config`, configData, {
         headers: { 
           'X-Session-Token': sessionToken,
@@ -115,10 +136,10 @@ const TemplateSettings = ({ isPro, sessionToken, onTemplateChange }) => {
 
       console.log('✅ Config Pro sauvegardée avec succès');
       
-      // Recharger la config pour confirmer
+      // 4. Recharger la config pour confirmer
       await loadUserTemplate();
       
-      // Notify parent component
+      // 5. Notify parent component
       if (onTemplateChange) {
         onTemplateChange(configData);
       }
