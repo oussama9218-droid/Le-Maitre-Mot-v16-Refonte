@@ -455,13 +455,6 @@ class ExerciseTemplateService:
 exercise_template_service = ExerciseTemplateService()
 
 
-# Export
-__all__ = [
-    "ExerciseTemplateService",
-    "exercise_template_service"
-]
-
-
     async def _generate_legacy_questions(
         self,
         exercise_type: ExerciseType,
