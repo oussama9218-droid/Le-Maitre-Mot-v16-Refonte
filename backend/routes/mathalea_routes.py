@@ -27,7 +27,8 @@ from models.mathalea_models import (
     SheetItem,
     SheetItemCreate,
     SheetItemUpdate,
-    SheetItemListResponse
+    SheetItemListResponse,
+    ExerciseItemConfig
 )
 
 # Router avec préfixe pour isoler du système existant
