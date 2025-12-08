@@ -1187,31 +1187,46 @@ async def generate_pro_pdf(
             template_config=template_config
         )
         
-        # 6. Rendre le HTML via Jinja2 avec les templates historiques
-        from engine.pdf_engine.template_renderer import render_pro_corrige
+        # 6. Générer les 2 PDFs Pro (Sujet + Corrigé) via Jinja2
+        from engine.pdf_engine.template_renderer import render_pro_sujet, render_pro_corrige
         import weasyprint
         
-        # On génère le corrigé Pro (qui contient énoncés + solutions)
-        html_content = render_pro_corrige(
+        # Générer le Sujet Pro (énoncés + zones de réponse)
+        html_sujet = render_pro_sujet(
             template_style=template,
             document_data=document_data,
             template_config=template_config
         )
+        pro_subject_pdf_bytes = weasyprint.HTML(string=html_sujet).write_pdf()
         
-        # 7. Convertir HTML → PDF avec WeasyPrint
-        pro_pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
+        # Générer le Corrigé Pro (énoncés + solutions)
+        html_corrige = render_pro_corrige(
+            template_style=template,
+            document_data=document_data,
+            template_config=template_config
+        )
+        pro_correction_pdf_bytes = weasyprint.HTML(string=html_corrige).write_pdf()
         
-        # 8. Encoder en base64
+        # 7. Encoder les 2 PDFs en base64
         import base64
-        pro_pdf_b64 = base64.b64encode(pro_pdf_bytes).decode('utf-8')
+        pro_subject_pdf_b64 = base64.b64encode(pro_subject_pdf_bytes).decode('utf-8')
+        pro_correction_pdf_b64 = base64.b64encode(pro_correction_pdf_bytes).decode('utf-8')
         
-        logger.info(f"✅ PDF Pro généré avec succès pour la fiche {sheet_id} (template: {template})")
+        # 8. Créer le nom de fichier base
+        base_filename = f"LeMaitreMot_{sheet.get('titre', 'Fiche').replace(' ', '_')}_Pro"
+        
+        logger.info(f"✅ 2 PDFs Pro générés avec succès pour la fiche {sheet_id} (template: {template})")
         
         return {
-            "pro_pdf": pro_pdf_b64,
-            "filename": f"LeMaitreMot_Pro_{sheet.get('titre', 'Fiche')}.pdf",
+            "pro_subject_pdf": pro_subject_pdf_b64,
+            "pro_correction_pdf": pro_correction_pdf_b64,
+            "base_filename": base_filename,
             "template": template,
-            "school_name": template_config.get("school_name")
+            "etablissement": template_config.get("school_name"),
+            "professeur": template_config.get("professor_name"),
+            "school_year": template_config.get("school_year"),
+            "footer_text": template_config.get("footer_text"),
+            "logo_url": template_config.get("logo_url")
         }
         
     except HTTPException:
