@@ -1332,3 +1332,65 @@ async def update_pro_config_endpoint(
         return {"message": "Configuration Pro mise à jour avec succès"}
     else:
         raise HTTPException(status_code=500, detail="Erreur lors de la mise à jour")
+
+
+@router.post("/pro/upload-logo")
+async def upload_pro_logo(
+    file: UploadFile = File(...),
+    x_session_token: str = Header(None, alias="X-Session-Token")
+):
+    """
+    Upload un logo pour la configuration Pro
+    
+    Args:
+        file: Fichier image (PNG, JPG, JPEG)
+        x_session_token: Token de session (requis)
+    
+    Returns:
+        URL du logo uploadé
+    
+    Raises:
+        403: Si pas de token
+        400: Si le fichier n'est pas une image
+    """
+    if not x_session_token:
+        raise HTTPException(status_code=403, detail="Session token required")
+    
+    # Vérifier le type de fichier
+    if not file.content_type or not file.content_type.startswith('image/'):
+        raise HTTPException(status_code=400, detail="Le fichier doit être une image (PNG, JPG, JPEG)")
+    
+    # Vérifier la taille (max 2MB)
+    file_content = await file.read()
+    if len(file_content) > 2 * 1024 * 1024:  # 2MB
+        raise HTTPException(status_code=400, detail="Le fichier ne doit pas dépasser 2 Mo")
+    
+    try:
+        # Créer le dossier uploads/logos s'il n'existe pas
+        upload_dir = Path("/app/backend/uploads/logos")
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Générer un nom de fichier unique
+        file_extension = file.filename.split('.')[-1] if '.' in file.filename else 'png'
+        unique_filename = f"{uuid.uuid4()}.{file_extension}"
+        file_path = upload_dir / unique_filename
+        
+        # Sauvegarder le fichier
+        with open(file_path, 'wb') as f:
+            f.write(file_content)
+        
+        # Construire l'URL du logo
+        logo_url = f"/uploads/logos/{unique_filename}"
+        
+        logger.info(f"✅ Logo uploadé: {logo_url}")
+        
+        return {
+            "logo_url": logo_url,
+            "filename": unique_filename,
+            "message": "Logo uploadé avec succès"
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur upload logo: {e}")
+        raise HTTPException(status_code=500, detail="Erreur lors de l'upload du logo")
+
