@@ -39,10 +39,18 @@
     "theoreme_de_pythagore__trouver_valeur__facile__etapes": "Étape 1 : Triangle {triangle} rectangle en {angleD}\nÉtape 2 : Note {cote1} = {long1} cm et {cote2} = {long2} cm\nÉtape 3 : Applique Pythagore pour trouver {coteACalculer}",
     "theoreme_de_pythagore__trouver_valeur__facile__academique": "Dans le triangle {triangle} rectangle en {angleD}, utilise les propriétés du théorème de Pythagore pour déterminer {coteACalculer}, sachant que {cote1} = {long1} cm et {cote2} = {long2} cm.",
     "theoreme_de_pythagore__trouver_valeur__facile__defi": "Défi Pythagore ! Triangle {triangle}, angle droit en {angleD}, {cote1} = {long1} cm, {cote2} = {long2} cm. Trouve {coteACalculer} en moins de 2 minutes !",
-    "theoreme_de_pythagore__trouver_valeur__facile__inductif": "Comme dans l'exercice précédent, utilise Pythagore. Triangle {triangle} rectangle en {angleD}, {cote1} = {long1} cm, {cote2} = {long2} cm. Calcule {coteACalculer}."
+    "theoreme_de_pythagore__trouver_valeur__facile__inductif": "Comme dans l'exercice précédent, utilise Pythagore. Triangle {triangle} rectangle en {angleD}, {cote1} = {long1} cm, {cote2} = {long2} cm. Calcule {coteACalculer}.",
+    "symetrie_axiale__trouver_valeur__facile__inductif": "Rappelle-toi comment on fait pour les symétries. Ici, {pointA}({coordA_x}, {coordA_y}) et {axeDesc}. Déduis-en la position de {pointB}.",
+    "symetrie_axiale__trouver_valeur__facile__etapes": "1) Place {pointA} en ({coordA_x}, {coordA_y})\n2) Trace {axeDesc}\n3) Détermine {pointB}, symétrique de {pointA}",
+    "symetrie_axiale__trouver_valeur__facile__oral": "OK, {pointA} c'est ({coordA_x}, {coordA_y}). L'axe c'est {axeDesc}. Maintenant dis-moi où va {pointB}.",
+    "symetrie_axiale__trouver_valeur__facile__narratif": "Marie trace un point {pointA} en ({coordA_x}, {coordA_y}). Son professeur lui demande de construire {pointB}, le symétrique de {pointA} par rapport à {axeDesc}. Où doit-elle le placer ?",
+    "symetrie_axiale__verifier_propriete__moyen__oral": "Dis-moi, {pointA} en ({coordA_x}, {coordA_y}) et {pointB} en ({coordB_x}, {coordB_y}), par rapport à {axeDesc}, c'est bon pour la symétrie ?",
+    "symetrie_centrale__trouver_valeur__moyen__concis": "Donnés : {pointA}({coordA_x}, {coordA_y}), centre {pointO}({centreX}, {centreY}). Calcule {pointB}.",
+    "symetrie_centrale__trouver_valeur__moyen__etapes": "Étape 1 : Repère le point {pointA}({coordA_x}, {coordA_y})\nÉtape 2 : Identifie le centre {pointO}({centreX}, {centreY})\nÉtape 3 : Utilise la formule du milieu pour calculer {pointB}",
+    "symetrie_centrale__verifier_propriete__moyen__etapes": "Étape 1 : Note les coordonnées : {pointA}({coordA_x}, {coordA_y}), {pointB}({coordB_x}, {coordB_y}), {pointO}({centreX}, {centreY})\nÉtape 2 : Calcule le milieu de [{pointA}{pointB}]\nÉtape 3 : Compare avec {pointO}"
   },
-  "hits": 21,
-  "misses": 40,
-  "total_cost_saved": 808.0,
-  "last_updated": "2025-12-07T22:38:07.628515"
+  "hits": 38,
+  "misses": 48,
+  "total_cost_saved": 1480.0,
+  "last_updated": "2025-12-07T23:07:58.839667"
 }
