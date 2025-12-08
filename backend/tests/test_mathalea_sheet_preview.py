@@ -76,7 +76,7 @@ async def test_exercise_type(client, test_competence):
     return response.json()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def test_sheet(client):
     """Créer une feuille de test"""
     response = await client.post(
