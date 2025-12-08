@@ -30,7 +30,9 @@ function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) 
     try {
       const response = await axios.post(
         `${API}/mathalea/sheets/${sheetId}/generate-pdf-pro`,
-        {},
+        {
+          template: selectedTemplate
+        },
         {
           headers: {
             'X-Session-Token': sessionToken
