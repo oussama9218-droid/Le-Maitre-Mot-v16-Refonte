@@ -165,6 +165,17 @@ function Header({ isPro, userEmail, onLogin, onLogout }) {
             <FolderOpen className="h-4 w-4 mr-1" />
             Fiches
           </Button>
+
+          {isPro && (
+            <Button
+              variant={isActive('/pro/settings') ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => navigate('/pro/settings')}
+            >
+              <Settings className="h-4 w-4 mr-1" />
+              Param. Pro
+            </Button>
+          )}
         </nav>
       </div>
     </header>
