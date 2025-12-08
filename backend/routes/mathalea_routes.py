@@ -1186,12 +1186,19 @@ async def generate_pro_pdf(
         
         logger.info(f"📋 Config Pro récupérée: professor={pro_config.get('professor_name')}, school={pro_config.get('school_name')}")
         
+        # Construire le chemin absolu du logo pour WeasyPrint
+        logo_url = pro_config.get("logo_url")
+        if logo_url and not logo_url.startswith('http'):
+            # Convertir le chemin relatif en chemin absolu pour WeasyPrint
+            logo_path = Path("/app/backend") / logo_url.lstrip('/')
+            logo_url = f"file://{logo_path}" if logo_path.exists() else None
+        
         template_config = {
             "professor_name": pro_config.get("professor_name", ""),
             "school_name": pro_config.get("school_name", "Le Maître Mot"),
             "school_year": pro_config.get("school_year", "2024-2025"),
             "footer_text": pro_config.get("footer_text", "Document généré par Le Maître Mot"),
-            "logo_url": pro_config.get("logo_url")
+            "logo_url": logo_url
         }
         
         logger.info(f"✅ Template config préparée: {template_config}")
