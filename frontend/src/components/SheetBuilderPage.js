@@ -724,7 +724,7 @@ function SheetBuilderPage() {
                       </Button>
                       
                       <Button
-                        onClick={() => handleGeneratePDF('complete')}
+                        onClick={handleGeneratePDF}
                         disabled={isGeneratingPDF}
                         className="w-full bg-green-600 hover:bg-green-700"
                       >
