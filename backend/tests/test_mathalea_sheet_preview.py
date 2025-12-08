@@ -10,6 +10,7 @@ Couvre:
 """
 
 import pytest
+import pytest_asyncio
 from httpx import AsyncClient
 from datetime import datetime, timezone
 from uuid import uuid4
@@ -22,14 +23,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from server import app
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client():
     """Client HTTP async pour les tests"""
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def test_competence(client):
     """Créer une compétence de test"""
     response = await client.post(
@@ -45,7 +46,7 @@ async def test_competence(client):
     return response.json()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def test_exercise_type(client, test_competence):
     """Créer un ExerciseType de test"""
     response = await client.post(
