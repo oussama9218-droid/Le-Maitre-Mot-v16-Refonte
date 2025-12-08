@@ -602,7 +602,7 @@ class ExerciseTemplateService:
                 solution = f"Par symétrie axiale par rapport à l'axe des abscisses (droite d'équation y = 0), l'abscisse reste identique et l'ordonnée change de signe.\n" \
                           f"Les coordonnées de {point}' sont ({x} ; {-y})."
         
-        elif "POURC" in legacy_type or "percent" in legacy_type.lower():
+        elif "pourc" in legacy_type_lower:
             # Pourcentages
             total = rng.randint(100, 1000)
             percent = rng.choice([10, 15, 20, 25, 30, 40, 50, 75])
@@ -611,7 +611,7 @@ class ExerciseTemplateService:
             enonce = f"Calculer {percent}% de {total}."
             solution = f"Pour calculer {percent}% de {total}, on effectue : ({percent} × {total}) / 100 = {result}"
         
-        elif "CALC" in legacy_type and "DEC" in legacy_type:
+        elif "calc" in legacy_type_lower and "dec" in legacy_type_lower:
             # Calculs avec décimaux
             a = round(rng.uniform(1, 50), 1)
             b = round(rng.uniform(1, 30), 1)
@@ -631,9 +631,9 @@ class ExerciseTemplateService:
                 solution = f"{a} × {b} = {result}"
         
         else:
-            # Type inconnu ou générique
-            enonce = f"Exercice de type {exercise_type.titre} - Question {question_number}"
-            solution = f"Cette question est en cours de développement pour le type {legacy_type}."
+            # Type inconnu ou générique - fournir une question générique mais professionnelle
+            enonce = f"Question d'exercice de géométrie ou de calcul (niveau {niveau})"
+            solution = f"La correction de cet exercice est en cours de développement."
         
         return {
             "id": f"q{question_number}",
