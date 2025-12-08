@@ -16,16 +16,55 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) {
-  const [isExporting, setIsExporting] = useState(false);
+  const [isExportingSubject, setIsExportingSubject] = useState(false);
+  const [isExportingCorrection, setIsExportingCorrection] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState("classique");
 
   if (!isOpen) return null;
 
   /**
-   * Exporte le PDF Pro personnalisé
+   * Helper pour télécharger un PDF depuis base64
    */
-  const handleProExport = async () => {
-    setIsExporting(true);
+  const downloadPdfFromBase64 = (base64Data, filename) => {
+    if (!base64Data) {
+      console.error('Pas de données base64 à télécharger');
+      return;
+    }
+    
+    try {
+      const byteCharacters = window.atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 1000);
+      
+      console.log('📥 PDF Pro téléchargé:', filename);
+    } catch (error) {
+      console.error('Erreur téléchargement PDF Pro:', error);
+      alert('Erreur lors du téléchargement du PDF. Veuillez réessayer.');
+    }
+  };
+
+  /**
+   * Exporte le Sujet Pro
+   */
+  const handleExportSubjectPro = async () => {
+    setIsExportingSubject(true);
     
     try {
       const response = await axios.post(
@@ -40,38 +79,20 @@ function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) 
         }
       );
       
-      const { pro_pdf, filename } = response.data;
+      const { pro_subject_pdf, base_filename } = response.data;
       
-      // Décoder base64 et télécharger
-      const byteCharacters = window.atob(pro_pdf);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      if (!pro_subject_pdf) {
+        throw new Error('PDF Sujet Pro non reçu du serveur');
       }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
       
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename || `LeMaitreMot_Pro_${sheetTitle}.pdf`;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      
-      setTimeout(() => {
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      }, 1000);
-      
-      console.log('📥 PDF Pro téléchargé:', filename);
-      alert('PDF Pro téléchargé avec succès !');
-      onClose();
+      const filename = `${base_filename}_SujetPro_${selectedTemplate}.pdf`;
+      downloadPdfFromBase64(pro_subject_pdf, filename);
+      alert('✅ Sujet Pro téléchargé avec succès !');
       
     } catch (error) {
-      console.error('Erreur export Pro:', error);
+      console.error('Erreur export Sujet Pro:', error);
       
-      let errorMessage = 'Erreur lors de l\'export Pro. ';
+      let errorMessage = 'Erreur lors de l\'export du Sujet Pro. ';
       
       if (error.response) {
         if (error.response.status === 403) {
@@ -89,7 +110,61 @@ function ProExportModal({ isOpen, onClose, sheetId, sheetTitle, sessionToken }) 
       
       alert(errorMessage);
     } finally {
-      setIsExporting(false);
+      setIsExportingSubject(false);
+    }
+  };
+
+  /**
+   * Exporte le Corrigé Pro
+   */
+  const handleExportCorrectionPro = async () => {
+    setIsExportingCorrection(true);
+    
+    try {
+      const response = await axios.post(
+        `${API}/mathalea/sheets/${sheetId}/generate-pdf-pro`,
+        {
+          template: selectedTemplate
+        },
+        {
+          headers: {
+            'X-Session-Token': sessionToken
+          }
+        }
+      );
+      
+      const { pro_correction_pdf, base_filename } = response.data;
+      
+      if (!pro_correction_pdf) {
+        throw new Error('PDF Corrigé Pro non reçu du serveur');
+      }
+      
+      const filename = `${base_filename}_CorrigePro_${selectedTemplate}.pdf`;
+      downloadPdfFromBase64(pro_correction_pdf, filename);
+      alert('✅ Corrigé Pro téléchargé avec succès !');
+      
+    } catch (error) {
+      console.error('Erreur export Corrigé Pro:', error);
+      
+      let errorMessage = 'Erreur lors de l\'export du Corrigé Pro. ';
+      
+      if (error.response) {
+        if (error.response.status === 403) {
+          errorMessage = 'Un compte Pro est nécessaire pour cette fonctionnalité.';
+        } else if (error.response.status >= 500) {
+          errorMessage += 'Erreur serveur. Merci de réessayer plus tard.';
+        } else {
+          errorMessage += error.response.data?.detail || 'Merci de réessayer.';
+        }
+      } else if (error.request) {
+        errorMessage += 'Impossible de contacter le serveur.';
+      } else {
+        errorMessage += error.message || 'Une erreur inattendue s\'est produite.';
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setIsExportingCorrection(false);
     }
   };
 
