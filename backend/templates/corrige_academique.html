@@ -89,9 +89,9 @@
       {% endif %}
     </div>
     <div class="school">
-      {% if template_config and template_config.school_name %}<div class="school-name">{{ template_config.school_name }}</div>{% endif %}
+      <div class="school-name">{{ template_config.school_name if template_config and template_config.school_name else 'Le Maître Mot' }}</div>
       {% if template_config and template_config.professor_name %}<div>{{ template_config.professor_name }}</div>{% endif %}
-      {% if template_config and template_config.school_year %}<div>{{ template_config.school_year }}</div>{% endif %}
+      <div>{{ template_config.school_year if template_config and template_config.school_year else '2024-2025' }}</div>
     </div>
   </div>
 
