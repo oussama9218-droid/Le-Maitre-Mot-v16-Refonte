@@ -289,36 +289,48 @@ function SheetBuilderPage() {
         };
       }
       
+      // Le backend retourne un JSON avec 3 PDFs en base64
       const response = await axios.post(
         `${API}/mathalea/sheets/${currentSheetId}/generate-pdf`,
         {},
-        {
-          ...config,
-          responseType: 'blob'
-        }
+        config  // Pas de responseType: 'blob' car on attend du JSON
       );
       
-      // Check if response is actually a PDF (not an error JSON)
-      if (response.data.type === 'application/json') {
-        // Server returned JSON error instead of PDF
-        const text = await response.data.text();
-        const errorData = JSON.parse(text);
-        throw new Error(errorData.detail || 'Erreur lors de la génération du PDF');
-      }
+      // Le backend retourne { subject_pdf, student_pdf, correction_pdf } en base64
+      const { subject_pdf, student_pdf, correction_pdf } = response.data;
       
-      // Download the PDF
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `LeMaitreMot_${sheetTitle}_${pdfType}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      // Fonction helper pour télécharger un PDF depuis base64
+      const downloadPdfFromBase64 = (base64Data, filename) => {
+        // Décoder base64 en bytes
+        const binaryString = window.atob(base64Data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        
+        // Créer blob et télécharger
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      };
       
-      console.log('📥 PDF téléchargé:', pdfType);
-      alert('PDF généré avec succès !');
+      // Télécharger les 3 PDFs avec un petit délai entre chaque
+      downloadPdfFromBase64(subject_pdf, `LeMaitreMot_${sheetTitle}_Sujet.pdf`);
+      setTimeout(() => {
+        downloadPdfFromBase64(student_pdf, `LeMaitreMot_${sheetTitle}_Eleve.pdf`);
+      }, 500);
+      setTimeout(() => {
+        downloadPdfFromBase64(correction_pdf, `LeMaitreMot_${sheetTitle}_Corrige.pdf`);
+      }, 1000);
+      
+      console.log('📥 3 PDFs téléchargés: Sujet, Élève, Corrigé');
+      alert('3 PDFs générés avec succès : Sujet, Élève, Corrigé !');
       
     } catch (error) {
       console.error('Erreur génération PDF:', error);
@@ -329,7 +341,7 @@ function SheetBuilderPage() {
       if (error.response) {
         // Server responded with error status
         if (error.response.status >= 400 && error.response.status < 500) {
-          errorMessage += 'Merci de vérifier la configuration des exercices ou réessayer.';
+          errorMessage += error.response.data?.detail || 'Merci de vérifier la configuration des exercices.';
         } else if (error.response.status >= 500) {
           errorMessage += 'Erreur serveur. Merci de réessayer plus tard.';
         }
