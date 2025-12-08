@@ -3,8 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Label } from "../ui/label";
 import { Badge } from "../ui/badge";
-import { Settings, Crown } from "lucide-react";
-import TemplateSettings from "../TemplateSettings";
+import { Settings } from "lucide-react";
 
 const Step2ParametresDocument = ({
   typeDoc,
