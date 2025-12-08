@@ -334,3 +334,15 @@ class SheetItemListResponse(BaseModel):
     """Réponse pour liste d'items de feuille"""
     total: int
     items: List[SheetItem]
+
+
+# ============================================================================
+# MODÈLE: Pro PDF Request
+# ============================================================================
+
+class ProPdfRequest(BaseModel):
+    """Requête pour génération de PDF Pro avec template"""
+    template: str = Field(
+        default="classique",
+        description="Template à utiliser: 'classique' ou 'academique'"
+    )
