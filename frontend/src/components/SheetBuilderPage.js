@@ -298,31 +298,31 @@ function SheetBuilderPage() {
         };
       }
       
-      // Le backend retourne un JSON avec 3 PDFs en base64
+      // Le backend retourne un JSON avec 2 PDFs en base64
       const response = await axios.post(
-        `${API}/mathalea/sheets/${currentSheetId}/generate-pdf`,
+        `${API}/mathalea/sheets/${currentSheetId}/export-standard`,
         {},
         config
       );
       
-      // Le backend retourne { subject_pdf, student_pdf, correction_pdf } en base64
-      const { subject_pdf, student_pdf, correction_pdf } = response.data;
+      // Le backend retourne { student_pdf, correction_pdf, base_filename } en base64
+      const { student_pdf, correction_pdf, base_filename } = response.data;
       
-      // Vérifier que les 3 PDFs sont présents
-      if (!subject_pdf || !student_pdf || !correction_pdf) {
+      // Vérifier que les 2 PDFs sont présents
+      if (!student_pdf || !correction_pdf) {
         throw new Error('PDFs incomplets reçus du serveur');
       }
       
       // Stocker les résultats et ouvrir la modale
       setPdfResult({
-        subject_pdf,
         student_pdf,
         correction_pdf,
+        base_filename,
         sheetTitle
       });
       setShowPdfModal(true);
       
-      console.log('✅ 3 PDFs générés et prêts à télécharger');
+      console.log('✅ 2 PDFs générés et prêts à télécharger');
       
     } catch (error) {
       console.error('Erreur génération PDF:', error);
