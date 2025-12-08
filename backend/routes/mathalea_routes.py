@@ -791,10 +791,11 @@ async def generate_sheet_pdf(sheet_id: str):
     """
     Générer les 3 PDFs pour une feuille d'exercices
     
-    Sprint D - Pipeline PDF complet:
+    Sprint D & E - Pipeline PDF complet avec IA optionnelle:
     1. Récupère la feuille et génère le preview
-    2. Génère 3 PDFs: sujet, élève, corrigé
-    3. Retourne les PDFs en base64
+    2. Si IA activée: enrichit les énoncés/corrections
+    3. Génère 3 PDFs: sujet, élève, corrigé
+    4. Retourne les PDFs en base64
     
     Returns:
         Dict avec 3 clés contenant les PDFs en base64:
@@ -806,6 +807,10 @@ async def generate_sheet_pdf(sheet_id: str):
         build_sheet_subject_pdf,
         build_sheet_student_pdf,
         build_sheet_correction_pdf
+    )
+    from engine.pdf_engine.sheet_ai_enrichment_helper import (
+        apply_ai_enrichment_to_sheet_preview,
+        check_if_ai_needed
     )
     
     try:
