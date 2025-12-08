@@ -11,6 +11,11 @@ function PdfDownloadModal({ isOpen, onClose, pdfResult }) {
   /**
    * Fonction helper pour télécharger un PDF depuis base64
    * Compatible avec tous les navigateurs (desktop + mobile + iOS Safari)
+   * 
+   * STRATÉGIE iOS-FRIENDLY:
+   * - Utilise un blob URL mais sans navigation
+   * - Force le téléchargement via l'attribut download
+   * - Empêche la navigation qui ferait fermer la modale
    */
   const downloadPdfFromBase64 = (base64Data, filename) => {
     if (!base64Data) {
@@ -36,23 +41,38 @@ function PdfDownloadModal({ isOpen, onClose, pdfResult }) {
       link.href = url;
       link.download = filename || 'document.pdf';
       
-      // IMPORTANT pour iOS : ne pas ouvrir dans un nouvel onglet
-      // Ne pas utiliser target="_blank" qui pourrait causer une navigation
-      
       // Style pour rendre le lien invisible
       link.style.display = 'none';
+      link.style.position = 'fixed';
+      link.style.zIndex = '-1';
       
-      // Ajouter au DOM, cliquer, puis retirer
+      // Ajouter au DOM
       document.body.appendChild(link);
-      link.click();
+      
+      // IMPORTANT: Ne PAS utiliser link.click() car cela peut causer une navigation
+      // Sur iOS, utiliser une approche plus contrôlée
+      const clickEvent = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      
+      link.dispatchEvent(clickEvent);
       
       // Nettoyage après un délai (important pour iOS)
       setTimeout(() => {
-        document.body.removeChild(link);
+        if (link.parentNode) {
+          document.body.removeChild(link);
+        }
         URL.revokeObjectURL(url);
       }, 1000);
       
       console.log('📥 PDF téléchargé:', filename);
+      
+      // Afficher une confirmation visuelle (toast)
+      // L'utilisateur peut maintenant télécharger le second PDF
+      console.log('✅ Téléchargement lancé. La modale reste ouverte pour télécharger d\'autres PDFs.');
+      
     } catch (error) {
       console.error('Erreur téléchargement PDF:', error);
       alert('Erreur lors du téléchargement du PDF. Veuillez réessayer.');
