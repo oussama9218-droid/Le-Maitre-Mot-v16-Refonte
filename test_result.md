@@ -24,15 +24,15 @@ Test complet du flux de création de fiche avec preview et génération PDF dans
 - ✅ Backend stable: Aucun 500 Internal Server Error détecté
 - ✅ Collections MongoDB: exercise_types correctement utilisées
 
-### Key Findings
-1. ✅ **Interface utilisateur complètement fonctionnelle**
-2. ✅ **Navigation fluide entre toutes les pages**
-3. ✅ **Sélecteurs niveau/chapitre avec chargement dynamique**
-4. ✅ **Catalogue d'exercices opérationnel**
-5. ✅ **Système de panier/fiche fonctionnel**
-6. ✅ **Configuration d'exercices (questions, seed) opérationnelle**
-7. ✅ **Gestion des états vides correcte**
-8. ✅ **Intégration frontend/backend sans erreur**
+### Key Findings - SPRINT F.3-FIX
+1. ✅ **Flux complet de création de fiche FONCTIONNEL**
+2. ✅ **Preview génération: HTTP 200 OK** (pas de 400/404 comme craint)
+3. ✅ **PDF génération: HTTP 200 OK** (pas d'onglet gris vide)
+4. ✅ **Exercices LEGACY opérationnels** (Proportionnalité, Pourcentages)
+5. ✅ **Backend corrigé**: Utilise mathalea_db.exercise_types correctement
+6. ✅ **Sélection niveau/chapitre dynamique** fonctionnelle
+7. ✅ **Configuration exercices avancée** (questions, seeds, options IA)
+8. ✅ **Intégration frontend/backend stable** (aucun crash serveur)
 
 ### Frontend Status Summary
 - **Page Loading**: ✅ PASSED (toutes les pages se chargent correctement)
