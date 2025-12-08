@@ -1190,9 +1190,13 @@ async def generate_pro_pdf(
         # 5. Convertir le preview Builder vers le format Legacy attendu par les templates
         from engine.pdf_engine.builder_to_legacy_converter import convert_builder_to_legacy_pro_format
         
+        # Extraire le type_doc de la requête
+        type_doc = request.type_doc
+        
         document_data = convert_builder_to_legacy_pro_format(
             preview_json=preview_json,
-            template_config=template_config
+            template_config=template_config,
+            type_doc=type_doc
         )
         
         # 6. Générer les 2 PDFs Pro (Sujet + Corrigé) via Jinja2
