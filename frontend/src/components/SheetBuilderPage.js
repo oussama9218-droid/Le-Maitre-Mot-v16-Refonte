@@ -62,6 +62,9 @@ function SheetBuilderPage() {
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [pdfResult, setPdfResult] = useState(null);
   
+  // États pour le modal d'export Pro
+  const [showProExportModal, setShowProExportModal] = useState(false);
+  
   // États pour filtres
   const [selectedDomain, setSelectedDomain] = useState("");
   const [selectedGeneratorKind, setSelectedGeneratorKind] = useState("");
