@@ -32,8 +32,8 @@ async def client():
 @pytest.fixture
 async def test_competence(client):
     """Créer une compétence de test"""
-        response = await async_client.post(
-            "/api/mathalea/competences",
+    response = await client.post(
+        "/api/mathalea/competences",
             json={
                 "code": "TEST_C1",
                 "intitule": "Compétence de test",
