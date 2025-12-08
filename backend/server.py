@@ -52,6 +52,44 @@ from curriculum_complete import (
 )
 from document_search import search_educational_document
 
+# ============================================================================
+# SYSTEM DEPENDENCIES INITIALIZATION
+# ============================================================================
+def ensure_system_dependencies():
+    """
+    Garantit que toutes les dépendances système critiques sont installées.
+    Appelé au démarrage de l'application pour résoudre le problème de libpangoft2-1.0-0.
+    """
+    try:
+        scripts_dir = Path(__file__).parent.parent / 'scripts'
+        init_script = scripts_dir / 'ensure_system_dependencies.py'
+        
+        if init_script.exists():
+            print("🔧 Vérification des dépendances système...")
+            result = subprocess.run(
+                [sys.executable, str(init_script)],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            
+            if result.stdout:
+                print(result.stdout)
+            
+            if result.returncode != 0:
+                print(f"⚠️  Avertissement: Problème lors de l'initialisation des dépendances système")
+                if result.stderr:
+                    print(result.stderr)
+        else:
+            print(f"⚠️  Script d'initialisation non trouvé: {init_script}")
+            
+    except Exception as e:
+        print(f"⚠️  Erreur lors de la vérification des dépendances: {e}")
+        # On continue le démarrage même en cas d'erreur
+
+# Exécuter la vérification des dépendances au démarrage
+ensure_system_dependencies()
+
 ROOT_DIR = Path(__file__).parent
 TEMPLATES_DIR = ROOT_DIR / 'templates'
 load_dotenv(ROOT_DIR / '.env')
