@@ -348,17 +348,25 @@ const ProExportModal = ({
                   </div>
                 </div>
                 
-                {/* Lien vers la page de paramètres */}
+                {/* Lien vers la page de paramètres - Nouvel onglet */}
                 <div className="pt-3 border-t border-gray-200">
                   <a 
                     href="/pro/settings"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center justify-center text-sm text-blue-600 hover:text-blue-700 hover:underline"
                   >
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                     </svg>
                     Modifier mes paramètres Pro
+                    <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
                   </a>
+                  <p className="text-xs text-gray-500 text-center mt-1">
+                    (Ouvre dans un nouvel onglet)
+                  </p>
                 </div>
               </div>
             )}
