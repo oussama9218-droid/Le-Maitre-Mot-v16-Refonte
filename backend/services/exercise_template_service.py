@@ -450,11 +450,6 @@ class ExerciseTemplateService:
         
         return solution
 
-
-# Instance globale du service
-exercise_template_service = ExerciseTemplateService()
-
-
     async def _generate_legacy_questions(
         self,
         exercise_type: ExerciseType,
