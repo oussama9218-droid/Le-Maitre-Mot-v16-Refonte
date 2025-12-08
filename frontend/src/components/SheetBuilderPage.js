@@ -739,6 +739,18 @@ function SheetBuilderPage() {
                         )}
                         Générer PDF
                       </Button>
+                      
+                      {/* Bouton Export Pro - visible uniquement pour les Pro */}
+                      {isPro && (
+                        <Button
+                          onClick={() => setShowProExportModal(true)}
+                          disabled={!sheetId}
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                        >
+                          <Crown className="h-4 w-4 mr-2" />
+                          Export Pro personnalisé
+                        </Button>
+                      )}
                     </div>
 
                     {!isPro && (
