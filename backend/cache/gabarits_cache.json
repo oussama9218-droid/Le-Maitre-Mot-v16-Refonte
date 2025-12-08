@@ -47,10 +47,11 @@
     "symetrie_axiale__verifier_propriete__moyen__oral": "Dis-moi, {pointA} en ({coordA_x}, {coordA_y}) et {pointB} en ({coordB_x}, {coordB_y}), par rapport à {axeDesc}, c'est bon pour la symétrie ?",
     "symetrie_centrale__trouver_valeur__moyen__concis": "Donnés : {pointA}({coordA_x}, {coordA_y}), centre {pointO}({centreX}, {centreY}). Calcule {pointB}.",
     "symetrie_centrale__trouver_valeur__moyen__etapes": "Étape 1 : Repère le point {pointA}({coordA_x}, {coordA_y})\nÉtape 2 : Identifie le centre {pointO}({centreX}, {centreY})\nÉtape 3 : Utilise la formule du milieu pour calculer {pointB}",
-    "symetrie_centrale__verifier_propriete__moyen__etapes": "Étape 1 : Note les coordonnées : {pointA}({coordA_x}, {coordA_y}), {pointB}({coordB_x}, {coordB_y}), {pointO}({centreX}, {centreY})\nÉtape 2 : Calcule le milieu de [{pointA}{pointB}]\nÉtape 3 : Compare avec {pointO}"
+    "symetrie_centrale__verifier_propriete__moyen__etapes": "Étape 1 : Note les coordonnées : {pointA}({coordA_x}, {coordA_y}), {pointB}({coordB_x}, {coordB_y}), {pointO}({centreX}, {centreY})\nÉtape 2 : Calcule le milieu de [{pointA}{pointB}]\nÉtape 3 : Compare avec {pointO}",
+    "perimetres_et_aires__trouver_valeur__facile__concis": "{figureType} : {dim1Val} {unite} × {dim2Val} {unite}. Calcule {quoiCalculer}."
   },
   "hits": 38,
-  "misses": 48,
+  "misses": 49,
   "total_cost_saved": 1480.0,
-  "last_updated": "2025-12-07T23:07:58.839667"
+  "last_updated": "2025-12-08T09:21:20.910405"
 }
