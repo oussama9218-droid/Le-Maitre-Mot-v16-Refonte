@@ -1176,8 +1176,12 @@ async def generate_pro_pdf(
         # Pour l'instant, utiliser un email par défaut ou token comme identifiant
         user_email = x_session_token if "@" in x_session_token else "user@lemaitremot.com"
         
+        logger.info(f"🔑 Export Pro pour user_email: {user_email}")
+        
         # Récupérer la vraie config Pro depuis MongoDB
         pro_config = await get_pro_config_for_user(user_email)
+        
+        logger.info(f"📋 Config Pro récupérée: professor={pro_config.get('professor_name')}, school={pro_config.get('school_name')}")
         
         template_config = {
             "professor_name": pro_config.get("professor_name", ""),
@@ -1186,6 +1190,8 @@ async def generate_pro_pdf(
             "footer_text": pro_config.get("footer_text", "Document généré par Le Maître Mot"),
             "logo_url": pro_config.get("logo_url")
         }
+        
+        logger.info(f"✅ Template config préparée: {template_config}")
         
         # 5. Convertir le preview Builder vers le format Legacy attendu par les templates
         from engine.pdf_engine.builder_to_legacy_converter import convert_builder_to_legacy_pro_format
