@@ -122,7 +122,7 @@ async def get_pro_config_for_user(user_email: str) -> Dict[str, Any]:
 
 async def update_pro_config(user_email: str, updates: Dict[str, Any]) -> bool:
     """
-    Met à jour la configuration Pro d'un utilisateur
+    Met à jour la configuration Pro d'un utilisateur dans user_templates
     
     Args:
         user_email: Email de l'utilisateur
@@ -134,17 +134,22 @@ async def update_pro_config(user_email: str, updates: Dict[str, Any]) -> bool:
     try:
         updates["updated_at"] = datetime.now(timezone.utc)
         
-        result = await pro_user_configs_collection.update_one(
+        # Mapper les noms de champs si nécessaire
+        # template_choice → template_style pour compatibilité
+        if "template_choice" in updates:
+            updates["template_style"] = updates["template_choice"]
+        
+        result = await user_templates_collection.update_one(
             {"user_email": user_email},
             {"$set": updates},
             upsert=True
         )
         
-        logger.info(f"✅ Config Pro mise à jour pour {user_email}")
+        logger.info(f"✅ Template mis à jour pour {user_email}")
         return True
         
     except Exception as e:
-        logger.error(f"❌ Erreur mise à jour config Pro: {e}")
+        logger.error(f"❌ Erreur mise à jour template: {e}")
         return False
 
 
