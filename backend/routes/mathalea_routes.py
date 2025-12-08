@@ -1072,7 +1072,7 @@ async def generate_pro_pdf(
             "pro_pdf": pro_pdf_b64,
             "filename": f"LeMaitreMot_Pro_{sheet.get('titre', 'Fiche')}.pdf",
             "etablissement": user_pro_config.get("etablissement"),
-            "template": user_pro_config.get("template_name")
+            "template": template
         }
         
     except HTTPException:
