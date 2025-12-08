@@ -73,11 +73,12 @@ async def test_exercise_type(client, test_competence):
         )
         assert response.status_code == 201
         return response.json()
-    
-    @pytest.fixture
-    async def test_sheet(self, async_client: AsyncClient):
-        """Créer une feuille de test"""
-        response = await async_client.post(
+
+
+@pytest.fixture
+async def test_sheet(client):
+    """Créer une feuille de test"""
+    response = await client.post(
             "/api/mathalea/sheets",
             json={
                 "titre": "Feuille de test",
