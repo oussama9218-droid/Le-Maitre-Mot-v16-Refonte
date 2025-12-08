@@ -84,7 +84,17 @@ function Header({ isPro, userEmail, onLogin, onLogout }) {
               <Button
                 variant={isActive('/pro/settings') ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => navigate('/pro/settings')}
+                onClick={() => {
+                  // Détecter le sheetId depuis l'URL courante
+                  const match = location.pathname.match(/\/builder\/([^/]+)/);
+                  const sheetId = match ? match[1] : localStorage.getItem('current_sheet_id');
+                  
+                  if (sheetId) {
+                    navigate('/pro/settings', { state: { from: 'builder', sheetId } });
+                  } else {
+                    navigate('/pro/settings');
+                  }
+                }}
                 className="relative"
               >
                 <Settings className="h-4 w-4 mr-2" />
