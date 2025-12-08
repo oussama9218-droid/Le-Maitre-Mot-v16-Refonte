@@ -13,14 +13,25 @@ import pytest
 from httpx import AsyncClient
 from datetime import datetime, timezone
 from uuid import uuid4
+import sys
+from pathlib import Path
+
+# Ajouter le répertoire backend au path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from server import app
 
 
-class TestExerciseSheetPreview:
-    """Tests pour l'endpoint POST /api/mathalea/sheets/{sheet_id}/preview"""
-    
-    @pytest.fixture
-    async def test_competence(self, async_client: AsyncClient):
-        """Créer une compétence de test"""
+@pytest.fixture
+async def client():
+    """Client HTTP async pour les tests"""
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        yield ac
+
+
+@pytest.fixture
+async def test_competence(client):
+    """Créer une compétence de test"""
         response = await async_client.post(
             "/api/mathalea/competences",
             json={
