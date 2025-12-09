@@ -2364,8 +2364,12 @@ class MathGenerationService:
         
         else:  # identifier
             # Identifier des droites perpendiculaires ou parallèles
-            droite1 = f"({points[0]}{points[1]})"
-            droite2 = f"({points[2]}{points[3]})"
+            # ✅ FIX: Obtenir un set supplémentaire car on a besoin de 4 points (2 droites)
+            points_set2 = self._get_next_geometry_points()
+            all_points = points + [points_set2[0]]  # Ajouter le 4ème point
+            
+            droite1 = f"({all_points[0]}{all_points[1]})"
+            droite2 = f"({all_points[2]}{all_points[3]})"
             
             relation = random.choice(["perpendiculaires", "parallèles", "quelconques"])
             
