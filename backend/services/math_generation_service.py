@@ -153,11 +153,19 @@ class MathGenerationService:
     ) -> MathExerciseSpec:
         """Génère une spec selon le type d'exercice"""
         
-        # SPRINT 1 : Générateurs spécifiques par chapitre (priorité sur les types)
+        # SPRINT 1 & 2 : Générateurs spécifiques par chapitre (priorité sur les types)
         chapter_specific_generators = {
+            # SPRINT 1
             "Perpendiculaires et parallèles à la règle et à l'équerre": self._gen_perpendiculaires_paralleles,
             "Droite numérique et repérage": self._gen_droite_numerique,
-            "Lire et compléter des tableaux de données": self._gen_tableaux_donnees
+            "Lire et compléter des tableaux de données": self._gen_tableaux_donnees,
+            
+            # SPRINT 2
+            "Points, segments, droites, demi-droites": self._gen_points_segments_droites,
+            "Alignement, milieu d'un segment": self._gen_alignement_milieu,
+            "Lire et écrire les nombres entiers": self._gen_lire_ecrire_entiers,
+            "Comparer et ranger des nombres entiers": self._gen_comparer_ranger_entiers,
+            "Addition et soustraction de nombres entiers": self._gen_addition_soustraction_entiers,
         }
         
         # Vérifier si un générateur spécifique existe pour ce chapitre
