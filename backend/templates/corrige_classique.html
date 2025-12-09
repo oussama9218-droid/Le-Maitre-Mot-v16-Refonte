@@ -192,7 +192,7 @@
     <div class="exercise">
         <div class="exercise-header">Exercice {{ loop.index }}</div>
         <div class="exercise-content">
-            {{ exercice.enonce }}
+            {{ exercice.enonce | safe }}
             
             <!-- NEW: Render geometric schema SVG if generated -->
             {% if exercice.schema_svg %}
