@@ -153,12 +153,15 @@ def _convert_item_to_legacy_exercise(item: Dict[str, Any], numero: int) -> Dict[
         figures_combined = "\n".join(figure_html_parts)
         enonce += f"\n\n{figures_combined}"
     
-    # Construire la solution avec étapes
+    # Construire la solution avec étapes + figures (si plusieurs questions, répéter les figures)
     etapes = []
     resultat = ""
+    correction_figures = []
     
     for q_idx, question in enumerate(questions, start=1):
         solution_brut = question.get("solution_brut", "")
+        figure_html = question.get("figure_html", "")
+        
         if solution_brut:
             if len(questions) > 1:
                 etapes.append(f"Question {q_idx}: {solution_brut}")
@@ -170,6 +173,10 @@ def _convert_item_to_legacy_exercise(item: Dict[str, Any], numero: int) -> Dict[
                     etapes.extend([line.strip() for line in lines if line.strip()])
                 else:
                     resultat = solution_brut
+        
+        # Ajouter la figure dans la correction aussi (utile pour certains exercices)
+        if figure_html and len(questions) > 1:
+            correction_figures.append(f'<div class="exercise-figure" data-question="{q_idx}">{figure_html}</div>')
     
     # Si on n'a que des étapes et pas de résultat, prendre la dernière étape comme résultat
     if etapes and not resultat:
