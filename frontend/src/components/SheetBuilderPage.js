@@ -138,25 +138,49 @@ function SheetBuilderPage() {
     }
   };
 
-  const loadExercises = async (niveau, chapitreId) => {
+  const loadExercises = async (niveau, chapterCodeOrId) => {
     try {
       setLoadingCatalogue(true);
       
-      let url = `${API}/catalogue/exercise-types?niveau=${niveau}&chapitre_id=${chapitreId}`;
+      // Utiliser le nouvel endpoint dédié chapter_code si disponible
+      // Le chapter_code suit le format : niveau_DXXXX (ex: 6e_G07, 4e_N02)
+      const isChapterCode = chapterCodeOrId && chapterCodeOrId.includes('_');
       
-      if (selectedDomain) {
-        url += `&domaine=${encodeURIComponent(selectedDomain)}`;
+      let url;
+      if (isChapterCode) {
+        // Nouveau système : utiliser l'endpoint dédié
+        url = `${API}/mathalea/chapters/${chapterCodeOrId}/exercise-types?limit=100`;
+        
+        if (selectedDomain) {
+          url += `&domaine=${encodeURIComponent(selectedDomain)}`;
+        }
+        
+        if (selectedGeneratorKind) {
+          url += `&generator_kind=${selectedGeneratorKind}`;
+        }
+      } else {
+        // Ancien système (fallback) : utiliser chapitre_id
+        url = `${API}/catalogue/exercise-types?niveau=${niveau}&chapitre_id=${chapterCodeOrId}`;
+        
+        if (selectedDomain) {
+          url += `&domaine=${encodeURIComponent(selectedDomain)}`;
+        }
+        
+        if (selectedGeneratorKind) {
+          url += `&generator_kind=${selectedGeneratorKind}`;
+        }
       }
       
-      if (selectedGeneratorKind) {
-        url += `&generator_kind=${selectedGeneratorKind}`;
-      }
-      
+      console.log('📡 Chargement exercices depuis:', url);
       const response = await axios.get(url);
-      setExercises(response.data);
-      console.log('📝 Exercices chargés:', response.data.length);
+      
+      // L'endpoint dédié retourne {total, items}
+      const exercisesList = response.data.items || response.data;
+      setExercises(exercisesList);
+      console.log('📝 Exercices chargés:', exercisesList.length);
     } catch (error) {
-      console.error('Erreur chargement exercices:', error);
+      console.error('❌ Erreur chargement exercices:', error);
+      console.error('   URL appelée:', error.config?.url);
       setExercises([]);
     } finally {
       setLoadingCatalogue(false);
