@@ -287,6 +287,9 @@ def _render_question(question: dict, q_number: int, include_solution: bool, is_s
     # Nettoyer et formater l'énoncé
     enonce_html = _format_text(enonce)
     
+    # Récupérer la figure HTML si présente
+    figure_html = question.get("figure_html", "")
+    
     html = f"""
     <div class="question">
         <div class="question-header">
@@ -296,6 +299,14 @@ def _render_question(question: dict, q_number: int, include_solution: bool, is_s
             {enonce_html}
         </div>
     """
+    
+    # Ajouter la figure géométrique si présente
+    if figure_html:
+        html += f"""
+        <div class="exercise-figure">
+            {figure_html}
+        </div>
+        """
     
     # Espace de réponse pour version élève
     if is_student:
