@@ -4198,7 +4198,8 @@ async def export_pdf(request: ExportRequest, http_request: Request):
         
         logger.info("✅ Mathematical expressions converted to SVG")
         
-        # Generate PDF with WeasyPrint
+        # Generate PDF with WeasyPrint (import lazy)
+        import weasyprint
         pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
         
         # Create temporary file
