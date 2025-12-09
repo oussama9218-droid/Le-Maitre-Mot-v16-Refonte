@@ -673,6 +673,145 @@ class ExerciseTemplateService:
             }
         }
     
+    def _generate_contextual_enonce(self, spec: MathExerciseSpec) -> str:
+        """
+        Génère un énoncé contextuel basé sur le type d'exercice et les paramètres disponibles
+        (Fix pour remplacer les énoncés génériques "Question 1, Question 2...")
+        
+        Args:
+            spec: MathExerciseSpec contenant les données de l'exercice
+        
+        Returns:
+            Énoncé contextuel en français
+        """
+        params = spec.parametres
+        type_ex = spec.type_exercice.value if hasattr(spec.type_exercice, 'value') else str(spec.type_exercice)
+        
+        # Énoncés contextuels par type d'exercice
+        if type_ex == "calcul_decimaux":
+            if "expression" in params:
+                return f"Calculer : {params['expression']}"
+            elif "a" in params and "b" in params and "operation" in params:
+                op_text = {"*": "×", "+": "+", "-": "-", "/": "÷"}.get(params["operation"], params["operation"])
+                return f"Calculer : {params['a']} {op_text} {params['b']}"
+            return "Effectuer le calcul suivant."
+        
+        elif type_ex == "calcul_fractions":
+            if "expression" in params:
+                return f"Calculer : {params['expression']}"
+            elif "fraction1" in params and "fraction2" in params:
+                op = params.get("operation", "+")
+                return f"Calculer : {params['fraction1']} {op} {params['fraction2']}"
+            return "Effectuer l'opération avec les fractions."
+        
+        elif type_ex == "calcul_relatifs":
+            if "expression" in params:
+                return f"Calculer : {params['expression']}"
+            return "Effectuer le calcul avec les nombres relatifs."
+        
+        elif type_ex == "equation_1er_degre":
+            if "equation" in params:
+                return f"Résoudre l'équation : {params['equation']}"
+            return "Résoudre l'équation du premier degré."
+        
+        elif type_ex == "triangle_rectangle":
+            if "triangle" in params:
+                triangle = params["triangle"]
+                angle_droit = params.get("angle_droit", "")
+                return f"Le triangle {triangle} est rectangle en {angle_droit}. Calculer la longueur manquante."
+            return "Utiliser le théorème de Pythagore pour trouver la longueur manquante."
+        
+        elif type_ex == "triangle_quelconque":
+            if "triangle" in params:
+                return f"Dans le triangle {params['triangle']}, calculer le troisième angle."
+            return "Calculer l'angle manquant du triangle."
+        
+        elif type_ex == "proportionnalite":
+            if "coefficient" in params:
+                return "Compléter le tableau de proportionnalité suivant."
+            return "Résoudre le problème de proportionnalité."
+        
+        elif type_ex == "perimetre_aire":
+            figure = params.get("figure", "figure")
+            if figure == "rectangle" and "longueur" in params and "largeur" in params:
+                return f"Calculer le périmètre et l'aire d'un rectangle de longueur {params['longueur']} cm et largeur {params['largeur']} cm."
+            elif figure == "carre" and "cote" in params:
+                return f"Calculer le périmètre et l'aire d'un carré de côté {params['cote']} cm."
+            elif figure == "cercle" and "rayon" in params:
+                return f"Calculer le périmètre et l'aire d'un cercle de rayon {params['rayon']} cm."
+            return f"Calculer le périmètre et l'aire de la figure."
+        
+        elif type_ex == "rectangle":
+            if "longueur" in params and "largeur" in params:
+                return f"Un rectangle a pour dimensions {params['longueur']} cm et {params['largeur']} cm. Calculer son périmètre et son aire."
+            return "Calculer le périmètre et l'aire du rectangle."
+        
+        elif type_ex == "volume":
+            solide = params.get("solide", "solide")
+            if solide == "cube" and "arete" in params:
+                return f"Calculer le volume d'un cube d'arête {params['arete']} cm."
+            elif solide == "pave" and "longueur" in params:
+                return f"Calculer le volume d'un pavé droit de dimensions {params['longueur']} cm × {params['largeur']} cm × {params['hauteur']} cm."
+            elif solide == "cylindre" and "rayon" in params:
+                return f"Calculer le volume d'un cylindre de rayon {params['rayon']} cm et hauteur {params['hauteur']} cm."
+            return "Calculer le volume du solide."
+        
+        elif type_ex == "statistiques":
+            if "valeurs" in params:
+                valeurs_str = ", ".join(map(str, params["valeurs"][:5]))
+                if len(params["valeurs"]) > 5:
+                    valeurs_str += ", ..."
+                return f"Série de données : {valeurs_str}. Calculer la moyenne, la médiane et l'étendue."
+            return "Calculer les indicateurs statistiques de la série."
+        
+        elif type_ex == "probabilites":
+            contexte = params.get("contexte", "expérience")
+            question = params.get("question", "un événement")
+            return f"Quelle est la probabilité d'{question} dans l'expérience suivante : {contexte} ?"
+        
+        elif type_ex == "puissances":
+            type_calc = params.get("type", "")
+            if type_calc == "calcul_simple" and "base" in params and "exposant" in params:
+                return f"Calculer {params['base']}^{{{params['exposant']}}}"
+            elif type_calc == "produit" and "base" in params:
+                return f"Calculer {params['base']}^{{{params['exposant1']}}} × {params['base']}^{{{params['exposant2']}}}"
+            elif type_calc == "quotient" and "base" in params:
+                return f"Calculer {params['base']}^{{{params['exposant1']}}} ÷ {params['base']}^{{{params['exposant2']}}}"
+            return "Effectuer le calcul avec les puissances."
+        
+        elif type_ex == "cercle":
+            type_calc = params.get("type", "")
+            if type_calc == "perimetre" and "rayon" in params:
+                return f"Calculer le périmètre d'un cercle de rayon {params['rayon']} cm."
+            elif type_calc == "aire" and "rayon" in params:
+                return f"Calculer l'aire d'un cercle de rayon {params['rayon']} cm."
+            elif type_calc == "rayon_depuis_perimetre" and "perimetre" in params:
+                return f"Un cercle a un périmètre de {params['perimetre']} cm. Calculer son rayon."
+            return "Calculer les dimensions du cercle."
+        
+        elif type_ex == "thales":
+            if "points" in params and len(params["points"]) >= 5:
+                points = params["points"]
+                return f"Dans la configuration de Thalès avec le triangle {points[0]}{points[1]}{points[2]}, calculer les longueurs manquantes."
+            return "Utiliser le théorème de Thalès pour calculer les longueurs."
+        
+        elif type_ex == "trigonometrie":
+            if "triangle" in params and "angle" in params:
+                return f"Dans le triangle rectangle {params['triangle']}, calculer la longueur manquante en utilisant la trigonométrie (angle = {params['angle']}°)."
+            return "Utiliser les relations trigonométriques pour calculer la longueur."
+        
+        elif type_ex == "symetrie_axiale":
+            return "Construire le symétrique de la figure par rapport à l'axe."
+        
+        elif type_ex == "symetrie_centrale":
+            return "Construire le symétrique de la figure par symétrie centrale."
+        
+        # Fallback final avec le chapitre si disponible
+        if spec.chapitre:
+            return f"Exercice de {spec.chapitre.lower()}."
+        
+        return "Résoudre l'exercice suivant."
+    
     def _convert_math_spec_to_question(
         self,
         spec: MathExerciseSpec,
