@@ -16,7 +16,8 @@ from emergentintegrations.payments.stripe.checkout import StripeCheckout, Checko
 import json
 import re
 import tempfile
-import weasyprint
+# Import lazy de weasyprint pour éviter les erreurs au démarrage
+# weasyprint est importé dans les fonctions qui en ont besoin
 from jinja2 import Template
 from latex_to_svg import latex_renderer
 from geometry_renderer import geometry_renderer
