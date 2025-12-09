@@ -72,7 +72,8 @@ class ExerciseTypeBase(BaseModel):
     """Base pour les types d'exercices (sans ID)"""
     code_ref: str = Field(..., description="Code de référence unique (ex: SYM_AX_01)")
     titre: str = Field(..., description="Titre de l'exercice")
-    chapitre_id: Optional[str] = Field(None, description="ID du chapitre associé")
+    chapitre_id: Optional[str] = Field(None, description="ID du chapitre associé (legacy)")
+    chapter_code: Optional[str] = Field(None, description="Code du chapitre MathALÉA (ex: 6e_G04)")
     niveau: str = Field(..., description="Niveau scolaire")
     domaine: str = Field(..., description="Domaine mathématique")
     
