@@ -160,7 +160,8 @@ async def create_exercise_type(exercise_type: ExerciseTypeCreate):
 async def list_exercise_types(
     niveau: Optional[str] = Query(None, description="Filtrer par niveau"),
     domaine: Optional[str] = Query(None, description="Filtrer par domaine"),
-    chapitre_id: Optional[str] = Query(None, description="Filtrer par chapitre"),
+    chapitre_id: Optional[str] = Query(None, description="Filtrer par chapitre (legacy)"),
+    chapter_code: Optional[str] = Query(None, description="Filtrer par code chapitre MathALÉA (ex: 6e_G04)"),
     generator_kind: Optional[str] = Query(None, description="Filtrer par type de générateur"),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500)
@@ -173,6 +174,8 @@ async def list_exercise_types(
         query["domaine"] = domaine
     if chapitre_id:
         query["chapitre_id"] = chapitre_id
+    if chapter_code:
+        query["chapter_code"] = chapter_code
     if generator_kind:
         query["generator_kind"] = generator_kind
     
