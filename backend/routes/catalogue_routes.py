@@ -186,20 +186,52 @@ async def get_chapters_for_level(niveau: str):
                     ]
                 })
                 
-                chapitre_with_stats = ChapterWithStats(
-                    id=chapitre_def["id"],
-                    titre=chapitre_def["titre"],
-                niveau=niveau,
-                domaine=domaine,
-                code=chapitre_def.get("code"),
-                ordre=chapitre_def.get("ordre", 0),
-                nb_exercises=count
-            )
-            
-            chapitres_avec_stats.append(chapitre_with_stats)
+                    chapitre_with_stats = ChapterWithStats(
+                        id=chapitre_def["id"],
+                        titre=chapitre_def["titre"],
+                        niveau=niveau,
+                        domaine=domaine,
+                        code=chapitre_def.get("code"),
+                        ordre=chapitre_def.get("ordre", 0),
+                        nb_exercises=count
+                    )
+                    
+                    chapitres_avec_stats.append(chapitre_with_stats)
+        
+        # Trier par ordre
+        chapitres_avec_stats.sort(key=lambda x: x.ordre)
+        
+        return chapitres_avec_stats
     
-    # Trier par ordre
-    chapitres_avec_stats.sort(key=lambda x: x.ordre)
+    # Nouvelle logique : utiliser les chapitres depuis MongoDB
+    chapitres_avec_stats = []
+    
+    for chapter in chapters:
+        # Compter le nombre d'ExerciseTypes pour ce chapitre
+        # Chercher par code, legacy_code ou chapitre_id
+        count = await exercise_types_collection.count_documents({
+            "niveau": niveau,
+            "$or": [
+                {"chapitre_id": chapter["code"]},
+                {"chapitre_id": chapter.get("legacy_code")},
+                {"chapter_code": chapter["code"]}
+            ]
+        })
+        
+        chapitre_with_stats = ChapterWithStats(
+            id=chapter["code"],
+            titre=chapter["titre"],
+            niveau=chapter["niveau"],
+            domaine=chapter.get("domaine_legacy", chapter["domaine"]),  # Utiliser domaine_legacy pour compatibilité
+            code=chapter["code"],
+            ordre=chapter.get("ordre", 0),
+            nb_exercises=count
+        )
+        
+        chapitres_avec_stats.append(chapitre_with_stats)
+    
+    # Trier par domaine puis ordre
+    chapitres_avec_stats.sort(key=lambda x: (x.domaine, x.ordre))
     
     return chapitres_avec_stats
 
