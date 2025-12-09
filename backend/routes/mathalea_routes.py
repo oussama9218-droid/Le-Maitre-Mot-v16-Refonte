@@ -192,16 +192,21 @@ async def list_exercise_types(
 @router.get("/chapters/{chapter_code}/exercise-types", response_model=ExerciseTypeListResponse)
 async def get_chapter_exercise_types(
     chapter_code: str,
-    niveau: Optional[str] = Query(None, description="Filtrer par niveau (optionnel)"),
+    domaine: Optional[str] = Query(None, description="Filtrer par domaine (optionnel)"),
+    generator_kind: Optional[str] = Query(None, description="Filtrer par type de générateur (optionnel)"),
     skip: int = Query(0, ge=0, description="Pagination: nombre d'éléments à sauter"),
     limit: int = Query(50, ge=1, le=500, description="Pagination: nombre maximum d'éléments")
 ):
     """
     Récupérer tous les ExerciseType d'un chapitre MathALÉA spécifique
     
+    FILTRE STRICT PAR NIVEAU : Seuls les exercices du niveau du chapitre sont retournés
+    pour garantir la cohérence niveau/domaine/chapitre.
+    
     Args:
         chapter_code: Code MathALÉA du chapitre (ex: 6e_G07, 4e_N02, 2nde_F01)
-        niveau: Filtre optionnel sur le niveau (pour double vérification)
+        domaine: Filtre optionnel sur le domaine
+        generator_kind: Filtre optionnel sur le type de générateur
         skip: Nombre d'éléments à sauter (pagination)
         limit: Nombre maximum d'éléments à retourner
         
@@ -228,19 +233,34 @@ async def get_chapter_exercise_types(
             detail=f"Chapter with code '{chapter_code}' not found"
         )
     
-    # 2. Construire la requête pour les ExerciseType
-    query = {"chapter_code": chapter_code}
+    # 2. Extraire le niveau du chapitre (FILTRE OBLIGATOIRE)
+    chapter_niveau = chapter.get("niveau")
+    if not chapter_niveau:
+        # Fallback : extraire depuis le code (premiers caractères avant _)
+        chapter_niveau = chapter_code.split('_')[0]
     
-    # Filtre optionnel sur le niveau
-    if niveau:
-        query["niveau"] = niveau
+    # 3. Construire la requête avec FILTRE STRICT PAR NIVEAU
+    query = {
+        "chapter_code": chapter_code,
+        "niveau": chapter_niveau  # ⚠️ FILTRE OBLIGATOIRE pour cohérence
+    }
     
-    # 3. Récupérer les exercices
+    # Filtres additionnels optionnels
+    if domaine:
+        query["domaine"] = domaine
+    if generator_kind:
+        query["generator_kind"] = generator_kind
+    
+    logger.info(f"🔍 Recherche exercices: chapter_code={chapter_code}, niveau={chapter_niveau}, filtres={query}")
+    
+    # 4. Récupérer les exercices
     cursor = exercise_types_collection.find(query, {"_id": 0}).skip(skip).limit(limit)
     items = await cursor.to_list(length=limit)
     total = await exercise_types_collection.count_documents(query)
     
-    # 4. Retourner la réponse
+    logger.info(f"✅ {total} exercices trouvés pour {chapter_code} (niveau {chapter_niveau})")
+    
+    # 5. Retourner la réponse
     return ExerciseTypeListResponse(
         total=total,
         items=[ExerciseType(**item) for item in items]
