@@ -333,6 +333,53 @@ function SheetBuilderPage() {
     }
   };
 
+  const saveSheet = async () => {
+    try {
+      let currentSheetId = sheetId;
+      
+      // Si pas de sheetId, créer une nouvelle fiche
+      if (!currentSheetId) {
+        return await createSheet();
+      }
+      
+      // Mettre à jour le titre si nécessaire
+      if (sheetTitle) {
+        await axios.patch(`${API}/mathalea/sheets/${currentSheetId}`, {
+          titre: sheetTitle
+        });
+      }
+      
+      // Supprimer tous les items existants
+      try {
+        const existingItems = await axios.get(`${API}/mathalea/sheet-items?sheet_id=${currentSheetId}`);
+        const itemsToDelete = existingItems.data.items || [];
+        
+        for (const item of itemsToDelete) {
+          await axios.delete(`${API}/mathalea/sheet-items/${item.id}`);
+        }
+      } catch (error) {
+        console.warn('Erreur suppression items existants (peut-être aucun item):', error);
+      }
+      
+      // Créer les nouveaux items
+      for (let i = 0; i < sheetItems.length; i++) {
+        const item = sheetItems[i];
+        await axios.post(`${API}/mathalea/sheets/${currentSheetId}/items`, {
+          sheet_id: currentSheetId,
+          exercise_type_id: item.exercise_type_id,
+          config: item.config,
+          order: i
+        });
+      }
+      
+      console.log('✅ Fiche sauvegardée:', currentSheetId, `(${sheetItems.length} items)`);
+      return currentSheetId;
+    } catch (error) {
+      console.error('❌ Erreur sauvegarde fiche:', error);
+      throw error;
+    }
+  };
+
   const handlePreview = async () => {
     if (sheetItems.length === 0) {
       alert('Veuillez ajouter au moins un exercice à la fiche');
