@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime
 
 class CurriculumFixTester:
-    def __init__(self, base_url="https://mathalea-export.preview.emergentagent.com"):
+    def __init__(self, base_url="https://mathworksheets.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
@@ -399,7 +399,7 @@ class CurriculumFixTester:
         return len(passed_tests), len(tests)
 
 if __name__ == "__main__":
-    base_url = sys.argv[1] if len(sys.argv) > 1 else "https://mathalea-export.preview.emergentagent.com"
+    base_url = sys.argv[1] if len(sys.argv) > 1 else "https://mathworksheets.preview.emergentagent.com"
     tester = CurriculumFixTester(base_url)
     
     passed, total = tester.run_all_tests()
