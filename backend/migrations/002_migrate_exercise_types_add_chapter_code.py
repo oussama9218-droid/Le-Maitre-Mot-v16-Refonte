@@ -68,18 +68,42 @@ async def migrate_exercise_types():
                 continue
             
             # Chercher le chapitre correspondant
-            # D'abord par legacy_code
+            # Stratégie 1: Par legacy_code (pour les anciens codes style "6G20")
             chapter = await chapters_collection.find_one(
                 {"legacy_code": chapitre_id},
                 {"_id": 0, "code": 1}
             )
             
-            # Si pas trouvé, essayer par code directement
+            # Stratégie 2: Par code directement (si chapitre_id est déjà un code MathALÉA)
             if not chapter:
                 chapter = await chapters_collection.find_one(
                     {"code": chapitre_id},
                     {"_id": 0, "code": 1}
                 )
+            
+            # Stratégie 3: Par titre + niveau (pour les anciens titres style "Nombres relatifs")
+            # C'est le cas le plus courant dans notre base
+            if not chapter:
+                niveau = exercise.get("niveau")
+                domaine = exercise.get("domaine")
+                
+                # Chercher par titre (insensible à la casse) et niveau
+                chapter = await chapters_collection.find_one(
+                    {
+                        "niveau": niveau,
+                        "titre": {"$regex": f".*{chapitre_id}.*", "$options": "i"}
+                    },
+                    {"_id": 0, "code": 1}
+                )
+                
+                # Si toujours pas trouvé, essayer juste avec le titre sans filtrer par niveau
+                if not chapter:
+                    chapter = await chapters_collection.find_one(
+                        {
+                            "titre": {"$regex": f".*{chapitre_id}.*", "$options": "i"}
+                        },
+                        {"_id": 0, "code": 1}
+                    )
             
             if chapter:
                 # Mettre à jour l'ExerciseType
