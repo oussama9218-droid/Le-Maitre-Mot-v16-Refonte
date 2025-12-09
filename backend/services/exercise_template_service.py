@@ -516,9 +516,11 @@ class ExerciseTemplateService:
                     # Générer l'exercice avec le service legacy
                     # Note: generate_math_exercise_specs génère plusieurs exercices,
                     # on prend le premier pour cette question
+                    # Utilise chapitre_id qui contient le nom précis du chapitre (ex: "Symétrie axiale")
+                    # et non le domaine général (ex: "Espace et géométrie")
                     specs = legacy_service.generate_math_exercise_specs(
                         niveau=exercise_type.niveau,
-                        chapitre=exercise_type.domaine,
+                        chapitre=exercise_type.chapitre_id,
                         difficulte=difficulty,
                         nb_exercices=1
                     )
