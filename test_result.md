@@ -882,12 +882,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "SPRINT P0 - Correction libpangoft2-1.0-0"
+    - "Bug affichage exercices Fiche"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
+  - agent: "testing"
+    message: "VALIDATION BUG AFFICHAGE EXERCICES FICHE COMPLÈTE - FIX ENTIÈREMENT FONCTIONNEL: ✅ SUCCÈS COMPLET (7/7 critères - 100%). Navigation page Fiche réussie, sélection niveau '6e' et chapitre 'Proportionnalité simple dans des tableaux (2 exercices)' fonctionnelle. 14 exercices correctement affichés (tous contiennent 'Proportionnalité'), aucun message 'Aucun exercice disponible pour cette sélection'. Ajout exercice au panier fonctionne (compteur mis à jour). Test chapitre alternatif 'Symétrie axiale' avec 11 exercices. Frontend utilise correctement endpoint dédié /api/mathalea/chapters/{chapter_code}/exercise-types. Bug entièrement corrigé - les chapitres affichent maintenant correctement leurs exercices au lieu d'une liste vide."
   - agent: "testing"
     message: "VALIDATION SPRINT P0 COMPLÈTE - CORRECTION libpangoft2-1.0-0 ENTIÈREMENT FONCTIONNELLE: ✅ SUCCÈS COMPLET (5/5 tests - 100%). Tous les scripts retournent exit code 0, aucune erreur libpangoft2 dans les logs récents, backend fonctionne normalement, génération PDF opérationnelle. Installation automatique des dépendances système via /app/scripts/ensure_system_dependencies.py (5/5 packages installés), import lazy weasyprint dans server.py, script de vérification /app/backend/scripts/check_pdf_env.py confirme PDF_ENV_OK. Problème récurrent libpangoft2-1.0-0 définitivement résolu."
 ```
