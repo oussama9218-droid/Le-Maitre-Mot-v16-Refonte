@@ -141,7 +141,20 @@ function SheetPreviewModal({ isOpen, onClose, previewData }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+    <>
+      <style>{`
+        .exercise-figure {
+          margin: 12px 0;
+          text-align: center;
+          width: 100%;
+        }
+        .exercise-figure svg {
+          max-width: 100%;
+          height: auto;
+        }
+      `}</style>
+      
+      <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
