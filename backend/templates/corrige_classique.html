@@ -209,7 +209,7 @@
             {% if exercice.solution.etapes %}
             <div class="solution-steps">
                 {% for etape in exercice.solution.etapes %}
-                <div class="solution-step">{{ etape }}</div>
+                <div class="solution-step">{{ etape | safe }}</div>
                 {% endfor %}
             </div>
             {% endif %}
