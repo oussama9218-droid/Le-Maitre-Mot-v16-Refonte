@@ -15,6 +15,7 @@ from collections import defaultdict
 
 from models.catalogue_models import ChapterWithStats, CatalogueExerciseType
 from models.mathalea_models import ExerciseType
+from services.chapter_service import ChapterService
 
 # Configuration MongoDB
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/')
@@ -23,6 +24,9 @@ db = db_client.mathalea_db
 
 # Collections
 exercise_types_collection = db.exercise_types
+
+# Services
+chapter_service = ChapterService(db)
 
 router = APIRouter(prefix="/api/catalogue", tags=["Catalogue"])
 
