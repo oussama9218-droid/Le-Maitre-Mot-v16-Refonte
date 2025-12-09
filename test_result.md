@@ -47,11 +47,14 @@ Test complet des 4 corrections majeures appliquées au générateur de fiches : 
 - **Test modifications**: ✅ PASSED (changements reflétés dans nouveau preview)
 
 ### Technical Notes
-- **Fix appliqué**: Frontend utilise maintenant l'endpoint dédié `/api/mathalea/chapters/{chapter_code}/exercise-types`
-- **Ancien problème**: Chapitres affichaient "(X exercices)" mais liste était vide
-- **Nouvelle solution**: Endpoint dédié retourne correctement les exercices pour chaque chapter_code
-- **Performance**: Chargement rapide des exercices (< 4 secondes)
-- **Compatibilité**: Fonctionne avec différents chapitres et niveaux
+- **CORRECTION 1**: Filtre strict par niveau implémenté - seuls les exercices du niveau sélectionné sont affichés
+- **CORRECTION 2**: Sauvegarde automatique avant preview via `saveSheet()` - garantit que modifications sont prises en compte
+- **CORRECTION 3**: Filtre domaine chargé depuis les chapitres via `loadChapters()` - visible immédiatement après sélection niveau
+- **CORRECTION 4**: Chapitre "Perpendiculaires et parallèles à la règle et à l'équerre" ajouté au mapping - fonctionnel avec 1 exercice
+- **Endpoint dédié**: Frontend utilise `/api/mathalea/chapters/{chapter_code}/exercise-types` pour charger exercices
+- **Modal preview**: 3 onglets (Sujet, Version élève, Corrigé) avec contenu différencié selon le mode
+- **Performance**: Chargement rapide des exercices (< 4 secondes), sauvegarde automatique fluide
+- **Compatibilité**: Fonctionne avec différents chapitres et niveaux, interface responsive
 
 ## Previous Test Session - SPRINT P0 libpangoft2-1.0-0 Fix Validation
 
