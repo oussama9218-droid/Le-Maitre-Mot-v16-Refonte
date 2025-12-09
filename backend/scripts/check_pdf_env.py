@@ -53,21 +53,36 @@ def check_python_packages():
     """Vérifie l'importation des packages Python critiques."""
     print("\n🐍 Vérification des packages Python...")
     
-    packages = {
+    # Packages critiques (doivent être présents)
+    critical_packages = {
         'weasyprint': 'WeasyPrint',
-        'cairo': 'cairocffi',
         'PIL': 'Pillow',
         'jinja2': 'Jinja2'
     }
     
+    # Packages optionnels (non bloquants)
+    optional_packages = {
+        'cairo': 'cairocffi (optionnel)'
+    }
+    
     all_ok = True
-    for module_name, display_name in packages.items():
+    
+    # Vérifier les packages critiques
+    for module_name, display_name in critical_packages.items():
         try:
             __import__(module_name)
             print(f"  ✅ {display_name} importé avec succès")
         except ImportError as e:
             print(f"  ❌ {display_name} : erreur d'import - {e}")
             all_ok = False
+    
+    # Vérifier les packages optionnels (ne pas échouer si absents)
+    for module_name, display_name in optional_packages.items():
+        try:
+            __import__(module_name)
+            print(f"  ✅ {display_name} importé avec succès")
+        except ImportError:
+            print(f"  ℹ️  {display_name} non disponible (pas critique)")
     
     return all_ok
 
