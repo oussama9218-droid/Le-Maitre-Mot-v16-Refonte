@@ -24,6 +24,14 @@ function SheetPreviewModal({ isOpen, onClose, previewData }) {
         <p className="font-medium text-gray-900 mb-2">
           <span className="font-bold">{questionNumber}.</span> {question.enonce_brut}
         </p>
+        
+        {/* Figure géométrique si présente */}
+        {question.figure_html && (
+          <div 
+            className="exercise-figure" 
+            dangerouslySetInnerHTML={{ __html: question.figure_html }}
+          />
+        )}
       </div>
     );
   };
