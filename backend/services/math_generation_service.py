@@ -88,6 +88,15 @@ class MathGenerationService:
             # ========== 6e - Organisation et gestion de données (SPRINT 1) ==========
             "Lire et compléter des tableaux de données": [MathExerciseType.STATISTIQUES],
             
+            # ========== 6e - Géométrie (SPRINT 2) ==========
+            "Points, segments, droites, demi-droites": [MathExerciseType.TRIANGLE_QUELCONQUE],
+            "Alignement, milieu d'un segment": [MathExerciseType.TRIANGLE_QUELCONQUE],
+            
+            # ========== 6e - Nombres et calculs (SPRINT 2) ==========
+            "Lire et écrire les nombres entiers": [MathExerciseType.CALCUL_DECIMAUX],
+            "Comparer et ranger des nombres entiers": [MathExerciseType.CALCUL_DECIMAUX],
+            "Addition et soustraction de nombres entiers": [MathExerciseType.CALCUL_RELATIFS],
+            
             # ========== Chapitres multi-niveaux (6e, 5e, 4e, 3e) ==========
             "Fractions": [MathExerciseType.CALCUL_FRACTIONS],
             "Proportionnalité": [MathExerciseType.PROPORTIONNALITE],
