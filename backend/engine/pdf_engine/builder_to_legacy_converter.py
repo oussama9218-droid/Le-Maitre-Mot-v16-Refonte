@@ -183,6 +183,10 @@ def _convert_item_to_legacy_exercise(item: Dict[str, Any], numero: int) -> Dict[
         resultat = etapes[-1]
         etapes = etapes[:-1]
     
+    # Ajouter les figures dans les étapes si présentes (pour multi-questions)
+    if correction_figures:
+        etapes.extend(correction_figures)
+    
     solution = {
         "etapes": etapes,
         "resultat": resultat if resultat else "Voir les étapes ci-dessus"
