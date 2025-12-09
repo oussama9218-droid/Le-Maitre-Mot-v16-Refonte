@@ -201,7 +201,7 @@ function SheetPreviewModal({ isOpen, onClose, previewData }) {
               <div className="space-y-4">
                 <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded">
                   <p className="text-sm text-green-900">
-                    <strong>Version élève :</strong> Les énoncés sont affichés avec des espaces pour que l'élève puisse répondre.
+                    <strong>Version élève :</strong> Les énoncés sont affichés avec des espaces pour que l&apos;élève puisse répondre.
                   </p>
                 </div>
                 
