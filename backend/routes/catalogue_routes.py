@@ -160,33 +160,35 @@ async def get_chapters_for_level(niveau: str):
     Récupère la liste des chapitres pour un niveau donné
     
     Args:
-        niveau: Niveau scolaire (6e, 5e, 4e, 3e)
+        niveau: Niveau scolaire (6e, 5e, 4e, 3e, 2nde, 1re, Tale)
         
     Returns:
         Liste des chapitres avec nombre d'exercices
     """
-    if niveau not in CHAPITRES_STRUCTURE:
-        raise HTTPException(status_code=404, detail=f"Niveau '{niveau}' non trouvé")
+    # Récupérer les chapitres depuis MongoDB
+    chapters = await chapter_service.get_chapters_by_niveau(niveau)
     
-    chapitres_avec_stats = []
-    
-    # Parcourir tous les domaines du niveau
-    for domaine, chapitres in CHAPITRES_STRUCTURE[niveau].items():
-        for chapitre_def in chapitres:
-            # Compter le nombre d'ExerciseTypes pour ce chapitre
-            # On cherche dans chapitre_id ou dans les chapitres listés
-            count = await exercise_types_collection.count_documents({
-                "niveau": niveau,
-                "domaine": domaine,
-                "$or": [
-                    {"chapitre_id": chapitre_def["titre"]},
-                    {"chapitre_id": {"$in": [chapitre_def["titre"], chapitre_def["id"]]}}
-                ]
-            })
-            
-            chapitre_with_stats = ChapterWithStats(
-                id=chapitre_def["id"],
-                titre=chapitre_def["titre"],
+    if not chapters:
+        # Fallback sur CHAPITRES_STRUCTURE si aucun chapitre trouvé dans MongoDB
+        if niveau not in CHAPITRES_STRUCTURE:
+            raise HTTPException(status_code=404, detail=f"Niveau '{niveau}' non trouvé")
+        
+        # Utiliser l'ancienne logique comme fallback
+        chapitres_avec_stats = []
+        for domaine, chapitres_list in CHAPITRES_STRUCTURE[niveau].items():
+            for chapitre_def in chapitres_list:
+                count = await exercise_types_collection.count_documents({
+                    "niveau": niveau,
+                    "domaine": domaine,
+                    "$or": [
+                        {"chapitre_id": chapitre_def["titre"]},
+                        {"chapitre_id": {"$in": [chapitre_def["titre"], chapitre_def["id"]]}}
+                    ]
+                })
+                
+                chapitre_with_stats = ChapterWithStats(
+                    id=chapitre_def["id"],
+                    titre=chapitre_def["titre"],
                 niveau=niveau,
                 domaine=domaine,
                 code=chapitre_def.get("code"),
