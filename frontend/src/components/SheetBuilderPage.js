@@ -438,7 +438,9 @@ function SheetBuilderPage() {
     setIsGeneratingPDF(true);
     
     try {
-      const currentSheetId = sheetId || await createSheet();
+      // ⚠️ SAUVEGARDER LA FICHE AVANT EXPORT (garantit que modifications sont prises en compte)
+      console.log('💾 Sauvegarde de la fiche avant export PDF...');
+      const currentSheetId = await saveSheet();
       
       const config = {};
       if (sessionToken) {
