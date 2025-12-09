@@ -155,7 +155,7 @@
         ({{ "%.1f"|format(total_points) }} pts)
       </span>
     </div>
-    <div class="exercise-text">{{ exercise.enonce or '' }}
+    <div class="exercise-text">{{ exercise.enonce | safe or '' }}
     
     <!-- NEW: Render geometric schema SVG if generated -->
     {% if exercise.schema_svg %}
