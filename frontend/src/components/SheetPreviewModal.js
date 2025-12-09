@@ -41,7 +41,12 @@ function SheetPreviewModal({ isOpen, onClose, previewData }) {
     );
   };
 
-  const renderQuestionWithAnswer = (question, questionNumber) => {
+  const renderQuestionWithAnswer = (question, questionNumber, exerciseType) => {
+    // Logging: Vérifier si un exercice de géométrie n'a pas de figure
+    if (!question.figure_html && exerciseType?.domaine?.toLowerCase().includes('géométrie')) {
+      console.warn(`⚠️ Question ${questionNumber} (${exerciseType.titre}) : figure_html manquante pour un exercice de géométrie`);
+    }
+    
     return (
       <div key={question.id} className="mb-6">
         <p className="font-medium text-gray-900 mb-2">
