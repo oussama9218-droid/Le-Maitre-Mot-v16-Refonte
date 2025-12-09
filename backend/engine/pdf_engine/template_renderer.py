@@ -40,7 +40,16 @@ def render_template(template_name: str, context: Dict[str, Any]) -> str:
     try:
         template = jinja_env.get_template(template_name)
         html = template.render(**context)
-        logger.info(f"✅ Template '{template_name}' rendu avec succès")
+        logger.info(f"✅ Template '{template_name}' rendu avec succès ({len(html)} caractères)")
+        
+        # DEBUG: Sauvegarder le HTML généré pour inspection
+        import tempfile
+        temp_path = tempfile.gettempdir()
+        debug_file = f"{temp_path}/debug_{template_name}"
+        with open(debug_file, 'w', encoding='utf-8') as f:
+            f.write(html)
+        logger.info(f"📝 HTML sauvegardé dans: {debug_file}")
+        
         return html
     except Exception as e:
         logger.error(f"❌ Erreur lors du rendu du template '{template_name}': {e}")
