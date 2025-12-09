@@ -125,17 +125,33 @@ def _convert_item_to_legacy_exercise(item: Dict[str, Any], numero: int) -> Dict[
     generated = item.get("generated", {})
     questions = generated.get("questions", [])
     
-    # Construire l'énoncé global (toutes les questions)
+    # Construire l'énoncé global (toutes les questions) + figures
     enonce_parts = []
+    figure_html_parts = []  # Collecter les figures HTML
+    
     for q_idx, question in enumerate(questions, start=1):
         enonce_brut = question.get("enonce_brut", "")
+        figure_html = question.get("figure_html", "")
+        
         if enonce_brut:
             if len(questions) > 1:
                 enonce_parts.append(f"{q_idx}. {enonce_brut}")
             else:
                 enonce_parts.append(enonce_brut)
+        
+        # Ajouter la figure si présente
+        if figure_html:
+            if len(questions) > 1:
+                figure_html_parts.append(f'<div class="exercise-figure" data-question="{q_idx}">{figure_html}</div>')
+            else:
+                figure_html_parts.append(f'<div class="exercise-figure">{figure_html}</div>')
     
     enonce = "\n\n".join(enonce_parts) if enonce_parts else f"Exercice {numero}"
+    
+    # Ajouter les figures au début de l'énoncé (après le texte)
+    if figure_html_parts:
+        figures_combined = "\n".join(figure_html_parts)
+        enonce += f"\n\n{figures_combined}"
     
     # Construire la solution avec étapes
     etapes = []
