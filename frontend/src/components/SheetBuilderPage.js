@@ -508,7 +508,7 @@ function SheetBuilderPage() {
   };
 
   // Obtenir les domaines uniques des exercices disponibles
-  const availableDomains = [...new Set(exercises.map(ex => ex.domaine))];
+  // availableDomains est maintenant un état chargé depuis les chapitres (voir loadChapters)
 
   const handleLogin = () => {
     window.location.href = '/';
