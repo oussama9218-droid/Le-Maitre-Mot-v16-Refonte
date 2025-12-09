@@ -143,6 +143,7 @@ class ExerciseTypeUpdate(BaseModel):
     code_ref: Optional[str] = None
     titre: Optional[str] = None
     chapitre_id: Optional[str] = None
+    chapter_code: Optional[str] = None
     niveau: Optional[str] = None
     domaine: Optional[str] = None
     competences_ids: Optional[List[str]] = None
