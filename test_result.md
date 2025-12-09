@@ -7,21 +7,22 @@ Test complet des 4 corrections majeures appliquées au générateur de fiches : 
 
 ### Tests Executed
 
-#### 1. Test Bug affichage exercices Fiche - Complete Validation
-**Command**: Playwright automation script (test complet du scénario)
-**Result**: ✅ SUCCÈS COMPLET (7/7 critères - 100%)
+#### 1. Test complet des 4 corrections appliquées - Validation E2E
+**Command**: Playwright automation script (test complet des 4 scénarios)
+**Result**: ✅ SUCCÈS COMPLET (4/4 corrections - 100%)
 **Backend URL**: https://mathalea-exercice.preview.emergentagent.com
-**Test Time**: 2025-12-09 20:26:17
+**Test Time**: 2025-12-09 22:19:52
 
 **Details**:
-- ✅ **Navigation vers page Fiche**: Page builder chargée avec succès
+- ✅ **CORRECTION 1 - Cohérence niveau**: Filtre strict par niveau 6e validé, aucun exercice d'autre niveau affiché
+- ✅ **CORRECTION 2 - Preview/export mis à jour**: Sauvegarde automatique avant preview confirmée, modifications reflétées
+- ✅ **CORRECTION 3 - Filtre domaine**: Filtre domaine visible immédiatement après sélection du niveau
+- ✅ **CORRECTION 4 - Mapping perpendiculaires/parallèles**: Chapitre "Perpendiculaires et parallèles à la règle et à l'équerre (1 exercices)" trouvé et fonctionnel
+- ✅ **Navigation page Fiche**: Page builder chargée avec succès
 - ✅ **Sélection niveau "6e"**: Niveau sélectionné correctement
-- ✅ **Sélection chapitre "Proportionnalité simple dans des tableaux (2 exercices)"**: Chapitre trouvé et sélectionné
-- ✅ **Affichage des exercices**: 14 exercices trouvés et affichés dans le catalogue
-- ✅ **Titres des exercices**: Tous contiennent "Proportionnalité" comme attendu
-- ✅ **Absence message d'erreur**: Aucun message "Aucun exercice disponible pour cette sélection"
-- ✅ **Ajout à la fiche**: Exercice ajouté avec succès au panier (compteur "1 exercice(s)")
-- ✅ **Test chapitre alternatif**: Chapitre "Symétrie axiale (1 exercices)" testé avec 11 exercices affichés
+- ✅ **Ajout exercice au panier**: Exercice "Cercle - Périmètre et aire (6e)" ajouté avec succès
+- ✅ **Test preview modal**: Modal "Aperçu de la fiche" ouvert avec 3 onglets (Sujet, Version élève, Corrigé)
+- ✅ **Test modifications fiche**: Configuration exercice modifiée (3 questions), nouveau preview reflète les changements
 
 ### Key Findings - Bug affichage exercices Fiche
 1. ✅ **BUG ENTIÈREMENT CORRIGÉ**: Les exercices s'affichent correctement dans la liste
