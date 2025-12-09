@@ -79,6 +79,7 @@ class MathGenerationService:
             "Géométrie dans le plan": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],
             "Perpendiculaires et parallèles à la règle et à l'équerre": [MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.RECTANGLE],  # ✅ AJOUT PROMPT 5
             "Symétrie axiale": [MathExerciseType.SYMETRIE_AXIALE],  # ✅ Générateur symétrie axiale ajouté
+            "Symétrie axiale (points, segments, figures)": [MathExerciseType.SYMETRIE_AXIALE],  # ✅ Titre complet de la migration
             "Symétrie centrale": [MathExerciseType.SYMETRIE_CENTRALE],  # ✅ Générateur symétrie centrale ajouté
             
             # ========== 6e - Nombres et calculs (SPRINT 1) ==========
