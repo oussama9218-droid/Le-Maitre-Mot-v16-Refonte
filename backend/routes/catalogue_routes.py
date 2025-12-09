@@ -186,17 +186,17 @@ async def get_chapters_for_level(niveau: str):
                     ]
                 })
                 
-                    chapitre_with_stats = ChapterWithStats(
-                        id=chapitre_def["id"],
-                        titre=chapitre_def["titre"],
-                        niveau=niveau,
-                        domaine=domaine,
-                        code=chapitre_def.get("code"),
-                        ordre=chapitre_def.get("ordre", 0),
-                        nb_exercises=count
-                    )
-                    
-                    chapitres_avec_stats.append(chapitre_with_stats)
+                chapitre_with_stats = ChapterWithStats(
+                    id=chapitre_def["id"],
+                    titre=chapitre_def["titre"],
+                    niveau=niveau,
+                    domaine=domaine,
+                    code=chapitre_def.get("code"),
+                    ordre=chapitre_def.get("ordre", 0),
+                    nb_exercises=count
+                )
+                
+                chapitres_avec_stats.append(chapitre_with_stats)
         
         # Trier par ordre
         chapitres_avec_stats.sort(key=lambda x: x.ordre)
