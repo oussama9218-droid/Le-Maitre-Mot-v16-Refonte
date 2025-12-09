@@ -66,6 +66,14 @@ function SheetPreviewModal({ isOpen, onClose, previewData }) {
           <span className="font-bold">{questionNumber}.</span> {question.enonce_brut}
         </p>
         
+        {/* Figure géométrique si présente */}
+        {question.figure_html && (
+          <div 
+            className="exercise-figure" 
+            dangerouslySetInnerHTML={{ __html: question.figure_html }}
+          />
+        )}
+        
         {/* Solution */}
         <div className="ml-6 mt-3 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
           <p className="text-sm font-semibold text-blue-900 mb-1">📝 Correction :</p>
