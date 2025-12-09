@@ -2747,7 +2747,8 @@ async def generate_advanced_pdf(document: dict, content: str, export_type: str, 
         </html>
         """
     
-    # Generate PDF
+    # Generate PDF (import lazy)
+    import weasyprint
     pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
     return pdf_bytes
 
