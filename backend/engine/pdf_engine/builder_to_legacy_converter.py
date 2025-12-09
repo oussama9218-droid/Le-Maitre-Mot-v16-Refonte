@@ -148,10 +148,8 @@ def _convert_item_to_legacy_exercise(item: Dict[str, Any], numero: int) -> Dict[
     
     enonce = "\n\n".join(enonce_parts) if enonce_parts else f"Exercice {numero}"
     
-    # Ajouter les figures au début de l'énoncé (après le texte)
-    if figure_html_parts:
-        figures_combined = "\n".join(figure_html_parts)
-        enonce += f"\n\n{figures_combined}"
+    # Collecter les figures dans un champ séparé pour les templates
+    figures_combined = "\n".join(figure_html_parts) if figure_html_parts else ""
     
     # Construire la solution avec étapes + figures (si plusieurs questions, répéter les figures)
     etapes = []
