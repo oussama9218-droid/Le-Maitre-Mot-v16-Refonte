@@ -236,6 +236,58 @@ async def get_chapters_for_level(niveau: str):
     return chapitres_avec_stats
 
 
+
+@router.get("/chapters", response_model=List[ChapterWithStats])
+async def get_chapters(
+    niveau: Optional[str] = Query(None, description="Filtrer par niveau (ex: '6e', '2nde')"),
+    domaine: Optional[str] = Query(None, description="Filtrer par domaine")
+):
+    """
+    Récupère la liste des chapitres avec filtres optionnels
+    
+    Args:
+        niveau: Niveau scolaire (optionnel)
+        domaine: Domaine mathématique (optionnel)
+        
+    Returns:
+        Liste des chapitres avec nombre d'exercices
+    """
+    if niveau:
+        chapters = await chapter_service.get_chapters_by_niveau_and_domaine(niveau, domaine)
+    else:
+        # Récupérer tous les chapitres
+        chapters = await chapter_service.collection.find({}, {"_id": 0}).sort([("niveau", 1), ("domaine", 1), ("ordre", 1)]).to_list(None)
+    
+    if not chapters:
+        return []
+    
+    chapitres_avec_stats = []
+    
+    for chapter in chapters:
+        # Compter le nombre d'ExerciseTypes pour ce chapitre
+        count = await exercise_types_collection.count_documents({
+            "$or": [
+                {"chapitre_id": chapter["code"]},
+                {"chapitre_id": chapter.get("legacy_code")},
+                {"chapter_code": chapter["code"]}
+            ]
+        })
+        
+        chapitre_with_stats = ChapterWithStats(
+            id=chapter["code"],
+            titre=chapter["titre"],
+            niveau=chapter["niveau"],
+            domaine=chapter.get("domaine_legacy", chapter["domaine"]),
+            code=chapter["code"],
+            ordre=chapter.get("ordre", 0),
+            nb_exercises=count
+        )
+        
+        chapitres_avec_stats.append(chapitre_with_stats)
+    
+    return chapitres_avec_stats
+
+
 @router.get("/exercise-types", response_model=List[CatalogueExerciseType])
 async def get_catalogue_exercise_types(
     niveau: Optional[str] = Query(None, description="Filtrer par niveau"),
