@@ -514,16 +514,22 @@ class ExerciseTemplateService:
                 # NOUVEAU: Essayer d'utiliser le vrai générateur legacy avec figures
                 try:
                     # Générer l'exercice avec le service legacy
-                    spec = legacy_service.generate_exercise(
+                    # Note: generate_math_exercise_specs génère plusieurs exercices,
+                    # on prend le premier pour cette question
+                    specs = legacy_service.generate_math_exercise_specs(
                         niveau=exercise_type.niveau,
                         chapitre=exercise_type.domaine,
-                        type_exercice=legacy_type,
-                        difficulte=difficulty
+                        difficulte=difficulty,
+                        nb_exercices=1
                     )
                     
-                    # Convertir MathExerciseSpec → Question avec figure_html
-                    question = self._convert_math_spec_to_question(spec, i+1)
-                    logger.info(f"✅ Question legacy avec figure générée: {exercise_type.code_ref}")
+                    if specs and len(specs) > 0:
+                        spec = specs[0]
+                        # Convertir MathExerciseSpec → Question avec figure_html
+                        question = self._convert_math_spec_to_question(spec, i+1)
+                        logger.info(f"✅ Question legacy avec figure générée: {exercise_type.code_ref}")
+                    else:
+                        raise ValueError("Aucune spec générée par le service legacy")
                     
                 except Exception as legacy_error:
                     # Si le générateur legacy échoue, utiliser le fallback
