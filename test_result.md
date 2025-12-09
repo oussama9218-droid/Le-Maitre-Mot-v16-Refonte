@@ -34,14 +34,17 @@ Test complet des 4 corrections majeures appliquées au générateur de fiches : 
 7. ✅ **Sauvegarde automatique**: Modifications de fiche sauvegardées automatiquement avant preview
 8. ✅ **Interface utilisateur**: Navigation fluide, tous les sélecteurs fonctionnels, aucune erreur JavaScript
 
-### Bug Fix Status Summary
+### Status Summary des 4 corrections
+- **CORRECTION 1 - Cohérence niveau**: ✅ PASSED (filtre strict 6e, aucun exercice autre niveau)
+- **CORRECTION 2 - Preview/export**: ✅ PASSED (sauvegarde automatique, modifications reflétées)
+- **CORRECTION 3 - Filtre domaine**: ✅ PASSED (visible immédiatement après sélection niveau)
+- **CORRECTION 4 - Perpendiculaires/parallèles**: ✅ PASSED (chapitre trouvé et fonctionnel)
 - **Navigation page Fiche**: ✅ PASSED (page builder accessible)
-- **Sélection niveau/chapitre**: ✅ PASSED (6e + Proportionnalité sélectionnés)
-- **Affichage exercices**: ✅ PASSED (14 exercices affichés pour Proportionnalité)
-- **Contenu exercices**: ✅ PASSED (titres contiennent "Proportionnalité")
-- **Absence message erreur**: ✅ PASSED (pas de "Aucun exercice disponible")
+- **Sélection niveau/chapitre**: ✅ PASSED (6e + Perpendiculaires sélectionnés)
+- **Affichage exercices**: ✅ PASSED (exercice "Cercle - Périmètre et aire (6e)" affiché)
 - **Ajout au panier**: ✅ PASSED (exercice ajouté, compteur mis à jour)
-- **Test chapitre alternatif**: ✅ PASSED (Symétrie avec 11 exercices)
+- **Modal preview**: ✅ PASSED (3 onglets fonctionnels, contenu différencié)
+- **Test modifications**: ✅ PASSED (changements reflétés dans nouveau preview)
 
 ### Technical Notes
 - **Fix appliqué**: Frontend utilise maintenant l'endpoint dédié `/api/mathalea/chapters/{chapter_code}/exercise-types`
