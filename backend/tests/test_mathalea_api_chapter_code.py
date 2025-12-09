@@ -4,6 +4,12 @@ Tests API pour l'endpoint dédié GET /api/chapters/{chapter_code}/exercise-type
 Sprint 4 - Tests avec FastAPI TestClient
 """
 
+import sys
+from pathlib import Path
+
+# Ajouter le répertoire parent au path pour importer server
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import pytest
 from fastapi.testclient import TestClient
 from server import app
