@@ -123,6 +123,13 @@
     </div>
     <div class="exercise-text">{{ exercise.enonce | safe or '' }}</div>
     
+    <!-- NEW: Render exercise figures (geometry SVG from questions) -->
+    {% if exercise.figure_html %}
+        <div class="exercise-figure">
+            {{ exercise.figure_html | safe }}
+        </div>
+    {% endif %}
+    
     <!-- NEW: Render geometric schema SVG if generated -->
     {% if exercise.schema_svg %}
         <div class="geometric-schema">
