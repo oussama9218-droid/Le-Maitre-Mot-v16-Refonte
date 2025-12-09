@@ -232,6 +232,7 @@ function SheetPreviewModal({ isOpen, onClose, previewData }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
