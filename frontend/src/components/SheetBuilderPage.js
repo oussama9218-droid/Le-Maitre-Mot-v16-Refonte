@@ -389,8 +389,11 @@ function SheetBuilderPage() {
     setIsGeneratingPreview(true);
     
     try {
-      const currentSheetId = sheetId || await createSheet();
+      // ⚠️ SAUVEGARDER LA FICHE AVANT PREVIEW (garantit que modifications sont prises en compte)
+      console.log('💾 Sauvegarde de la fiche avant preview...');
+      const currentSheetId = await saveSheet();
       
+      console.log('📡 Génération du preview...');
       const response = await axios.post(`${API}/mathalea/sheets/${currentSheetId}/preview`);
       
       console.log('👁️ Preview généré:', response.data);
@@ -400,7 +403,7 @@ function SheetBuilderPage() {
       setShowPreviewModal(true);
       
     } catch (error) {
-      console.error('Erreur preview:', error);
+      console.error('❌ Erreur preview:', error);
       
       // Improved error handling
       let errorMessage = 'Impossible de générer la prévisualisation. ';
