@@ -2185,4 +2185,578 @@ class MathGenerationService:
                     {"etape": "Construction des symétriques", "points": 3.0},
                     {"etape": "Tracé de la figure complète", "points": 1.0}
                 ]
+            )    # ========== SPRINT 1 : Générateurs 6e (G03, N03, SP01) ==========
+    
+    def _gen_perpendiculaires_paralleles(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur les perpendiculaires et parallèles (6e_G03)
+        
+        Concepts :
+        - Tracer une perpendiculaire à une droite passant par un point
+        - Tracer une parallèle à une droite passant par un point
+        - Identifier des droites perpendiculaires/parallèles
+        """
+        
+        points = self._get_next_geometry_points()
+        
+        types_exercices = ["tracer_perpendiculaire", "tracer_parallele", "identifier"]
+        
+        if difficulte == "facile":
+            type_exercice = "tracer_perpendiculaire"
+        else:
+            type_exercice = random.choice(types_exercices)
+        
+        if type_exercice == "tracer_perpendiculaire":
+            # Tracer une perpendiculaire à une droite passant par un point
+            droite = f"({points[0]}{points[1]})"
+            point = points[2]
+            
+            # Coordonnées pour le schéma
+            if difficulte == "facile":
+                point_A_x = random.randint(2, 6)
+                point_A_y = random.randint(4, 8)
+                point_B_x = random.randint(10, 14)
+                point_B_y = random.randint(4, 8)
+                point_C_x = random.randint(6, 10)
+                point_C_y = random.randint(10, 14)
+            else:
+                point_A_x = random.randint(1, 5)
+                point_A_y = random.randint(2, 10)
+                point_B_x = random.randint(11, 15)
+                point_B_y = random.randint(2, 10)
+                point_C_x = random.randint(4, 12)
+                point_C_y = random.randint(8, 15)
+            
+            etapes = [
+                f"Tracer la perpendiculaire à la droite {droite} passant par le point {point}",
+                f"Méthode :",
+                f"1. Placer l'équerre le long de la droite {droite}",
+                f"2. Faire glisser l'équerre jusqu'au point {point}",
+                f"3. Tracer la droite perpendiculaire",
+                f"Vérification : l'angle formé doit être de 90°"
+            ]
+            
+            figure = GeometricFigure(
+                type="perpendiculaires_paralleles",
+                points=[points[0], points[1], points[2]],
+                longueurs_connues={
+                    f"{points[0]}_x": point_A_x,
+                    f"{points[0]}_y": point_A_y,
+                    f"{points[1]}_x": point_B_x,
+                    f"{points[1]}_y": point_B_y,
+                    f"{points[2]}_x": point_C_x,
+                    f"{points[2]}_y": point_C_y
+                },
+                proprietes=["perpendiculaire", "with_grid"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.RECTANGLE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "tracer_perpendiculaire",
+                    "droite": droite,
+                    "point": point,
+                    "enonce": f"Tracer la perpendiculaire à la droite {droite} passant par le point {point}. Utiliser l'équerre."
+                },
+                solution_calculee={
+                    "angle": 90,
+                    "methode": "équerre"
+                },
+                etapes_calculees=etapes,
+                resultat_final="Droite perpendiculaire tracée",
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Positionnement équerre", "points": 1.0},
+                    {"etape": "Tracé perpendiculaire", "points": 1.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'équerre est bien positionnée le long de la droite",
+                    "Vérifier que la perpendiculaire passe bien par le point donné"
+                ]
+            )
+        
+        elif type_exercice == "tracer_parallele":
+            # Tracer une parallèle à une droite passant par un point
+            droite = f"({points[0]}{points[1]})"
+            point = points[2]
+            
+            # Coordonnées
+            if difficulte == "facile":
+                point_A_x = random.randint(2, 6)
+                point_A_y = random.randint(3, 6)
+                point_B_x = random.randint(10, 14)
+                point_B_y = random.randint(3, 6)
+                point_C_x = random.randint(2, 6)
+                point_C_y = random.randint(10, 14)
+            else:
+                point_A_x = random.randint(1, 5)
+                point_A_y = random.randint(2, 8)
+                point_B_x = random.randint(11, 15)
+                point_B_y = random.randint(2, 8)
+                point_C_x = random.randint(1, 5)
+                point_C_y = random.randint(9, 15)
+            
+            etapes = [
+                f"Tracer la parallèle à la droite {droite} passant par le point {point}",
+                f"Méthode :",
+                f"1. Placer la règle le long de la droite {droite}",
+                f"2. Placer l'équerre contre la règle",
+                f"3. Faire glisser l'ensemble jusqu'au point {point}",
+                f"4. Tracer la droite parallèle",
+                f"Vérification : les deux droites ne se coupent jamais"
+            ]
+            
+            figure = GeometricFigure(
+                type="perpendiculaires_paralleles",
+                points=[points[0], points[1], points[2]],
+                longueurs_connues={
+                    f"{points[0]}_x": point_A_x,
+                    f"{points[0]}_y": point_A_y,
+                    f"{points[1]}_x": point_B_x,
+                    f"{points[1]}_y": point_B_y,
+                    f"{points[2]}_x": point_C_x,
+                    f"{points[2]}_y": point_C_y
+                },
+                proprietes=["parallele", "with_grid"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.RECTANGLE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "tracer_parallele",
+                    "droite": droite,
+                    "point": point,
+                    "enonce": f"Tracer la parallèle à la droite {droite} passant par le point {point}. Utiliser la règle et l'équerre."
+                },
+                solution_calculee={
+                    "methode": "règle_et_équerre"
+                },
+                etapes_calculees=etapes,
+                resultat_final="Droite parallèle tracée",
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Positionnement règle et équerre", "points": 1.0},
+                    {"etape": "Tracé parallèle", "points": 1.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que la règle et l'équerre sont bien positionnées",
+                    "Vérifier que la parallèle passe bien par le point donné"
+                ]
+            )
+        
+        else:  # identifier
+            # Identifier des droites perpendiculaires ou parallèles
+            droite1 = f"({points[0]}{points[1]})"
+            droite2 = f"({points[2]}{points[3]})"
+            
+            relation = random.choice(["perpendiculaires", "parallèles", "quelconques"])
+            
+            etapes = [
+                f"Observer les droites {droite1} et {droite2}",
+                f"Méthode :",
+                f"1. Placer l'équerre sur les deux droites",
+                f"2. Vérifier si elles forment un angle de 90° (perpendiculaires)",
+                f"3. Ou vérifier si elles ne se coupent jamais (parallèles)",
+                f"Résultat : les droites sont {relation}"
+            ]
+            
+            # Coordonnées selon la relation
+            if relation == "perpendiculaires":
+                point_A_x, point_A_y = random.randint(2, 6), random.randint(4, 8)
+                point_B_x, point_B_y = random.randint(10, 14), random.randint(4, 8)
+                point_C_x, point_C_y = random.randint(6, 10), random.randint(10, 14)
+                point_D_x, point_D_y = random.randint(6, 10), random.randint(2, 4)
+                proprietes = ["perpendiculaire", "with_grid"]
+            elif relation == "parallèles":
+                point_A_x, point_A_y = random.randint(2, 6), random.randint(3, 6)
+                point_B_x, point_B_y = random.randint(10, 14), random.randint(3, 6)
+                point_C_x, point_C_y = random.randint(2, 6), random.randint(10, 14)
+                point_D_x, point_D_y = random.randint(10, 14), random.randint(10, 14)
+                proprietes = ["parallele", "with_grid"]
+            else:
+                point_A_x, point_A_y = random.randint(2, 6), random.randint(3, 6)
+                point_B_x, point_B_y = random.randint(10, 14), random.randint(5, 9)
+                point_C_x, point_C_y = random.randint(1, 5), random.randint(10, 14)
+                point_D_x, point_D_y = random.randint(11, 15), random.randint(12, 15)
+                proprietes = ["with_grid"]
+            
+            figure = GeometricFigure(
+                type="perpendiculaires_paralleles",
+                points=[points[0], points[1], points[2], points[3]],
+                longueurs_connues={
+                    f"{points[0]}_x": point_A_x,
+                    f"{points[0]}_y": point_A_y,
+                    f"{points[1]}_x": point_B_x,
+                    f"{points[1]}_y": point_B_y,
+                    f"{points[2]}_x": point_C_x,
+                    f"{points[2]}_y": point_C_y,
+                    f"{points[3]}_x": point_D_x,
+                    f"{points[3]}_y": point_D_y
+                },
+                proprietes=proprietes
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.RECTANGLE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "identifier",
+                    "droite1": droite1,
+                    "droite2": droite2,
+                    "enonce": f"Observer les droites {droite1} et {droite2}. Dire si elles sont perpendiculaires, parallèles ou quelconques."
+                },
+                solution_calculee={
+                    "relation": relation
+                },
+                etapes_calculees=etapes,
+                resultat_final=f"Les droites sont {relation}",
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Observation", "points": 1.0},
+                    {"etape": "Identification", "points": 1.0}
+                ]
+            )
+    
+    def _gen_droite_numerique(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur la droite numérique et le repérage (6e_N03)
+        
+        Concepts :
+        - Placer un nombre sur la droite graduée
+        - Lire l'abscisse d'un point
+        - Calculer la distance entre deux points
+        """
+        
+        types_exercices = ["placer_nombre", "lire_abscisse", "calculer_distance"]
+        
+        if difficulte == "facile":
+            type_exercice = "lire_abscisse"
+        else:
+            type_exercice = random.choice(types_exercices)
+        
+        # Définir l'échelle de la droite selon la difficulté
+        if difficulte == "facile":
+            min_val = 0
+            max_val = 10
+            graduation = 1
+        elif difficulte == "moyen":
+            min_val = 0
+            max_val = 50
+            graduation = 5
+        else:  # difficile
+            min_val = -20
+            max_val = 20
+            graduation = 2
+        
+        if type_exercice == "placer_nombre":
+            # Placer un nombre sur la droite
+            nombre = min_val + random.randint(1, (max_val - min_val) // graduation) * graduation
+            
+            etapes = [
+                f"Placer le nombre {nombre} sur la droite graduée",
+                f"Méthode :",
+                f"1. Observer l'échelle : les graduations vont de {min_val} à {max_val} par pas de {graduation}",
+                f"2. Compter les graduations depuis {min_val}",
+                f"3. Marquer le point à la position {nombre}"
+            ]
+            
+            enonce = f"Sur une droite graduée allant de {min_val} à {max_val} (graduations tous les {graduation}), placer le point A d'abscisse {nombre}."
+            
+        elif type_exercice == "lire_abscisse":
+            # Lire l'abscisse d'un point
+            position = random.randint(1, (max_val - min_val) // graduation)
+            abscisse = min_val + position * graduation
+            
+            etapes = [
+                f"Lire l'abscisse du point A",
+                f"Méthode :",
+                f"1. Repérer l'origine ({min_val}) sur la droite",
+                f"2. Compter les graduations jusqu'au point A",
+                f"3. Multiplier par la graduation ({graduation})",
+                f"Résultat : abscisse = {abscisse}"
+            ]
+            
+            enonce = f"Sur une droite graduée allant de {min_val} à {max_val} (graduations tous les {graduation}), le point A est placé. Lire son abscisse."
+            
+        else:  # calculer_distance
+            # Calculer la distance entre deux points
+            pos1 = random.randint(1, (max_val - min_val) // (graduation * 2))
+            pos2 = random.randint(pos1 + 2, (max_val - min_val) // graduation)
+            
+            abscisse1 = min_val + pos1 * graduation
+            abscisse2 = min_val + pos2 * graduation
+            distance = abs(abscisse2 - abscisse1)
+            
+            etapes = [
+                f"Calculer la distance entre A et B",
+                f"Point A : abscisse = {abscisse1}",
+                f"Point B : abscisse = {abscisse2}",
+                f"Méthode :",
+                f"Distance = |abscisse de B - abscisse de A|",
+                f"Distance = |{abscisse2} - {abscisse1}|",
+                f"Distance = {distance}"
+            ]
+            
+            enonce = f"Sur une droite graduée, le point A a pour abscisse {abscisse1} et le point B a pour abscisse {abscisse2}. Calculer la distance AB."
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "calculer_distance",
+                    "abscisse1": abscisse1,
+                    "abscisse2": abscisse2,
+                    "enonce": enonce
+                },
+                solution_calculee={
+                    "distance": distance,
+                    "methode": "valeur_absolue"
+                },
+                etapes_calculees=etapes,
+                resultat_final=str(distance),
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Identification des abscisses", "points": 1.0},
+                    {"etape": "Calcul de la distance", "points": 1.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève utilise la valeur absolue",
+                    "Insister sur le fait que la distance est toujours positive"
+                ]
+            )
+        
+        # Pour les types "placer_nombre" et "lire_abscisse"
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "type": type_exercice,
+                "min_val": min_val,
+                "max_val": max_val,
+                "graduation": graduation,
+                "nombre": nombre if type_exercice == "placer_nombre" else abscisse,
+                "enonce": enonce
+            },
+            solution_calculee={
+                "abscisse": nombre if type_exercice == "placer_nombre" else abscisse,
+                "methode": "graduation"
+            },
+            etapes_calculees=etapes,
+            resultat_final=str(nombre if type_exercice == "placer_nombre" else abscisse),
+            figure_geometrique=None,
+            points_bareme=[
+                {"etape": "Lecture/placement correct", "points": 2.0}
+            ],
+            conseils_prof=[
+                "Vérifier que l'élève respecte l'échelle de graduation",
+                "Insister sur la précision du placement"
+            ]
+        )
+    
+    def _gen_tableaux_donnees(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur les tableaux de données (6e_SP01)
+        
+        Concepts :
+        - Lire un tableau de données
+        - Compléter un tableau
+        - Calculer des totaux
+        """
+        
+        types_exercices = ["lire_tableau", "completer_tableau", "calculer_total"]
+        
+        if difficulte == "facile":
+            type_exercice = "lire_tableau"
+            nb_lignes = 2
+            nb_colonnes = 3
+        elif difficulte == "moyen":
+            type_exercice = random.choice(["lire_tableau", "completer_tableau"])
+            nb_lignes = 3
+            nb_colonnes = 4
+        else:  # difficile
+            type_exercice = random.choice(types_exercices)
+            nb_lignes = 4
+            nb_colonnes = 5
+        
+        # Thèmes possibles
+        themes = [
+            {"nom": "notes", "lignes": ["Mathématiques", "Français", "Histoire"], "colonnes": ["Trimestre 1", "Trimestre 2", "Trimestre 3"]},
+            {"nom": "ventes", "lignes": ["Lundi", "Mardi", "Mercredi"], "colonnes": ["Pommes", "Bananes", "Oranges"]},
+            {"nom": "temperatures", "lignes": ["Lundi", "Mardi", "Mercredi"], "colonnes": ["Matin", "Midi", "Soir"]}
+        ]
+        
+        theme = random.choice(themes)
+        
+        # Générer les données selon la difficulté
+        if difficulte == "facile":
+            donnees = [[random.randint(10, 20) for _ in range(nb_colonnes)] for _ in range(nb_lignes)]
+        elif difficulte == "moyen":
+            donnees = [[random.randint(5, 50) for _ in range(nb_colonnes)] for _ in range(nb_lignes)]
+        else:
+            donnees = [[random.randint(1, 100) for _ in range(nb_colonnes)] for _ in range(nb_lignes)]
+        
+        if type_exercice == "lire_tableau":
+            # Lire une valeur dans le tableau
+            ligne = random.randint(0, nb_lignes - 1)
+            colonne = random.randint(0, nb_colonnes - 1)
+            valeur = donnees[ligne][colonne]
+            
+            nom_ligne = theme["lignes"][ligne % len(theme["lignes"])]
+            nom_colonne = theme["colonnes"][colonne % len(theme["colonnes"])]
+            
+            etapes = [
+                f"Lire la valeur dans le tableau",
+                f"Ligne : {nom_ligne}",
+                f"Colonne : {nom_colonne}",
+                f"Valeur : {valeur}"
+            ]
+            
+            enonce = f"Dans un tableau de {theme['nom']}, quelle est la valeur pour {nom_ligne} dans la colonne {nom_colonne} ?"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.STATISTIQUES,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "lire_tableau",
+                    "donnees": donnees,
+                    "ligne": ligne,
+                    "colonne": colonne,
+                    "nom_ligne": nom_ligne,
+                    "nom_colonne": nom_colonne,
+                    "enonce": enonce
+                },
+                solution_calculee={
+                    "valeur": valeur
+                },
+                etapes_calculees=etapes,
+                resultat_final=str(valeur),
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Lecture correcte", "points": 2.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève repère bien la ligne et la colonne",
+                    "Insister sur la lecture méthodique"
+                ]
+            )
+        
+        elif type_exercice == "completer_tableau":
+            # Compléter une valeur manquante
+            ligne = random.randint(0, nb_lignes - 1)
+            colonne = random.randint(0, nb_colonnes - 1)
+            valeur_manquante = donnees[ligne][colonne]
+            
+            # Donner un indice : somme de ligne ou colonne
+            total_ligne = sum(donnees[ligne])
+            total_sans_manquante = total_ligne - valeur_manquante
+            
+            nom_ligne = theme["lignes"][ligne % len(theme["lignes"])]
+            
+            etapes = [
+                f"Compléter le tableau",
+                f"Ligne : {nom_ligne}",
+                f"Total de la ligne : {total_ligne}",
+                f"Somme des valeurs connues : {total_sans_manquante}",
+                f"Valeur manquante = {total_ligne} - {total_sans_manquante} = {valeur_manquante}"
+            ]
+            
+            enonce = f"Dans un tableau de {theme['nom']}, la ligne {nom_ligne} a un total de {total_ligne}. Sachant que la somme des valeurs connues est {total_sans_manquante}, quelle est la valeur manquante ?"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.STATISTIQUES,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "completer_tableau",
+                    "total_ligne": total_ligne,
+                    "total_sans_manquante": total_sans_manquante,
+                    "nom_ligne": nom_ligne,
+                    "enonce": enonce
+                },
+                solution_calculee={
+                    "valeur_manquante": valeur_manquante
+                },
+                etapes_calculees=etapes,
+                resultat_final=str(valeur_manquante),
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Compréhension du problème", "points": 1.0},
+                    {"etape": "Calcul de la valeur manquante", "points": 1.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève comprend le principe du total",
+                    "Insister sur la soustraction pour trouver la valeur manquante"
+                ]
+            )
+        
+        else:  # calculer_total
+            # Calculer le total d'une ligne ou colonne
+            choix = random.choice(["ligne", "colonne"])
+            
+            if choix == "ligne":
+                ligne = random.randint(0, nb_lignes - 1)
+                total = sum(donnees[ligne])
+                nom = theme["lignes"][ligne % len(theme["lignes"])]
+                
+                etapes = [
+                    f"Calculer le total de la ligne {nom}",
+                    f"Valeurs : {' + '.join(map(str, donnees[ligne]))}",
+                    f"Total = {total}"
+                ]
+                
+                enonce = f"Dans un tableau de {theme['nom']}, calculer le total de la ligne {nom}. Les valeurs sont : {', '.join(map(str, donnees[ligne]))}."
+            else:
+                colonne = random.randint(0, nb_colonnes - 1)
+                total = sum(donnees[i][colonne] for i in range(nb_lignes))
+                nom = theme["colonnes"][colonne % len(theme["colonnes"])]
+                
+                valeurs_colonne = [donnees[i][colonne] for i in range(nb_lignes)]
+                
+                etapes = [
+                    f"Calculer le total de la colonne {nom}",
+                    f"Valeurs : {' + '.join(map(str, valeurs_colonne))}",
+                    f"Total = {total}"
+                ]
+                
+                enonce = f"Dans un tableau de {theme['nom']}, calculer le total de la colonne {nom}. Les valeurs sont : {', '.join(map(str, valeurs_colonne))}."
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.STATISTIQUES,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "calculer_total",
+                    "choix": choix,
+                    "nom": nom,
+                    "enonce": enonce
+                },
+                solution_calculee={
+                    "total": total
+                },
+                etapes_calculees=etapes,
+                resultat_final=str(total),
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Addition des valeurs", "points": 2.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève additionne toutes les valeurs",
+                    "Insister sur la vérification du calcul"
+                ]
             )
