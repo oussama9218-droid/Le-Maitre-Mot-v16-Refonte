@@ -59,21 +59,42 @@ def install_package(package_name: str) -> bool:
         return False
 
 def ensure_dependencies():
-    """Garantit que toutes les dépendances système critiques sont installées."""
+    """
+    Garantit que toutes les dépendances système critiques sont installées.
+    
+    WeasyPrint nécessite les dépendances suivantes :
+    - libpango-1.0-0 : Bibliothèque de rendu de texte
+    - libpangoft2-1.0-0 : Support FreeType pour Pango
+    - libcairo2 : Bibliothèque graphique 2D
+    - libgdk-pixbuf2.0-0 : Chargement d'images
+    - shared-mime-info : Types MIME
+    """
     required_packages = [
-        "libpangoft2-1.0-0"
+        "libpango-1.0-0",
+        "libpangoft2-1.0-0",
+        "libcairo2",
+        "libgdk-pixbuf2.0-0",
+        "shared-mime-info"
     ]
     
-    print("🔍 Vérification des dépendances système...")
+    print("🔧 Vérification des dépendances système pour WeasyPrint...")
+    print(f"📋 Packages requis : {', '.join(required_packages)}")
     
     all_ok = True
+    installed_count = 0
+    
     for package in required_packages:
         if check_package_installed(package):
             print(f"✅ {package} est déjà installé")
+            installed_count += 1
         else:
             print(f"⚠️  {package} n'est pas installé, installation en cours...")
             if not install_package(package):
                 all_ok = False
+            else:
+                installed_count += 1
+    
+    print(f"\n📊 Résultat : {installed_count}/{len(required_packages)} packages installés")
     
     if all_ok:
         print("✅ Toutes les dépendances système sont prêtes")
