@@ -707,7 +707,8 @@ class ExerciseTemplateService:
                         f"par rapport à {axe_desc}."
                     )
         
-        enonce = " ".join(enonce_parts) if enonce_parts else f"Question {question_number}"
+        # ✅ FIX P1: Si aucun énoncé n'est trouvé, générer un énoncé contextuel basé sur le type d'exercice
+        enonce = " ".join(enonce_parts) if enonce_parts else self._generate_contextual_enonce(spec)
         
         # Construire la solution
         solution_parts = []
