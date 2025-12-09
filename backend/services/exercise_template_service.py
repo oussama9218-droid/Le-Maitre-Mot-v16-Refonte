@@ -661,4 +661,187 @@ exercise_template_service = ExerciseTemplateService()
 __all__ = [
     "ExerciseTemplateService",
     "exercise_template_service"
+
+    
+    def _convert_math_spec_to_question(
+        self,
+        spec: MathExerciseSpec,
+        question_number: int
+    ) -> Dict[str, Any]:
+        """
+        Convertit un MathExerciseSpec (legacy avec figure_geometrique)
+        en question au format standardisé (avec figure_html pour preview/PDF)
+        
+        Args:
+            spec: MathExerciseSpec du générateur legacy
+            question_number: Numéro de la question (pour l'ID)
+        
+        Returns:
+            Dict au format question standardisé avec figure_html si présente
+        """
+        # Construire l'énoncé à partir des paramètres
+        enonce_parts = []
+        if spec.parametres:
+            # Extraire l'énoncé depuis les paramètres (format legacy)
+            if "enonce" in spec.parametres:
+                enonce_parts.append(spec.parametres["enonce"])
+            elif "type" in spec.parametres:
+                # Construire un énoncé générique basé sur le type
+                type_ex = spec.parametres["type"]
+                if type_ex == "trouver_symetrique":
+                    point_orig = spec.parametres.get("point_original", "A")
+                    coords = spec.parametres.get("point_original_coords", {})
+                    axe_desc = spec.parametres.get("axe_description", "l'axe")
+                    enonce_parts.append(
+                        f"Trouver le symétrique du point {point_orig}({coords.get('x', 0)}, {coords.get('y', 0)}) "
+                        f"par rapport à {axe_desc}."
+                    )
+        
+        enonce = " ".join(enonce_parts) if enonce_parts else f"Question {question_number}"
+        
+        # Construire la solution
+        solution_parts = []
+        if spec.etapes_calculees:
+            solution_parts.extend(spec.etapes_calculees)
+        if spec.resultat_final:
+            solution_parts.append(f"Résultat final : {spec.resultat_final}")
+        
+        solution = "\n".join(solution_parts) if solution_parts else "Solution à compléter"
+        
+        question = {
+            "id": f"q{question_number}",
+            "enonce_brut": enonce,
+            "data": {},
+            "solution_brut": solution,
+            "metadata": {
+                "generator": "legacy",
+                "has_figure": spec.figure_geometrique is not None,
+                "type_exercice": spec.type_exercice.value if hasattr(spec.type_exercice, 'value') else str(spec.type_exercice)
+            }
+        }
+        
+        # GÉNÉRER LE SVG si figure présente
+        if spec.figure_geometrique:
+            try:
+                figure_svg = self._render_figure_to_svg(spec.figure_geometrique)
+                if figure_svg:
+                    question["figure_html"] = figure_svg
+                    question["data"]["figure"] = spec.figure_geometrique.dict()
+                    logger.info(f"✅ Figure SVG générée pour question {question_number}")
+                else:
+                    logger.warning(f"⚠️  Figure SVG vide pour question {question_number}")
+            except Exception as e:
+                logger.error(f"❌ Erreur génération SVG pour question {question_number}: {e}")
+                # Continue sans figure plutôt que de crasher
+        
+        return question
+    
+    def _render_figure_to_svg(self, figure: GeometricFigure) -> str:
+        """
+        Convertit une GeometricFigure en SVG HTML
+        
+        Args:
+            figure: GeometricFigure à convertir
+        
+        Returns:
+            String SVG HTML ou chaîne vide si échec
+        """
+        try:
+            figure_type = figure.type.lower()
+            
+            if figure_type == "symetrie_axiale":
+                # Utiliser GeometryRenderService pour la symétrie
+                from services.geometry_render_service import GeometryRenderService
+                
+                service = GeometryRenderService()
+                
+                # Extraire les coordonnées depuis longueurs_connues
+                points = figure.points if figure.points else ["A", "A'"]
+                point_orig = points[0] if len(points) > 0 else "A"
+                point_image = points[1] if len(points) > 1 else "A'"
+                
+                coords_orig = {
+                    "x": figure.longueurs_connues.get(f"{point_orig}_x", 3),
+                    "y": figure.longueurs_connues.get(f"{point_orig}_y", 5)
+                }
+                coords_image = {
+                    "x": figure.longueurs_connues.get(f"{point_image}_x", 7),
+                    "y": figure.longueurs_connues.get(f"{point_image}_y", 5)
+                }
+                
+                # Déterminer le type d'axe depuis les propriétés
+                axe_type = "vertical"  # Par défaut
+                axe_position = 5  # Par défaut
+                
+                for prop in figure.proprietes:
+                    if "axe_vertical" in prop or "axe_horizontal" in prop:
+                        axe_type = "vertical" if "vertical" in prop else "horizontal"
+                    if "axe_position" in prop:
+                        # Extraire la position : "axe_position_5" → 5
+                        parts = prop.split("_")
+                        if len(parts) > 2:
+                            try:
+                                axe_position = float(parts[2])
+                            except:
+                                pass
+                
+                # Générer le SVG
+                svg = service.render_symmetry_figure(
+                    point_orig=point_orig,
+                    coords_orig=coords_orig,
+                    point_image=point_image,
+                    coords_image=coords_image,
+                    axe_type=axe_type,
+                    axe_position=axe_position
+                )
+                
+                return svg
+            
+            elif figure_type in ["triangle", "triangle_rectangle", "rectangle", "carre", "cercle", "cylindre", "pyramide"]:
+                # Utiliser SchemaRenderer pour les autres formes
+                from render_schema import schema_renderer
+                
+                # Construire schema_data depuis GeometricFigure
+                schema_data = {
+                    "type": figure_type,
+                    "points": figure.points if figure.points else []
+                }
+                
+                # Ajouter les longueurs connues
+                for key, value in figure.longueurs_connues.items():
+                    # Nettoyer les clés (enlever les suffixes _x, _y)
+                    clean_key = key.replace("_x", "").replace("_y", "")
+                    if clean_key not in schema_data and not key.endswith("_x") and not key.endswith("_y"):
+                        schema_data[clean_key] = value
+                
+                # Cas spéciaux selon le type
+                if figure_type == "cylindre":
+                    schema_data["rayon"] = figure.longueurs_connues.get("rayon", 3)
+                    schema_data["hauteur"] = figure.longueurs_connues.get("hauteur", 5)
+                elif figure_type in ["rectangle", "carre"]:
+                    schema_data["longueur"] = figure.longueurs_connues.get("longueur", 6)
+                    schema_data["largeur"] = figure.longueurs_connues.get("largeur", 4)
+                elif figure_type == "cercle":
+                    schema_data["rayon"] = figure.longueurs_connues.get("rayon", 4)
+                elif "triangle" in figure_type:
+                    schema_data["cotes"] = {
+                        "AB": figure.longueurs_connues.get("AB", 5),
+                        "AC": figure.longueurs_connues.get("AC", 4),
+                        "BC": figure.longueurs_connues.get("BC", 3)
+                    }
+                    # Déterminer si rectangle
+                    if any("rectangle" in prop for prop in figure.proprietes):
+                        schema_data["rectangle_en"] = figure.proprietes[0] if figure.proprietes else None
+                
+                svg = schema_renderer.render_to_svg(schema_data)
+                return svg
+            
+            else:
+                logger.warning(f"⚠️  Type de figure non supporté: {figure_type}")
+                return ""
+                
+        except Exception as e:
+            logger.error(f"❌ Erreur lors du rendu SVG: {e}", exc_info=True)
+            return ""
+
 ]
