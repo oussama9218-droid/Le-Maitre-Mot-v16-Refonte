@@ -938,6 +938,18 @@ def _build_html_pro_academique(legacy_format: dict, user_config: dict = None) ->
             color: #5a7a3d;
             border-left-color: #5a7a3d;
         }}
+        
+        /* Styles pour les figures géométriques */
+        .exercise-figure {{
+            margin: 14px 0;
+            text-align: center;
+            width: 100%;
+        }}
+        
+        .exercise-figure svg {{
+            max-width: 100%;
+            height: auto;
+        }}
     </style>
     """
     
