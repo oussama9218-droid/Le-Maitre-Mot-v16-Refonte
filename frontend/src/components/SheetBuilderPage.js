@@ -74,6 +74,7 @@ function SheetBuilderPage() {
   // États pour filtres
   const [selectedDomain, setSelectedDomain] = useState("");
   const [selectedGeneratorKind, setSelectedGeneratorKind] = useState("");
+  const [availableDomains, setAvailableDomains] = useState([]);
 
   // Initialiser l'authentification
   useEffect(() => {
