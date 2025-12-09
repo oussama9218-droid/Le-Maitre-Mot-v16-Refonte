@@ -43,6 +43,14 @@ function SheetPreviewModal({ isOpen, onClose, previewData }) {
           <span className="font-bold">{questionNumber}.</span> {question.enonce_brut}
         </p>
         
+        {/* Figure géométrique si présente */}
+        {question.figure_html && (
+          <div 
+            className="exercise-figure" 
+            dangerouslySetInnerHTML={{ __html: question.figure_html }}
+          />
+        )}
+        
         {/* Zone de réponse élève */}
         <div className="ml-6 mt-2 p-4 border-2 border-dashed border-gray-300 rounded bg-gray-50 min-h-[80px]">
           <p className="text-xs text-gray-400 italic">Zone de réponse</p>
