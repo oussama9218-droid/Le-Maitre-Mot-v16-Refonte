@@ -507,21 +507,36 @@ class ExerciseTemplateService:
         
         for i in range(nb_questions):
             try:
-                # Pour l'instant, les générateurs legacy ne sont pas complètement implémentés
-                # On génère des questions de fallback professionnelles
-                
                 # Utiliser une seed unique par question pour variété
                 question_seed = seed + i
                 question_rng = random.Random(question_seed)
                 
-                # Générer une question de fallback basée sur le type d'exercice
-                question = self._generate_legacy_fallback_question(
-                    exercise_type=exercise_type,
-                    question_number=i+1,
-                    seed=question_seed,
-                    difficulty=difficulty,
-                    rng=question_rng
-                )
+                # NOUVEAU: Essayer d'utiliser le vrai générateur legacy avec figures
+                try:
+                    # Générer l'exercice avec le service legacy
+                    spec = legacy_service.generate_exercise(
+                        niveau=exercise_type.niveau,
+                        chapitre=exercise_type.domaine,
+                        type_exercice=legacy_type,
+                        difficulte=difficulty
+                    )
+                    
+                    # Convertir MathExerciseSpec → Question avec figure_html
+                    question = self._convert_math_spec_to_question(spec, i+1)
+                    logger.info(f"✅ Question legacy avec figure générée: {exercise_type.code_ref}")
+                    
+                except Exception as legacy_error:
+                    # Si le générateur legacy échoue, utiliser le fallback
+                    logger.warning(
+                        f"⚠️  Générateur legacy failed, using fallback for {exercise_type.code_ref}: {legacy_error}"
+                    )
+                    question = self._generate_legacy_fallback_question(
+                        exercise_type=exercise_type,
+                        question_number=i+1,
+                        seed=question_seed,
+                        difficulty=difficulty,
+                        rng=question_rng
+                    )
                 
                 questions.append(question)
                 
@@ -533,10 +548,7 @@ class ExerciseTemplateService:
                 )
                 
                 # JAMAIS afficher de stacktrace ou message technique au professeur
-                # Option A: On ignore la question et continue
-                # Option B: On met une question fallback propre
-                
-                # Pour l'instant, fallback propre (Option B)
+                # Fallback propre
                 questions.append({
                     "id": f"q{i+1}",
                     "enonce_brut": "Exercice temporairement indisponible (erreur technique)",
