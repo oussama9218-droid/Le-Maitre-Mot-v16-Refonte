@@ -15,6 +15,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 
 from models.mathalea_models import ExerciseType
+from models.math_models import MathExerciseSpec, GeometricFigure, MathExerciseType
 
 logger = logging.getLogger(__name__)
 
