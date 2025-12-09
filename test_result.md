@@ -11,7 +11,7 @@ Test complet du flux de persistance du logo dans la configuration Pro PDF - Vali
 **Command**: `python backend_test.py logo-persistence`
 **Result**: ✅ SUCCÈS COMPLET (5/5 tests - 100%)
 **User Email**: Oussama92.18@gmail.com
-**Backend URL**: https://mathworksheets.preview.emergentagent.com
+**Backend URL**: https://mathalea-exercice.preview.emergentagent.com
 
 **Details**:
 - ✅ **TEST 1: Upload de logo** - Logo uploadé avec succès
@@ -112,7 +112,7 @@ Test complet du flux de création de fiche avec preview et génération PDF dans
 **Command**: Playwright automation script (scénario spécifique SPRINT F.3-FIX)
 **Result**: ✅ SUCCÈS COMPLET (8/8 étapes critiques validées)
 **Details**:
-- ✅ Page builder chargée correctement (https://mathworksheets.preview.emergentagent.com/builder)
+- ✅ Page builder chargée correctement (https://mathalea-exercice.preview.emergentagent.com/builder)
 - ✅ Header "Le Maître Mot" et navigation complète (5 éléments) visibles
 - ✅ Configuration fiche: Niveau "6e" sélectionné avec succès
 - ✅ Chapitre "Proportionnalité (2 exercices)" sélectionné avec succès
@@ -388,7 +388,7 @@ Test complet du flux d'aperçu HTML pour le SPRINT F.4 - Modal de prévisualisat
 **Command**: Playwright automation script (scénario spécifique SPRINT F.4)
 **Result**: ✅ SUCCÈS COMPLET (30/32 étapes critiques validées - 93.8%)
 **Details**:
-- ✅ Page builder chargée correctement (https://mathworksheets.preview.emergentagent.com/builder)
+- ✅ Page builder chargée correctement (https://mathalea-exercice.preview.emergentagent.com/builder)
 - ✅ Header "Générateur de fiches" et navigation complète (2 éléments) visibles
 - ✅ Configuration fiche: Niveau "6e" sélectionné avec succès
 - ✅ Chapitre "Proportionnalité (2 exercices)" sélectionné avec succès
