@@ -130,7 +130,7 @@
       <div class="solution-title">Solution :</div>
       {% if exercise.solution and exercise.solution.etapes %}
         {% for etape in exercise.solution.etapes %}
-          <div class="step">{{ loop.index }}. {{ etape }}</div>
+          <div class="step">{{ loop.index }}. {{ etape | safe }}</div>
         {% endfor %}
       {% endif %}
       {% if exercise.solution and exercise.solution.resultat %}
