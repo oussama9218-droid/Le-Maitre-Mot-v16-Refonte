@@ -24,14 +24,15 @@ Test complet des 4 corrections majeures appliquées au générateur de fiches : 
 - ✅ **Test preview modal**: Modal "Aperçu de la fiche" ouvert avec 3 onglets (Sujet, Version élève, Corrigé)
 - ✅ **Test modifications fiche**: Configuration exercice modifiée (3 questions), nouveau preview reflète les changements
 
-### Key Findings - Bug affichage exercices Fiche
-1. ✅ **BUG ENTIÈREMENT CORRIGÉ**: Les exercices s'affichent correctement dans la liste
-2. ✅ **Endpoint dédié fonctionnel**: Frontend utilise `/api/mathalea/chapters/{chapter_code}/exercise-types`
-3. ✅ **Cohérence affichage**: Chapitres indiquent "(X exercices)" ET la liste contient bien les exercices
-4. ✅ **Pas de liste vide**: Plus de problème de liste vide malgré le compteur d'exercices
-5. ✅ **Fonctionnalité complète**: Ajout d'exercices au panier fonctionne parfaitement
-6. ✅ **Multiple chapitres**: Testé avec Proportionnalité (14 exercices) et Symétrie (11 exercices)
-7. ✅ **Interface utilisateur**: Navigation fluide, sélecteurs fonctionnels, pas d'erreurs
+### Key Findings - Test complet des 4 corrections
+1. ✅ **CORRECTION 1 ENTIÈREMENT VALIDÉE**: Cohérence niveau/domaine/chapitre respectée - filtre strict par niveau 6e
+2. ✅ **CORRECTION 2 ENTIÈREMENT VALIDÉE**: Preview/export mis à jour avec sauvegarde automatique avant génération
+3. ✅ **CORRECTION 3 ENTIÈREMENT VALIDÉE**: Filtre domaine visible immédiatement après sélection du niveau
+4. ✅ **CORRECTION 4 ENTIÈREMENT VALIDÉE**: Mapping perpendiculaires/parallèles fonctionnel avec chapitre ajouté
+5. ✅ **Endpoint dédié fonctionnel**: Frontend utilise `/api/mathalea/chapters/{chapter_code}/exercise-types`
+6. ✅ **Modal preview fonctionnel**: 3 onglets (Sujet, Version élève, Corrigé) avec contenu différencié
+7. ✅ **Sauvegarde automatique**: Modifications de fiche sauvegardées automatiquement avant preview
+8. ✅ **Interface utilisateur**: Navigation fluide, tous les sélecteurs fonctionnels, aucune erreur JavaScript
 
 ### Bug Fix Status Summary
 - **Navigation page Fiche**: ✅ PASSED (page builder accessible)
