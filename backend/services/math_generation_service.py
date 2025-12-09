@@ -2404,16 +2404,16 @@ class MathGenerationService:
             
             figure = GeometricFigure(
                 type="perpendiculaires_paralleles",
-                points=[points[0], points[1], points[2], points[3]],
+                points=[all_points[0], all_points[1], all_points[2], all_points[3]],
                 longueurs_connues={
-                    f"{points[0]}_x": point_A_x,
-                    f"{points[0]}_y": point_A_y,
-                    f"{points[1]}_x": point_B_x,
-                    f"{points[1]}_y": point_B_y,
-                    f"{points[2]}_x": point_C_x,
-                    f"{points[2]}_y": point_C_y,
-                    f"{points[3]}_x": point_D_x,
-                    f"{points[3]}_y": point_D_y
+                    f"{all_points[0]}_x": point_A_x,
+                    f"{all_points[0]}_y": point_A_y,
+                    f"{all_points[1]}_x": point_B_x,
+                    f"{all_points[1]}_y": point_B_y,
+                    f"{all_points[2]}_x": point_C_x,
+                    f"{all_points[2]}_y": point_C_y,
+                    f"{all_points[3]}_x": point_D_x,
+                    f"{all_points[3]}_y": point_D_y
                 },
                 proprietes=proprietes
             )
