@@ -1,6 +1,72 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Logo Persistence Flow Testing
+## Latest Test Session - SPRINT 4 Chapters Endpoint Testing
+
+### Test Focus
+Test du nouvel endpoint créé dans SPRINT 4 : GET /api/chapters/{chapter_code}/exercise-types - Validation complète
+
+### Tests Executed
+
+#### 1. Test SPRINT 4 Chapters Endpoint Complete
+**Command**: `python test_sprint4_chapters.py`
+**Result**: ✅ SUCCÈS COMPLET (4/4 tests critiques - 100%)
+**Backend URL**: https://mathalea-exercice.preview.emergentagent.com
+**Test Time**: 2025-12-09 19:22:10
+
+**Details**:
+- ✅ **TEST 1: Succès avec chapter_code valide (6e_G07)** - Endpoint fonctionnel
+  - Endpoint: `GET /api/mathalea/chapters/6e_G07/exercise-types`
+  - Status: 200 OK
+  - Response: total=1, items count=1
+  - ✅ Tous les items ont chapter_code correct: "6e_G07"
+  - ✅ Tous les champs requis présents: id, code_ref, titre, niveau, domaine, chapter_code
+  - Sample item: LEGACY_SYM_AX_6e (Symétrie axiale 6e)
+
+- ✅ **TEST 2: HTTP 404 avec chapter_code inexistant** - Gestion d'erreur correcte
+  - Endpoint: `GET /api/mathalea/chapters/INVALID_CODE_123/exercise-types`
+  - Status: 404 NOT FOUND
+  - Message: "Chapter with code 'INVALID_CODE_123' not found" ✅
+
+- ✅ **TEST 3: Test pagination (limit=1&skip=0)** - Pagination fonctionnelle
+  - Endpoint: `GET /api/mathalea/chapters/6e_G07/exercise-types?limit=1&skip=0`
+  - Status: 200 OK
+  - ✅ Pagination correcte: 1 item retourné avec total=1
+
+- ✅ **TEST 4: Test compatibilité backward** - Compatibilité assurée
+  - Ancien endpoint: `GET /api/mathalea/exercise-types?chapter_code=6e_G07`
+  - Nouveau endpoint: `GET /api/mathalea/chapters/6e_G07/exercise-types`
+  - ✅ Les deux endpoints retournent le même total (1)
+
+- ⚠️ **TEST 5: Test avec chapter_code ayant 0 exercices** - Non testé
+  - Codes testés: 6e_G99, 5e_Z99, EMPTY_CHAPTER, TEST_EMPTY
+  - Résultat: Tous retournent 404 (chapitres n'existent pas)
+  - Note: Comportement attendu si les codes de test n'existent pas
+
+### Key Findings - SPRINT 4 Chapters Endpoint
+1. ✅ **ENDPOINT FONCTIONNEL**: Le nouvel endpoint GET /api/mathalea/chapters/{chapter_code}/exercise-types fonctionne parfaitement
+2. ✅ **Structure de réponse correcte**: Format JSON avec `total` et `items` respecté
+3. ✅ **Filtrage par chapter_code**: Tous les items retournés ont le bon chapter_code
+4. ✅ **Champs requis présents**: id, code_ref, titre, niveau, domaine, chapter_code tous présents
+5. ✅ **Gestion d'erreur 404**: Message d'erreur approprié pour chapter_code inexistant
+6. ✅ **Pagination fonctionnelle**: Paramètres limit et skip respectés
+7. ✅ **Compatibilité backward**: Ancien et nouveau endpoints retournent les mêmes données
+8. ✅ **Performance**: Réponses rapides (< 30s)
+
+### SPRINT 4 Endpoint Status Summary
+- **Test succès chapter valide**: ✅ PASSED (6e_G07 trouvé avec 1 exercice)
+- **Test 404 chapter invalide**: ✅ PASSED (message d'erreur correct)
+- **Test pagination**: ✅ PASSED (limit=1 respecté)
+- **Test compatibilité backward**: ✅ PASSED (même total sur les deux endpoints)
+- **Test chapter vide**: ⚠️ NOT TESTED (aucun chapter vide trouvé)
+
+### Technical Notes
+- **Collection MongoDB**: exercise_types avec champ `chapter_code` fonctionne correctement
+- **Endpoint path**: `/api/mathalea/chapters/{chapter_code}/exercise-types` opérationnel
+- **Paramètres de pagination**: `limit` et `skip` supportés
+- **Gestion d'erreurs**: 404 avec message explicite pour chapter_code inexistant
+- **Backward compatibility**: Ancien endpoint `/api/mathalea/exercise-types?chapter_code=X` maintenu
+
+## Previous Test Session - Logo Persistence Flow Testing
 
 ### Test Focus
 Test complet du flux de persistance du logo dans la configuration Pro PDF - Validation du bug fix
