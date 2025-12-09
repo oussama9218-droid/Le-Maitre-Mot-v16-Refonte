@@ -139,11 +139,11 @@ function SheetPreviewModal({ isOpen, onClose, previewData }) {
                 const qNum = questionCounter++;
                 
                 if (renderMode === "sujet") {
-                  return renderQuestionEnonce(question, qNum);
+                  return renderQuestionEnonce(question, qNum, exerciseType);
                 } else if (renderMode === "eleve") {
-                  return renderQuestionWithAnswer(question, qNum);
+                  return renderQuestionWithAnswer(question, qNum, exerciseType);
                 } else if (renderMode === "corrige") {
-                  return renderQuestionWithSolution(question, qNum);
+                  return renderQuestionWithSolution(question, qNum, exerciseType);
                 }
                 
                 return null;
