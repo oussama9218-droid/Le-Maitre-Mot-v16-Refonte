@@ -189,6 +189,64 @@ async def list_exercise_types(
     )
 
 
+@router.get("/chapters/{chapter_code}/exercise-types", response_model=ExerciseTypeListResponse)
+async def get_chapter_exercise_types(
+    chapter_code: str,
+    niveau: Optional[str] = Query(None, description="Filtrer par niveau (optionnel)"),
+    skip: int = Query(0, ge=0, description="Pagination: nombre d'éléments à sauter"),
+    limit: int = Query(50, ge=1, le=500, description="Pagination: nombre maximum d'éléments")
+):
+    """
+    Récupérer tous les ExerciseType d'un chapitre MathALÉA spécifique
+    
+    Args:
+        chapter_code: Code MathALÉA du chapitre (ex: 6e_G07, 4e_N02, 2nde_F01)
+        niveau: Filtre optionnel sur le niveau (pour double vérification)
+        skip: Nombre d'éléments à sauter (pagination)
+        limit: Nombre maximum d'éléments à retourner
+        
+    Returns:
+        Liste des ExerciseType du chapitre avec métadonnées
+        
+    Raises:
+        404: Si le chapter_code n'existe pas dans la collection chapters
+        
+    Note:
+        Cet endpoint est la méthode recommandée pour récupérer les exercices
+        d'un chapitre donné, car il valide l'existence du chapitre et utilise
+        le système de codes MathALÉA moderne (chapter_code).
+    """
+    from services.chapter_service import ChapterService
+    
+    # 1. Vérifier que le chapitre existe
+    chapter_service = ChapterService(db)
+    chapter = await chapter_service.get_chapter_by_code(chapter_code)
+    
+    if not chapter:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Chapter with code '{chapter_code}' not found"
+        )
+    
+    # 2. Construire la requête pour les ExerciseType
+    query = {"chapter_code": chapter_code}
+    
+    # Filtre optionnel sur le niveau
+    if niveau:
+        query["niveau"] = niveau
+    
+    # 3. Récupérer les exercices
+    cursor = exercise_types_collection.find(query, {"_id": 0}).skip(skip).limit(limit)
+    items = await cursor.to_list(length=limit)
+    total = await exercise_types_collection.count_documents(query)
+    
+    # 4. Retourner la réponse
+    return ExerciseTypeListResponse(
+        total=total,
+        items=[ExerciseType(**item) for item in items]
+    )
+
+
 @router.get("/exercise-types/{exercise_type_id}", response_model=ExerciseType)
 async def get_exercise_type(exercise_type_id: str):
     """Récupérer un type d'exercice par ID"""
