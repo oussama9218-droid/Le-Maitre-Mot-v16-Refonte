@@ -77,6 +77,7 @@ class MathGenerationService:
             "Angles": [MathExerciseType.TRIANGLE_QUELCONQUE],  # Angles dans triangles
             "Géométrie - Triangles et quadrilatères": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],
             "Géométrie dans le plan": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],
+            "Perpendiculaires et parallèles à la règle et à l'équerre": [MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.RECTANGLE],  # ✅ AJOUT PROMPT 5
             "Symétrie axiale": [MathExerciseType.SYMETRIE_AXIALE],  # ✅ Générateur symétrie axiale ajouté
             "Symétrie centrale": [MathExerciseType.SYMETRIE_CENTRALE],  # ✅ Générateur symétrie centrale ajouté
             
