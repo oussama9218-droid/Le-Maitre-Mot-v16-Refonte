@@ -130,10 +130,17 @@ function SheetBuilderPage() {
     try {
       setLoadingCatalogue(true);
       const response = await axios.get(`${API}/catalogue/levels/${niveau}/chapters`);
-      setChapters(response.data);
-      console.log('📖 Chapitres chargés pour', niveau, ':', response.data.length);
+      const chaptersData = response.data;
+      setChapters(chaptersData);
+      console.log('📖 Chapitres chargés pour', niveau, ':', chaptersData.length);
+      
+      // Charger les domaines disponibles depuis les chapitres
+      const domains = [...new Set(chaptersData.map(ch => ch.domaine).filter(Boolean))];
+      setAvailableDomains(domains);
+      console.log('📐 Domaines disponibles pour', niveau, ':', domains);
     } catch (error) {
       console.error('Erreur chargement chapitres:', error);
+      setAvailableDomains([]);
     } finally {
       setLoadingCatalogue(false);
     }
