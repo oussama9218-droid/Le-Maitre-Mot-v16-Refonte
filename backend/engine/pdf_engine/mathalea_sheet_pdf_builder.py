@@ -459,6 +459,18 @@ def _get_base_css() -> str:
         .solution strong {
             color: #27ae60;
         }
+        
+        /* Styles pour les figures géométriques */
+        .exercise-figure {
+            margin: 14px 0;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .exercise-figure svg {
+            max-width: 100%;
+            height: auto;
+        }
     """
 
 
