@@ -757,97 +757,30 @@ class ExerciseTemplateService:
             String SVG HTML ou chaîne vide si échec
         """
         try:
-            figure_type = figure.type.lower()
+            # Utiliser GeometryRenderService pour tous les types de figures
+            from services.geometry_render_service import GeometryRenderService
             
-            if figure_type == "symetrie_axiale":
-                # Utiliser GeometryRenderService pour la symétrie
-                from services.geometry_render_service import GeometryRenderService
-                
-                service = GeometryRenderService()
-                
-                # Extraire les coordonnées depuis longueurs_connues
-                points = figure.points if figure.points else ["A", "A'"]
-                point_orig = points[0] if len(points) > 0 else "A"
-                point_image = points[1] if len(points) > 1 else "A'"
-                
-                coords_orig = {
-                    "x": figure.longueurs_connues.get(f"{point_orig}_x", 3),
-                    "y": figure.longueurs_connues.get(f"{point_orig}_y", 5)
-                }
-                coords_image = {
-                    "x": figure.longueurs_connues.get(f"{point_image}_x", 7),
-                    "y": figure.longueurs_connues.get(f"{point_image}_y", 5)
-                }
-                
-                # Déterminer le type d'axe depuis les propriétés
-                axe_type = "vertical"  # Par défaut
-                axe_position = 5  # Par défaut
-                
-                for prop in figure.proprietes:
-                    if "axe_vertical" in prop or "axe_horizontal" in prop:
-                        axe_type = "vertical" if "vertical" in prop else "horizontal"
-                    if "axe_position" in prop:
-                        # Extraire la position : "axe_position_5" → 5
-                        parts = prop.split("_")
-                        if len(parts) > 2:
-                            try:
-                                axe_position = float(parts[2])
-                            except:
-                                pass
-                
-                # Générer le SVG
-                svg = service.render_symmetry_figure(
-                    point_orig=point_orig,
-                    coords_orig=coords_orig,
-                    point_image=point_image,
-                    coords_image=coords_image,
-                    axe_type=axe_type,
-                    axe_position=axe_position
-                )
-                
+            service = GeometryRenderService()
+            result = service.render_figure_to_svg(figure)
+            
+            if result is None:
+                logger.warning(f"⚠️  Rendu SVG None pour figure type: {figure.type}")
+                return ""
+            
+            # Gérer les différents types de retour
+            if isinstance(result, dict):
+                # Pour symétrie axiale/centrale: retourne un dict
+                # Utiliser la figure complète (avec question et correction ensemble)
+                svg = result.get("figure_svg", "")
+                if not svg:
+                    # Fallback sur figure_svg_question si figure_svg n'existe pas
+                    svg = result.get("figure_svg_question", "")
                 return svg
-            
-            elif figure_type in ["triangle", "triangle_rectangle", "rectangle", "carre", "cercle", "cylindre", "pyramide"]:
-                # Utiliser SchemaRenderer pour les autres formes
-                from render_schema import schema_renderer
-                
-                # Construire schema_data depuis GeometricFigure
-                schema_data = {
-                    "type": figure_type,
-                    "points": figure.points if figure.points else []
-                }
-                
-                # Ajouter les longueurs connues
-                for key, value in figure.longueurs_connues.items():
-                    # Nettoyer les clés (enlever les suffixes _x, _y)
-                    clean_key = key.replace("_x", "").replace("_y", "")
-                    if clean_key not in schema_data and not key.endswith("_x") and not key.endswith("_y"):
-                        schema_data[clean_key] = value
-                
-                # Cas spéciaux selon le type
-                if figure_type == "cylindre":
-                    schema_data["rayon"] = figure.longueurs_connues.get("rayon", 3)
-                    schema_data["hauteur"] = figure.longueurs_connues.get("hauteur", 5)
-                elif figure_type in ["rectangle", "carre"]:
-                    schema_data["longueur"] = figure.longueurs_connues.get("longueur", 6)
-                    schema_data["largeur"] = figure.longueurs_connues.get("largeur", 4)
-                elif figure_type == "cercle":
-                    schema_data["rayon"] = figure.longueurs_connues.get("rayon", 4)
-                elif "triangle" in figure_type:
-                    schema_data["cotes"] = {
-                        "AB": figure.longueurs_connues.get("AB", 5),
-                        "AC": figure.longueurs_connues.get("AC", 4),
-                        "BC": figure.longueurs_connues.get("BC", 3)
-                    }
-                    # Déterminer si rectangle
-                    if any("rectangle" in prop for prop in figure.proprietes):
-                        schema_data["rectangle_en"] = figure.proprietes[0] if figure.proprietes else None
-                
-                svg = schema_renderer.render_to_svg(schema_data)
-                return svg
-            
+            elif isinstance(result, str):
+                # Pour les autres types de figures: retourne directement le SVG
+                return result
             else:
-                logger.warning(f"⚠️  Type de figure non supporté: {figure_type}")
+                logger.warning(f"⚠️  Type de retour inattendu: {type(result)}")
                 return ""
                 
         except Exception as e:
