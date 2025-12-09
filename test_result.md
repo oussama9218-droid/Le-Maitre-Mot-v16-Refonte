@@ -1,9 +1,9 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Bug affichage exercices Fiche - COMPLETE FIX VALIDATION
+## Latest Test Session - Test complet des 4 corrections appliquées - SUCCÈS COMPLET
 
 ### Test Focus
-Test complet du fix "Bug affichage exercices Fiche" - Validation de la correction de l'affichage des exercices dans la page Fiche
+Test complet des 4 corrections majeures appliquées au générateur de fiches : cohérence niveau/domaine/chapitre, filtre domaine, preview/export mis à jour, et mapping perpendiculaires/parallèles
 
 ### Tests Executed
 
