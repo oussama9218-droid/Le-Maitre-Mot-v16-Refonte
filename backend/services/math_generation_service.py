@@ -143,6 +143,18 @@ class MathGenerationService:
     ) -> MathExerciseSpec:
         """Génère une spec selon le type d'exercice"""
         
+        # SPRINT 1 : Générateurs spécifiques par chapitre (priorité sur les types)
+        chapter_specific_generators = {
+            "Perpendiculaires et parallèles à la règle et à l'équerre": self._gen_perpendiculaires_paralleles,
+            "Droite numérique et repérage": self._gen_droite_numerique,
+            "Lire et compléter des tableaux de données": self._gen_tableaux_donnees
+        }
+        
+        # Vérifier si un générateur spécifique existe pour ce chapitre
+        if chapitre in chapter_specific_generators:
+            return chapter_specific_generators[chapitre](niveau, chapitre, difficulte)
+        
+        # Sinon, utiliser les générateurs par type d'exercice (système existant)
         generators = {
             MathExerciseType.CALCUL_RELATIFS: self._gen_calcul_relatifs,
             MathExerciseType.CALCUL_FRACTIONS: self._gen_calcul_fractions,
