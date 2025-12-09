@@ -673,9 +673,7 @@ exercise_template_service = ExerciseTemplateService()
 __all__ = [
     "ExerciseTemplateService",
     "exercise_template_service"
-
-    
-    def _convert_math_spec_to_question(
+]
         self,
         spec: MathExerciseSpec,
         question_number: int
