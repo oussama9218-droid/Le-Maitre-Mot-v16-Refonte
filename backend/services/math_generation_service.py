@@ -81,6 +81,12 @@ class MathGenerationService:
             "Symétrie axiale": [MathExerciseType.SYMETRIE_AXIALE],  # ✅ Générateur symétrie axiale ajouté
             "Symétrie centrale": [MathExerciseType.SYMETRIE_CENTRALE],  # ✅ Générateur symétrie centrale ajouté
             
+            # ========== 6e - Nombres et calculs (SPRINT 1) ==========
+            "Droite numérique et repérage": [MathExerciseType.CALCUL_DECIMAUX],
+            
+            # ========== 6e - Organisation et gestion de données (SPRINT 1) ==========
+            "Lire et compléter des tableaux de données": [MathExerciseType.STATISTIQUES],
+            
             # ========== Chapitres multi-niveaux (6e, 5e, 4e, 3e) ==========
             "Fractions": [MathExerciseType.CALCUL_FRACTIONS],
             "Proportionnalité": [MathExerciseType.PROPORTIONNALITE],
