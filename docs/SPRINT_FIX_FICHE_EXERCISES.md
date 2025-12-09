@@ -158,7 +158,7 @@ curl -s "http://localhost:8001/api/mathalea/chapters/6e_SP03/exercise-types"
 ### Test 3 : Frontend - Navigation complète
 
 **Étapes** :
-1. Aller sur https://mathalea-exercice.preview.emergentagent.com
+1. Aller sur https://mathfix-refonte.preview.emergentagent.com
 2. Onglet "Fiche"
 3. Sélectionner :
    - Niveau : 6e
