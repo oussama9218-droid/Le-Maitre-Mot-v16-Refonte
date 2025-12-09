@@ -836,6 +836,19 @@ Tous les objectifs du SPRINT F.3-FIX sont atteints. Le système est stable et pr
 ## YAML Test Structure
 
 ```yaml
+frontend:
+  - task: "Bug affichage exercices Fiche"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/SheetBuilderPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "SUCCÈS COMPLET (7/7 critères - 100%) - Bug entièrement corrigé. Navigation vers page Fiche réussie, sélection niveau '6e' et chapitre 'Proportionnalité simple dans des tableaux (2 exercices)' fonctionnelle. 14 exercices affichés correctement dans le catalogue (tous contiennent 'Proportionnalité'), aucun message 'Aucun exercice disponible pour cette sélection'. Ajout d'exercice au panier fonctionne (compteur '1 exercice(s)' mis à jour). Test chapitre alternatif 'Symétrie axiale (1 exercices)' avec 11 exercices affichés. Frontend utilise correctement l'endpoint dédié /api/mathalea/chapters/{chapter_code}/exercise-types."
+
 backend:
   - task: "SPRINT P0 - Correction libpangoft2-1.0-0"
     implemented: true
@@ -860,19 +873,6 @@ backend:
       - working: true
         agent: "testing"
         comment: "SUCCÈS COMPLET (4/4 tests critiques - 100%) - Nouvel endpoint GET /api/mathalea/chapters/{chapter_code}/exercise-types fonctionne parfaitement, structure de réponse correcte avec total et items, filtrage par chapter_code opérationnel, gestion d'erreur 404 appropriée, pagination fonctionnelle, compatibilité backward assurée."
-
-frontend:
-  - task: "Frontend Testing"
-    implemented: true
-    working: "NA"
-    file: "N/A"
-    stuck_count: 0
-    priority: "low"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "testing"
-        comment: "Frontend testing not performed as per system limitations - focus on backend API testing only."
 
 metadata:
   created_by: "testing_agent"
