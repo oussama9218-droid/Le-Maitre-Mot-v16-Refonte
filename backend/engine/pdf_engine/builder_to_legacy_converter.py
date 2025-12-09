@@ -198,6 +198,7 @@ def _convert_item_to_legacy_exercise(item: Dict[str, Any], numero: int) -> Dict[
     
     return {
         "enonce": enonce,
+        "figure_html": figures_combined,  # Champ séparé pour les templates
         "solution": solution,
         "type": exercise_type_str,
         # "bareme": []  # Optionnel
