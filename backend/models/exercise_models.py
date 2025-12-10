@@ -11,7 +11,7 @@ class ExerciseGenerateRequest(BaseModel):
     chapitre: str = Field(..., description="Chapitre du curriculum")
     type_exercice: str = Field(
         default="standard",
-        description="Type d'exercice (standard, avancé, simplifié)"
+        description="Type d'exercice (standard, avancé, simplifié). Note V1: paramètre accepté mais non utilisé dans la logique de génération V1, réservé pour V2"
     )
     difficulte: str = Field(
         default="facile",
