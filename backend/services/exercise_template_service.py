@@ -112,8 +112,48 @@ class ExerciseTemplateService:
                 rng=rng,
                 options=options or {}
             )
+        elif exercise_type.generator_kind.value == "template" and hasattr(exercise_type, 'chapter_code') and exercise_type.chapter_code:
+            # ✅ FIX: Générateur SPRINT (template avec chapter_code)
+            # Utiliser math_generation_service pour les générateurs spécifiques par chapitre
+            math_gen_service = MathGenerationService()
+            
+            # Récupérer le chapitre depuis MongoDB
+            chapter = await self.db.chapters.find_one(
+                {"code": exercise_type.chapter_code},
+                {"_id": 0, "titre": 1}
+            )
+            
+            if chapter:
+                chapter_title = chapter["titre"]
+                
+                # Générer les specs via math_generation_service
+                specs = math_gen_service.generate_math_exercise_specs(
+                    niveau=exercise_type.niveau,
+                    chapitre=chapter_title,
+                    difficulte=difficulty,
+                    nb_exercices=nb_questions
+                )
+                
+                # Convertir les specs en questions
+                questions = []
+                for i, spec in enumerate(specs, 1):
+                    question = self._convert_math_spec_to_question(spec, i)
+                    questions.append(question)
+            else:
+                # Fallback si chapitre non trouvé
+                logger.warning(f"⚠️  Chapitre {exercise_type.chapter_code} non trouvé, utilisation du générateur template standard")
+                questions = []
+                for i in range(nb_questions):
+                    question = self._generate_question(
+                        exercise_type=exercise_type,
+                        question_number=i + 1,
+                        difficulty=difficulty,
+                        rng=rng,
+                        options=options or {}
+                    )
+                    questions.append(question)
         else:
-            # Générateur TEMPLATE standard
+            # Générateur TEMPLATE standard (sans chapter_code)
             questions = []
             for i in range(nb_questions):
                 question = self._generate_question(
