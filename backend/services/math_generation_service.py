@@ -194,6 +194,14 @@ class MathGenerationService:
             "Multiplication de nombres entiers": self._gen_multiplication_entiers,
             "Division euclidienne": self._gen_division_euclidienne,
             "Multiples et diviseurs, critères de divisibilité": self._gen_multiples_diviseurs,
+            
+            # SPRINT 4
+            "Fractions comme partage et quotient": self._gen_fractions_partage,
+            "Fractions simples de l'unité": self._gen_fractions_simples,
+            "Mesurer et comparer des longueurs": self._gen_mesurer_longueurs,
+            "Périmètre de figures usuelles": self._gen_perimetre_figures,
+            "Aire du rectangle et du carré": self._gen_aire_rectangle_carre,
+            "Diagrammes en barres et pictogrammes": self._gen_diagrammes_barres,
         }
         
         # Vérifier si un générateur spécifique existe pour ce chapitre
