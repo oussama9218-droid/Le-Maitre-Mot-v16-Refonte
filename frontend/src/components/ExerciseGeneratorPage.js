@@ -405,6 +405,26 @@ const ExerciseGeneratorPage = () => {
                   {currentExercise.metadata?.difficulte && (
                     <Badge variant="secondary">{currentExercise.metadata.difficulte}</Badge>
                   )}
+                  {/* Badge générateur dédié vs fallback (pour debug) */}
+                  {currentExercise.metadata?.is_fallback === false ? (
+                    <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                      ✓ Générateur dédié
+                    </Badge>
+                  ) : currentExercise.metadata?.is_fallback === true ? (
+                    <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">
+                      ⚠ Exercice générique (beta)
+                    </Badge>
+                  ) : null}
+                  {/* Code générateur pour debug (visible au survol) */}
+                  {currentExercise.metadata?.generator_code && (
+                    <Badge 
+                      variant="outline" 
+                      className="text-xs text-gray-500"
+                      title={`Code: ${currentExercise.metadata.generator_code}`}
+                    >
+                      {currentExercise.metadata.generator_code}
+                    </Badge>
+                  )}
                 </div>
 
                 {/* Énoncé (inclut la figure si présente via enonce_html) */}
