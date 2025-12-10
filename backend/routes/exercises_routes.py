@@ -370,13 +370,19 @@ async def generate_exercise(request: ExerciseGenerateRequest):
     # 7. MÉTADONNÉES
     # ============================================================================
     
+    # Générer un code de générateur pour debug (ex: "6e_CALCUL_FRACTIONS")
+    generator_code = f"{request.niveau}_{spec.type_exercice.name if spec.type_exercice else 'UNKNOWN'}"
+    
     metadata = {
         "type_exercice": request.type_exercice,
         "difficulte": request.difficulte,
         "duree_estimee": 5,  # minutes (valeur par défaut)
         "points": 2.0,  # points de barème (valeur par défaut)
         "domaine": curriculum_service.get_domaine_by_chapitre(request.niveau, request.chapitre),
-        "has_figure": spec.figure_geometrique is not None
+        "has_figure": spec.figure_geometrique is not None,
+        # Nouveaux champs pour debug/identification du générateur
+        "is_fallback": is_fallback,
+        "generator_code": generator_code
     }
     
     # ============================================================================
