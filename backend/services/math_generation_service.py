@@ -2807,11 +2807,47 @@ class MathGenerationService:
             colonne = random.randint(0, nb_colonnes - 1)
             valeur_manquante = donnees[ligne][colonne]
             
-            # Donner un indice : somme de ligne ou colonne
+            # Recalculer le total avant de cacher la valeur
             total_ligne = sum(donnees[ligne])
-            total_sans_manquante = total_ligne - valeur_manquante
+            
+            # Cacher la valeur
+            donnees[ligne][colonne] = None
+            total_sans_manquante = sum(v for v in donnees[ligne] if v is not None)
             
             nom_ligne = theme["lignes"][ligne % len(theme["lignes"])]
+            
+            # ✅ GÉNÉRER LE TABLEAU HTML
+            tableau_html = '<table style="border-collapse: collapse; margin: 15px auto; border: 2px solid #000; font-size: 14px;">'
+            
+            # En-tête du tableau
+            tableau_html += '<tr><th style="border: 1px solid #000; padding: 8px 12px; background-color: #f0f0f0;"></th>'
+            for col_name in theme["colonnes"][:nb_colonnes]:
+                tableau_html += f'<th style="border: 1px solid #000; padding: 8px 12px; background-color: #f0f0f0; font-weight: bold;">{col_name}</th>'
+            tableau_html += '<th style="border: 1px solid #000; padding: 8px 12px; background-color: #f0f0f0; font-weight: bold;">Total</th></tr>'
+            
+            # Lignes de données
+            for i, row in enumerate(donnees[:nb_lignes]):
+                row_name = theme["lignes"][i % len(theme["lignes"])]
+                tableau_html += f'<tr><th style="border: 1px solid #000; padding: 8px 12px; background-color: #f0f0f0; font-weight: bold;">{row_name}</th>'
+                for j, cell_value in enumerate(row[:nb_colonnes]):
+                    # Mettre en évidence la cellule manquante
+                    if i == ligne and j == colonne:
+                        tableau_html += f'<td style="border: 1px solid #000; padding: 8px 12px; text-align: center; background-color: #ffffcc; font-weight: bold;">?</td>'
+                    elif cell_value is None:
+                        tableau_html += f'<td style="border: 1px solid #000; padding: 8px 12px; text-align: center;">-</td>'
+                    else:
+                        tableau_html += f'<td style="border: 1px solid #000; padding: 8px 12px; text-align: center;">{cell_value}</td>'
+                
+                # Colonne Total
+                if i == ligne:
+                    tableau_html += f'<td style="border: 1px solid #000; padding: 8px 12px; text-align: center; font-weight: bold;">{total_ligne}</td>'
+                else:
+                    row_total = sum(v for v in row if v is not None)
+                    tableau_html += f'<td style="border: 1px solid #000; padding: 8px 12px; text-align: center;">{row_total}</td>'
+                
+                tableau_html += '</tr>'
+            
+            tableau_html += '</table>'
             
             etapes = [
                 f"Compléter le tableau",
@@ -2821,7 +2857,7 @@ class MathGenerationService:
                 f"Valeur manquante = {total_ligne} - {total_sans_manquante} = {valeur_manquante}"
             ]
             
-            enonce = f"Dans un tableau de {theme['nom']}, la ligne {nom_ligne} a un total de {total_ligne}. Sachant que la somme des valeurs connues est {total_sans_manquante}, quelle est la valeur manquante ?"
+            enonce = f"Dans le tableau de {theme['nom']} ci-dessous, la ligne {nom_ligne} a un total de {total_ligne}. Quelle est la valeur manquante ?{tableau_html}"
             
             return MathExerciseSpec(
                 niveau=niveau,
