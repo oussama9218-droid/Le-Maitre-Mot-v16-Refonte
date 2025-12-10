@@ -4,6 +4,7 @@ Endpoint: POST /api/v1/exercises/generate
 """
 from fastapi import APIRouter, HTTPException
 from typing import Optional
+from html import escape
 import time
 import re
 
@@ -20,6 +21,14 @@ from logger import get_logger
 logger = get_logger()
 
 router = APIRouter()
+
+# ============================================================================
+# INSTANCES GLOBALES DES SERVICES (V1-BE-002-FIX: Performance)
+# Instanciation unique pour éviter de recréer les services à chaque requête
+# ============================================================================
+
+_math_service = MathGenerationService()
+_geom_service = GeometryRenderService()
 
 
 def generate_exercise_id(niveau: str, chapitre: str) -> str:
