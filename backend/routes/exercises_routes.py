@@ -202,10 +202,9 @@ async def generate_exercise(request: ExerciseGenerateRequest):
     # ============================================================================
     
     try:
-        math_service = MathGenerationService()
-        
+        # V1-BE-002-FIX: Utiliser l'instance globale (performance)
         # Générer l'exercice avec le service math (génère 1 exercice)
-        specs = math_service.generate_math_exercise_specs(
+        specs = _math_service.generate_math_exercise_specs(
             niveau=request.niveau,
             chapitre=request.chapitre,
             difficulte=request.difficulte,
@@ -235,8 +234,8 @@ async def generate_exercise(request: ExerciseGenerateRequest):
     
     if spec.figure_geometrique:
         try:
-            geom_service = GeometryRenderService()
-            result = geom_service.render_figure_to_svg(spec.figure_geometrique)
+            # V1-BE-002-FIX: Utiliser l'instance globale (performance)
+            result = _geom_service.render_figure_to_svg(spec.figure_geometrique)
             
             # Gérer les deux formats de retour (dict ou string)
             if isinstance(result, dict):
