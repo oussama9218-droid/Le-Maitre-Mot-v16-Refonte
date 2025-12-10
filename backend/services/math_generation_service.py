@@ -3530,3 +3530,201 @@ class MathGenerationService:
                 ]
             )
 
+
+    
+    def _gen_addition_soustraction_entiers(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur addition et soustraction de nombres entiers (6e_N04)
+        
+        Concepts :
+        - Calculer une addition/soustraction
+        - Poser l'opération en colonnes
+        - Résoudre un problème rédigé
+        """
+        
+        types_exercices = ["calculer", "poser_operation", "probleme"]
+        
+        if difficulte == "facile":
+            type_exercice = "calculer"
+            # Nombres sans retenue
+            a = random.randint(10, 40)
+            b = random.randint(10, 40)
+            # Ajuster pour éviter retenue en addition
+            if (a % 10) + (b % 10) >= 10:
+                b = b - ((a % 10) + (b % 10) - 9)
+        elif difficulte == "moyen":
+            type_exercice = random.choice(["calculer", "poser_operation"])
+            a = random.randint(50, 200)
+            b = random.randint(50, 200)
+        else:
+            type_exercice = random.choice(types_exercices)
+            a = random.randint(200, 1000)
+            b = random.randint(200, 1000)
+        
+        operation = random.choice(["+", "-"])
+        
+        # Pour la soustraction, s'assurer que a > b
+        if operation == "-" and a < b:
+            a, b = b, a
+        
+        if type_exercice == "calculer":
+            enonce = f"Calculer : {a} {operation} {b}"
+            
+            if operation == "+":
+                resultat = a + b
+                etapes = [f"{a} + {b} = {resultat}"]
+            else:
+                resultat = a - b
+                etapes = [f"{a} - {b} = {resultat}"]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_RELATIFS,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "calculer",
+                    "enonce": enonce,
+                    "operation": operation,
+                    "a": a,
+                    "b": b
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=str(resultat),
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Calcul correct", "points": 2.0}
+                ]
+            )
+        
+        elif type_exercice == "poser_operation":
+            enonce = f"Poser et calculer : {a} {operation} {b}"
+            
+            if operation == "+":
+                resultat = a + b
+                # Détailler les étapes de l'addition en colonnes
+                etapes = [
+                    f"  {a}",
+                    f"{operation} {b}",
+                    "-----",
+                    f"  {resultat}",
+                    "",
+                    "Calcul par colonne (de droite à gauche) :"
+                ]
+                
+                # Détail unités, dizaines, centaines...
+                str_a = str(a)
+                str_b = str(b)
+                str_r = str(resultat)
+                
+                # Unités
+                u_a = int(str_a[-1]) if len(str_a) >= 1 else 0
+                u_b = int(str_b[-1]) if len(str_b) >= 1 else 0
+                u_sum = u_a + u_b
+                retenue_u = u_sum // 10
+                u_r = u_sum % 10
+                
+                if retenue_u > 0:
+                    etapes.append(f"Unités : {u_a} + {u_b} = {u_sum}, on pose {u_r} et on retient {retenue_u}")
+                else:
+                    etapes.append(f"Unités : {u_a} + {u_b} = {u_r}")
+                
+                # Dizaines (si nécessaire)
+                if len(str_a) >= 2 or len(str_b) >= 2:
+                    d_a = int(str_a[-2]) if len(str_a) >= 2 else 0
+                    d_b = int(str_b[-2]) if len(str_b) >= 2 else 0
+                    d_sum = d_a + d_b + retenue_u
+                    retenue_d = d_sum // 10
+                    d_r = d_sum % 10
+                    
+                    if retenue_d > 0:
+                        etapes.append(f"Dizaines : {d_a} + {d_b} + {retenue_u} = {d_sum}, on pose {d_r} et on retient {retenue_d}")
+                    else:
+                        etapes.append(f"Dizaines : {d_a} + {d_b} + {retenue_u} = {d_r}")
+                
+                etapes.append(f"Résultat : {resultat}")
+            else:
+                resultat = a - b
+                etapes = [
+                    f"  {a}",
+                    f"- {b}",
+                    "-----",
+                    f"  {resultat}"
+                ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_RELATIFS,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "poser_operation",
+                    "enonce": enonce,
+                    "operation": operation,
+                    "a": a,
+                    "b": b
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=str(resultat),
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Opération posée correctement", "points": 0.5},
+                    {"etape": "Calcul correct", "points": 1.5}
+                ]
+            )
+        
+        else:  # probleme
+            themes = [
+                {"nom": "argent", "unite": "€", "contexte_add": "reçoit", "contexte_sub": "dépense"},
+                {"nom": "objets", "unite": "objets", "contexte_add": "achète", "contexte_sub": "donne"},
+                {"nom": "distance", "unite": "km", "contexte_add": "parcourt en plus", "contexte_sub": "parcourt en moins"}
+            ]
+            
+            theme = random.choice(themes)
+            
+            if operation == "+":
+                enonce = f"Marie a {a} {theme['unite']}. Elle {theme['contexte_add']} {b} {theme['unite']}. Combien a-t-elle maintenant ?"
+                resultat = a + b
+                etapes = [
+                    f"{a} + {b} = {resultat}",
+                    f"Marie a maintenant {resultat} {theme['unite']}."
+                ]
+            else:
+                enonce = f"Marie a {a} {theme['unite']}. Elle {theme['contexte_sub']} {b} {theme['unite']}. Combien lui reste-t-il ?"
+                resultat = a - b
+                etapes = [
+                    f"{a} - {b} = {resultat}",
+                    f"Il reste {resultat} {theme['unite']} à Marie."
+                ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_RELATIFS,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "probleme",
+                    "enonce": enonce,
+                    "operation": operation,
+                    "a": a,
+                    "b": b,
+                    "theme": theme["nom"]
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=f"{resultat} {theme['unite']}",
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Compréhension du problème", "points": 0.5},
+                    {"etape": "Opération correcte", "points": 1.0},
+                    {"etape": "Résultat avec unité", "points": 0.5}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève comprend bien la situation",
+                    "S'assurer qu'il choisit la bonne opération",
+                    "Insister sur l'importance de l'unité dans la réponse"
+                ]
+            )
+
