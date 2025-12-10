@@ -2567,6 +2567,19 @@ class MathGenerationService:
             
             enonce = f"Sur une droite graduée allant de {min_val} à {max_val} (graduations tous les {graduation}), placer le point A d'abscisse {nombre}."
             
+            # ✅ CRÉER LA FIGURE GÉOMÉTRIQUE (droite graduée)
+            figure = GeometricFigure(
+                type="droite_numerique",
+                points=["A"],
+                longueurs_connues={
+                    "min": min_val,
+                    "max": max_val,
+                    "graduation": graduation,
+                    "point_A_abscisse": nombre  # Point à placer (pour correction)
+                },
+                proprietes=["placer_nombre", "with_graduations"]
+            )
+            
         elif type_exercice == "lire_abscisse":
             # Lire l'abscisse d'un point
             position = random.randint(1, (max_val - min_val) // graduation)
@@ -2582,6 +2595,19 @@ class MathGenerationService:
             ]
             
             enonce = f"Sur une droite graduée allant de {min_val} à {max_val} (graduations tous les {graduation}), le point A est placé. Lire son abscisse."
+            
+            # ✅ CRÉER LA FIGURE GÉOMÉTRIQUE (droite graduée avec point)
+            figure = GeometricFigure(
+                type="droite_numerique",
+                points=["A"],
+                longueurs_connues={
+                    "min": min_val,
+                    "max": max_val,
+                    "graduation": graduation,
+                    "point_A_abscisse": abscisse  # Point déjà placé
+                },
+                proprietes=["lire_abscisse", "with_graduations", "show_point_A"]
+            )
             
         else:  # calculer_distance
             # Calculer la distance entre deux points
@@ -2652,7 +2678,7 @@ class MathGenerationService:
             },
             etapes_calculees=etapes,
             resultat_final=str(nombre if type_exercice == "placer_nombre" else abscisse),
-            figure_geometrique=None,
+            figure_geometrique=figure,  # ✅ AJOUT DE LA FIGURE
             points_bareme=[
                 {"etape": "Lecture/placement correct", "points": 2.0}
             ],
