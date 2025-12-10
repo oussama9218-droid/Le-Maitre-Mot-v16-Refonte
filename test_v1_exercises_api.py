@@ -324,9 +324,10 @@ class V1ExercisesAPITester:
         print("VERIFY: enonce_html contains HTML table tags for data tables")
         print("="*60)
         
+        # Use a valid chapter that might contain tables
         test_data = {
             "niveau": "6e",
-            "chapitre": "Lire et compléter des tableaux de données",
+            "chapitre": "Périmètres et aires",
             "difficulte": "moyen"
         }
         
