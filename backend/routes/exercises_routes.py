@@ -87,11 +87,12 @@ def build_solution_html(etapes: list, resultat_final: str, svg_correction: Optio
     """
     Construit la solution HTML à partir des étapes et du résultat
     
-    V1-BE-002-FIX: Échappement HTML pour prévenir les injections XSS
+    NOTE: Les étapes et le résultat ne sont PAS échappés car ils peuvent
+    contenir des formules LaTeX ou du HTML généré par notre code interne.
     
     Args:
-        etapes: Liste des étapes de résolution (seront échappées)
-        resultat_final: Résultat final (sera échappé)
+        etapes: Liste des étapes de résolution (peuvent contenir LaTeX/HTML)
+        resultat_final: Résultat final (peut contenir LaTeX/HTML)
         svg_correction: SVG de correction optionnel (non échappé car généré par notre code interne)
     
     Returns:
@@ -103,14 +104,13 @@ def build_solution_html(etapes: list, resultat_final: str, svg_correction: Optio
     if etapes:
         html += "<ol>"
         for etape in etapes:
-            # Échapper chaque étape pour prévenir les injections XSS
-            etape_escaped = escape(str(etape))
-            html += f"<li>{etape_escaped}</li>"
+            # NOTE: On n'échappe PAS les étapes car elles peuvent contenir
+            # des formules LaTeX (\\frac{}{}) ou du HTML de confiance
+            html += f"<li>{etape}</li>"
         html += "</ol>"
     
-    # Échapper le résultat final
-    resultat_escaped = escape(str(resultat_final))
-    html += f"<p><strong>Résultat final :</strong> {resultat_escaped}</p>"
+    # NOTE: On n'échappe PAS le résultat car il peut contenir du LaTeX
+    html += f"<p><strong>Résultat final :</strong> {resultat_final}</p>"
     
     # Le SVG n'est PAS échappé car il est généré par notre code interne de confiance
     if svg_correction:
