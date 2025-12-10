@@ -2826,6 +2826,10 @@ class MathGenerationService:
             type_exercice = random.choice(types_exercices)
             max_coord = 20
             nb_points = 4
+            # ✅ FIX: Obtenir un 4ème point si nécessaire
+            if nb_points > 3:
+                points_set2 = self._get_next_geometry_points()
+                points = points + [points_set2[0]]
         
         # Générer coordonnées
         coords = {}
