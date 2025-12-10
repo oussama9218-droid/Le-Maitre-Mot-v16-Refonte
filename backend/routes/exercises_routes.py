@@ -58,15 +58,21 @@ def build_enonce_html(enonce: str, svg: Optional[str] = None) -> str:
     """
     Construit l'énoncé HTML à partir de l'énoncé texte et du SVG
     
+    V1-BE-002-FIX: Échappement HTML pour prévenir les injections XSS
+    
     Args:
-        enonce: Énoncé textuel
-        svg: SVG optionnel
+        enonce: Énoncé textuel (sera échappé)
+        svg: SVG optionnel (non échappé car généré par notre code interne)
     
     Returns:
         HTML de l'énoncé
     """
-    html = f"<div class='exercise-enonce'><p>{enonce}</p>"
+    # Échapper le texte de l'énoncé pour prévenir les injections XSS
+    enonce_escaped = escape(str(enonce))
     
+    html = f"<div class='exercise-enonce'><p>{enonce_escaped}</p>"
+    
+    # Le SVG n'est PAS échappé car il est généré par notre code interne de confiance
     if svg:
         html += f"<div class='exercise-figure'>{svg}</div>"
     
@@ -79,10 +85,12 @@ def build_solution_html(etapes: list, resultat_final: str, svg_correction: Optio
     """
     Construit la solution HTML à partir des étapes et du résultat
     
+    V1-BE-002-FIX: Échappement HTML pour prévenir les injections XSS
+    
     Args:
-        etapes: Liste des étapes de résolution
-        resultat_final: Résultat final
-        svg_correction: SVG de correction optionnel
+        etapes: Liste des étapes de résolution (seront échappées)
+        resultat_final: Résultat final (sera échappé)
+        svg_correction: SVG de correction optionnel (non échappé car généré par notre code interne)
     
     Returns:
         HTML de la solution
@@ -93,11 +101,16 @@ def build_solution_html(etapes: list, resultat_final: str, svg_correction: Optio
     if etapes:
         html += "<ol>"
         for etape in etapes:
-            html += f"<li>{etape}</li>"
+            # Échapper chaque étape pour prévenir les injections XSS
+            etape_escaped = escape(str(etape))
+            html += f"<li>{etape_escaped}</li>"
         html += "</ol>"
     
-    html += f"<p><strong>Résultat final :</strong> {resultat_final}</p>"
+    # Échapper le résultat final
+    resultat_escaped = escape(str(resultat_final))
+    html += f"<p><strong>Résultat final :</strong> {resultat_escaped}</p>"
     
+    # Le SVG n'est PAS échappé car il est généré par notre code interne de confiance
     if svg_correction:
         html += f"<div class='exercise-figure-correction'>{svg_correction}</div>"
     
