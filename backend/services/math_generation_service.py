@@ -162,7 +162,7 @@ class MathGenerationService:
     ) -> MathExerciseSpec:
         """Génère une spec selon le type d'exercice"""
         
-        # SPRINT 1 & 2 : Générateurs spécifiques par chapitre (priorité sur les types)
+        # SPRINT 1, 2 & 3 : Générateurs spécifiques par chapitre (priorité sur les types)
         chapter_specific_generators = {
             # SPRINT 1
             "Perpendiculaires et parallèles à la règle et à l'équerre": self._gen_perpendiculaires_paralleles,
@@ -175,6 +175,13 @@ class MathGenerationService:
             "Lire et écrire les nombres entiers": self._gen_lire_ecrire_entiers,
             "Comparer et ranger des nombres entiers": self._gen_comparer_ranger_entiers,
             "Addition et soustraction de nombres entiers": self._gen_addition_soustraction_entiers,
+            
+            # SPRINT 3
+            "Triangles (construction et classification)": self._gen_triangles,
+            "Quadrilatères usuels (carré, rectangle, losange, parallélogramme)": self._gen_quadrilateres,
+            "Multiplication de nombres entiers": self._gen_multiplication_entiers,
+            "Division euclidienne": self._gen_division_euclidienne,
+            "Multiples et diviseurs, critères de divisibilité": self._gen_multiples_diviseurs,
         }
         
         # Vérifier si un générateur spécifique existe pour ce chapitre
