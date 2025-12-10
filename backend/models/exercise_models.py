@@ -54,11 +54,11 @@ class ExerciseGenerateResponse(BaseModel):
     id_exercice: str = Field(..., description="Identifiant unique de l'exercice")
     niveau: str = Field(..., description="Niveau scolaire")
     chapitre: str = Field(..., description="Chapitre du curriculum")
-    enonce_html: str = Field(..., description="Énoncé au format HTML")
-    svg: Optional[str] = Field(None, description="Figure géométrique SVG (si applicable)")
+    enonce_html: str = Field(..., description="Énoncé au format HTML (inclut la figure SVG si applicable)")
+    svg: Optional[str] = Field(None, description="Figure géométrique SVG brute (pour compatibilité, déjà incluse dans enonce_html)")
     solution_html: str = Field(..., description="Solution détaillée au format HTML")
     pdf_token: str = Field(..., description="Token pour télécharger le PDF")
-    metadata: Dict[str, Any] = Field(..., description="Métadonnées supplémentaires")
+    metadata: Dict[str, Any] = Field(..., description="Métadonnées supplémentaires incluant is_fallback et generator_code")
     
     class Config:
         schema_extra = {
@@ -66,15 +66,19 @@ class ExerciseGenerateResponse(BaseModel):
                 "id_exercice": "ex_5e_symetrie-axiale_1702401234",
                 "niveau": "5e",
                 "chapitre": "Symétrie axiale",
-                "enonce_html": "<p>Construire le symétrique du point A(3, 4) par rapport à l'axe vertical x=5.</p>",
+                "enonce_html": "<div class='exercise-enonce'><p>Construire le symétrique du point A par rapport à l'axe.</p><div class='exercise-figure'><svg>...</svg></div></div>",
                 "svg": "<svg width=\"400\" height=\"300\">...</svg>",
-                "solution_html": "<p><strong>Solution :</strong><br>1. Le point A est à 2 unités à gauche de l'axe...",
+                "solution_html": "<div class='exercise-solution'><p><strong>Solution :</strong></p><ol><li>Étape 1...</li></ol></div>",
                 "pdf_token": "ex_5e_symetrie-axiale_1702401234",
                 "metadata": {
                     "type_exercice": "standard",
                     "difficulte": "moyen",
                     "duree_estimee": 5,
-                    "points": 2.0
+                    "points": 2.0,
+                    "domaine": "Géométrie",
+                    "has_figure": True,
+                    "is_fallback": False,
+                    "generator_code": "5e_SYMETRIE_AXIALE"
                 }
             }
         }
