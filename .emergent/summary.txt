@@ -1,55 +1,70 @@
 <analysis>**original_problem_statement:**
-The user's high-level goal is to complete the development of all 19 exercise generators for the 6th-grade level in the Le-Maitre-Mot-v16-Refonte math application.
+The user's goal is to enhance the Le-Maitre-Mot-v16-Refonte math application by addressing several visual bugs and then building a new, streamlined feature for generating exercises.
 
-This session involved several phases:
-1.  **Bug Fixing (SPRINT 1 Validation):** The agent first had to fix validation failures for the initial 3 generators created in the previous job.
-2.  **Bug Fixing (P1-P3):** The agent addressed other pending bugs, including fixing generic Question 1... statements and investigating a PDF export issue.
-3.  **Feature Implementation (SPRINT 2, 3, 4):** The agent implemented the 16 remaining 6th-grade exercise generators in three successive sprints.
-4.  **Database Migration:** After implementing the generators, the agent created and executed a migration script to register the 19 new  documents in MongoDB, making them accessible to the frontend.
-5.  **Critical Bug Fix:** The user reported that the newly created exercises were generating incorrect, generic questions. The agent had to debug the application's service layer to find and fix the logic bug that was preventing the new generators from being called.
-6.  **Feature Implementation (SVG Rendering):** The user then requested the implementation of SVG rendering for all the new geometric figure types introduced by the new generators.
+The work was divided into three main parts:
+1.  **Visual Bug Fixing:** Address multiple issues where visual elements like geometric figures, HTML tables, and number lines were not rendering correctly in the exercise statements. This also included a critical pedagogical bug where the answer to an exercise was shown in the question itself.
+2.  **New V1 API Endpoint (Tickets V1-BE-002 & V1-BE-002-FIX):** Create and harden a new, robust backend endpoint  to serve single, standardized exercises. This involved creating documentation, models, services, routes, and comprehensive tests.
+3.  **New Frontend Page (Ticket FRONTEND_V1_GENERATOR):** Begin the implementation of a new React page at the  route, , which will consume the new V1 API. The goal is to create a simple, modern interface for teachers to quickly generate 1, 3, or 5 exercises.
 
 **User's preferred language**: French
 
 **what currently exists?**
-- A full-stack React/FastAPI/MongoDB application for generating math exercise sheets.
-- The backend logic for all 19 6th-grade exercise generators is fully implemented and tested via validation scripts. The generators produce pedagogically correct and contextual exercises.
-- A critical bug has been fixed in , which now correctly dispatches requests for  exercises to the , ensuring the new generators are used.
-- All 19 new  documents are correctly registered in the  MongoDB database, making them available in the frontend UI.
-- The backend services have been restarted with the latest fixes.
-- The implementation of SVG rendering for the new geometric figures is currently underway in .
+- A full-stack React/FastAPI/MongoDB application for generating math exercises.
+- A series of critical visual bugs have been fixed in the legacy exercise generation system. This includes rendering for new SPRINT geometry figures, HTML tables for proportionality and data exercises, and number lines.
+- A fix has been implemented to separate the question and correction versions of figures for exercises that require students to draw something (e.g., placing a point on a number line).
+- A new, fully tested, and hardened V1 backend endpoint  is live. It's built with its own documentation, models (), services (), and routes ().
+- A new, but currently skeletal, React component  has been created and is routed at .
+- A critical frontend crash on the  page () has been fixed by adding the required import in .
 
 **Last working item**:
-- **Last item agent was working**: The agent was implementing the SVG rendering logic for the new geometric figure types created during SPRINTs 1-4 (e.g., , , ). This involves adding new  conditions to the main  dispatcher and creating the corresponding private render methods (e.g., ).
-- **Status**: IN PROGRESS
-- **Agent Testing Done**: N
-- **Which testing method agent to use?**: After completing the implementation, the agent should use the **screenshot tool**. To do this, it will need to generate sheets for the newly implemented geometric chapters (like 6e_G01, 6e_G02, 6e_G03, 6e_G05) and take screenshots of the exercise preview to visually confirm that the SVGs are rendering correctly instead of showing up as blank spaces or warnings.
+- **Last item agent was working**: The agent fixed a critical frontend crash by adding  to . This was in response to a user report that the newly created  page was blank.
+- **Status**: USER VERIFICATION PENDING
+- **Agent Testing Done**: Y
+- **Which testing method agent to use?**: screenshot tool. The agent should navigate to the  route to confirm that the placeholder page now loads correctly without crashing.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1**: Standard PDF Export Structure Bug (P2)
-- **Issue 2**: Broken  Setup (P3)
+- **Issue 1**: Pedagogical Bug:  may still show the solution (P0)
+- **Issue 2**:  does not generate an SVG (P2)
+- **Issue 3**: Standard PDF Export Structure Bug (P2)
+- **Issue 4**: Broken  Setup (P3)
 
 **Issues Detail:**
-- **Issue 1: Standard PDF Export Structure Bug**
-    - **Description**: An issue from a previous handoff suggests that the Standard PDF export might merge multiple exercises into a single Exercice 1. The agent investigated but could not reproduce it due to a lack of test data at the time. The code structure appeared correct.
-    - **Attempted fixes**: Code analysis was performed. No direct fix was attempted.
+- **Issue 1: Pedagogical Bug:  may still show the solution**
+    - **Description**: The user last reported that for number line exercises of type place the point, the point (the answer) is still visible in the question. The agent implemented a fix in  to use the  field, but struggled to reliably test this specific case via the API and could not get a definitive confirmation.
+    - **Attempted fixes**: Logic in  was modified to correctly handle dictionaries returned from the render service, prioritizing  for questions and creating a new  field for corrections.
     - **Next debug checklist**:
-        1.  Now that data is migrated, create a sheet with multiple SPRINT exercises (e.g., from 6e_N01 and 6e_N02).
-        2.  Use the Standard PDF Export feature.
-        3.  Inspect the resulting PDF to see if the exercises are correctly separated as Exercice 1, Exercice 2, etc.
-    - **Why fix this issue and what will be achieved with the fix?**: Ensures that PDF exports are correctly formatted for users.
+        1.  Verify the fix is active by generating an exercise of type  with .
+        2.  Inspect the API response for the  call. The  in the question should contain an SVG *without* the point to be placed. The  should contain the  field with the point visible.
+        3.  If it's still broken, re-examine  in .
+    - **Why fix this issue and what will be achieved with the fix?**: This is a critical pedagogical bug that makes exercises unusable. Fixing it is essential for the feature's validity.
+    - **Status**: IN PROGRESS
+    - **Is recurring issue?**: Y
+    - **Should Test frontend/backend/both after fix?**: Both
+    - **Blocked on other issue**: None
+- **Issue 2:  does not generate an SVG**
+    - **Description**: During a systematic check, the agent found that the  generator in  creates data for a bar chart but does not generate an SVG for the exercise statement.
+    - **Attempted fixes**: None. This was identified but not actioned.
+    - **Next debug checklist**:
+        1.  Modify  to create a  of a new type, e.g., .
+        2.  Add rendering logic for this new type in  and .
+    - **Why fix this issue and what will be achieved with the fix?**: This will enable exercises involving bar charts.
+    - **Status**: NOT STARTED
+    - **Is recurring issue?**: N
+    - **Should Test frontend/backend/both after fix?**: Backend
+    - **Blocked on other issue**: None
+- **Issue 3: Standard PDF Export Structure Bug**
+    - **Description**: From previous handoff. The Standard PDF export might merge multiple exercises into a single Exercice 1.
     - **Status**: NOT STARTED
     - **Is recurring issue?**: Y
     - **Should Test frontend/backend/both after fix?**: Backend
-    - **Blocked on other issue**: None
-- **Issue 2: Broken  Setup**
-    - **Description**: The initial handoff mentioned  errors when running ============================= test session starts ==============================
+- **Issue 4: Broken  Setup**
+    - **Description**: From previous handoff. ============================= test session starts ==============================
 platform linux -- Python 3.11.14, pytest-8.4.2, pluggy-1.6.0
 rootdir: /app
 plugins: asyncio-1.2.0, anyio-4.10.0
 asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collected 232 items / 1 error
+collected 242 items / 1 error
 
 ==================================== ERRORS ====================================
 _______________ ERROR collecting test_ia_optimization_system.py ________________
@@ -76,19 +91,25 @@ HINT: remove __pycache__ / .pyc files and/or use a unique basename for your test
   /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:32: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
     @validator('stripe_price_id')
 
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: 11 warnings
   /root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
     warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
 
-backend/server.py:4765
-  /app/backend/server.py:4765: DeprecationWarning: 
+backend/models/exercise_models.py:21
+  /app/backend/tests/../models/exercise_models.py:21: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('difficulte')
+
+backend/models/exercise_models.py:31
+  /app/backend/tests/../models/exercise_models.py:31: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('type_exercice')
+
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:373
+  /root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:373: UserWarning: Valid config keys have changed in V2:
+  * 'schema_extra' has been renamed to 'json_schema_extra'
+    warnings.warn(message, UserWarning)
+
+backend/server.py:4769
+  /app/backend/tests/../server.py:4769: DeprecationWarning: 
           on_event is deprecated, use lifespan event handlers instead.
   
           Read more about it in the
@@ -121,247 +142,128 @@ backend/tests/test_sprint2_validation.py:47
 =========================== short test summary info ============================
 ERROR test_ia_optimization_system.py
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-======================== 17 warnings, 1 error in 22.07s ========================. While the agent did not encounter this specific error, it noted that ============================= test session starts ==============================
-platform linux -- Python 3.11.14, pytest-8.4.2, pluggy-1.6.0
-rootdir: /app
-plugins: asyncio-1.2.0, anyio-4.10.0
-asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collected 232 items / 1 error
-
-==================================== ERRORS ====================================
-_______________ ERROR collecting test_ia_optimization_system.py ________________
-import file mismatch:
-imported module 'test_ia_optimization_system' has this __file__ attribute:
-  /app/backend/tests/test_ia_optimization_system.py
-which is not the same as the test file we want to collect:
-  /app/test_ia_optimization_system.py
-HINT: remove __pycache__ / .pyc files and/or use a unique basename for your test file modules
-=============================== warnings summary ===============================
-../root/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
-  /root/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
-    import multipart
-
-../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:20
-  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:20: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
-    @validator('amount')
-
-../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:26
-  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:26: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
-    @validator('quantity')
-
-../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:32
-  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:32: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
-    @validator('stripe_price_id')
-
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-  /root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
-    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
-
-backend/server.py:4765
-  /app/backend/server.py:4765: DeprecationWarning: 
-          on_event is deprecated, use lifespan event handlers instead.
-  
-          Read more about it in the
-          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
-          
-    @app.on_event("shutdown")
-
-../root/.venv/lib/python3.11/site-packages/fastapi/applications.py:4495
-  /root/.venv/lib/python3.11/site-packages/fastapi/applications.py:4495: DeprecationWarning: 
-          on_event is deprecated, use lifespan event handlers instead.
-  
-          Read more about it in the
-          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
-          
-    return self.router.on_event(event_type)
-
-backend/tests/test_massive_generators.py:15
-  /app/backend/tests/test_massive_generators.py:15: PytestCollectionWarning: cannot collect test class 'TestResults' because it has a __init__ constructor (from: backend/tests/test_massive_generators.py)
-    class TestResults:
-
-backend/tests/test_sprint1_validation.py:45
-  /app/backend/tests/test_sprint1_validation.py:45: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint1_validation.py)
-    class TestResult:
-
-backend/tests/test_sprint2_validation.py:47
-  /app/backend/tests/test_sprint2_validation.py:47: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint2_validation.py)
-    class TestResult:
-
--- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-=========================== short test summary info ============================
-ERROR test_ia_optimization_system.py
-!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-======================== 17 warnings, 1 error in 5.78s ========================= sometimes fails to collect tests or has flaky test outcomes. The primary testing method has been standalone validation scripts.
-    - **Attempted fixes**: The agent ran various ============================= test session starts ==============================
-platform linux -- Python 3.11.14, pytest-8.4.2, pluggy-1.6.0
-rootdir: /app
-plugins: asyncio-1.2.0, anyio-4.10.0
-asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collected 232 items / 1 error
-
-==================================== ERRORS ====================================
-_______________ ERROR collecting test_ia_optimization_system.py ________________
-import file mismatch:
-imported module 'test_ia_optimization_system' has this __file__ attribute:
-  /app/backend/tests/test_ia_optimization_system.py
-which is not the same as the test file we want to collect:
-  /app/test_ia_optimization_system.py
-HINT: remove __pycache__ / .pyc files and/or use a unique basename for your test file modules
-=============================== warnings summary ===============================
-../root/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
-  /root/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
-    import multipart
-
-../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:20
-  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:20: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
-    @validator('amount')
-
-../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:26
-  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:26: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
-    @validator('quantity')
-
-../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:32
-  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:32: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
-    @validator('stripe_price_id')
-
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-  /root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
-    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
-
-backend/server.py:4765
-  /app/backend/server.py:4765: DeprecationWarning: 
-          on_event is deprecated, use lifespan event handlers instead.
-  
-          Read more about it in the
-          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
-          
-    @app.on_event("shutdown")
-
-../root/.venv/lib/python3.11/site-packages/fastapi/applications.py:4495
-  /root/.venv/lib/python3.11/site-packages/fastapi/applications.py:4495: DeprecationWarning: 
-          on_event is deprecated, use lifespan event handlers instead.
-  
-          Read more about it in the
-          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
-          
-    return self.router.on_event(event_type)
-
-backend/tests/test_massive_generators.py:15
-  /app/backend/tests/test_massive_generators.py:15: PytestCollectionWarning: cannot collect test class 'TestResults' because it has a __init__ constructor (from: backend/tests/test_massive_generators.py)
-    class TestResults:
-
-backend/tests/test_sprint1_validation.py:45
-  /app/backend/tests/test_sprint1_validation.py:45: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint1_validation.py)
-    class TestResult:
-
-backend/tests/test_sprint2_validation.py:47
-  /app/backend/tests/test_sprint2_validation.py:47: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint2_validation.py)
-    class TestResult:
-
--- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-=========================== short test summary info ============================
-ERROR test_ia_optimization_system.py
-!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-======================== 17 warnings, 1 error in 5.10s ========================= commands and found inconsistent behavior but did not attempt a root cause fix.
-    - **Next debug checklist**:
-        1.  Research common   issues with FastAPI's .
-        2.  Review  and  for incorrect configurations.
-        3.  Ensure all test functions that use the  fixture are  and correctly marked.
-    - **Why fix this issue and what will be achieved with the fix?**: A stable test suite would allow for more robust and integrated testing, rather than relying solely on separate validation scripts.
+======================== 23 warnings, 1 error in 9.44s ========================= is unreliable, leading to a dependency on standalone validation scripts.
     - **Status**: NOT STARTED
     - **Is recurring issue?**: Y
     - **Should Test frontend/backend/both after fix?**: Backend
-    - **Blocked on other issue**: None
 
 **In progress Task List**:
-- **Task 1: Complete SVG rendering for new SPRINT figure types (P0)**
-    - **Description**: Implement the rendering logic for all new geometric figures (, , , , , ) so they appear visually in the exercise previews.
-    - **Where to resume**: The agent has already added the dispatcher logic in  and inserted the placeholder methods in . The next step is to fill in the implementation details for each of these new render methods.
-    - **What will be achieved with this?**: This will complete the user-facing part of the new geometry exercises, allowing users to see the figures they are working on.
+- **Task 1: Complete Implementation of  (P0)**
+    - **Description**: The user has provided a detailed brief to build out the new exercise generator page. The current file is just a skeleton.
+    - **Where to resume**: In . The agent needs to:
+        1.  Build the UI form with selectors for level, chapter, and number of exercises (1, 3, or 5).
+        2.  Fetch the curriculum data to populate the selectors (similar to how  might do it).
+        3.  Implement the Générer button logic to make parallel calls to the new  endpoint.
+        4.  Manage state for loading, errors, and the returned exercise data.
+        5.  Implement the results view with pagination, HTML/SVG rendering, and collapsible corrections.
+    - **What will be achieved with this?**: This is the top priority feature requested by the user, creating the first piece of the V2 vision for the app.
     - **Status**: IN PROGRESS
-    - **Should Test frontend/backend/both after fix?**: Frontend (via screenshot tool).
+    - **Should Test frontend/backend/both after fix?**: Frontend
     - **Blocked on something**: No.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
     - **P1**: Manually map the 7  documents that were not migrated automatically (from original handoff).
 - **Future Tasks**:
+    - Refactor .
     - Implement an improved HTML-based preview (Sprint F.5).
-    - Optimize PDF/SVG generation time.
     - Implement Thematic Premium Mode.
-    - Extend the system to other subjects (French, History).
-    - Enhance the frontend with a commercial-focused landing page.
-    - Refactor  (currently over 4700 lines).
 
 **Completed work in this session**
-- **SPRINT 1 Validation**: Fixed  bug and a chapter title mismatch, getting the validation script to 100% success.
-- **Generic Statements Fix**: Resolved the Question 1, Question 2... bug by implementing a contextual statement generator in .
-- **SPRINT 2 Implementation**: Implemented and validated 5 new 6th-grade generators (, , , , ).
-- **SPRINT 3 Implementation**: Implemented and validated 5 new 6th-grade generators (, , , , ).
-- **SPRINT 4 Implementation**: Implemented and validated the final 6 6th-grade generators (, , , , , ), completing all 19.
-- **Database Migration**: Created and successfully ran  to register all 19 new s in MongoDB.
-- **Critical Bug Fix**: Fixed the core logic in  to correctly call  for the new  generators, resolving the user-reported issue of generic questions.
+- **Visual Bug Fixes:**
+    - Fixed SVG rendering for all new SPRINT geometry types in  and .
+    - Fixed missing HTML tables in  and  in .
+    - Fixed raw HTML table rendering in the frontend () by using .
+    - Implemented SVG rendering for number lines ().
+    - Implemented question/correction separation for figures where the student must place an element.
+- **New V1 API Endpoint:**
+    - Created and documented the new  endpoint.
+    - Created supporting files: , , , , .
+    - Wrote a comprehensive test suite in .
+- **V1 API Hardening:**
+    - Optimized performance by instantiating services as singletons in .
+    - Improved security by adding  to prevent XSS.
+    - Added a new SVG regression test.
+    - Updated documentation in .
+- **New Frontend Page:**
+    - Created the skeleton component .
+    - Added the  route in .
+    - Created documentation file .
+    - **Recently completed:** Fixed the  crash by adding the missing component import in .
 
 **Earlier issues found/mentioned but not fixed**
-- See All Pending/In progress Issue list.
+-  in  does not generate a visual element.
 
 **Known issue recurrence from previous fork**
-- **Issue recurrence in previous fork**: Backend startup failure due to missing  dependency.
-- **Recurrence count**: High
-- **Status**: RESOLVED (Confirmed fixed in the previous job).
+- None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Service Layer Dispatcher**: The critical fix involved modifying  to act as a dispatcher. It now inspects the  of an  and routes the request to  for  kinds, otherwise using its own legacy logic.
-- **Standalone Validation Scripts**: The development of all 19 generators was validated using dedicated Python scripts () that test the generator logic independently of the API, proving to be a very effective testing strategy.
-- **Database Migrations**: A Python script was used to programmatically populate the MongoDB  collection, ensuring that the new backend logic was made available to the rest of the application.
+- **API Development (FastAPI):** Creation of a new, versioned () API endpoint from scratch, including Pydantic models for request/response validation, router separation, and service-based architecture.
+- **API Hardening:** Implementation of performance (singleton service instances) and security (XSS prevention via ) best practices.
+- **Pedagogical Logic in Rendering:** Differentiating between a question figure and a correction figure by returning a dictionary () from the render service, which is crucial for interactive exercises.
+- **Frontend Development (React):** Creation of new components and integration into the main application router (). Use of  to render backend-generated HTML.
 
 **key DB schema**
-- **exercise_types**: 
+- No changes to the DB schema in this session.
 
 **changes in tech stack**
 - None.
 
 **All files of reference**
-- : Contains the logic for all 19 new generators.
-- : Contains the critical dispatcher logic that routes requests to the correct generator service.
-- : Contains the SVG rendering logic currently being implemented.
-- : The script that registered the new exercises in the database.
-- : The test scripts used to validate all 19 generators.
+- : The primary file for the next task.
+- : Contains the routing logic.
+- : The new V1 API endpoint implementation.
+- : Contains the logic for the pedagogical bug regarding question/correction figures.
+- : The user's brief for the current frontend task.
 
 **Areas that need refactoring**:
--  is very large (over 4700 lines) and could be broken down into smaller, more manageable modules (e.g., separating routes into a  directory).
-- The SVG rendering logic in  is becoming a large  chain and could potentially be refactored into a dictionary-based dispatcher pattern for better scalability.
+-  remains very large and is a candidate for refactoring.
+- The  generator in  appears to have biased randomness ( always picking  on 'facile' difficulty), which made testing difficult and may need review.
 
 **key api endpoints**
-- : This is the main endpoint used by the frontend. The critical bug fix was in the service layer called by this endpoint.
+- ****: (NEW) Generates a single, standardized exercise. This is the endpoint the new frontend page should use.
+- : (Legacy) The existing endpoint used by the main application, which was the source of the visual bugs fixed in this session.
 
 **Critical Info for New Agent**
-- The core logic for all 19 6th-grade generators is **complete and correct**. The generators are successfully registered in the database.
-- The most important change was fixing  to properly call . Do not revert this change, as it is the key to making the new generators work.
-- The current task is purely visual: implementing the SVG rendering for the geometric figures. The backend logic to generate the figure data is already working.
-- Bypassing the ============================= test session starts ==============================
+- Your top priority is to implement the functionality of the new React page  as detailed in the user's brief (and documented in ).
+- Before starting new work, you must visually verify two things:
+    1.  The  page now loads correctly without crashing (the last fix).
+    2.  The pedagogical bug with number lines ( exercises) is truly fixed. Generate exercises of that type and check that the question figure does *not* contain the answer. This is a critical user-reported issue.
+- Do not modify the legacy wizard or . The current work is focused on building a new, separate user flow based on the V1 API.
+
+**documents created in this job**
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+
+**Last 10 User Messages and any pending user messages**
+1.  **User:** Provides a detailed brief to create a new frontend page () to consume the V1 API. (Status: **IN PROGRESS**)
+2.  **Agent:** Creates the skeleton page, route, and documentation.
+3.  **User:** Reports the new  page is blank and provides a console error: . (Status: **RESOLVED**)
+4.  **Agent:** Identifies the missing import in  and fixes it.
+5.  **Agent:** Confirms the frontend recompiles and finishes the job.
+The user has not yet responded to the last fix.
+
+**Project Health Check:**
+- **Broken**:
+    - The  is just a skeleton and does not have any of the required functionality (form, API calls, results display).
+    - The pedagogical bug with number line exercises showing the solution in the question might still be present and needs verification.
+- **Mocked**:
+    - ============================= test session starts ==============================
 platform linux -- Python 3.11.14, pytest-8.4.2, pluggy-1.6.0
 rootdir: /app
 plugins: asyncio-1.2.0, anyio-4.10.0
 asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collected 232 items / 1 error
+collected 242 items / 1 error
 
 ==================================== ERRORS ====================================
 _______________ ERROR collecting test_ia_optimization_system.py ________________
@@ -388,19 +290,25 @@ HINT: remove __pycache__ / .pyc files and/or use a unique basename for your test
   /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:32: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
     @validator('stripe_price_id')
 
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
-../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: 11 warnings
   /root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
     warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
 
-backend/server.py:4765
-  /app/backend/server.py:4765: DeprecationWarning: 
+backend/models/exercise_models.py:21
+  /app/backend/tests/../models/exercise_models.py:21: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('difficulte')
+
+backend/models/exercise_models.py:31
+  /app/backend/tests/../models/exercise_models.py:31: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('type_exercice')
+
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:373
+  /root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:373: UserWarning: Valid config keys have changed in V2:
+  * 'schema_extra' has been renamed to 'json_schema_extra'
+    warnings.warn(message, UserWarning)
+
+backend/server.py:4769
+  /app/backend/tests/../server.py:4769: DeprecationWarning: 
           on_event is deprecated, use lifespan event handlers instead.
   
           Read more about it in the
@@ -433,31 +341,7 @@ backend/tests/test_sprint2_validation.py:47
 =========================== short test summary info ============================
 ERROR test_ia_optimization_system.py
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-======================== 17 warnings, 1 error in 5.22s ========================= suite and using standalone validation scripts has been a successful strategy. Continue this pattern if new generators are added.
-
-**documents created in this job**
-- 
-- 
-- 
-- 
-
-**Last 10 User Messages and any pending user messages**
-1.  **User (Msg 264):** Confirms that the migration ran.
-2.  **Agent (Msg 265):** Reports successful creation of 16 ExerciseTypes.
-3.  **Agent (Msg 271):** Confirms all 19 SPRINT chapters are now correctly in MongoDB.
-4.  **User (Msg 273):** Reports a critical bug: newly created exercises show generic, nonsensical questions in the UI. Provides detailed examples. (Status: **RESOLVED**)
-5.  **Agent (Msg 274):** Acknowledges the bug and starts debugging.
-6.  **Agent (Msg 308):** Confirms the bug is fixed in the backend by testing the API directly.
-7.  **Agent (Msg 310):** Confirms the bug is fully resolved and restarts the backend.
-8.  **Agent (Msg 317):** Asks the user to verify the fix and asks for the next task.
-9.  **User (Msg 318):** Asks the agent to now implement the SVG rendering for the new figure types. Provides a plan. (Status: **IN PROGRESS**)
-10. **Agent (Msg 319):** Accepts the plan and begins working on the SVG rendering implementation.
-
-**Project Health Check:**
-- **Broken**:
-    - SVG rendering for new geometric figures (, , etc.) is missing. This is the current task.
-- **Mocked**:
-    - The  test suite is still considered unreliable and is being bypassed in favor of standalone validation scripts.
+======================== 23 warnings, 1 error in 8.26s ========================= suite is still considered unreliable.
 
 **3rd Party Integrations**
 - **WeasyPrint**: Used for PDF generation.
@@ -468,15 +352,12 @@ ERROR test_ia_optimization_system.py
 - **Troubleshoot agent used after agent stuck in loop**: NO
 - **Test files created**:
     - 
-    - 
-    - 
-    - 
 - **Known regressions**: None.
 
 **Credentials to test flow:**
 - Use the email  as the value for the  header when testing any Pro features.
 
 **What agent forgot to execute**
-- The agent has not yet addressed the user's suggestion to **refactor **.
-- The task from the original handoff to **manually map 7 unmigrated  documents** has not been started.
-- The low-priority **PDF export bug** remains un-fixed.</analysis>
+- Did not fix the missing SVG in the  generator.
+- Did not address the carry-over tasks: manual mapping of 7 s, fixing the PDF export bug, or fixing the  setup.
+- Could not definitively test and confirm the fix for the  pedagogical bug.</analysis>

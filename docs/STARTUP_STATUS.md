@@ -48,7 +48,7 @@ code-server      RUNNING   30     Opérationnel
 
 ## 🎯 Accès au site
 
-**URL principale** : https://mathalea-svg.preview.emergentagent.com
+**URL principale** : https://math-drill-creator.preview.emergentagent.com
 
 ### Pages accessibles :
 - ✅ `/` - Accueil
@@ -68,7 +68,7 @@ code-server      RUNNING   30     Opérationnel
 ## 🧪 Test rapide pour l'utilisateur
 
 ### Test 1 : Accès au catalogue
-1. Allez sur https://mathalea-svg.preview.emergentagent.com
+1. Allez sur https://math-drill-creator.preview.emergentagent.com
 2. Cliquez sur "Créer une fiche"
 3. **Vérifiez** : Les niveaux s'affichent (6e, 5e, 4e, 3e)
 4. Sélectionnez "6ème"
