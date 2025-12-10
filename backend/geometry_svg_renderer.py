@@ -1372,7 +1372,7 @@ class GeometrySVGRenderer:
             # Angle droit au premier sommet
             if len(point_objects) >= 3:
                 p0, p1, p2 = point_objects[0], point_objects[1], point_objects[2]
-                self._add_right_angle_marker(svg, p1, p0, p2, size=10)
+                self.add_right_angle_mark(svg, p1, p0, p2, size=10)
         
         # Dessiner les points
         for point in point_objects:
