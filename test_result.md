@@ -946,6 +946,18 @@ frontend:
         agent: "testing"
         comment: "SUCCÈS COMPLET (7/7 critères - 100%) - Bug entièrement corrigé. Navigation vers page Fiche réussie, sélection niveau '6e' et chapitre 'Proportionnalité simple dans des tableaux (2 exercices)' fonctionnelle. 14 exercices affichés correctement dans le catalogue (tous contiennent 'Proportionnalité'), aucun message 'Aucun exercice disponible pour cette sélection'. Ajout d'exercice au panier fonctionne (compteur '1 exercice(s)' mis à jour). Test chapitre alternatif 'Symétrie axiale (1 exercices)' avec 11 exercices affichés. Frontend utilise correctement l'endpoint dédié /api/mathalea/chapters/{chapter_code}/exercise-types."
 
+  - task: "MathRenderer LaTeX Integration Testing"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/ExerciseGeneratorPage.js, /app/frontend/src/components/MathRenderer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Task created for testing MathRenderer integration on /generate page. Need to verify LaTeX rendering for fractions, HTML table display for Proportionnalité, and geometry figure display without duplication."
+
 backend:
   - task: "V1 Exercises API Bug Fixes Testing"
     implemented: true
