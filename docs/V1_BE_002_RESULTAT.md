@@ -336,6 +336,189 @@ L'endpoint **POST /api/v1/exercises/generate** a été implémenté avec succès
 
 ---
 
+## 🔒 V1-BE-002-FIX — Durcissement performance + sécurité + propreté
+
+### 📅 Date de la correction
+**2024-12-10**
+
+### 🎯 Objectifs du ticket de durcissement
+
+Suite aux audits de Cursor et Perplexity, application de corrections mineures pour améliorer :
+1. **Performance** : Instanciation unique des services
+2. **Sécurité** : Échappement HTML (prévention XSS)
+3. **Robustesse** : Test de régression SVG
+4. **Clarté** : Documentation du paramètre `type_exercice`
+
+---
+
+### 🔧 Modifications appliquées
+
+#### 1. Performance : Instanciation unique des services
+
+**Problème** : Les services `MathGenerationService` et `GeometryRenderService` étaient instanciés à chaque requête, créant une charge inutile.
+
+**Solution** :
+```python
+# En haut de /app/backend/routes/exercises_routes.py
+_math_service = MathGenerationService()
+_geom_service = GeometryRenderService()
+
+# Dans le handler d'API
+specs = _math_service.generate_math_exercise_specs(...)
+result = _geom_service.render_figure_to_svg(...)
+```
+
+**Impact** :
+- ✅ Réduction de la latence par requête
+- ✅ Réduction de la charge mémoire
+- ✅ Instanciation unique au démarrage de l'application
+
+---
+
+#### 2. Sécurité : Échappement HTML
+
+**Problème** : Les textes utilisateur (énoncés, étapes, résultats) étaient injectés directement dans le HTML sans échappement, créant un risque XSS.
+
+**Solution** :
+```python
+from html import escape
+
+# Dans build_enonce_html()
+enonce_escaped = escape(str(enonce))
+html = f"<div class='exercise-enonce'><p>{enonce_escaped}</p>"
+
+# Dans build_solution_html()
+for etape in etapes:
+    etape_escaped = escape(str(etape))
+    html += f"<li>{etape_escaped}</li>"
+```
+
+**Important** : Le SVG n'est **PAS** échappé car il est généré par notre code interne de confiance.
+
+**Impact** :
+- ✅ Protection contre les injections XSS
+- ✅ Caractères spéciaux (`<`, `>`, `&`, `'`, `"`) correctement échappés
+- ✅ Conformité aux bonnes pratiques de sécurité web
+
+**Tests d'échappement** :
+```
+Input : "5 < 10 && alert('XSS')"
+Output: "5 &lt; 10 &amp;&amp; alert(&#x27;XSS&#x27;)"
+✅ Échappement vérifié et fonctionnel
+```
+
+---
+
+#### 3. Robustesse : Test de régression SVG
+
+**Problème** : Aucun test ne vérifiait que les chapitres géométriques génèrent bien un SVG.
+
+**Solution** : Ajout d'un nouveau test dans `/app/backend/tests/test_api_exercises.py` :
+
+```python
+def test_svg_regression_geometry_chapters(self):
+    """Vérifie que les chapitres géométriques génèrent un SVG non vide"""
+    geometry_chapters = [
+        {"niveau": "5e", "chapitre": "Symétrie centrale"},
+        {"niveau": "6e", "chapitre": "Symétrie axiale"},
+        {"niveau": "5e", "chapitre": "Triangles"},
+    ]
+    
+    for test_case in geometry_chapters:
+        response = client.post("/api/v1/exercises/generate", json=test_case)
+        data = response.json()
+        
+        assert data["svg"] is not None
+        assert "<svg" in data["svg"]
+```
+
+**Résultat** : ✅ Test passé
+
+---
+
+#### 4. Clarté V1/V2 : Documentation de `type_exercice`
+
+**Problème** : Le paramètre `type_exercice` est accepté mais non utilisé en V1, créant une confusion.
+
+**Solution** : Documentation explicite dans `/app/backend/models/exercise_models.py` :
+
+```python
+type_exercice: str = Field(
+    default="standard",
+    description="Type d'exercice (standard, avancé, simplifié). "
+                "Note V1: paramètre accepté mais non utilisé dans la logique "
+                "de génération V1, réservé pour V2"
+)
+```
+
+**Impact** :
+- ✅ Clarification du comportement V1
+- ✅ Préparation pour l'évolution V2
+- ✅ Pas de breaking change
+
+---
+
+### 📊 Résultats des tests après correction
+
+**Suite de tests complète** : `/app/backend/tests/test_api_exercises.py`
+
+```bash
+cd /app/backend
+python -m pytest tests/test_api_exercises.py -v
+```
+
+**Résultat** : ✅ **10 tests passés** (1 nouveau test ajouté)
+
+```
+test_generate_exercise_success_geometry .............. PASSED
+test_generate_exercise_success_calculation ........... PASSED
+test_generate_exercise_invalid_niveau ................ PASSED
+test_generate_exercise_invalid_chapitre .............. PASSED
+test_generate_exercise_with_difficulty_levels ........ PASSED
+test_pdf_token_format ................................ PASSED
+test_health_endpoint ................................. PASSED
+test_svg_regression_geometry_chapters ................ PASSED ✨ (nouveau)
+test_invalid_difficulte_value ........................ PASSED
+test_missing_required_fields ......................... PASSED
+```
+
+---
+
+### 📈 Impact global
+
+| Aspect | Avant | Après |
+|--------|-------|-------|
+| **Tests** | 9 | 10 (+1 régression SVG) |
+| **Instanciation services/requête** | 2 | 0 (instanciation globale) |
+| **Échappement HTML** | ❌ Non | ✅ Oui |
+| **Documentation type_exercice** | ❌ Ambiguë | ✅ Claire |
+
+---
+
+### 🔍 Audit de conformité
+
+**Cursor + Perplexity** :
+- ✅ Performance : Instanciation unique appliquée
+- ✅ Sécurité : Échappement HTML appliqué
+- ✅ Robustesse : Test SVG ajouté
+- ✅ Clarté : Documentation améliorée
+- ⚠️ Import mort : MathGenerationService EST utilisé dans server.py (ligne 2364), pas d'import mort
+
+---
+
+### ✅ Validation finale
+
+**Tous les critères d'acceptation respectés** :
+- [x] Aucune instanciation de services dans les handlers d'API
+- [x] HTML correctement échappé (énoncé + solution)
+- [x] SVG non échappé (généré par notre code interne)
+- [x] Test de régression SVG existe et passe
+- [x] 10/10 tests au vert
+- [x] Documentation mise à jour
+
+---
+
 **Développé par** : E1 Agent (Emergent AI)  
 **Date** : 2024-12-10  
-**Version de l'API** : v1
+**Version de l'API** : v1  
+**Ticket de durcissement** : V1-BE-002-FIX
