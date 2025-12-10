@@ -3224,3 +3224,153 @@ class MathGenerationService:
                 ]
             )
 
+
+    
+    def _nombre_en_lettres(self, nombre: int) -> str:
+        """Helper pour convertir un nombre en lettres (simplifié pour 6e)"""
+        unites = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"]
+        dizaines_spec = ["dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"]
+        dizaines = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante-dix", "quatre-vingt", "quatre-vingt-dix"]
+        
+        if nombre == 0:
+            return "zéro"
+        
+        if nombre < 10:
+            return unites[nombre]
+        
+        if nombre < 20:
+            return dizaines_spec[nombre - 10]
+        
+        if nombre < 100:
+            d, u = divmod(nombre, 10)
+            if u == 0:
+                result = dizaines[d]
+                if d == 8:
+                    result += "s"  # quatre-vingts
+                return result
+            elif d == 7 or d == 9:
+                return dizaines[d - 1] + "-" + dizaines_spec[u]
+            elif u == 1 and d != 8:
+                return dizaines[d] + " et un"
+            else:
+                return dizaines[d] + "-" + unites[u]
+        
+        if nombre < 1000:
+            c, reste = divmod(nombre, 100)
+            if c == 1:
+                result = "cent"
+            else:
+                result = unites[c] + " cent"
+                if reste == 0:
+                    result += "s"
+            if reste > 0:
+                result += " " + self._nombre_en_lettres(reste)
+            return result
+        
+        if nombre < 1000000:
+            m, reste = divmod(nombre, 1000)
+            if m == 1:
+                result = "mille"
+            else:
+                result = self._nombre_en_lettres(m) + " mille"
+            if reste > 0:
+                result += " " + self._nombre_en_lettres(reste)
+            return result
+        
+        return str(nombre)  # Fallback pour nombres très grands
+    
+    def _gen_lire_ecrire_entiers(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur lire et écrire les nombres entiers (6e_N01)
+        
+        Concepts :
+        - Lire un nombre en lettres → chiffres
+        - Écrire un nombre en chiffres → lettres
+        - Décomposer un nombre
+        """
+        
+        types_exercices = ["lire_nombre", "ecrire_nombre", "decomposer"]
+        
+        if difficulte == "facile":
+            type_exercice = "lire_nombre"
+            nombre = random.randint(1, 100)
+        elif difficulte == "moyen":
+            type_exercice = random.choice(["lire_nombre", "ecrire_nombre"])
+            nombre = random.randint(100, 10000)
+        else:
+            type_exercice = random.choice(types_exercices)
+            nombre = random.randint(10000, 100000)
+        
+        if type_exercice == "lire_nombre":
+            # Convertir nombre en lettres
+            nombre_lettres = self._nombre_en_lettres(nombre)
+            enonce = f"Écrire en chiffres : {nombre_lettres}"
+            resultat = str(nombre)
+            etapes = [f"{nombre_lettres} = {nombre}"]
+        
+        elif type_exercice == "ecrire_nombre":
+            # Convertir nombre en lettres
+            nombre_lettres = self._nombre_en_lettres(nombre)
+            
+            # Formater avec espaces pour nombres > 999
+            if nombre > 999:
+                nombre_formate = f"{nombre:,}".replace(",", " ")
+            else:
+                nombre_formate = str(nombre)
+            
+            enonce = f"Écrire en lettres : {nombre_formate}"
+            resultat = nombre_lettres
+            etapes = [f"{nombre} = {nombre_lettres}"]
+        
+        else:  # decomposer
+            # Formater avec espaces pour nombres > 999
+            if nombre > 999:
+                nombre_formate = f"{nombre:,}".replace(",", " ")
+            else:
+                nombre_formate = str(nombre)
+            
+            enonce = f"Décomposer le nombre {nombre_formate} selon les unités, dizaines, centaines, etc."
+            
+            # Décomposition
+            decomposition_parts = []
+            decomposition_additive = []
+            
+            chiffres = str(nombre)
+            longueur = len(chiffres)
+            
+            for i, chiffre in enumerate(chiffres):
+                if chiffre != '0':
+                    valeur_position = int(chiffre) * (10 ** (longueur - i - 1))
+                    decomposition_parts.append(f"{chiffre} × {10 ** (longueur - i - 1)}")
+                    decomposition_additive.append(str(valeur_position))
+            
+            etapes = [
+                f"{nombre} = " + " + ".join(decomposition_parts),
+                f"{nombre} = " + " + ".join(decomposition_additive)
+            ]
+            
+            resultat = " + ".join(decomposition_additive)
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "type": type_exercice,
+                "enonce": enonce,
+                "nombre": nombre
+            },
+            solution_calculee={"resultat": resultat},
+            etapes_calculees=etapes,
+            resultat_final=str(resultat),
+            figure_geometrique=None,
+            points_bareme=[
+                {"etape": "Conversion/Décomposition correcte", "points": 2.0}
+            ],
+            conseils_prof=[
+                "Vérifier la bonne écriture des nombres",
+                "Insister sur les règles d'orthographe (trait d'union, 's' à vingt et cent)"
+            ]
+        )
+
