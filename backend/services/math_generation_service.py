@@ -4047,3 +4047,318 @@ class MathGenerationService:
                 ]
             )
 
+
+    
+    def _gen_quadrilateres(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur les quadrilatères usuels (6e_G05)
+        
+        Concepts :
+        - Identifier carré, rectangle, losange, parallélogramme
+        - Construire un quadrilatère
+        - Vérifier propriétés (angles, côtés parallèles)
+        """
+        
+        points = self._get_next_geometry_points()
+        # Besoin de 4 points pour un quadrilatère
+        points_set2 = self._get_next_geometry_points()
+        points = points + [points_set2[0]]
+        
+        types_exercices = ["identifier", "construire", "verifier_propriete"]
+        
+        if difficulte == "facile":
+            type_exercice = "identifier"
+            max_coord = 10
+        elif difficulte == "moyen":
+            type_exercice = "construire"
+            max_coord = 15
+        else:
+            type_exercice = "verifier_propriete"
+            max_coord = 20
+        
+        if type_exercice == "identifier":
+            # Identifier le type de quadrilatère
+            type_quad = random.choice(["carre", "rectangle", "losange", "parallelogramme"])
+            
+            if type_quad == "carre":
+                cote = random.randint(4, 8)
+                ab = bc = cd = da = cote
+                description = "carré (4 côtés égaux et 4 angles droits)"
+            elif type_quad == "rectangle":
+                longueur = random.randint(6, 10)
+                largeur = random.randint(3, 5)
+                ab = cd = longueur
+                bc = da = largeur
+                description = "rectangle (côtés opposés égaux et 4 angles droits)"
+            elif type_quad == "losange":
+                cote = random.randint(5, 9)
+                ab = bc = cd = da = cote
+                description = "losange (4 côtés égaux)"
+            else:  # parallelogramme
+                cote1 = random.randint(6, 10)
+                cote2 = random.randint(4, 7)
+                ab = cd = cote1
+                bc = da = cote2
+                description = "parallélogramme (côtés opposés égaux et parallèles)"
+            
+            enonce = f"Identifier le quadrilatère {points[0]}{points[1]}{points[2]}{points[3]} sachant que : {points[0]}{points[1]} = {ab} cm, {points[1]}{points[2]} = {bc} cm, {points[2]}{points[3]} = {cd} cm, {points[3]}{points[0]} = {da} cm."
+            
+            if type_quad == "carre":
+                enonce += f" Tous les angles sont droits."
+            elif type_quad == "rectangle":
+                enonce += f" Tous les angles sont droits."
+            
+            etapes = [
+                f"Côtés : {points[0]}{points[1]} = {ab} cm, {points[1]}{points[2]} = {bc} cm, {points[2]}{points[3]} = {cd} cm, {points[3]}{points[0]} = {da} cm"
+            ]
+            
+            if type_quad == "carre":
+                etapes.append("Les 4 côtés sont égaux et les 4 angles sont droits")
+                etapes.append(f"Le quadrilatère est un {description}")
+            elif type_quad == "rectangle":
+                etapes.append("Les côtés opposés sont égaux et les 4 angles sont droits")
+                etapes.append(f"Le quadrilatère est un {description}")
+            elif type_quad == "losange":
+                etapes.append("Les 4 côtés sont égaux")
+                etapes.append(f"Le quadrilatère est un {description}")
+            else:
+                etapes.append("Les côtés opposés sont égaux")
+                etapes.append(f"Le quadrilatère est un {description}")
+            
+            resultat = description
+            
+            # Coordonnées pour le schéma
+            ax, ay = 2, 2
+            bx = ax + ab
+            by = ay
+            cx, cy = bx, by + bc
+            dx = ax
+            dy = cy
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                f"{points[2]}_x": cx,
+                f"{points[2]}_y": cy,
+                f"{points[3]}_x": dx,
+                f"{points[3]}_y": dy
+            }
+            
+            figure = GeometricFigure(
+                type="quadrilatere",
+                points=points[:4],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "quadrilatere", type_quad]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.RECTANGLE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "identifier",
+                    "enonce": enonce,
+                    "type_quad": type_quad,
+                    "ab": ab, "bc": bc, "cd": cd, "da": da
+                },
+                solution_calculee={"resultat": resultat, "type": type_quad},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Analyse des mesures", "points": 0.5},
+                    {"etape": "Identification correcte", "points": 1.5}
+                ]
+            )
+        
+        elif type_exercice == "construire":
+            # Construire un quadrilatère spécifique
+            type_quad = random.choice(["rectangle", "carre"])
+            
+            if type_quad == "carre":
+                cote = random.randint(4, 8)
+                enonce = f"Construire un carré {points[0]}{points[1]}{points[2]}{points[3]} de côté {cote} cm."
+                
+                etapes = [
+                    f"1. Tracer le segment [{points[0]}{points[1]}] de {cote} cm",
+                    f"2. En {points[1]}, tracer la perpendiculaire à [{points[0]}{points[1]}]",
+                    f"3. Placer {points[2]} à {cote} cm de {points[1]} sur cette perpendiculaire",
+                    f"4. Compléter le carré en traçant les côtés [{points[2]}{points[3]}] et [{points[3]}{points[0]}]",
+                    "Vérifier : les 4 côtés mesurent la même longueur et les 4 angles sont droits"
+                ]
+                
+                resultat = f"Carré de côté {cote} cm construit"
+                
+                # Coordonnées
+                ax, ay = 2, 2
+                bx, by = ax + cote, ay
+                cx, cy = bx, by + cote
+                dx, dy = ax, cy
+            else:  # rectangle
+                longueur = random.randint(6, 10)
+                largeur = random.randint(3, 5)
+                
+                enonce = f"Construire un rectangle {points[0]}{points[1]}{points[2]}{points[3]} avec {points[0]}{points[1]} = {longueur} cm et {points[1]}{points[2]} = {largeur} cm."
+                
+                etapes = [
+                    f"1. Tracer le segment [{points[0]}{points[1]}] de {longueur} cm",
+                    f"2. En {points[1]}, tracer la perpendiculaire à [{points[0]}{points[1]}]",
+                    f"3. Placer {points[2]} à {largeur} cm de {points[1]} sur cette perpendiculaire",
+                    f"4. Tracer [{points[2]}{points[3]}] parallèle à [{points[0]}{points[1]}] de longueur {longueur} cm",
+                    f"5. Relier {points[3]} à {points[0]}",
+                    "Vérifier : les côtés opposés sont égaux et les 4 angles sont droits"
+                ]
+                
+                resultat = f"Rectangle {longueur} cm × {largeur} cm construit"
+                
+                # Coordonnées
+                ax, ay = 2, 2
+                bx, by = ax + longueur, ay
+                cx, cy = bx, by + largeur
+                dx, dy = ax, cy
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                f"{points[2]}_x": cx,
+                f"{points[2]}_y": cy,
+                f"{points[3]}_x": dx,
+                f"{points[3]}_y": dy
+            }
+            
+            figure = GeometricFigure(
+                type="quadrilatere",
+                points=points[:4],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "quadrilatere", type_quad, "construction"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.RECTANGLE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "construire",
+                    "enonce": enonce,
+                    "type_quad": type_quad
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Tracé du premier côté", "points": 0.5},
+                    {"etape": "Perpendiculaires/parallèles", "points": 0.75},
+                    {"etape": "Complétion du quadrilatère", "points": 0.75}
+                ]
+            )
+        
+        else:  # verifier_propriete
+            # Vérifier une propriété (angles droits, côtés parallèles)
+            propriete = random.choice(["angles_droits", "cotes_paralleles"])
+            
+            if propriete == "angles_droits":
+                # Vérifier si un quadrilatère a des angles droits
+                a_angles_droits = random.choice([True, False])
+                
+                if a_angles_droits:
+                    angle_a = angle_b = angle_c = angle_d = 90
+                    enonce = f"Le quadrilatère {points[0]}{points[1]}{points[2]}{points[3]} a les angles suivants : angle en {points[0]} = {angle_a}°, angle en {points[1]} = {angle_b}°, angle en {points[2]} = {angle_c}°, angle en {points[3]} = {angle_d}°. Ce quadrilatère a-t-il tous ses angles droits ?"
+                    
+                    etapes = [
+                        f"Tous les angles valent 90° : {angle_a}° = {angle_b}° = {angle_c}° = {angle_d}° = 90°",
+                        "Donc OUI, le quadrilatère a tous ses angles droits"
+                    ]
+                    resultat = "Oui, tous les angles sont droits"
+                else:
+                    angle_a = 90
+                    angle_b = 90
+                    angle_c = random.randint(85, 95)
+                    angle_d = 360 - angle_a - angle_b - angle_c
+                    
+                    enonce = f"Le quadrilatère {points[0]}{points[1]}{points[2]}{points[3]} a les angles suivants : angle en {points[0]} = {angle_a}°, angle en {points[1]} = {angle_b}°, angle en {points[2]} = {angle_c}°, angle en {points[3]} = {angle_d}°. Ce quadrilatère a-t-il tous ses angles droits ?"
+                    
+                    etapes = [
+                        f"Angles : {angle_a}°, {angle_b}°, {angle_c}°, {angle_d}°",
+                        f"L'angle en {points[2]} vaut {angle_c}° ≠ 90°",
+                        "Donc NON, le quadrilatère n'a pas tous ses angles droits"
+                    ]
+                    resultat = "Non, tous les angles ne sont pas droits"
+            
+            else:  # cotes_paralleles
+                # Vérifier si les côtés opposés sont parallèles
+                sont_paralleles = random.choice([True, False])
+                
+                if sont_paralleles:
+                    enonce = f"Dans le quadrilatère {points[0]}{points[1]}{points[2]}{points[3]}, les côtés [{points[0]}{points[1]}] et [{points[3]}{points[2]}] sont-ils parallèles ? On sait que les deux côtés ont la même pente."
+                    
+                    etapes = [
+                        "Deux droites sont parallèles si elles ont la même pente (coefficient directeur)",
+                        f"Les côtés [{points[0]}{points[1]}] et [{points[3]}{points[2]}] ont la même pente",
+                        "Donc OUI, les côtés sont parallèles"
+                    ]
+                    resultat = "Oui, les côtés sont parallèles"
+                else:
+                    enonce = f"Dans le quadrilatère {points[0]}{points[1]}{points[2]}{points[3]}, les côtés [{points[0]}{points[1]}] et [{points[3]}{points[2]}] sont-ils parallèles ? Les pentes sont différentes."
+                    
+                    etapes = [
+                        "Deux droites sont parallèles si elles ont la même pente",
+                        f"Les côtés [{points[0]}{points[1]}] et [{points[3]}{points[2]}] ont des pentes différentes",
+                        "Donc NON, les côtés ne sont pas parallèles"
+                    ]
+                    resultat = "Non, les côtés ne sont pas parallèles"
+            
+            # Coordonnées simples pour visualisation
+            ax, ay = 2, 2
+            bx, by = 8, 2
+            cx, cy = 8, 6
+            dx, dy = 2, 6
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                f"{points[2]}_x": cx,
+                f"{points[2]}_y": cy,
+                f"{points[3]}_x": dx,
+                f"{points[3]}_y": dy
+            }
+            
+            figure = GeometricFigure(
+                type="quadrilatere",
+                points=points[:4],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "quadrilatere", propriete]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.RECTANGLE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "verifier_propriete",
+                    "enonce": enonce,
+                    "propriete": propriete
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Application de la propriété", "points": 1.0},
+                    {"etape": "Conclusion correcte", "points": 1.0}
+                ],
+                conseils_prof=[
+                    "Insister sur les propriétés caractéristiques des quadrilatères",
+                    "Vérifier que l'élève sait distinguer les différents types"
+                ]
+            )
+
