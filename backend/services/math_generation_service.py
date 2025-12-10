@@ -4686,3 +4686,198 @@ class MathGenerationService:
                 ]
             )
 
+
+    
+    def _gen_multiples_diviseurs(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur multiples et diviseurs, critères de divisibilité (6e_N07)
+        
+        Concepts :
+        - Trouver les multiples d'un nombre
+        - Lister les diviseurs d'un nombre
+        - Vérifier les critères de divisibilité (2, 3, 4, 5, 9, 10)
+        """
+        
+        types_exercices = ["trouver_multiples", "trouver_diviseurs", "verifier_divisibilite"]
+        
+        if difficulte == "facile":
+            type_exercice = "trouver_multiples"
+            nombre = random.randint(2, 10)
+        elif difficulte == "moyen":
+            type_exercice = "trouver_diviseurs"
+            nombre = random.randint(12, 50)
+        else:
+            type_exercice = "verifier_divisibilite"
+            nombre = random.randint(100, 500)
+        
+        if type_exercice == "trouver_multiples":
+            nb_multiples = 5
+            enonce = f"Lister les {nb_multiples} premiers multiples de {nombre}."
+            
+            multiples = [nombre * i for i in range(1, nb_multiples + 1)]
+            
+            etapes = [
+                f"Un multiple de {nombre} est un nombre qui peut s'écrire {nombre} × k (où k est un entier)",
+                f"Les {nb_multiples} premiers multiples de {nombre} sont :"
+            ]
+            
+            for i, m in enumerate(multiples, 1):
+                etapes.append(f"  {nombre} × {i} = {m}")
+            
+            resultat = ", ".join(map(str, multiples))
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "trouver_multiples",
+                    "enonce": enonce,
+                    "nombre": nombre
+                },
+                solution_calculee={"multiples": multiples, "resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Liste complète et correcte", "points": 2.0}
+                ]
+            )
+        
+        elif type_exercice == "trouver_diviseurs":
+            enonce = f"Lister tous les diviseurs de {nombre}."
+            
+            # Trouver tous les diviseurs
+            diviseurs = []
+            for i in range(1, nombre + 1):
+                if nombre % i == 0:
+                    diviseurs.append(i)
+            
+            etapes = [
+                f"Un diviseur de {nombre} est un nombre qui divise {nombre} sans reste",
+                "Cherchons tous les diviseurs :"
+            ]
+            
+            # Montrer quelques divisions
+            for d in diviseurs[:min(len(diviseurs), 6)]:
+                etapes.append(f"  {nombre} ÷ {d} = {nombre // d} (reste 0) → {d} est un diviseur")
+            
+            if len(diviseurs) > 6:
+                etapes.append(f"  ...")
+            
+            etapes.append(f"Diviseurs de {nombre} : {', '.join(map(str, diviseurs))}")
+            
+            # Vérification avec produits
+            verification = []
+            for i in range(len(diviseurs) // 2 + 1):
+                if i < len(diviseurs) // 2 or (len(diviseurs) % 2 == 1 and i == len(diviseurs) // 2):
+                    d1 = diviseurs[i]
+                    d2 = diviseurs[-(i + 1)]
+                    if d1 <= d2:
+                        verification.append(f"{nombre} = {d1} × {d2}")
+            
+            etapes.append("Vérification :")
+            etapes.extend(verification[:3])
+            
+            resultat = ", ".join(map(str, diviseurs))
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "trouver_diviseurs",
+                    "enonce": enonce,
+                    "nombre": nombre
+                },
+                solution_calculee={"diviseurs": diviseurs, "resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Méthode de recherche", "points": 0.5},
+                    {"etape": "Liste complète", "points": 1.5}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève cherche systématiquement tous les diviseurs",
+                    "Insister sur la méthode : tester tous les nombres de 1 à n"
+                ]
+            )
+        
+        else:  # verifier_divisibilite
+            # Vérifier les critères de divisibilité
+            criteres_a_verifier = random.sample([2, 3, 4, 5, 9, 10], k=3)
+            
+            enonce = f"Le nombre {nombre} est-il divisible par {', '.join(map(str, criteres_a_verifier))} ? Justifier avec les critères de divisibilité."
+            
+            etapes = []
+            resultats = []
+            
+            for critere in sorted(criteres_a_verifier):
+                if critere == 2:
+                    dernier_chiffre = nombre % 10
+                    est_divisible = dernier_chiffre % 2 == 0
+                    etapes.append(f"Divisibilité par 2 : le dernier chiffre est {dernier_chiffre}, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 2")
+                    resultats.append(f"2: {'Oui' if est_divisible else 'Non'}")
+                
+                elif critere == 3:
+                    somme_chiffres = sum(int(c) for c in str(nombre))
+                    est_divisible = somme_chiffres % 3 == 0
+                    etapes.append(f"Divisibilité par 3 : somme des chiffres = {somme_chiffres}, {'divisible' if est_divisible else 'non divisible'} par 3, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 3")
+                    resultats.append(f"3: {'Oui' if est_divisible else 'Non'}")
+                
+                elif critere == 4:
+                    deux_derniers = nombre % 100
+                    est_divisible = deux_derniers % 4 == 0
+                    etapes.append(f"Divisibilité par 4 : les deux derniers chiffres forment {deux_derniers}, {'divisible' if est_divisible else 'non divisible'} par 4, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 4")
+                    resultats.append(f"4: {'Oui' if est_divisible else 'Non'}")
+                
+                elif critere == 5:
+                    dernier_chiffre = nombre % 10
+                    est_divisible = dernier_chiffre in [0, 5]
+                    etapes.append(f"Divisibilité par 5 : le dernier chiffre est {dernier_chiffre}, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 5")
+                    resultats.append(f"5: {'Oui' if est_divisible else 'Non'}")
+                
+                elif critere == 9:
+                    somme_chiffres = sum(int(c) for c in str(nombre))
+                    est_divisible = somme_chiffres % 9 == 0
+                    etapes.append(f"Divisibilité par 9 : somme des chiffres = {somme_chiffres}, {'divisible' if est_divisible else 'non divisible'} par 9, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 9")
+                    resultats.append(f"9: {'Oui' if est_divisible else 'Non'}")
+                
+                elif critere == 10:
+                    dernier_chiffre = nombre % 10
+                    est_divisible = dernier_chiffre == 0
+                    etapes.append(f"Divisibilité par 10 : le dernier chiffre est {dernier_chiffre}, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 10")
+                    resultats.append(f"10: {'Oui' if est_divisible else 'Non'}")
+            
+            resultat = " | ".join(resultats)
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "verifier_divisibilite",
+                    "enonce": enonce,
+                    "nombre": nombre,
+                    "criteres": criteres_a_verifier
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Application critère 1", "points": 0.7},
+                    {"etape": "Application critère 2", "points": 0.7},
+                    {"etape": "Application critère 3", "points": 0.6}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève connaît les critères de divisibilité",
+                    "Insister sur l'application rigoureuse de chaque critère",
+                    "Critères à connaître : 2 (dernier chiffre pair), 3 (somme des chiffres divisible par 3), 5 (dernier chiffre 0 ou 5), 9 (somme des chiffres divisible par 9), 10 (dernier chiffre 0)"
+                ]
+            )
+
