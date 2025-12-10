@@ -601,8 +601,11 @@ class GeometryRenderService:
         
         return self.renderer.render_segments(data)
     
-    def _render_droite_numerique(self, figure: GeometricFigure) -> str:
-        """Rendu d'une droite graduée (nombre line)"""
+    def _render_droite_numerique(self, figure: GeometricFigure) -> dict:
+        """
+        Rendu d'une droite graduée (nombre line)
+        Retourne un dict avec question et correction comme les symétries
+        """
         
         # Extraire les paramètres
         min_val = figure.longueurs_connues.get("min", 0)
@@ -617,21 +620,44 @@ class GeometryRenderService:
                 abscisse = figure.longueurs_connues[abscisse_key]
                 points_data.append({"name": point, "abscisse": abscisse})
         
-        # Vérifier si on doit afficher les points
-        show_points = "show_point_" in str(figure.proprietes)
+        # Déterminer le type d'exercice
         is_lire_abscisse = "lire_abscisse" in (figure.proprietes if figure.proprietes else [])
+        is_placer_nombre = "placer_nombre" in (figure.proprietes if figure.proprietes else [])
         
-        data = {
+        # VERSION QUESTION
+        # - Pour "lire_abscisse" : afficher le point (l'élève doit lire l'abscisse)
+        # - Pour "placer_nombre" : NE PAS afficher le point (l'élève doit le placer)
+        data_question = {
             "min": min_val,
             "max": max_val,
             "graduation": graduation,
-            "points": points_data,
-            "show_points": show_points or is_lire_abscisse,
+            "points": points_data if is_lire_abscisse else [],  # ✅ Cacher point si "placer"
+            "show_points": is_lire_abscisse,
             "with_graduations": True,
             "with_labels": True
         }
         
-        return self.renderer.render_number_line(data)
+        # VERSION CORRECTION
+        # - Toujours afficher le point (solution)
+        data_correction = {
+            "min": min_val,
+            "max": max_val,
+            "graduation": graduation,
+            "points": points_data,
+            "show_points": True,  # ✅ Toujours afficher dans la correction
+            "with_graduations": True,
+            "with_labels": True
+        }
+        
+        # Générer les deux versions
+        svg_question = self.renderer.render_number_line(data_question)
+        svg_correction = self.renderer.render_number_line(data_correction)
+        
+        return {
+            "figure_svg": svg_correction,  # Rétrocompatibilité
+            "figure_svg_question": svg_question,
+            "figure_svg_correction": svg_correction
+        }
     
     def _render_fallback_grid_with_points(self, figure: GeometricFigure) -> str:
         """Fallback : grille simple avec points pour les types non supportés"""
