@@ -26,7 +26,7 @@ class TestExercisesAPIGenerate:
         # Arrange
         request_data = {
             "niveau": "5e",
-            "chapitre": "Symétrie axiale",
+            "chapitre": "Symétrie centrale",
             "type_exercice": "standard",
             "difficulte": "moyen"
         }
@@ -50,7 +50,7 @@ class TestExercisesAPIGenerate:
         
         # Vérifier les valeurs
         assert data["niveau"] == "5e"
-        assert data["chapitre"] == "Symétrie axiale"
+        assert data["chapitre"] == "Symétrie centrale"
         assert data["pdf_token"] == data["id_exercice"]  # v1: pdf_token = id_exercice
         
         # Vérifier l'énoncé HTML
@@ -68,7 +68,7 @@ class TestExercisesAPIGenerate:
         assert "points" in data["metadata"]
         
         # Pour un exercice de géométrie, vérifier le SVG
-        # Note: Le SVG peut être None si pas de figure, mais pour symétrie axiale il devrait y en avoir
+        # Note: Le SVG peut être None si pas de figure, mais pour symétrie centrale il devrait y en avoir
         if data.get("svg"):
             assert "<svg" in data["svg"]
             assert len(data["svg"]) > 100
@@ -116,7 +116,7 @@ class TestExercisesAPIGenerate:
         # Arrange
         request_data = {
             "niveau": "5eme",  # Invalide (devrait être "5e")
-            "chapitre": "Symétrie axiale"
+            "chapitre": "Symétrie centrale"
         }
         
         # Act
@@ -217,7 +217,7 @@ class TestExercisesAPIGenerate:
         # Arrange
         request_data = {
             "niveau": "5e",
-            "chapitre": "Symétrie axiale"
+            "chapitre": "Symétrie centrale"
         }
         
         # Act
