@@ -697,6 +697,31 @@ class MathGenerationService:
         resultat2 = val2 * k
         resultat_a_trouver = val3 * k
         
+        # ✅ GÉNÉRER LE TABLEAU HTML pour l'énoncé
+        tableau_html = f"""
+<table style="border-collapse: collapse; margin: 15px auto; border: 2px solid #000; font-size: 14px;">
+    <tr>
+        <th style="border: 1px solid #000; padding: 8px 12px; background-color: #f0f0f0; font-weight: bold;">Valeur</th>
+        <th style="border: 1px solid #000; padding: 8px 12px; background-color: #f0f0f0; font-weight: bold;">Résultat</th>
+    </tr>
+    <tr>
+        <td style="border: 1px solid #000; padding: 8px 12px; text-align: center;">{val1}</td>
+        <td style="border: 1px solid #000; padding: 8px 12px; text-align: center;">{resultat1}</td>
+    </tr>
+    <tr>
+        <td style="border: 1px solid #000; padding: 8px 12px; text-align: center;">{val2}</td>
+        <td style="border: 1px solid #000; padding: 8px 12px; text-align: center;">{resultat2}</td>
+    </tr>
+    <tr>
+        <td style="border: 1px solid #000; padding: 8px 12px; text-align: center;">{val3}</td>
+        <td style="border: 1px solid #000; padding: 8px 12px; text-align: center; background-color: #ffffcc; font-weight: bold;">?</td>
+    </tr>
+</table>
+"""
+        
+        # Énoncé avec tableau HTML
+        enonce = f"Compléter le tableau de proportionnalité suivant.{tableau_html}"
+        
         etapes = [
             "Tableau de proportionnalité",
             f"{val1} → {resultat1}",
@@ -712,10 +737,12 @@ class MathGenerationService:
             difficulte=DifficultyLevel(difficulte),
             parametres={
                 "type": "trouver_valeur",  # Type pédagogique pour gabarits
+                "enonce": enonce,  # ✅ ÉNONCÉ AVEC TABLEAU HTML
                 "valeurs_donnees": [val1, val2],
                 "resultats_donnes": [resultat1, resultat2],
                 "valeur_a_trouver": val3,
-                "coefficient": k
+                "coefficient": k,
+                "tableau_html": tableau_html  # ✅ TABLEAU SÉPARÉ POUR RÉUTILISATION
             },
             solution_calculee={
                 "resultat": resultat_a_trouver,
