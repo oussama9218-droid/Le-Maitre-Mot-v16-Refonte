@@ -29,6 +29,7 @@ import {
   CheckCircle,
   GraduationCap
 } from "lucide-react";
+import MathRenderer from "./MathRenderer";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API_V1 = `${BACKEND_URL}/api/v1/exercises`;
