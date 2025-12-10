@@ -2833,7 +2833,8 @@ class MathGenerationService:
                     "total_ligne": total_ligne,
                     "total_sans_manquante": total_sans_manquante,
                     "nom_ligne": nom_ligne,
-                    "enonce": enonce
+                    "enonce": enonce,
+                    "tableau_html": tableau_html  # ✅ TABLEAU HTML AJOUTÉ
                 },
                 solution_calculee={
                     "valeur_manquante": valeur_manquante
