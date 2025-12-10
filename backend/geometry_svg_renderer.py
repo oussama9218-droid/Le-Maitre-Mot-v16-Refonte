@@ -1192,5 +1192,321 @@ class GeometrySVGRenderer:
                 self.add_line(svg, full_segment)
         
         return ET.tostring(svg, encoding='unicode')
+    
+    # ============================================================================
+    # MÉTHODES DE RENDU POUR LES FIGURES SPRINT
+    # ============================================================================
+    
+    def render_points_and_lines(self, data: Dict[str, Any]) -> str:
+        """
+        Rendu pour points, segments, droites, demi-droites
+        Utilisé par : 6e_G01, 6e_G02, 6e_G03
+        """
+        svg = self.create_svg_root()
+        
+        # Ajouter fond blanc
+        ET.SubElement(svg, 'rect', {
+            'width': str(self.width),
+            'height': str(self.height),
+            'fill': '#FFFFFF'
+        })
+        
+        # Grille si demandée
+        if data.get("grid", False):
+            self._add_grid(svg)
+        
+        # Récupérer les points
+        points_data = data.get("points", [])
+        figure_type = data.get("figure_type", "segment")
+        show_milieu = data.get("show_milieu", False)
+        show_perpendiculaires = data.get("show_perpendiculaires", False)
+        show_paralleles = data.get("show_paralleles", False)
+        
+        # Convertir les coordonnées mathématiques en SVG
+        point_objects = []
+        for point_info in points_data:
+            # Coordonnées en unités de grille (0-10)
+            x_grid = point_info.get("x", 5)
+            y_grid = point_info.get("y", 5)
+            
+            # Conversion grille -> SVG (grille 10x10 centrée)
+            x_svg = self.margin + (x_grid * (self.width - 2 * self.margin) / 10)
+            y_svg = self.height - self.margin - (y_grid * (self.height - 2 * self.margin) / 10)
+            
+            point = Point(x_svg, y_svg, point_info.get("name", ""))
+            point_objects.append(point)
+        
+        # Dessiner les lignes selon le type
+        if len(point_objects) >= 2:
+            p1, p2 = point_objects[0], point_objects[1]
+            
+            if figure_type == "segment":
+                # Segment simple
+                line = Line(p1, p2)
+                self.add_line(svg, line)
+                
+            elif figure_type == "droite":
+                # Droite infinie (prolonger au-delà des points)
+                dx = p2.x - p1.x
+                dy = p2.y - p1.y
+                length = math.sqrt(dx*dx + dy*dy)
+                if length > 0:
+                    dx /= length
+                    dy /= length
+                    # Prolonger de 100 pixels de chaque côté
+                    extended_start = Point(p1.x - dx * 100, p1.y - dy * 100)
+                    extended_end = Point(p2.x + dx * 100, p2.y + dy * 100)
+                    line = Line(extended_start, extended_end)
+                    self.add_line(svg, line)
+                    
+            elif figure_type == "demi_droite":
+                # Demi-droite (prolonger seulement dans une direction)
+                dx = p2.x - p1.x
+                dy = p2.y - p1.y
+                length = math.sqrt(dx*dx + dy*dy)
+                if length > 0:
+                    dx /= length
+                    dy /= length
+                    extended_end = Point(p2.x + dx * 150, p2.y + dy * 150)
+                    line = Line(p1, extended_end)
+                    self.add_line(svg, line)
+            
+            # Marquer le milieu si demandé
+            if show_milieu and len(point_objects) >= 2:
+                midpoint = p1.midpoint_to(p2)
+                midpoint.label = "I"
+                # Croix pour marquer le milieu
+                cross_size = 6
+                ET.SubElement(svg, 'line', {
+                    'x1': str(midpoint.x - cross_size),
+                    'y1': str(midpoint.y),
+                    'x2': str(midpoint.x + cross_size),
+                    'y2': str(midpoint.y),
+                    'stroke': '#FF6600',
+                    'stroke-width': '2'
+                })
+                ET.SubElement(svg, 'line', {
+                    'x1': str(midpoint.x),
+                    'y1': str(midpoint.y - cross_size),
+                    'x2': str(midpoint.x),
+                    'y2': str(midpoint.y + cross_size),
+                    'stroke': '#FF6600',
+                    'stroke-width': '2'
+                })
+                self.add_point(svg, midpoint, show_label=True)
+            
+            # Perpendiculaires
+            if show_perpendiculaires and len(point_objects) >= 2:
+                line = Line(p1, p2)
+                midpoint = line.midpoint()
+                perp_line = line.perpendicular_at_point(midpoint, 60)
+                self.add_line(svg, perp_line)
+            
+            # Parallèles (ligne parallèle décalée)
+            if show_paralleles and len(point_objects) >= 2:
+                dx = p2.x - p1.x
+                dy = p2.y - p1.y
+                # Décalage perpendiculaire
+                offset = 40
+                norm = math.sqrt(dx*dx + dy*dy)
+                if norm > 0:
+                    perp_x = -dy / norm * offset
+                    perp_y = dx / norm * offset
+                    parallel_p1 = Point(p1.x + perp_x, p1.y + perp_y)
+                    parallel_p2 = Point(p2.x + perp_x, p2.y + perp_y)
+                    parallel_line = Line(parallel_p1, parallel_p2, color="#0066CC")
+                    self.add_line(svg, parallel_line)
+        
+        # Dessiner tous les points
+        for point in point_objects:
+            self.add_point(svg, point, show_label=True)
+        
+        return ET.tostring(svg, encoding='unicode')
+    
+    def render_quadrilatere(self, data: Dict[str, Any]) -> str:
+        """
+        Rendu pour quadrilatères (carré, rectangle, losange, parallélogramme)
+        Utilisé par : 6e_G05
+        """
+        svg = self.create_svg_root()
+        
+        # Fond blanc
+        ET.SubElement(svg, 'rect', {
+            'width': str(self.width),
+            'height': str(self.height),
+            'fill': '#FFFFFF'
+        })
+        
+        # Grille si demandée
+        if data.get("grid", False):
+            self._add_grid(svg)
+        
+        points_data = data.get("points", [])
+        quad_type = data.get("quad_type", "quelconque")
+        
+        # Convertir les 4 points
+        point_objects = []
+        polygon_points = []
+        for point_info in points_data[:4]:
+            x_grid = point_info.get("x", 5)
+            y_grid = point_info.get("y", 5)
+            
+            x_svg = self.margin + (x_grid * (self.width - 2 * self.margin) / 10)
+            y_svg = self.height - self.margin - (y_grid * (self.height - 2 * self.margin) / 10)
+            
+            point = Point(x_svg, y_svg, point_info.get("name", ""))
+            point_objects.append(point)
+            polygon_points.append(f"{x_svg},{y_svg}")
+        
+        # Dessiner le quadrilatère (polygone fermé)
+        if len(polygon_points) >= 3:
+            ET.SubElement(svg, 'polygon', {
+                'points': ' '.join(polygon_points),
+                'fill': 'none',
+                'stroke': '#000000',
+                'stroke-width': '2'
+            })
+        
+        # Marquer les angles droits pour carré et rectangle
+        if quad_type in ["carre", "rectangle"]:
+            # Angle droit au premier sommet
+            if len(point_objects) >= 3:
+                p0, p1, p2 = point_objects[0], point_objects[1], point_objects[2]
+                self._add_right_angle_marker(svg, p1, p0, p2, size=10)
+        
+        # Dessiner les points
+        for point in point_objects:
+            self.add_point(svg, point, show_label=True)
+        
+        return ET.tostring(svg, encoding='unicode')
+    
+    def render_segments(self, data: Dict[str, Any]) -> str:
+        """
+        Rendu pour segments avec mesures
+        Utilisé par : 6e_GM01 (segments_comparaison)
+        """
+        svg = self.create_svg_root()
+        
+        # Fond blanc
+        ET.SubElement(svg, 'rect', {
+            'width': str(self.width),
+            'height': str(self.height),
+            'fill': '#FFFFFF'
+        })
+        
+        # Grille si demandée
+        if data.get("grid", False):
+            self._add_grid(svg)
+        
+        segments_data = data.get("segments", [])
+        show_measures = data.get("show_measures", False)
+        
+        # Dessiner chaque segment
+        for segment_info in segments_data:
+            x1_grid = segment_info.get("x1", 2)
+            y1_grid = segment_info.get("y1", 5)
+            x2_grid = segment_info.get("x2", 8)
+            y2_grid = segment_info.get("y2", 5)
+            
+            # Conversion grille -> SVG
+            x1_svg = self.margin + (x1_grid * (self.width - 2 * self.margin) / 10)
+            y1_svg = self.height - self.margin - (y1_grid * (self.height - 2 * self.margin) / 10)
+            x2_svg = self.margin + (x2_grid * (self.width - 2 * self.margin) / 10)
+            y2_svg = self.height - self.margin - (y2_grid * (self.height - 2 * self.margin) / 10)
+            
+            p1 = Point(x1_svg, y1_svg, segment_info.get("p1", "A"))
+            p2 = Point(x2_svg, y2_svg, segment_info.get("p2", "B"))
+            
+            # Dessiner le segment
+            line = Line(p1, p2)
+            self.add_line(svg, line)
+            
+            # Afficher la mesure si demandé
+            if show_measures:
+                midpoint = p1.midpoint_to(p2)
+                length = p1.distance_to(p2)
+                # Convertir en unités de grille
+                length_grid = round(math.sqrt((x2_grid - x1_grid)**2 + (y2_grid - y1_grid)**2), 1)
+                
+                ET.SubElement(svg, 'text', {
+                    'x': str(midpoint.x),
+                    'y': str(midpoint.y - 10),
+                    'class': 'geometry-text',
+                    'font-size': '12',
+                    'fill': '#0066CC',
+                    'text-anchor': 'middle'
+                }).text = f"{length_grid} cm"
+            
+            # Dessiner les points
+            self.add_point(svg, p1, show_label=True)
+            self.add_point(svg, p2, show_label=True)
+        
+        return ET.tostring(svg, encoding='unicode')
+    
+    def render_grid_with_points(self, data: Dict[str, Any]) -> str:
+        """
+        Fallback : grille simple avec points
+        Utilisé pour les types de figures non encore implémentés
+        """
+        svg = self.create_svg_root()
+        
+        # Fond blanc
+        ET.SubElement(svg, 'rect', {
+            'width': str(self.width),
+            'height': str(self.height),
+            'fill': '#FFFFFF'
+        })
+        
+        # Grille
+        self._add_grid(svg)
+        
+        # Si grille seule
+        if data.get("grid_only", False):
+            return ET.tostring(svg, encoding='unicode')
+        
+        # Points
+        points_data = data.get("points", [])
+        for point_info in points_data:
+            x_grid = point_info.get("x", 5)
+            y_grid = point_info.get("y", 5)
+            
+            x_svg = self.margin + (x_grid * (self.width - 2 * self.margin) / 10)
+            y_svg = self.height - self.margin - (y_grid * (self.height - 2 * self.margin) / 10)
+            
+            point = Point(x_svg, y_svg, point_info.get("name", ""))
+            self.add_point(svg, point, show_label=True)
+        
+        return ET.tostring(svg, encoding='unicode')
+    
+    def _add_grid(self, svg: ET.Element):
+        """Ajoute une grille 10x10 au SVG"""
+        grid_size = 10
+        cell_width = (self.width - 2 * self.margin) / grid_size
+        cell_height = (self.height - 2 * self.margin) / grid_size
+        
+        # Lignes verticales
+        for i in range(grid_size + 1):
+            x = self.margin + i * cell_width
+            ET.SubElement(svg, 'line', {
+                'x1': str(x),
+                'y1': str(self.margin),
+                'x2': str(x),
+                'y2': str(self.height - self.margin),
+                'stroke': '#CCCCCC' if i % 5 != 0 else '#999999',
+                'stroke-width': '0.5' if i % 5 != 0 else '1'
+            })
+        
+        # Lignes horizontales
+        for i in range(grid_size + 1):
+            y = self.margin + i * cell_height
+            ET.SubElement(svg, 'line', {
+                'x1': str(self.margin),
+                'y1': str(y),
+                'x2': str(self.width - self.margin),
+                'y2': str(y),
+                'stroke': '#CCCCCC' if i % 5 != 0 else '#999999',
+                'stroke-width': '0.5' if i % 5 != 0 else '1'
+            })
+
 # Instance globale
 geometry_svg_renderer = GeometrySVGRenderer()
