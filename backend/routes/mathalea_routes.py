@@ -239,9 +239,13 @@ async def get_chapter_exercise_types(
         # Fallback : extraire depuis le code (premiers caractères avant _)
         chapter_niveau = chapter_code.split('_')[0]
     
-    # 3. Construire la requête avec FILTRE STRICT PAR NIVEAU
+    # 3. Construire la requête avec FILTRE STRICT PAR NIVEAU + fallback chapitre_id
     query = {
-        "chapter_code": chapter_code,
+        "$or": [
+            {"chapter_code": chapter_code},  # Nouveau système
+            {"chapitre_id": chapter_code},   # Fallback : Ancien système
+            {"chapitre_id": chapter.get("legacy_code")}  # Fallback : Legacy code
+        ],
         "niveau": chapter_niveau  # ⚠️ FILTRE OBLIGATOIRE pour cohérence
     }
     
