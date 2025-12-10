@@ -1507,6 +1507,123 @@ class GeometrySVGRenderer:
                 'stroke': '#CCCCCC' if i % 5 != 0 else '#999999',
                 'stroke-width': '0.5' if i % 5 != 0 else '1'
             })
+    
+    def render_number_line(self, data: Dict[str, Any]) -> str:
+        """
+        Rendu d'une droite graduée (nombre line)
+        Utilisé par : _gen_droite_numerique() (6e_N03)
+        """
+        svg = self.create_svg_root()
+        
+        # Fond blanc
+        ET.SubElement(svg, 'rect', {
+            'width': str(self.width),
+            'height': str(self.height),
+            'fill': '#FFFFFF'
+        })
+        
+        # Paramètres
+        min_val = data.get("min", 0)
+        max_val = data.get("max", 10)
+        graduation = data.get("graduation", 1)
+        points = data.get("points", [])
+        show_points = data.get("show_points", False)
+        with_graduations = data.get("with_graduations", True)
+        with_labels = data.get("with_labels", True)
+        
+        # Calcul de l'échelle
+        range_val = max_val - min_val
+        usable_width = self.width - 2 * self.margin
+        
+        # Position Y de la droite (au centre vertical)
+        line_y = self.height / 2
+        
+        # Dessiner la droite principale
+        ET.SubElement(svg, 'line', {
+            'x1': str(self.margin),
+            'y1': str(line_y),
+            'x2': str(self.width - self.margin),
+            'y2': str(line_y),
+            'stroke': '#000000',
+            'stroke-width': '2',
+            'marker-end': 'url(#arrowhead)'
+        })
+        
+        # Ajouter flèche à droite
+        defs = ET.SubElement(svg, 'defs')
+        marker = ET.SubElement(defs, 'marker', {
+            'id': 'arrowhead',
+            'markerWidth': '10',
+            'markerHeight': '10',
+            'refX': '9',
+            'refY': '3',
+            'orient': 'auto'
+        })
+        ET.SubElement(marker, 'polygon', {
+            'points': '0 0, 10 3, 0 6',
+            'fill': '#000000'
+        })
+        
+        # Dessiner les graduations
+        if with_graduations:
+            nb_graduations = int(range_val / graduation) + 1
+            
+            for i in range(nb_graduations):
+                val = min_val + i * graduation
+                # Position x proportionnelle
+                x = self.margin + (val - min_val) / range_val * usable_width
+                
+                # Graduation (trait vertical)
+                grad_height = 10
+                ET.SubElement(svg, 'line', {
+                    'x1': str(x),
+                    'y1': str(line_y - grad_height),
+                    'x2': str(x),
+                    'y2': str(line_y + grad_height),
+                    'stroke': '#000000',
+                    'stroke-width': '1.5'
+                })
+                
+                # Label de la graduation
+                if with_labels:
+                    ET.SubElement(svg, 'text', {
+                        'x': str(x),
+                        'y': str(line_y + grad_height + 20),
+                        'text-anchor': 'middle',
+                        'font-size': '12',
+                        'fill': '#000000'
+                    }).text = str(int(val)) if val == int(val) else str(val)
+        
+        # Dessiner les points si demandé
+        if show_points:
+            for point_info in points:
+                abscisse = point_info.get("abscisse", 0)
+                point_name = point_info.get("name", "")
+                
+                # Position x du point
+                x = self.margin + (abscisse - min_val) / range_val * usable_width
+                
+                # Dessiner le point
+                ET.SubElement(svg, 'circle', {
+                    'cx': str(x),
+                    'cy': str(line_y),
+                    'r': '5',
+                    'fill': '#FF0000',
+                    'stroke': '#000000',
+                    'stroke-width': '1.5'
+                })
+                
+                # Label du point
+                ET.SubElement(svg, 'text', {
+                    'x': str(x),
+                    'y': str(line_y - 15),
+                    'text-anchor': 'middle',
+                    'font-size': '14',
+                    'font-weight': 'bold',
+                    'fill': '#FF0000'
+                }).text = point_name
+        
+        return ET.tostring(svg, encoding='unicode')
 
 # Instance globale
 geometry_svg_renderer = GeometrySVGRenderer()
