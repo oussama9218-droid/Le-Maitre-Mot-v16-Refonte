@@ -177,6 +177,9 @@ class GeometryRenderService:
             elif figure_type == "carre":
                 # Carré = rectangle avec propriété carrée
                 return self._render_rectangle(figure)
+            elif figure_type == "droite_numerique":
+                # Droite graduée (nombre line)
+                return self._render_droite_numerique(figure)
             else:
                 logger.warning(f"Type de figure non supporté: {figure_type}")
                 # Fallback : grille simple avec points
