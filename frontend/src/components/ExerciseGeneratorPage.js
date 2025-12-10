@@ -34,6 +34,113 @@ import MathRenderer from "./MathRenderer";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API_V1 = `${BACKEND_URL}/api/v1/exercises`;
 
+/**
+ * MathHtmlRenderer - Composant pour rendre du HTML contenant du LaTeX
+ * 
+ * Ce composant gère les contenus mixtes (HTML + LaTeX) en:
+ * 1. Préservant la structure HTML (tableaux, listes, divs, etc.)
+ * 2. Appliquant MathRenderer aux zones de texte contenant du LaTeX
+ * 
+ * Utilisé pour l'API V1 qui renvoie du HTML avec des formules LaTeX.
+ */
+const MathHtmlRenderer = ({ html, className = "" }) => {
+  if (!html) {
+    return null;
+  }
+
+  // Fonction pour extraire le contenu texte principal et le rendre avec MathRenderer
+  // tout en préservant les éléments HTML (tables, SVG, etc.)
+  const renderMixedContent = (htmlContent) => {
+    // Parser le HTML pour séparer les éléments HTML des textes contenant du LaTeX
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+    
+    // Fonction récursive pour traiter les nœuds
+    const processNode = (node, index = 0) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        // Nœud texte : vérifier s'il contient du LaTeX
+        const text = node.textContent;
+        if (text && text.trim()) {
+          // Vérifier si le texte contient des patterns LaTeX
+          const hasLatex = /\\(?:frac|sqrt|times|div|pm|cdot|leq|geq|neq|approx|[a-zA-Z]+)\{/.test(text) ||
+                          /\^{[^}]+}/.test(text) ||
+                          /_\{[^}]+\}/.test(text);
+          
+          if (hasLatex) {
+            return <MathRenderer key={`math-${index}`} content={text} className="inline" />;
+          }
+          return <span key={`text-${index}`}>{text}</span>;
+        }
+        return null;
+      }
+      
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const tagName = node.tagName.toLowerCase();
+        
+        // Éléments qui doivent être rendus en HTML brut (SVG, tables, etc.)
+        const rawHtmlElements = ['svg', 'table', 'img', 'br', 'hr'];
+        if (rawHtmlElements.includes(tagName)) {
+          return (
+            <span 
+              key={`html-${index}`} 
+              dangerouslySetInnerHTML={{ __html: node.outerHTML }}
+            />
+          );
+        }
+        
+        // Pour les autres éléments, traiter récursivement les enfants
+        const children = Array.from(node.childNodes).map((child, i) => 
+          processNode(child, index * 100 + i)
+        ).filter(Boolean);
+        
+        // Recréer l'élément avec ses enfants traités
+        const props = { key: `elem-${index}` };
+        
+        // Copier les attributs importants
+        if (node.className) props.className = node.className;
+        if (node.id) props.id = node.id;
+        
+        // Mapper les tags HTML vers React
+        const reactTagMap = {
+          'div': 'div',
+          'p': 'p',
+          'span': 'span',
+          'strong': 'strong',
+          'b': 'b',
+          'em': 'em',
+          'i': 'i',
+          'ol': 'ol',
+          'ul': 'ul',
+          'li': 'li',
+          'h1': 'h1', 'h2': 'h2', 'h3': 'h3', 'h4': 'h4', 'h5': 'h5', 'h6': 'h6',
+          'a': 'a',
+          'sup': 'sup',
+          'sub': 'sub'
+        };
+        
+        const ReactTag = reactTagMap[tagName] || 'span';
+        
+        return React.createElement(ReactTag, props, children.length > 0 ? children : null);
+      }
+      
+      return null;
+    };
+    
+    // Traiter le body du document parsé
+    const bodyChildren = Array.from(doc.body.childNodes).map((node, i) => 
+      processNode(node, i)
+    ).filter(Boolean);
+    
+    return bodyChildren;
+  };
+
+  return (
+    <div className={`math-html-renderer ${className}`}>
+      {renderMixedContent(html)}
+    </div>
+  );
+};
+
 const ExerciseGeneratorPage = () => {
   // États pour le formulaire
   const [niveaux, setNiveaux] = useState([]);
