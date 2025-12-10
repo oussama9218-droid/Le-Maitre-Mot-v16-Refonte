@@ -121,6 +121,86 @@ def build_solution_html(etapes: list, resultat_final: str, svg_correction: Optio
     return html
 
 
+def _build_fallback_enonce(spec, chapitre: str) -> str:
+    """
+    Génère un énoncé pédagogique de fallback basé sur les paramètres de l'exercice
+    
+    Args:
+        spec: Spécification de l'exercice (MathExerciseSpec)
+        chapitre: Nom du chapitre
+    
+    Returns:
+        Énoncé lisible pour l'élève
+    """
+    params = spec.parametres or {}
+    
+    # 1. Si expression mathématique présente, l'utiliser
+    expression = params.get("expression", "")
+    if expression:
+        return f"Calculer : {expression}"
+    
+    # 2. Fallback spécifique par type d'exercice
+    type_exercice = str(spec.type_exercice).lower() if spec.type_exercice else ""
+    
+    # Fractions
+    if "fractions" in chapitre.lower() or "fraction" in type_exercice:
+        frac1 = params.get("fraction1", "")
+        frac2 = params.get("fraction2", "")
+        operation = params.get("operation", "+")
+        if frac1 and frac2:
+            op_text = "la somme" if operation == "+" else "la différence"
+            return f"Calculer {op_text} des fractions {frac1} et {frac2}. Donner le résultat sous forme de fraction irréductible."
+    
+    # Équations
+    if "equation" in type_exercice or "équation" in chapitre.lower():
+        equation = params.get("equation", "")
+        if equation:
+            return f"Résoudre l'équation suivante : {equation}"
+    
+    # Calculs décimaux
+    if "decimaux" in type_exercice or "décimaux" in chapitre.lower():
+        a = params.get("a", "")
+        b = params.get("b", "")
+        if a and b:
+            return f"Effectuer le calcul suivant : {a} et {b}"
+    
+    # Géométrie - triangles
+    if "triangle" in type_exercice or "triangle" in chapitre.lower():
+        if params.get("points"):
+            return f"Soit le triangle {params.get('points', 'ABC')}. Calculer les mesures demandées."
+    
+    # Périmètre/Aire
+    if "perimetre" in type_exercice or "aire" in type_exercice:
+        figure = params.get("figure", params.get("type_figure", "figure"))
+        return f"Calculer le périmètre et/ou l'aire de la {figure} donnée."
+    
+    # Volume
+    if "volume" in type_exercice:
+        solide = params.get("solide", params.get("type_solide", "solide"))
+        return f"Calculer le volume du {solide}."
+    
+    # Probabilités
+    if "probabilite" in type_exercice:
+        return "Calculer la probabilité demandée."
+    
+    # Statistiques
+    if "statistique" in type_exercice:
+        return "Analyser les données statistiques ci-dessous et répondre aux questions."
+    
+    # 3. Fallback générique amélioré
+    # Essayer de construire quelque chose d'utile avec les paramètres disponibles
+    if params:
+        # Chercher des indices dans les clés des paramètres
+        param_keys = list(params.keys())
+        if any("nombre" in k.lower() for k in param_keys):
+            return f"Effectuer les calculs demandés sur les nombres suivants."
+        if any("point" in k.lower() for k in param_keys):
+            return "Réaliser la construction géométrique demandée."
+    
+    # 4. Dernier recours : message générique mais informatif
+    return f"Exercice de {chapitre}. Répondre aux questions ci-dessous."
+
+
 @router.post(
     "/api/v1/exercises/generate",
     response_model=ExerciseGenerateResponse,
