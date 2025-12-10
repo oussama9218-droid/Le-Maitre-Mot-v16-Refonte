@@ -19,6 +19,9 @@ from models.math_models import MathExerciseSpec, GeometricFigure, MathExerciseTy
 
 logger = logging.getLogger(__name__)
 
+# Import du service de génération mathématique (SPRINT generators)
+from services.math_generation_service import MathGenerationService
+
 
 class ExerciseTemplateService:
     """
