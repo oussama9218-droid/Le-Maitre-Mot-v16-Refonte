@@ -959,6 +959,18 @@ backend:
         agent: "testing"
         comment: "SUCCÈS COMPLET (5/5 tests - 100%) - V1 exercises API endpoint /api/v1/exercises/generate fully operational. Bug 1 (HTML Tables): HTML tables properly rendered without escaping - <table style='border-collapse: collapse;'> visible, NO &lt;table escaping. Bug 2 (Fractions enonce): Contains proper mathematical instruction 'Calculer : \\frac{6}{3} + \\frac{10}{11}' instead of generic text. Bug 3 (Chapter mapping): 'Nombres en écriture fractionnaire' returns valid content without 'CHAPITRE NON MAPPÉ' error. Performance excellent: all responses < 0.1s. All 3 bug fixes completely verified and working correctly."
 
+  - task: "V1 Exercises API Metadata Fields Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/exercises_routes.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "SUCCÈS COMPLET (3/3 tests - 100%) - V1 exercises API metadata fields fully operational. TEST 1 (Proportionnalité dedicated): metadata.is_fallback === false, metadata.generator_code contains 'PROPORTIONNALITE', enonce_html contains proper HTML tables (not escaped). TEST 2 (Fractions fallback): metadata.is_fallback === true, metadata.generator_code contains 'CALCUL_FRACTIONS', enonce_html contains 'Calculer' instruction. TEST 3 (Périmètres et aires): metadata.is_fallback === true (fallback generator 6e_PERIMETRE_AIRE), metadata.generator_code exists. All metadata fields working correctly with proper dedicated/fallback generator detection. Response times excellent: all < 0.1s."
+
   - task: "SPRINT P0 - Correction libpangoft2-1.0-0"
     implemented: true
     working: true
