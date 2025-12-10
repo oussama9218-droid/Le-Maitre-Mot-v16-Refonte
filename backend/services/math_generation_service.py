@@ -5202,3 +5202,217 @@ class MathGenerationService:
                 ]
             )
 
+
+    
+    def _gen_mesurer_longueurs(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur mesurer et comparer des longueurs (6e_GM01)
+        
+        Concepts :
+        - Mesurer un segment avec règle
+        - Comparer deux longueurs
+        - Convertir cm ↔ m ↔ km
+        """
+        
+        points = self._get_next_geometry_points()
+        
+        types_exercices = ["mesurer", "comparer", "convertir"]
+        
+        if difficulte == "facile":
+            type_exercice = "mesurer"
+            max_coord = 15
+        elif difficulte == "moyen":
+            type_exercice = "comparer"
+            max_coord = 20
+        else:
+            type_exercice = "convertir"
+            max_coord = 20
+        
+        if type_exercice == "mesurer":
+            # Mesurer un segment
+            ax = random.randint(2, 5)
+            ay = random.randint(2, 5)
+            longueur_cm = random.randint(4, 15)
+            bx = ax + longueur_cm
+            by = ay
+            
+            enonce = f"Mesurer la longueur du segment [{points[0]}{points[1]}] sur la figure ci-dessous."
+            
+            etapes = [
+                f"Le segment [{points[0]}{points[1]}] mesure {longueur_cm} cm",
+                "Pour mesurer, on utilise une règle graduée en cm"
+            ]
+            
+            resultat = f"{longueur_cm} cm"
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by
+            }
+            
+            figure = GeometricFigure(
+                type="segment",
+                points=points[:2],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "segment", "mesure"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "mesurer",
+                    "enonce": enonce,
+                    "longueur": longueur_cm
+                },
+                solution_calculee={"resultat": resultat, "longueur": longueur_cm},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Mesure correcte", "points": 2.0}
+                ]
+            )
+        
+        elif type_exercice == "comparer":
+            # Comparer deux longueurs avec conversions
+            longueur1_cm = random.randint(50, 200)
+            longueur2_m = round(random.uniform(0.5, 2.0), 1)
+            
+            enonce = f"Comparer les longueurs : {longueur1_cm} cm et {longueur2_m} m. Laquelle est la plus grande ?"
+            
+            # Convertir en même unité
+            longueur1_m = longueur1_cm / 100
+            
+            etapes = [
+                f"Conversion en mètres :",
+                f"{longueur1_cm} cm = {longueur1_cm} ÷ 100 = {longueur1_m} m",
+                f"Comparaison : {longueur1_m} m {'<' if longueur1_m < longueur2_m else '>' if longueur1_m > longueur2_m else '='} {longueur2_m} m"
+            ]
+            
+            if longueur1_m < longueur2_m:
+                etapes.append(f"Donc {longueur1_cm} cm < {longueur2_m} m")
+                resultat = f"{longueur1_cm} cm < {longueur2_m} m"
+            elif longueur1_m > longueur2_m:
+                etapes.append(f"Donc {longueur1_cm} cm > {longueur2_m} m")
+                resultat = f"{longueur1_cm} cm > {longueur2_m} m"
+            else:
+                etapes.append(f"Donc {longueur1_cm} cm = {longueur2_m} m")
+                resultat = f"{longueur1_cm} cm = {longueur2_m} m"
+            
+            # Schéma simple avec 2 segments
+            ax1, ay1 = 2, 3
+            bx1 = ax1 + 8
+            by1 = ay1
+            
+            ax2, ay2 = 2, 6
+            bx2 = ax2 + 10
+            by2 = ay2
+            
+            coords = {
+                f"{points[0]}_x": ax1,
+                f"{points[0]}_y": ay1,
+                f"{points[1]}_x": bx1,
+                f"{points[1]}_y": by1,
+                f"{points[2]}_x": ax2,
+                f"{points[2]}_y": ay2,
+                "D_x": bx2,
+                "D_y": by2
+            }
+            
+            figure = GeometricFigure(
+                type="segments_comparaison",
+                points=points[:3] + ["D"],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "segments", "comparaison"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "comparer",
+                    "enonce": enonce,
+                    "longueur1_cm": longueur1_cm,
+                    "longueur2_m": longueur2_m
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Conversion correcte", "points": 1.0},
+                    {"etape": "Comparaison correcte", "points": 1.0}
+                ]
+            )
+        
+        else:  # convertir
+            # Conversions cm ↔ m ↔ km
+            type_conversion = random.choice(["cm_to_m", "m_to_cm", "m_to_km", "km_to_m"])
+            
+            if type_conversion == "cm_to_m":
+                valeur_cm = random.randint(100, 500)
+                enonce = f"Convertir {valeur_cm} cm en mètres."
+                valeur_m = valeur_cm / 100
+                etapes = [
+                    f"1 m = 100 cm",
+                    f"{valeur_cm} cm = {valeur_cm} ÷ 100 = {valeur_m} m"
+                ]
+                resultat = f"{valeur_m} m"
+            elif type_conversion == "m_to_cm":
+                valeur_m = random.randint(1, 10)
+                enonce = f"Convertir {valeur_m} m en centimètres."
+                valeur_cm = valeur_m * 100
+                etapes = [
+                    f"1 m = 100 cm",
+                    f"{valeur_m} m = {valeur_m} × 100 = {valeur_cm} cm"
+                ]
+                resultat = f"{valeur_cm} cm"
+            elif type_conversion == "m_to_km":
+                valeur_m = random.randint(1000, 5000)
+                enonce = f"Convertir {valeur_m} m en kilomètres."
+                valeur_km = valeur_m / 1000
+                etapes = [
+                    f"1 km = 1000 m",
+                    f"{valeur_m} m = {valeur_m} ÷ 1000 = {valeur_km} km"
+                ]
+                resultat = f"{valeur_km} km"
+            else:  # km_to_m
+                valeur_km = random.randint(1, 10)
+                enonce = f"Convertir {valeur_km} km en mètres."
+                valeur_m = valeur_km * 1000
+                etapes = [
+                    f"1 km = 1000 m",
+                    f"{valeur_km} km = {valeur_km} × 1000 = {valeur_m} m"
+                ]
+                resultat = f"{valeur_m} m"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "convertir",
+                    "enonce": enonce,
+                    "type_conversion": type_conversion
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Conversion correcte", "points": 2.0}
+                ],
+                conseils_prof=[
+                    "Rappeler les équivalences : 1 m = 100 cm, 1 km = 1000 m",
+                    "Vérifier que l'élève multiplie ou divise selon le sens de conversion"
+                ]
+            )
+
