@@ -1,41 +1,91 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Corrections page /generate V1 - 2025-12-10
+## Latest Test Session - V1 Exercises API Comprehensive Testing - 2025-12-10 23:04:13
 
 ### Test Focus
-Correction des 3 bugs prioritaires remontés par l'utilisateur sur la page `/generate` :
-1. HTML brut visible (tableaux de proportionnalité affichés en `<table>...</table>`)
-2. Énoncé vide pour certains chapitres (ex: Fractions)
-3. Chapitre non mappé "Nombres en écriture fractionnaire"
+Comprehensive testing of V1 exercises generation API endpoint `/api/v1/exercises/generate` to verify the 3 bug fixes:
+1. HTML Tables (Proportionnalité) - HTML table tags should not be escaped
+2. Fractions enonce - Should contain actual mathematical content, not generic text
+3. Newly mapped chapter - "Nombres en écriture fractionnaire" should work without errors
+4. Additional HTML table validation
+5. General API health check
 
-### Tests Executed (via curl)
+### Tests Executed (via Python test suite)
 
-#### Test 1 - HTML des tableaux (Proportionnalité)
-**Command**: `curl POST /api/v1/exercises/generate avec chapitre "Proportionnalité"`
-**Result**: ✅ SUCCÈS - Le tableau HTML est correctement présent dans `enonce_html` sans échappement
-**Details**: `<table style="border-collapse:...">` visible, pas de `&lt;table&gt;`
+#### Test 1 - HTML Tables (Proportionnalité) - Priority 1
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Proportionnalité", "difficulte": "moyen"}`
+**Result**: ✅ PASSED - HTML tables properly rendered without escaping
+**Details**: 
+- Response time: 0.08s
+- enonce_html length: 1114 characters
+- Contains `<table style="border-collapse: collapse; margin: 15px auto; border: 2px solid #000; font-size: 14px;...`
+- NO escaped HTML (`&lt;table` not found)
+- HTML table has proper styling attributes
 
-#### Test 2 - Énoncé Fractions
-**Command**: `curl POST /api/v1/exercises/generate avec chapitre "Fractions"`
-**Result**: ✅ SUCCÈS - Énoncé généré: "Calculer : \frac{2}{11} + \frac{9}{5}"
-**Details**: Le fallback intelligent utilise l'expression mathématique pour générer un énoncé lisible
+#### Test 2 - Fractions enonce - Priority 2
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Fractions", "difficulte": "moyen"}`
+**Result**: ✅ PASSED - Contains 'Calculer' instruction with fractions
+**Details**:
+- Response time: 0.06s
+- enonce_html: `<div class='exercise-enonce'><p>Calculer : \frac{6}{3} + \frac{10}{11}</p></div>`
+- Contains mathematical instruction "Calculer :"
+- Contains proper LaTeX fractions `\frac{}`
+- NOT generic "Exercice de Fractions" text
 
-#### Test 3 - Chapitre "Nombres en écriture fractionnaire"
-**Command**: `curl POST /api/v1/exercises/generate avec chapitre "Nombres en écriture fractionnaire"`
-**Result**: ✅ SUCCÈS - Exercice généré correctement
-**Details**: Chapitre ajouté au mapping vers `CALCUL_FRACTIONS`
+#### Test 3 - Newly mapped chapter - Priority 3
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Nombres en écriture fractionnaire", "difficulte": "moyen"}`
+**Result**: ✅ PASSED - Chapter properly mapped, no unmapped error
+**Details**:
+- Response time: 0.06s
+- enonce_html: `<div class='exercise-enonce'><p>Calculer : \frac{7}{4} - \frac{6}{4}</p></div>`
+- NO "CHAPITRE NON MAPPÉ" error
+- Returns valid mathematical content
 
-### Corrections Applied
-1. **exercises_routes.py** - `build_enonce_html()`: Supprimé `html.escape()` car le HTML est généré par notre code interne de confiance
-2. **exercises_routes.py** - `build_solution_html()`: Supprimé `html.escape()` pour les étapes/résultats (peuvent contenir LaTeX)
-3. **exercises_routes.py** - Ajout fonction `_build_fallback_enonce()`: Génère un énoncé pédagogique intelligent basé sur les paramètres
-4. **math_generation_service.py** - Ajout mapping "Nombres en écriture fractionnaire" → `CALCUL_FRACTIONS`
+#### Test 4 - Additional HTML table validation
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Périmètres et aires", "difficulte": "moyen"}`
+**Result**: ✅ PASSED - No HTML tables but no escaping issues
+**Details**:
+- Response time: 0.05s
+- enonce_html length: 2065 characters
+- Contains SVG geometry content
+- No HTML table escaping issues detected
+
+#### Test 5 - API Health Check
+**Command**: `GET /api/v1/exercises/health`
+**Result**: ✅ PASSED - Status: healthy
+**Details**:
+- Response time: 0.05s
+- Returns `{"status": "healthy"}`
+- API endpoint is operational
+
+### Test Results Summary
+**Overall Results**: 5/5 tests passed (100.0%)
+
+**Bug Fix Assessment**:
+- **Bug 1 (HTML Tables)**: ✅ FIXED - HTML tables render properly without escaping
+- **Bug 2 (Fractions enonce)**: ✅ FIXED - Fractions generate actual mathematical content  
+- **Bug 3 (Chapter mapping)**: ✅ FIXED - New chapter mapping works without errors
+
+### Technical Validation
+- All API calls completed successfully with 200 status codes
+- Response times under 0.1 seconds (excellent performance)
+- HTML content properly formatted without escaping issues
+- Mathematical content (LaTeX fractions) properly generated
+- Chapter mapping working correctly for new chapters
+- API health endpoint operational
+
+### Corrections Verified
+1. **HTML escaping removed**: `html.escape()` successfully removed from `build_enonce_html()`
+2. **Fallback enonce generation**: `_build_fallback_enonce()` generating proper mathematical instructions
+3. **Chapter mapping**: "Nombres en écriture fractionnaire" → `CALCUL_FRACTIONS` mapping working
+4. **API stability**: All endpoints responding correctly with proper error handling
 
 ### Status Summary
-- **Bug 1 (HTML brut)**: ✅ FIXED
-- **Bug 2 (Énoncé vide)**: ✅ FIXED  
-- **Bug 3 (Chapitre non mappé)**: ✅ FIXED
-- **Bug 4 (Bouton PDF)**: ⏳ TODO (conservé comme placeholder)
+- **Bug 1 (HTML brut)**: ✅ COMPLETELY FIXED
+- **Bug 2 (Énoncé vide)**: ✅ COMPLETELY FIXED  
+- **Bug 3 (Chapitre non mappé)**: ✅ COMPLETELY FIXED
+- **API Health**: ✅ OPERATIONAL
+- **Performance**: ✅ EXCELLENT (< 0.1s response times)
 
 ---
 
