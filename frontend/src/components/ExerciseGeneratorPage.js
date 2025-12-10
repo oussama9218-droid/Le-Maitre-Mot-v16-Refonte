@@ -407,7 +407,7 @@ const ExerciseGeneratorPage = () => {
                   )}
                 </div>
 
-                {/* Énoncé */}
+                {/* Énoncé (inclut la figure si présente via enonce_html) */}
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                     <FileText className="h-5 w-5" />
@@ -419,16 +419,9 @@ const ExerciseGeneratorPage = () => {
                   />
                 </div>
 
-                {/* Figure SVG */}
-                {currentExercise.svg && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-3">Figure</h3>
-                    <div 
-                      className="bg-white p-4 rounded-lg border flex justify-center"
-                      dangerouslySetInnerHTML={{ __html: currentExercise.svg }}
-                    />
-                  </div>
-                )}
+                {/* Note: La section "Figure SVG" séparée a été supprimée car la figure 
+                    est déjà incluse dans enonce_html via build_enonce_html() côté backend.
+                    Cela évite la duplication visuelle de la figure. */}
 
                 {/* Solution (repliable) */}
                 <details className="bg-green-50 p-4 rounded-lg border border-green-200">
