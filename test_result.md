@@ -1,6 +1,45 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Test complet des 4 corrections appliquées - SUCCÈS COMPLET
+## Latest Test Session - Corrections page /generate V1 - 2025-12-10
+
+### Test Focus
+Correction des 3 bugs prioritaires remontés par l'utilisateur sur la page `/generate` :
+1. HTML brut visible (tableaux de proportionnalité affichés en `<table>...</table>`)
+2. Énoncé vide pour certains chapitres (ex: Fractions)
+3. Chapitre non mappé "Nombres en écriture fractionnaire"
+
+### Tests Executed (via curl)
+
+#### Test 1 - HTML des tableaux (Proportionnalité)
+**Command**: `curl POST /api/v1/exercises/generate avec chapitre "Proportionnalité"`
+**Result**: ✅ SUCCÈS - Le tableau HTML est correctement présent dans `enonce_html` sans échappement
+**Details**: `<table style="border-collapse:...">` visible, pas de `&lt;table&gt;`
+
+#### Test 2 - Énoncé Fractions
+**Command**: `curl POST /api/v1/exercises/generate avec chapitre "Fractions"`
+**Result**: ✅ SUCCÈS - Énoncé généré: "Calculer : \frac{2}{11} + \frac{9}{5}"
+**Details**: Le fallback intelligent utilise l'expression mathématique pour générer un énoncé lisible
+
+#### Test 3 - Chapitre "Nombres en écriture fractionnaire"
+**Command**: `curl POST /api/v1/exercises/generate avec chapitre "Nombres en écriture fractionnaire"`
+**Result**: ✅ SUCCÈS - Exercice généré correctement
+**Details**: Chapitre ajouté au mapping vers `CALCUL_FRACTIONS`
+
+### Corrections Applied
+1. **exercises_routes.py** - `build_enonce_html()`: Supprimé `html.escape()` car le HTML est généré par notre code interne de confiance
+2. **exercises_routes.py** - `build_solution_html()`: Supprimé `html.escape()` pour les étapes/résultats (peuvent contenir LaTeX)
+3. **exercises_routes.py** - Ajout fonction `_build_fallback_enonce()`: Génère un énoncé pédagogique intelligent basé sur les paramètres
+4. **math_generation_service.py** - Ajout mapping "Nombres en écriture fractionnaire" → `CALCUL_FRACTIONS`
+
+### Status Summary
+- **Bug 1 (HTML brut)**: ✅ FIXED
+- **Bug 2 (Énoncé vide)**: ✅ FIXED  
+- **Bug 3 (Chapitre non mappé)**: ✅ FIXED
+- **Bug 4 (Bouton PDF)**: ⏳ TODO (conservé comme placeholder)
+
+---
+
+## Previous Test Session - Test complet des 4 corrections appliquées - SUCCÈS COMPLET
 
 ### Test Focus
 Test complet des 4 corrections majeures appliquées au générateur de fiches : cohérence niveau/domaine/chapitre, filtre domaine, preview/export mis à jour, et mapping perpendiculaires/parallèles
