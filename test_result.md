@@ -1003,7 +1003,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Bug affichage exercices Fiche"
+    - "V1 Exercises API Metadata Fields Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
