@@ -4522,3 +4522,167 @@ class MathGenerationService:
                 ]
             )
 
+
+    
+    def _gen_division_euclidienne(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur la division euclidienne (6e_N06)
+        
+        Concepts :
+        - Calculer une division (quotient et reste)
+        - Poser une division euclidienne
+        - Résoudre des problèmes avec division
+        """
+        
+        types_exercices = ["calculer", "poser_operation", "probleme"]
+        
+        if difficulte == "facile":
+            type_exercice = "calculer"
+            diviseur = random.randint(2, 10)
+            quotient = random.randint(2, 10)
+            reste = random.randint(0, diviseur - 1)
+            dividende = diviseur * quotient + reste
+        elif difficulte == "moyen":
+            type_exercice = random.choice(["calculer", "poser_operation"])
+            diviseur = random.randint(3, 15)
+            quotient = random.randint(5, 20)
+            reste = random.randint(0, diviseur - 1)
+            dividende = diviseur * quotient + reste
+        else:
+            type_exercice = random.choice(types_exercices)
+            diviseur = random.randint(10, 50)
+            quotient = random.randint(10, 50)
+            reste = random.randint(0, diviseur - 1)
+            dividende = diviseur * quotient + reste
+        
+        if type_exercice == "calculer":
+            enonce = f"Effectuer la division euclidienne de {dividende} par {diviseur}. Donner le quotient et le reste."
+            
+            etapes = [
+                f"{dividende} = {diviseur} × {quotient} + {reste}",
+                f"Quotient : {quotient}",
+                f"Reste : {reste}",
+                f"Vérification : {diviseur} × {quotient} + {reste} = {diviseur * quotient} + {reste} = {dividende}"
+            ]
+            
+            resultat = f"Quotient = {quotient}, Reste = {reste}"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "calculer",
+                    "enonce": enonce,
+                    "dividende": dividende,
+                    "diviseur": diviseur
+                },
+                solution_calculee={"quotient": quotient, "reste": reste, "resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Quotient correct", "points": 1.0},
+                    {"etape": "Reste correct", "points": 0.5},
+                    {"etape": "Vérification", "points": 0.5}
+                ]
+            )
+        
+        elif type_exercice == "poser_operation":
+            enonce = f"Poser et effectuer la division euclidienne : {dividende} ÷ {diviseur}"
+            
+            etapes = [
+                f"Division : {dividende} ÷ {diviseur}",
+                "",
+                "Méthode :",
+                f"Combien de fois {diviseur} dans {dividende} ?",
+                f"Réponse : {quotient} fois",
+                f"{diviseur} × {quotient} = {diviseur * quotient}",
+                f"Reste : {dividende} - {diviseur * quotient} = {reste}",
+                "",
+                f"Résultat : {dividende} = {diviseur} × {quotient} + {reste}",
+                f"Quotient = {quotient}, Reste = {reste}"
+            ]
+            
+            resultat = f"Quotient = {quotient}, Reste = {reste}"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "poser_operation",
+                    "enonce": enonce,
+                    "dividende": dividende,
+                    "diviseur": diviseur
+                },
+                solution_calculee={"quotient": quotient, "reste": reste, "resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Opération posée", "points": 0.5},
+                    {"etape": "Quotient correct", "points": 1.0},
+                    {"etape": "Reste correct", "points": 0.5}
+                ]
+            )
+        
+        else:  # probleme
+            # Problèmes contextuels avec division
+            themes = [
+                {"nom": "partage", "contexte": "a {dividende} bonbons et veut les partager équitablement entre {diviseur} amis", "question": "Combien de bonbons chaque ami recevra-t-il ? Combien en restera-t-il ?"},
+                {"nom": "rangement", "contexte": "doit ranger {dividende} livres dans des cartons contenant chacun {diviseur} livres", "question": "Combien de cartons complets pourra-t-elle remplir ? Combien de livres resteront ?"},
+                {"nom": "transport", "contexte": "doit transporter {dividende} personnes dans des voitures de {diviseur} places", "question": "Combien de voitures pleines faut-il ? Combien de places seront libres dans la dernière voiture ?"}
+            ]
+            
+            theme = random.choice(themes)
+            contexte = theme["contexte"].format(dividende=dividende, diviseur=diviseur)
+            question = theme["question"]
+            
+            enonce = f"Marie {contexte}. {question}"
+            
+            etapes = [
+                f"{dividende} ÷ {diviseur} = {quotient} reste {reste}",
+                f"Division euclidienne : {dividende} = {diviseur} × {quotient} + {reste}"
+            ]
+            
+            if theme["nom"] == "partage":
+                etapes.append(f"Chaque ami recevra {quotient} bonbons et il en restera {reste}.")
+                resultat = f"{quotient} bonbons par ami, {reste} restant(s)"
+            elif theme["nom"] == "rangement":
+                etapes.append(f"Elle pourra remplir {quotient} cartons complets et il restera {reste} livre(s).")
+                resultat = f"{quotient} cartons, {reste} livre(s) restant(s)"
+            else:
+                places_libres = diviseur - reste if reste > 0 else 0
+                etapes.append(f"Il faut {quotient + (1 if reste > 0 else 0)} voiture(s). Dans la dernière, il y aura {places_libres} place(s) libre(s).")
+                resultat = f"{quotient + (1 if reste > 0 else 0)} voiture(s), {places_libres} place(s) libre(s)"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "probleme",
+                    "enonce": enonce,
+                    "dividende": dividende,
+                    "diviseur": diviseur,
+                    "theme": theme["nom"]
+                },
+                solution_calculee={"quotient": quotient, "reste": reste, "resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Compréhension du problème", "points": 0.5},
+                    {"etape": "Division correcte", "points": 1.0},
+                    {"etape": "Interprétation du reste", "points": 0.5}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève comprend le sens du quotient et du reste",
+                    "Insister sur l'interprétation du reste dans le contexte"
+                ]
+            )
+
