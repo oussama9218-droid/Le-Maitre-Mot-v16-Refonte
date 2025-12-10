@@ -4747,6 +4747,10 @@ from routes.catalogue_routes import router as catalogue_router
 app.include_router(mathalea_router)
 app.include_router(catalogue_router)
 
+# Include Exercises v1 API router (V1-BE-002)
+from routes.exercises_routes import router as exercises_router
+app.include_router(exercises_router, tags=["Exercises v1"])
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
