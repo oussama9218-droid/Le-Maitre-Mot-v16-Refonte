@@ -425,5 +425,207 @@ class GeometryRenderService:
         }
 
 
+    
+    # ============================================================================
+    # RENDU DES FIGURES SPRINT
+    # ============================================================================
+    
+    def _render_points_segments_droites(self, figure: GeometricFigure) -> str:
+        """Rendu pour points, segments, droites, demi-droites (6e_G01)"""
+        
+        # Créer une grille avec les points
+        points_data = []
+        for point in figure.points:
+            x_key = f"{point}_x"
+            y_key = f"{point}_y"
+            if x_key in figure.longueurs_connues and y_key in figure.longueurs_connues:
+                x = figure.longueurs_connues[x_key]
+                y = figure.longueurs_connues[y_key]
+                points_data.append({"name": point, "x": x, "y": y})
+        
+        # Déterminer le type de figure à dessiner
+        figure_props = figure.proprietes if figure.proprietes else []
+        
+        data = {
+            "points": points_data,
+            "grid": True,
+            "figure_type": "segment" if "segment" in figure_props else "droite" if "droite" in figure_props else "demi_droite"
+        }
+        
+        # Utiliser le renderer de base pour grille + points + segments
+        return self.renderer.render_points_and_lines(data)
+    
+    def _render_alignement_milieu(self, figure: GeometricFigure) -> str:
+        """Rendu pour alignement et milieu d'un segment (6e_G02)"""
+        
+        # Créer les points
+        points_data = []
+        for point in figure.points:
+            x_key = f"{point}_x"
+            y_key = f"{point}_y"
+            if x_key in figure.longueurs_connues and y_key in figure.longueurs_connues:
+                x = figure.longueurs_connues[x_key]
+                y = figure.longueurs_connues[y_key]
+                points_data.append({"name": point, "x": x, "y": y})
+        
+        # Vérifier si c'est un exercice de milieu
+        is_milieu = "milieu" in (figure.proprietes if figure.proprietes else [])
+        
+        data = {
+            "points": points_data,
+            "grid": True,
+            "show_milieu": is_milieu,
+            "alignement": "alignement" in (figure.proprietes if figure.proprietes else [])
+        }
+        
+        return self.renderer.render_points_and_lines(data)
+    
+    def _render_perpendiculaires_paralleles(self, figure: GeometricFigure) -> str:
+        """Rendu pour perpendiculaires et parallèles (6e_G03)"""
+        
+        # Créer les points
+        points_data = []
+        for point in figure.points:
+            x_key = f"{point}_x"
+            y_key = f"{point}_y"
+            if x_key in figure.longueurs_connues and y_key in figure.longueurs_connues:
+                x = figure.longueurs_connues[x_key]
+                y = figure.longueurs_connues[y_key]
+                points_data.append({"name": point, "x": x, "y": y})
+        
+        data = {
+            "points": points_data,
+            "grid": True,
+            "show_perpendiculaires": "perpendiculaires" in (figure.proprietes if figure.proprietes else []),
+            "show_paralleles": "paralleles" in (figure.proprietes if figure.proprietes else [])
+        }
+        
+        return self.renderer.render_points_and_lines(data)
+    
+    def _render_quadrilatere(self, figure: GeometricFigure) -> str:
+        """Rendu pour quadrilatères (6e_G05)"""
+        
+        # Extraire les coordonnées des 4 points
+        points_coords = []
+        for point in figure.points[:4]:
+            x_key = f"{point}_x"
+            y_key = f"{point}_y"
+            if x_key in figure.longueurs_connues and y_key in figure.longueurs_connues:
+                x = figure.longueurs_connues[x_key]
+                y = figure.longueurs_connues[y_key]
+                points_coords.append({"name": point, "x": x, "y": y})
+        
+        # Déterminer le type de quadrilatère
+        quad_type = "quelconque"
+        if figure.proprietes:
+            if "carre" in figure.proprietes:
+                quad_type = "carre"
+            elif "rectangle" in figure.proprietes:
+                quad_type = "rectangle"
+            elif "losange" in figure.proprietes:
+                quad_type = "losange"
+            elif "parallelogramme" in figure.proprietes:
+                quad_type = "parallelogramme"
+        
+        data = {
+            "points": points_coords,
+            "quad_type": quad_type,
+            "grid": True
+        }
+        
+        return self.renderer.render_quadrilatere(data)
+    
+    def _render_segment(self, figure: GeometricFigure) -> str:
+        """Rendu pour segments avec mesures (6e_GM01)"""
+        
+        # Créer les segments
+        segments_data = []
+        
+        if figure.type == "segments_comparaison":
+            # Plusieurs segments à comparer
+            i = 0
+            while i < len(figure.points):
+                if i + 1 < len(figure.points):
+                    p1 = figure.points[i]
+                    p2 = figure.points[i + 1]
+                    
+                    x1_key = f"{p1}_x"
+                    y1_key = f"{p1}_y"
+                    x2_key = f"{p2}_x"
+                    y2_key = f"{p2}_y"
+                    
+                    if all(k in figure.longueurs_connues for k in [x1_key, y1_key, x2_key, y2_key]):
+                        x1 = figure.longueurs_connues[x1_key]
+                        y1 = figure.longueurs_connues[y1_key]
+                        x2 = figure.longueurs_connues[x2_key]
+                        y2 = figure.longueurs_connues[y2_key]
+                        
+                        segments_data.append({
+                            "p1": p1,
+                            "p2": p2,
+                            "x1": x1,
+                            "y1": y1,
+                            "x2": x2,
+                            "y2": y2
+                        })
+                    i += 2
+                else:
+                    break
+        else:
+            # Un seul segment
+            if len(figure.points) >= 2:
+                p1, p2 = figure.points[0], figure.points[1]
+                x1_key = f"{p1}_x"
+                y1_key = f"{p1}_y"
+                x2_key = f"{p2}_x"
+                y2_key = f"{p2}_y"
+                
+                if all(k in figure.longueurs_connues for k in [x1_key, y1_key, x2_key, y2_key]):
+                    segments_data.append({
+                        "p1": p1,
+                        "p2": p2,
+                        "x1": figure.longueurs_connues[x1_key],
+                        "y1": figure.longueurs_connues[y1_key],
+                        "x2": figure.longueurs_connues[x2_key],
+                        "y2": figure.longueurs_connues[y2_key]
+                    })
+        
+        data = {
+            "segments": segments_data,
+            "grid": True,
+            "show_measures": "mesure" in (figure.proprietes if figure.proprietes else [])
+        }
+        
+        return self.renderer.render_segments(data)
+    
+    def _render_fallback_grid_with_points(self, figure: GeometricFigure) -> str:
+        """Fallback : grille simple avec points pour les types non supportés"""
+        
+        # Extraire tous les points disponibles
+        points_data = []
+        for point in figure.points if figure.points else []:
+            x_key = f"{point}_x"
+            y_key = f"{point}_y"
+            if x_key in figure.longueurs_connues and y_key in figure.longueurs_connues:
+                x = figure.longueurs_connues[x_key]
+                y = figure.longueurs_connues[y_key]
+                points_data.append({"name": point, "x": x, "y": y})
+        
+        # Si pas de points, créer une grille vide simple
+        if not points_data:
+            data = {
+                "grid_only": True,
+                "width": 400,
+                "height": 300
+            }
+        else:
+            data = {
+                "points": points_data,
+                "grid": True
+            }
+        
+        return self.renderer.render_grid_with_points(data)
+
+
 # Instance globale
 geometry_render_service = GeometryRenderService()
