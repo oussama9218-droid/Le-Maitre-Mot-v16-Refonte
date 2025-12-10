@@ -4362,3 +4362,163 @@ class MathGenerationService:
                 ]
             )
 
+
+    
+    def _gen_multiplication_entiers(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur la multiplication de nombres entiers (6e_N05)
+        
+        Concepts :
+        - Calculer une multiplication simple
+        - Poser une multiplication en colonnes
+        - Résoudre des problèmes contextuels
+        """
+        
+        types_exercices = ["calculer", "poser_operation", "probleme"]
+        
+        if difficulte == "facile":
+            type_exercice = "calculer"
+            a = random.randint(2, 20)
+            b = random.randint(2, 10)
+        elif difficulte == "moyen":
+            type_exercice = random.choice(["calculer", "poser_operation"])
+            a = random.randint(50, 200)
+            b = random.randint(10, 50)
+        else:
+            type_exercice = random.choice(types_exercices)
+            a = random.randint(200, 1000)
+            b = random.randint(10, 100)
+        
+        if type_exercice == "calculer":
+            enonce = f"Effectuer la multiplication : {a} × {b}"
+            
+            resultat = a * b
+            etapes = [f"{a} × {b} = {resultat}"]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "calculer",
+                    "enonce": enonce,
+                    "a": a,
+                    "b": b
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=str(resultat),
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Calcul correct", "points": 2.0}
+                ]
+            )
+        
+        elif type_exercice == "poser_operation":
+            enonce = f"Poser et calculer : {a} × {b}"
+            
+            resultat = a * b
+            
+            # Décomposer b en unités, dizaines, etc.
+            str_b = str(b)
+            etapes = [
+                f"  {a}",
+                f"×  {b}",
+                "-----"
+            ]
+            
+            # Calcul par ligne
+            produits_intermediaires = []
+            for i, chiffre in enumerate(reversed(str_b)):
+                if chiffre != '0':
+                    multiplicateur = int(chiffre) * (10 ** i)
+                    produit = a * int(chiffre)
+                    if i > 0:
+                        etapes.append(f" {produit}{'0' * i}  ({a} × {chiffre} × 10^{i})")
+                    else:
+                        etapes.append(f"  {produit}  ({a} × {chiffre})")
+                    produits_intermediaires.append(produit * (10 ** i))
+            
+            etapes.append("-----")
+            etapes.append(f" {resultat}")
+            etapes.append("")
+            etapes.append(f"Résultat : {a} × {b} = {resultat}")
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "poser_operation",
+                    "enonce": enonce,
+                    "a": a,
+                    "b": b
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=str(resultat),
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Opération posée correctement", "points": 0.5},
+                    {"etape": "Produits intermédiaires", "points": 1.0},
+                    {"etape": "Résultat final", "points": 0.5}
+                ]
+            )
+        
+        else:  # probleme
+            # Problèmes contextuels
+            themes = [
+                {"nom": "objets", "contexte": "achète {b} paquets de {a} bonbons", "question": "Combien de bonbons a-t-elle au total ?"},
+                {"nom": "argent", "contexte": "achète {b} articles à {a} € chacun", "question": "Quel est le prix total ?"},
+                {"nom": "distance", "contexte": "parcourt {b} fois un circuit de {a} km", "question": "Quelle distance totale a-t-elle parcourue ?"}
+            ]
+            
+            theme = random.choice(themes)
+            contexte = theme["contexte"].format(a=a, b=b)
+            question = theme["question"]
+            
+            enonce = f"Marie {contexte}. {question}"
+            
+            resultat = a * b
+            
+            if theme["nom"] == "objets":
+                unite = "bonbons"
+            elif theme["nom"] == "argent":
+                unite = "€"
+            else:
+                unite = "km"
+            
+            etapes = [
+                f"{b} × {a} = {resultat}",
+                f"Marie a {resultat} {unite}."
+            ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "probleme",
+                    "enonce": enonce,
+                    "a": a,
+                    "b": b,
+                    "theme": theme["nom"]
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=f"{resultat} {unite}",
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Compréhension du problème", "points": 0.5},
+                    {"etape": "Opération correcte", "points": 1.0},
+                    {"etape": "Résultat avec unité", "points": 0.5}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève identifie bien la multiplication",
+                    "Insister sur l'importance de l'unité dans la réponse"
+                ]
+            )
+
