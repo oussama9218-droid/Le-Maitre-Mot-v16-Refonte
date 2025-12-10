@@ -3572,12 +3572,12 @@ class MathGenerationService:
             a, b = b, a
         
         if type_exercice == "calculer":
-            enonce = f"Calculer : {a} {operation} {b}"
-            
             if operation == "+":
+                enonce = f"Effectuer l'addition : {a} + {b}"
                 resultat = a + b
                 etapes = [f"{a} + {b} = {resultat}"]
             else:
+                enonce = f"Effectuer la soustraction : {a} - {b}"
                 resultat = a - b
                 etapes = [f"{a} - {b} = {resultat}"]
             
