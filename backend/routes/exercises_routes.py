@@ -260,11 +260,12 @@ async def generate_exercise(request: ExerciseGenerateRequest):
     # 5. CONSTRUCTION DE L'ÉNONCÉ ET DE LA SOLUTION HTML
     # ============================================================================
     
-    # Énoncé
+    # Énoncé - Priorité : enonce > expression > fallback intelligent
     enonce_text = spec.parametres.get("enonce", "") if spec.parametres else ""
+    
     if not enonce_text:
-        # Fallback sur l'énoncé générique
-        enonce_text = f"Exercice de {request.chapitre}"
+        # Fallback intelligent : générer un énoncé pédagogique à partir des paramètres
+        enonce_text = _build_fallback_enonce(spec, request.chapitre)
     
     enonce_html = build_enonce_html(enonce_text, svg_question)
     
