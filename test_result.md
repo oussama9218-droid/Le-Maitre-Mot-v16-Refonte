@@ -1015,7 +1015,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "V1 Exercises API Metadata Fields Testing"
+    - "MathRenderer LaTeX Integration Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
