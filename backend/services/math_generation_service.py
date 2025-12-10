@@ -2856,10 +2856,34 @@ class MathGenerationService:
             # Calculer le total d'une ligne ou colonne
             choix = random.choice(["ligne", "colonne"])
             
+            # ✅ GÉNÉRER LE TABLEAU HTML COMPLET
+            tableau_html = '<table style="border-collapse: collapse; margin: 15px auto; border: 2px solid #000; font-size: 14px;">'
+            
+            # En-tête du tableau
+            tableau_html += '<tr><th style="border: 1px solid #000; padding: 8px 12px; background-color: #f0f0f0;"></th>'
+            for col_name in theme["colonnes"][:nb_colonnes]:
+                tableau_html += f'<th style="border: 1px solid #000; padding: 8px 12px; background-color: #f0f0f0; font-weight: bold;">{col_name}</th>'
+            tableau_html += '</tr>'
+            
             if choix == "ligne":
                 ligne = random.randint(0, nb_lignes - 1)
                 total = sum(donnees[ligne])
                 nom = theme["lignes"][ligne % len(theme["lignes"])]
+                
+                # Lignes de données avec mise en évidence
+                for i, row in enumerate(donnees[:nb_lignes]):
+                    row_name = theme["lignes"][i % len(theme["lignes"])]
+                    if i == ligne:
+                        # Ligne à calculer - mise en évidence
+                        tableau_html += f'<tr style="background-color: #fff3cd;"><th style="border: 1px solid #000; padding: 8px 12px; background-color: #ffc107; font-weight: bold;">{row_name}</th>'
+                    else:
+                        tableau_html += f'<tr><th style="border: 1px solid #000; padding: 8px 12px; background-color: #f0f0f0; font-weight: bold;">{row_name}</th>'
+                    
+                    for cell_value in row[:nb_colonnes]:
+                        tableau_html += f'<td style="border: 1px solid #000; padding: 8px 12px; text-align: center;">{cell_value}</td>'
+                    tableau_html += '</tr>'
+                
+                tableau_html += '</table>'
                 
                 etapes = [
                     f"Calculer le total de la ligne {nom}",
@@ -2867,7 +2891,7 @@ class MathGenerationService:
                     f"Total = {total}"
                 ]
                 
-                enonce = f"Dans un tableau de {theme['nom']}, calculer le total de la ligne {nom}. Les valeurs sont : {', '.join(map(str, donnees[ligne]))}."
+                enonce = f"Dans le tableau de {theme['nom']} ci-dessous, calculer le total de la ligne {nom}.{tableau_html}"
             else:
                 colonne = random.randint(0, nb_colonnes - 1)
                 total = sum(donnees[i][colonne] for i in range(nb_lignes))
@@ -2875,13 +2899,28 @@ class MathGenerationService:
                 
                 valeurs_colonne = [donnees[i][colonne] for i in range(nb_lignes)]
                 
+                # Lignes de données avec mise en évidence de la colonne
+                for i, row in enumerate(donnees[:nb_lignes]):
+                    row_name = theme["lignes"][i % len(theme["lignes"])]
+                    tableau_html += f'<tr><th style="border: 1px solid #000; padding: 8px 12px; background-color: #f0f0f0; font-weight: bold;">{row_name}</th>'
+                    
+                    for j, cell_value in enumerate(row[:nb_colonnes]):
+                        if j == colonne:
+                            # Colonne à calculer - mise en évidence
+                            tableau_html += f'<td style="border: 1px solid #000; padding: 8px 12px; text-align: center; background-color: #fff3cd; font-weight: bold;">{cell_value}</td>'
+                        else:
+                            tableau_html += f'<td style="border: 1px solid #000; padding: 8px 12px; text-align: center;">{cell_value}</td>'
+                    tableau_html += '</tr>'
+                
+                tableau_html += '</table>'
+                
                 etapes = [
                     f"Calculer le total de la colonne {nom}",
                     f"Valeurs : {' + '.join(map(str, valeurs_colonne))}",
                     f"Total = {total}"
                 ]
                 
-                enonce = f"Dans un tableau de {theme['nom']}, calculer le total de la colonne {nom}. Les valeurs sont : {', '.join(map(str, valeurs_colonne))}."
+                enonce = f"Dans le tableau de {theme['nom']} ci-dessous, calculer le total de la colonne {nom}.{tableau_html}"
             
             return MathExerciseSpec(
                 niveau=niveau,
@@ -2892,7 +2931,8 @@ class MathGenerationService:
                     "type": "calculer_total",
                     "choix": choix,
                     "nom": nom,
-                    "enonce": enonce
+                    "enonce": enonce,
+                    "tableau_html": tableau_html  # ✅ TABLEAU HTML AJOUTÉ
                 },
                 solution_calculee={
                     "total": total
