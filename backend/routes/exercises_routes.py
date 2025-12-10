@@ -182,12 +182,18 @@ async def generate_exercise(request: ExerciseGenerateRequest):
     try:
         math_service = MathGenerationService()
         
-        # Générer l'exercice avec le service math
-        spec = math_service.generate_exercise(
+        # Générer l'exercice avec le service math (génère 1 exercice)
+        specs = math_service.generate_math_exercise_specs(
             niveau=request.niveau,
             chapitre=request.chapitre,
-            difficulte=request.difficulte
+            difficulte=request.difficulte,
+            nb_exercices=1
         )
+        
+        if not specs or len(specs) == 0:
+            raise ValueError(f"Aucun exercice généré pour {request.niveau} - {request.chapitre}")
+        
+        spec = specs[0]  # Prendre le premier exercice
         
         logger.info(f"Exercice généré: type={spec.type_exercice}, has_figure={spec.figure_geometrique is not None}")
         
