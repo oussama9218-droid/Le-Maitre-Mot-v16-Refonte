@@ -1,87 +1,55 @@
 <analysis>**original_problem_statement:**
-The user's overall goal is to enhance a Math exercise sheet generator application, Le-Maitre-Mot-v16-Refonte. The session involved several distinct sprints and bug-fixing waves:
+The user's high-level goal is to complete the development of all 19 exercise generators for the 6th-grade level in the Le-Maitre-Mot-v16-Refonte math application.
 
-1.  **SPRINT 4:** Create a new, dedicated RESTful endpoint  to fetch exercises for a specific chapter, along with robust API tests.
-2.  **SPRINT P0:** Find a permanent fix for the recurring backend startup failure caused by the missing  system dependency required by WeasyPrint for PDF generation.
-3.  **SPRINT FIX:** Correct a major bug in the Fiche (Sheet) builder UI where selecting a chapter with a known number of exercises resulted in an empty list, because the frontend was using the new  with a legacy API endpoint.
-4.  **BUG FIXING WAVE 1:** Address a list of 5 bugs provided by the user, including backend API logic inconsistencies (level filtering), frontend state management issues (preview/export not saving changes, domain filter loading late), and missing backend data mappings.
-5.  **FEATURE SPRINT 1 (Generators):** Begin a large feature implementation to create Python-based exercise generators for 19 missing 6th-grade chapters. This first sprint focused on creating the initial 3 high-priority generators (, , ) and establishing the correct architectural pattern for them.
+This session involved several phases:
+1.  **Bug Fixing (SPRINT 1 Validation):** The agent first had to fix validation failures for the initial 3 generators created in the previous job.
+2.  **Bug Fixing (P1-P3):** The agent addressed other pending bugs, including fixing generic Question 1... statements and investigating a PDF export issue.
+3.  **Feature Implementation (SPRINT 2, 3, 4):** The agent implemented the 16 remaining 6th-grade exercise generators in three successive sprints.
+4.  **Database Migration:** After implementing the generators, the agent created and executed a migration script to register the 19 new  documents in MongoDB, making them accessible to the frontend.
+5.  **Critical Bug Fix:** The user reported that the newly created exercises were generating incorrect, generic questions. The agent had to debug the application's service layer to find and fix the logic bug that was preventing the new generators from being called.
+6.  **Feature Implementation (SVG Rendering):** The user then requested the implementation of SVG rendering for all the new geometric figure types introduced by the new generators.
 
 **User's preferred language**: French
 
 **what currently exists?**
 - A full-stack React/FastAPI/MongoDB application for generating math exercise sheets.
-- A stable backend environment. The critical  dependency issue has been permanently resolved with a  script and lazy loading of 
------
-
-WeasyPrint could not import some external libraries. Please carefully follow the installation steps before reporting an issue:
-https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#installation
-https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#troubleshooting 
-
------ in .
-- A new, dedicated, and tested API endpoint  is live and used by the frontend.
-- The Fiche (Sheet) builder UI now correctly fetches and displays exercises when a chapter is selected.
-- Several bugs related to API-level filtering, frontend state saving for previews, and UI filter loading have been fixed.
-- A new architectural pattern is in place in  using a  dictionary. This allows new, chapter-specific exercise generators to be prioritized over older, generic ones.
-- The first 3 of 19 new 6th-grade exercise generators have been implemented for chapters , , and .
-- A comprehensive validation script, , exists to test the new generators.
+- The backend logic for all 19 6th-grade exercise generators is fully implemented and tested via validation scripts. The generators produce pedagogically correct and contextual exercises.
+- A critical bug has been fixed in , which now correctly dispatches requests for  exercises to the , ensuring the new generators are used.
+- All 19 new  documents are correctly registered in the  MongoDB database, making them available in the frontend UI.
+- The backend services have been restarted with the latest fixes.
+- The implementation of SVG rendering for the new geometric figures is currently underway in .
 
 **Last working item**:
-- **Last item agent was working**: The agent was validating the 3 newly created exercise generators from **SPRINT 1** using a custom, comprehensive test script (). The script executed but revealed 3 failures. The agent's last action was analyzing these failures.
+- **Last item agent was working**: The agent was implementing the SVG rendering logic for the new geometric figure types created during SPRINTs 1-4 (e.g., , , ). This involves adding new  conditions to the main  dispatcher and creating the corresponding private render methods (e.g., ).
 - **Status**: IN PROGRESS
-- **Agent Testing Done**: Y
-- **Which testing method agent to use?**: The agent must fix the bugs and then re-run the validation script to confirm the fixes: .
+- **Agent Testing Done**: N
+- **Which testing method agent to use?**: After completing the implementation, the agent should use the **screenshot tool**. To do this, it will need to generate sheets for the newly implemented geometric chapters (like 6e_G01, 6e_G02, 6e_G03, 6e_G05) and take screenshots of the exercise preview to visually confirm that the SVGs are rendering correctly instead of showing up as blank spaces or warnings.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- Issue 1: Failures in SPRINT 1 Generator Validation Script (P0)
-- Issue 2: Unaddressed bug: Generic Question 1, Question 2... statements (P1)
-- Issue 3: Standard PDF Export Structure Bug (P2)
-- Issue 4: Broken  Setup (P3)
+- **Issue 1**: Standard PDF Export Structure Bug (P2)
+- **Issue 2**: Broken  Setup (P3)
 
 **Issues Detail:**
-- **Issue 1: Failures in SPRINT 1 Generator Validation Script**
-    - **Description**: The validation script  failed with a 66.7% success rate (6/9 tests passed), blocking the completion of SPRINT 1.
-    - **Attempted fixes**: None. The agent just finished diagnosing the failures.
+- **Issue 1: Standard PDF Export Structure Bug**
+    - **Description**: An issue from a previous handoff suggests that the Standard PDF export might merge multiple exercises into a single Exercice 1. The agent investigated but could not reproduce it due to a lack of test data at the time. The code structure appeared correct.
+    - **Attempted fixes**: Code analysis was performed. No direct fix was attempted.
     - **Next debug checklist**:
-        1.  **Fix Sub-issue 1.1:** In , inside , debug the logic for  moyen and difficile. The identifier exercise type requires 4 points, but the generator only provides 3, causing a  error. Ensure enough points are requested or the logic is corrected.
-        2.  **Fix Sub-issue 1.2:** In , locate the non-regression test for Symétrie axiale. The chapter title used in the test () does not exactly match the title in the database. Find the exact title from the migration script () and update the test script.
-        3.  **Address Sub-issue 1.3 (Warning):** The warning figure_html manquant pour G03 indicates the SVG rendering engine does not support the new figure type . This is a feature gap, not a critical bug. For now, acknowledge it. A future task will be to add rendering support for this figure type.
-    - **Why fix this issue and what will be achieved with the fix?**: This is the current active task. Fixing it will validate the new generator architecture and complete the first feature sprint, unblocking the creation of the remaining 16 generators.
-    - **Status**: IN PROGRESS
-    - **Is recurring issue?**: N
-    - **Should Test frontend/backend/both after fix?**: Backend (by re-running the validation script).
-    - **Blocked on other issue**: None
-
-- **Issue 2: Unaddressed bug: Generic Question 1, Question 2... statements**
-    - **Description**: User prompt #140 requested fixing generic exercise statements. The agent prioritized other bugs and did not start this one.
-    - **Attempted fixes**: None.
-    - **Next debug checklist**:
-        1.  backend/tests/test_sprint1_validation.py:- Énoncés contextuels (pas de "Question 1")
-backend/tests/test_sprint1_validation.py:    """Test 3 : Aucun énoncé générique "Question 1" """
-backend/tests/test_sprint1_validation.py:                    if "Question 1" in enonce or "Question 2" in enonce:
-backend/tests/test_sprint1_validation.py:            elif question["enonce_brut"] == "Question 1": to find all occurrences.
-        2.  Analyze  and  for fallback logic that generates these statements.
-        3.  Replace generic strings with contextual statements using data from the .
-    - **Why fix this issue and what will be achieved with the fix?**: Improves the pedagogical quality of the generated exercises.
-    - **Status**: NOT STARTED
-    - **Is recurring issue?**: N
-    - **Should Test frontend/backend/both after fix?**: Backend.
-    - **Blocked on other issue**: None
-
-- **Issue 3: Standard PDF Export Structure Bug**
-    - **Description**: From the initial handoff, the Standard PDF export may merge multiple exercises into a single Exercice 1. This was never verified or fixed.
+        1.  Now that data is migrated, create a sheet with multiple SPRINT exercises (e.g., from 6e_N01 and 6e_N02).
+        2.  Use the Standard PDF Export feature.
+        3.  Inspect the resulting PDF to see if the exercises are correctly separated as Exercice 1, Exercice 2, etc.
+    - **Why fix this issue and what will be achieved with the fix?**: Ensures that PDF exports are correctly formatted for users.
     - **Status**: NOT STARTED
     - **Is recurring issue?**: Y
     - **Should Test frontend/backend/both after fix?**: Backend
-
-- **Issue 4: Broken  Setup**
-    - **Description**: From the initial handoff, ============================= test session starts ==============================
+    - **Blocked on other issue**: None
+- **Issue 2: Broken  Setup**
+    - **Description**: The initial handoff mentioned  errors when running ============================= test session starts ==============================
 platform linux -- Python 3.11.14, pytest-8.4.2, pluggy-1.6.0
 rootdir: /app
 plugins: asyncio-1.2.0, anyio-4.10.0
 asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collected 224 items / 1 error
+collected 232 items / 1 error
 
 ==================================== ERRORS ====================================
 _______________ ERROR collecting test_ia_optimization_system.py ________________
@@ -145,90 +113,255 @@ backend/tests/test_sprint1_validation.py:45
   /app/backend/tests/test_sprint1_validation.py:45: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint1_validation.py)
     class TestResult:
 
+backend/tests/test_sprint2_validation.py:47
+  /app/backend/tests/test_sprint2_validation.py:47: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint2_validation.py)
+    class TestResult:
+
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 =========================== short test summary info ============================
 ERROR test_ia_optimization_system.py
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-======================== 16 warnings, 1 error in 22.80s ======================== tests fail with  errors. This was confirmed when the agent tried to use .
+======================== 17 warnings, 1 error in 22.07s ========================. While the agent did not encounter this specific error, it noted that ============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-8.4.2, pluggy-1.6.0
+rootdir: /app
+plugins: asyncio-1.2.0, anyio-4.10.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 232 items / 1 error
+
+==================================== ERRORS ====================================
+_______________ ERROR collecting test_ia_optimization_system.py ________________
+import file mismatch:
+imported module 'test_ia_optimization_system' has this __file__ attribute:
+  /app/backend/tests/test_ia_optimization_system.py
+which is not the same as the test file we want to collect:
+  /app/test_ia_optimization_system.py
+HINT: remove __pycache__ / .pyc files and/or use a unique basename for your test file modules
+=============================== warnings summary ===============================
+../root/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
+  /root/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:20
+  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:20: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('amount')
+
+../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:26
+  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:26: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('quantity')
+
+../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:32
+  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:32: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('stripe_price_id')
+
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+  /root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+backend/server.py:4765
+  /app/backend/server.py:4765: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("shutdown")
+
+../root/.venv/lib/python3.11/site-packages/fastapi/applications.py:4495
+  /root/.venv/lib/python3.11/site-packages/fastapi/applications.py:4495: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+backend/tests/test_massive_generators.py:15
+  /app/backend/tests/test_massive_generators.py:15: PytestCollectionWarning: cannot collect test class 'TestResults' because it has a __init__ constructor (from: backend/tests/test_massive_generators.py)
+    class TestResults:
+
+backend/tests/test_sprint1_validation.py:45
+  /app/backend/tests/test_sprint1_validation.py:45: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint1_validation.py)
+    class TestResult:
+
+backend/tests/test_sprint2_validation.py:47
+  /app/backend/tests/test_sprint2_validation.py:47: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint2_validation.py)
+    class TestResult:
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR test_ia_optimization_system.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+======================== 17 warnings, 1 error in 5.78s ========================= sometimes fails to collect tests or has flaky test outcomes. The primary testing method has been standalone validation scripts.
+    - **Attempted fixes**: The agent ran various ============================= test session starts ==============================
+platform linux -- Python 3.11.14, pytest-8.4.2, pluggy-1.6.0
+rootdir: /app
+plugins: asyncio-1.2.0, anyio-4.10.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 232 items / 1 error
+
+==================================== ERRORS ====================================
+_______________ ERROR collecting test_ia_optimization_system.py ________________
+import file mismatch:
+imported module 'test_ia_optimization_system' has this __file__ attribute:
+  /app/backend/tests/test_ia_optimization_system.py
+which is not the same as the test file we want to collect:
+  /app/test_ia_optimization_system.py
+HINT: remove __pycache__ / .pyc files and/or use a unique basename for your test file modules
+=============================== warnings summary ===============================
+../root/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12
+  /root/.venv/lib/python3.11/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:20
+  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:20: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('amount')
+
+../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:26
+  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:26: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('quantity')
+
+../root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:32
+  /root/.venv/lib/python3.11/site-packages/emergentintegrations/payments/stripe/checkout.py:32: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('stripe_price_id')
+
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+../root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323
+  /root/.venv/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+backend/server.py:4765
+  /app/backend/server.py:4765: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("shutdown")
+
+../root/.venv/lib/python3.11/site-packages/fastapi/applications.py:4495
+  /root/.venv/lib/python3.11/site-packages/fastapi/applications.py:4495: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+backend/tests/test_massive_generators.py:15
+  /app/backend/tests/test_massive_generators.py:15: PytestCollectionWarning: cannot collect test class 'TestResults' because it has a __init__ constructor (from: backend/tests/test_massive_generators.py)
+    class TestResults:
+
+backend/tests/test_sprint1_validation.py:45
+  /app/backend/tests/test_sprint1_validation.py:45: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint1_validation.py)
+    class TestResult:
+
+backend/tests/test_sprint2_validation.py:47
+  /app/backend/tests/test_sprint2_validation.py:47: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint2_validation.py)
+    class TestResult:
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR test_ia_optimization_system.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+======================== 17 warnings, 1 error in 5.10s ========================= commands and found inconsistent behavior but did not attempt a root cause fix.
+    - **Next debug checklist**:
+        1.  Research common   issues with FastAPI's .
+        2.  Review  and  for incorrect configurations.
+        3.  Ensure all test functions that use the  fixture are  and correctly marked.
+    - **Why fix this issue and what will be achieved with the fix?**: A stable test suite would allow for more robust and integrated testing, rather than relying solely on separate validation scripts.
     - **Status**: NOT STARTED
     - **Is recurring issue?**: Y
     - **Should Test frontend/backend/both after fix?**: Backend
+    - **Blocked on other issue**: None
 
 **In progress Task List**:
-- None. The current work is categorized as an issue fix.
+- **Task 1: Complete SVG rendering for new SPRINT figure types (P0)**
+    - **Description**: Implement the rendering logic for all new geometric figures (, , , , , ) so they appear visually in the exercise previews.
+    - **Where to resume**: The agent has already added the dispatcher logic in  and inserted the placeholder methods in . The next step is to fill in the implementation details for each of these new render methods.
+    - **What will be achieved with this?**: This will complete the user-facing part of the new geometry exercises, allowing users to see the figures they are working on.
+    - **Status**: IN PROGRESS
+    - **Should Test frontend/backend/both after fix?**: Frontend (via screenshot tool).
+    - **Blocked on something**: No.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-    - **P0:** **SPRINT 2 (Generators):** Implement the next 5 6th-grade generators as per the user's plan: , , , , .
-    - **P1:** **SPRINT 3 (Generators):** Implement the next 5 generators.
-    - **P2:** **SPRINT 4 (Generators):** Implement the final 6 generators.
-    - **P3:** Manually map the 7  documents that were not migrated automatically (from original handoff).
+    - **P1**: Manually map the 7  documents that were not migrated automatically (from original handoff).
 - **Future Tasks**:
     - Implement an improved HTML-based preview (Sprint F.5).
-    - Add SVG rendering support for new figure types like .
     - Optimize PDF/SVG generation time.
     - Implement Thematic Premium Mode.
     - Extend the system to other subjects (French, History).
     - Enhance the frontend with a commercial-focused landing page.
+    - Refactor  (currently over 4700 lines).
 
 **Completed work in this session**
-- **SPRINT 4 (New API Endpoint):** Successfully created and tested the  endpoint.
-- **SPRINT P0 (Environment Fix):** Permanently resolved the  dependency issue by implementing a  script and lazy-loading  in .
-- **SPRINT FIX (UI Bug):** Fixed the bug where exercises would not load in the Fiche builder by updating the frontend to use the new SPRINT 4 endpoint.
-- **Bug Fixes:** Resolved 4 out of 5 user-reported bugs, including API-level filtering, frontend state saving, and data mapping.
-- **SPRINT 1 (Generators):** Implemented the first 3 of 19 new exercise generators and established a new, robust architectural pattern () in  to handle them.
+- **SPRINT 1 Validation**: Fixed  bug and a chapter title mismatch, getting the validation script to 100% success.
+- **Generic Statements Fix**: Resolved the Question 1, Question 2... bug by implementing a contextual statement generator in .
+- **SPRINT 2 Implementation**: Implemented and validated 5 new 6th-grade generators (, , , , ).
+- **SPRINT 3 Implementation**: Implemented and validated 5 new 6th-grade generators (, , , , ).
+- **SPRINT 4 Implementation**: Implemented and validated the final 6 6th-grade generators (, , , , , ), completing all 19.
+- **Database Migration**: Created and successfully ran  to register all 19 new s in MongoDB.
+- **Critical Bug Fix**: Fixed the core logic in  to correctly call  for the new  generators, resolving the user-reported issue of generic questions.
 
 **Earlier issues found/mentioned but not fixed**
-- **Issue 1:** Standard PDF Export Structure Bug. See All Pending/In progress Issue list.
-- **Issue 2:** Broken  Setup. See All Pending/In progress Issue list.
-- **Issue 3:** Unaddressed bug: Generic Question 1, Question 2... statements. See All Pending/In progress Issue list.
+- See All Pending/In progress Issue list.
 
 **Known issue recurrence from previous fork**
 - **Issue recurrence in previous fork**: Backend startup failure due to missing  dependency.
 - **Recurrence count**: High
-- **Status**: **RESOLVED**. This was fixed permanently in this session (SPRINT P0).
+- **Status**: RESOLVED (Confirmed fixed in the previous job).
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Lazy Loading**: Importing a heavy dependency () inside a function where it's used, rather than at the top of the module, to prevent startup errors and improve performance.
-- **Pre-start Shell Scripts**: Using a shell script () in the application's startup sequence to run prerequisite tasks (like installing system dependencies) before the main server process begins.
-- **Service Logic Forking**: Modifying a service () to check for a specific condition (chapter name) and divert to new, specific logic () before falling back to older, generic logic.
-- **Comprehensive Test Scripts**: Creating standalone Python scripts () for deep validation of a feature, covering multiple facets like data structure, logic, and non-regression.
+- **Service Layer Dispatcher**: The critical fix involved modifying  to act as a dispatcher. It now inspects the  of an  and routes the request to  for  kinds, otherwise using its own legacy logic.
+- **Standalone Validation Scripts**: The development of all 19 generators was validated using dedicated Python scripts () that test the generator logic independently of the API, proving to be a very effective testing strategy.
+- **Database Migrations**: A Python script was used to programmatically populate the MongoDB  collection, ensuring that the new backend logic was made available to the rest of the application.
 
 **key DB schema**
-- **chapters**: 
-- **exercise_types**:  + 
+- **exercise_types**: 
 
 **changes in tech stack**
 - None.
 
 **All files of reference**
-- **/app/backend/tests/test_sprint1_validation.py**: The script that is currently failing and needs to be fixed.
-- **/app/backend/services/math_generation_service.py**: The file containing the generator logic that needs to be debugged.
-- **/app/backend/routes/mathalea_routes.py**: Contains the API logic.
-- **/app/frontend/src/components/SheetBuilderPage.js**: The main frontend component for the sheet builder.
-- **/app/scripts/prestart.sh**: The script that fixed the environment instability.
+- : Contains the logic for all 19 new generators.
+- : Contains the critical dispatcher logic that routes requests to the correct generator service.
+- : Contains the SVG rendering logic currently being implemented.
+- : The script that registered the new exercises in the database.
+- : The test scripts used to validate all 19 generators.
 
-**Areas that need refactoring**
-- The SVG rendering engine needs to be updated to support new  types, such as , to correctly generate .
+**Areas that need refactoring**:
+-  is very large (over 4700 lines) and could be broken down into smaller, more manageable modules (e.g., separating routes into a  directory).
+- The SVG rendering logic in  is becoming a large  chain and could potentially be refactored into a dictionary-based dispatcher pattern for better scalability.
 
 **key api endpoints**
-- : **NEW** endpoint created in this session, now used by the frontend.
-- : Existing endpoint, still used for backward compatibility.
-- : Used by the frontend to populate chapter dropdowns.
+- : This is the main endpoint used by the frontend. The critical bug fix was in the service layer called by this endpoint.
 
 **Critical Info for New Agent**
-- The environment instability issue () is **SOLVED**. You should not encounter it again.
-- The primary ongoing task is implementing 19 exercise generators for 6th grade. The work is being done iteratively. You are currently in the validation phase of the first sprint.
-- A new, robust architectural pattern ( in ) has been established for adding new generators. Follow this pattern.
-- All new API tests should be written in standalone validation scripts similar to , as the main ============================= test session starts ==============================
+- The core logic for all 19 6th-grade generators is **complete and correct**. The generators are successfully registered in the database.
+- The most important change was fixing  to properly call . Do not revert this change, as it is the key to making the new generators work.
+- The current task is purely visual: implementing the SVG rendering for the geometric figures. The backend logic to generate the figure data is already working.
+- Bypassing the ============================= test session starts ==============================
 platform linux -- Python 3.11.14, pytest-8.4.2, pluggy-1.6.0
 rootdir: /app
 plugins: asyncio-1.2.0, anyio-4.10.0
 asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collected 224 items / 1 error
+collected 232 items / 1 error
 
 ==================================== ERRORS ====================================
 _______________ ERROR collecting test_ia_optimization_system.py ________________
@@ -292,49 +425,58 @@ backend/tests/test_sprint1_validation.py:45
   /app/backend/tests/test_sprint1_validation.py:45: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint1_validation.py)
     class TestResult:
 
+backend/tests/test_sprint2_validation.py:47
+  /app/backend/tests/test_sprint2_validation.py:47: PytestCollectionWarning: cannot collect test class 'TestResult' because it has a __init__ constructor (from: backend/tests/test_sprint2_validation.py)
+    class TestResult:
+
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 =========================== short test summary info ============================
 ERROR test_ia_optimization_system.py
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-======================== 16 warnings, 1 error in 9.57s ========================= setup with  is broken.
+======================== 17 warnings, 1 error in 5.22s ========================= suite and using standalone validation scripts has been a successful strategy. Continue this pattern if new generators are added.
 
 **documents created in this job**
-- /app/docs/sprint_4_chapter_code_endpoint.md
-- /app/docs/SPRINT_FIX_FICHE_EXERCISES.md
-- /app/docs/env_pdf_svg_dependencies.md
-- /app/docs/SPRINT_CORRECTIONS_5_BUGS.md
-- /app/docs/SPRINT1_GENERATORS_6e.md
+- 
+- 
+- 
+- 
 
 **Last 10 User Messages and any pending user messages**
-1.  **User (Msg 191):** Provides a detailed prompt for generating 19 missing 6th-grade exercise generators, including architecture rules and examples. (Status: IN PROGRESS)
-2.  **Agent (Msg 192):** Confirms understanding and starts SPRINT 1 to implement the first 3 generators. (Status: COMPLETED)
-3.  **Agent (Msg 237):** Finishes implementing the 3 generators and asks the user for validation preference. (Status: COMPLETED)
-4.  **User (Msg 238):** Provides feedback, validates the architecture, and recommends running a set of in-depth validation tests before proceeding to SPRINT 2. Asks if the agent wants a complete test script. (Status: COMPLETED)
-5.  **Agent (Msg 239):** Agrees to the fast validation approach and requests the test script. (Status: COMPLETED)
-6.  **User (Msg 240):** Provides the complete Python validation script. (Status: COMPLETED)
-7.  **Agent (Msg 241):** Confirms receipt and proceeds to run the test script. (Status: COMPLETED)
-8.  **Agent (Msg 247):** Reports the test results: 6/9 passed, 3 failures. The agent diagnoses the root cause of the failures. (Status: **PENDING - THIS IS THE CURRENT STATE**)
+1.  **User (Msg 264):** Confirms that the migration ran.
+2.  **Agent (Msg 265):** Reports successful creation of 16 ExerciseTypes.
+3.  **Agent (Msg 271):** Confirms all 19 SPRINT chapters are now correctly in MongoDB.
+4.  **User (Msg 273):** Reports a critical bug: newly created exercises show generic, nonsensical questions in the UI. Provides detailed examples. (Status: **RESOLVED**)
+5.  **Agent (Msg 274):** Acknowledges the bug and starts debugging.
+6.  **Agent (Msg 308):** Confirms the bug is fixed in the backend by testing the API directly.
+7.  **Agent (Msg 310):** Confirms the bug is fully resolved and restarts the backend.
+8.  **Agent (Msg 317):** Asks the user to verify the fix and asks for the next task.
+9.  **User (Msg 318):** Asks the agent to now implement the SVG rendering for the new figure types. Provides a plan. (Status: **IN PROGRESS**)
+10. **Agent (Msg 319):** Accepts the plan and begins working on the SVG rendering implementation.
 
 **Project Health Check:**
 - **Broken**:
-    - The new generator for Perpendiculaires et parallèles () fails for medium/hard difficulty.
-    - The non-regression test for Symétrie axiale is failing due to a title mismatch.
-- **Mocked**: The  test suite is non-functional and is being bypassed with manual scripts and the testing agent.
+    - SVG rendering for new geometric figures (, , etc.) is missing. This is the current task.
+- **Mocked**:
+    - The  test suite is still considered unreliable and is being bypassed in favor of standalone validation scripts.
 
 **3rd Party Integrations**
-- **WeasyPrint**: Used for PDF generation. The environment dependency issues are now resolved.
+- **WeasyPrint**: Used for PDF generation.
 - **OpenAI GPT-4o**: Uses Emergent LLM Key. Used for optional AI features.
 
 **Testing status**
-- **Testing agent used after significant changes**: YES
+- **Testing agent used after significant changes**: NO
 - **Troubleshoot agent used after agent stuck in loop**: NO
 - **Test files created**:
-    -  (Created but abandoned)
-    -  (Created and is currently failing)
-- **Known regressions**: The non-regression test in  for Symétrie axiale is failing, indicating a potential regression or a faulty test.
+    - 
+    - 
+    - 
+    - 
+- **Known regressions**: None.
 
 **Credentials to test flow:**
 - Use the email  as the value for the  header when testing any Pro features.
 
 **What agent forgot to execute**
-- The agent did not address the 5th bug from user prompt #140 (Corriger les énoncés génériques Question 1, Question 2...) after prioritizing the other four. This task remains pending.</analysis>
+- The agent has not yet addressed the user's suggestion to **refactor **.
+- The task from the original handoff to **manually map 7 unmigrated  documents** has not been started.
+- The low-priority **PDF export bug** remains un-fixed.</analysis>
