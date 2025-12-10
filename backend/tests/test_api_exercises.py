@@ -261,6 +261,51 @@ class TestExercisesAPIGenerate:
         print(f"✅ Health check OK: {curriculum_info['total_niveaux']} niveaux, {curriculum_info['total_chapitres']} chapitres")
 
 
+class TestExercisesAPIRobustness:
+    """Tests de robustesse et de régression"""
+    
+    def test_svg_regression_geometry_chapters(self):
+        """
+        Test de régression : chapitres géométriques doivent générer un SVG
+        V1-BE-002-FIX: S'assurer que les chapitres géométriques génèrent bien un SVG non vide
+        """
+        # Liste de chapitres géométriques connus pour avoir des figures
+        geometry_chapters = [
+            {"niveau": "5e", "chapitre": "Symétrie centrale"},
+            {"niveau": "6e", "chapitre": "Symétrie axiale"},
+            {"niveau": "5e", "chapitre": "Triangles"},
+        ]
+        
+        for test_case in geometry_chapters:
+            # Arrange
+            request_data = {
+                "niveau": test_case["niveau"],
+                "chapitre": test_case["chapitre"],
+                "difficulte": "moyen"
+            }
+            
+            # Act
+            response = client.post("/api/v1/exercises/generate", json=request_data)
+            
+            # Assert
+            assert response.status_code == 200, \
+                f"Failed for {test_case['niveau']} - {test_case['chapitre']}: {response.text}"
+            
+            data = response.json()
+            
+            # Vérifier que le SVG est présent et non vide
+            assert data.get("svg") is not None, \
+                f"SVG is None for geometry chapter: {test_case['chapitre']}"
+            
+            assert len(data["svg"]) > 0, \
+                f"SVG is empty for geometry chapter: {test_case['chapitre']}"
+            
+            assert "<svg" in data["svg"], \
+                f"SVG doesn't contain <svg tag for: {test_case['chapitre']}"
+            
+            print(f"✅ SVG regression OK: {test_case['niveau']} - {test_case['chapitre']} ({len(data['svg'])} chars)")
+
+
 class TestExercisesAPIValidation:
     """Tests supplémentaires pour la validation Pydantic"""
     
