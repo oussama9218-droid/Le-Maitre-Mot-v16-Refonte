@@ -2986,3 +2986,241 @@ class MathGenerationService:
                 ]
             )
 
+
+    
+    def _gen_alignement_milieu(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur alignement et milieu d'un segment (6e_G02)
+        
+        Concepts :
+        - Vérifier si des points sont alignés
+        - Calculer les coordonnées du milieu
+        - Construire le milieu avec compas/règle
+        """
+        
+        points = self._get_next_geometry_points()
+        
+        types_exercices = ["verifier_alignement", "trouver_milieu", "construire_milieu"]
+        
+        if difficulte == "facile":
+            type_exercice = "verifier_alignement"
+            max_coord = 10
+        elif difficulte == "moyen":
+            type_exercice = random.choice(["verifier_alignement", "trouver_milieu"])
+            max_coord = 15
+        else:
+            type_exercice = random.choice(types_exercices)
+            max_coord = 20
+        
+        if type_exercice == "verifier_alignement":
+            # Générer 3 points alignés ou non
+            sont_alignes = random.choice([True, False])
+            
+            # Points A et B
+            ax = random.randint(2, max_coord - 4)
+            ay = random.randint(2, max_coord - 4)
+            bx = random.randint(ax + 2, max_coord - 2)
+            by = random.randint(ay + 2, max_coord - 2)
+            
+            if sont_alignes:
+                # Point C aligné (même coefficient directeur)
+                coeff = (by - ay) / (bx - ax)
+                cx = random.randint(bx + 1, min(bx + 3, max_coord))
+                cy = round(ay + coeff * (cx - ax))
+                # S'assurer que cy est dans les limites
+                if cy > max_coord:
+                    cy = max_coord
+                if cy < 2:
+                    cy = 2
+            else:
+                # Point C non aligné
+                cx = random.randint(bx + 1, max_coord)
+                cy = random.randint(2, max_coord)
+                # S'assurer qu'il n'est PAS aligné
+                coeff_ab = (by - ay) / (bx - ax) if (bx - ax) != 0 else 999
+                coeff_ac = (cy - ay) / (cx - ax) if (cx - ax) != 0 else 999
+                if abs(coeff_ab - coeff_ac) < 0.2:
+                    cy = cy + 3 if cy + 3 <= max_coord else cy - 3
+            
+            enonce = f"Les points {points[0]}({ax}, {ay}), {points[1]}({bx}, {by}) et {points[2]}({cx}, {cy}) sont-ils alignés ? Justifier."
+            
+            if sont_alignes:
+                etapes = [
+                    f"Calculons les coefficients directeurs :",
+                    f"- Droite ({points[0]}{points[1]}) : ({by}-{ay})/({bx}-{ax}) = {by-ay}/{bx-ax} = {round((by-ay)/(bx-ax), 2)}",
+                    f"- Droite ({points[1]}{points[2]}) : ({cy}-{by})/({cx}-{bx}) = {cy-by}/{cx-bx} = {round((cy-by)/(cx-bx), 2) if (cx-bx) != 0 else 'infini'}",
+                    f"Les coefficients sont égaux (ou proches), donc {points[0]}, {points[1]} et {points[2]} sont alignés."
+                ]
+                resultat = "Oui, les points sont alignés"
+            else:
+                coeff_ab_calc = round((by-ay)/(bx-ax), 2) if (bx-ax) != 0 else "infini"
+                coeff_ac_calc = round((cy-ay)/(cx-ax), 2) if (cx-ax) != 0 else "infini"
+                etapes = [
+                    f"Calculons les coefficients directeurs :",
+                    f"- Droite ({points[0]}{points[1]}) : ({by}-{ay})/({bx}-{ax}) = {coeff_ab_calc}",
+                    f"- Droite ({points[0]}{points[2]}) : ({cy}-{ay})/({cx}-{ax}) = {coeff_ac_calc}",
+                    f"Les coefficients sont différents, donc {points[0]}, {points[1]} et {points[2]} ne sont PAS alignés."
+                ]
+                resultat = "Non, les points ne sont pas alignés"
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                f"{points[2]}_x": cx,
+                f"{points[2]}_y": cy
+            }
+            
+            figure = GeometricFigure(
+                type="alignement_milieu",
+                points=points[:3],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "alignement", "verif_alignement"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.TRIANGLE_QUELCONQUE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "verifier_alignement",
+                    "enonce": enonce,
+                    "points": points[:3],
+                    "sont_alignes": sont_alignes
+                },
+                solution_calculee={"resultat": resultat, "alignes": sont_alignes},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Calcul des coefficients", "points": 1.5},
+                    {"etape": "Conclusion correcte", "points": 0.5}
+                ]
+            )
+        
+        elif type_exercice == "trouver_milieu":
+            # Points A et B
+            ax = random.randint(2, max_coord - 4)
+            ay = random.randint(2, max_coord - 4)
+            bx = random.randint(ax + 2, max_coord - 2)
+            by = random.randint(ay + 2, max_coord - 2)
+            
+            # Milieu M
+            mx = (ax + bx) / 2
+            my = (ay + by) / 2
+            
+            enonce = f"Calculer les coordonnées du milieu M du segment [{points[0]}{points[1]}] avec {points[0]}({ax}, {ay}) et {points[1]}({bx}, {by})."
+            
+            etapes = [
+                f"Formule du milieu : M((x_{points[0]}+x_{points[1]})/2, (y_{points[0]}+y_{points[1]})/2)",
+                f"M(({ax}+{bx})/2, ({ay}+{by})/2)",
+                f"M({mx}, {my})"
+            ]
+            
+            resultat = f"M({mx}, {my})"
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                "M_x": mx,
+                "M_y": my
+            }
+            
+            figure = GeometricFigure(
+                type="alignement_milieu",
+                points=points[:2] + ["M"],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "milieu", "segment"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.TRIANGLE_QUELCONQUE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "trouver_milieu",
+                    "enonce": enonce,
+                    "points": points[:2],
+                    "ax": ax, "ay": ay,
+                    "bx": bx, "by": by
+                },
+                solution_calculee={"mx": mx, "my": my, "resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Application de la formule", "points": 1.0},
+                    {"etape": "Calcul correct", "points": 1.0}
+                ]
+            )
+        
+        else:  # construire_milieu
+            # Points A et B
+            ax = random.randint(2, max_coord - 4)
+            ay = random.randint(2, max_coord - 4)
+            bx = random.randint(ax + 3, max_coord - 2)
+            by = random.randint(ay + 3, max_coord - 2)
+            
+            # Milieu M (pour référence)
+            mx = (ax + bx) / 2
+            my = (ay + by) / 2
+            
+            enonce = f"Construire le milieu M du segment [{points[0]}{points[1]}] avec {points[0]}({ax}, {ay}) et {points[1]}({bx}, {by}) en utilisant la règle et le compas."
+            
+            etapes = [
+                f"1. Tracer le segment [{points[0]}{points[1]}]",
+                f"2. Avec le compas, tracer un cercle de centre {points[0]} de rayon [{points[0]}{points[1]}]",
+                f"3. Avec le compas, tracer un cercle de centre {points[1]} de même rayon",
+                "4. Les deux cercles se coupent en deux points",
+                "5. La droite passant par ces deux points coupe [AB] en son milieu M",
+                f"6. Le milieu M a pour coordonnées ({mx}, {my})"
+            ]
+            
+            resultat = f"Milieu M({mx}, {my}) construit"
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                "M_x": mx,
+                "M_y": my
+            }
+            
+            figure = GeometricFigure(
+                type="alignement_milieu",
+                points=points[:2] + ["M"],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "milieu", "construction", "compas"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.TRIANGLE_QUELCONQUE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "construire_milieu",
+                    "enonce": enonce,
+                    "points": points[:2]
+                },
+                solution_calculee={"mx": mx, "my": my, "resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Construction des cercles", "points": 1.0},
+                    {"etape": "Tracé de la médiatrice", "points": 0.5},
+                    {"etape": "Placement du milieu", "points": 0.5}
+                ],
+                conseils_prof=[
+                    "Vérifier que les cercles ont le même rayon",
+                    "S'assurer que la médiatrice est bien perpendiculaire"
+                ]
+            )
+
