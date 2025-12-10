@@ -106,6 +106,18 @@ class MathGenerationService:
             "Division euclidienne": [MathExerciseType.CALCUL_DECIMAUX],
             "Multiples et diviseurs, critères de divisibilité": [MathExerciseType.CALCUL_DECIMAUX],
             
+            # ========== 6e - Fractions (SPRINT 4) ==========
+            "Fractions comme partage et quotient": [MathExerciseType.CALCUL_FRACTIONS],
+            "Fractions simples de l'unité": [MathExerciseType.CALCUL_FRACTIONS],
+            
+            # ========== 6e - Grandeurs et mesures (SPRINT 4) ==========
+            "Mesurer et comparer des longueurs": [MathExerciseType.CALCUL_DECIMAUX],
+            "Périmètre de figures usuelles": [MathExerciseType.PERIMETRE_AIRE],
+            "Aire du rectangle et du carré": [MathExerciseType.PERIMETRE_AIRE],
+            
+            # ========== 6e - Organisation et gestion de données (SPRINT 4) ==========
+            "Diagrammes en barres et pictogrammes": [MathExerciseType.STATISTIQUES],
+            
             # ========== Chapitres multi-niveaux (6e, 5e, 4e, 3e) ==========
             "Fractions": [MathExerciseType.CALCUL_FRACTIONS],
             "Proportionnalité": [MathExerciseType.PROPORTIONNALITE],
