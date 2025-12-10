@@ -601,6 +601,38 @@ class GeometryRenderService:
         
         return self.renderer.render_segments(data)
     
+    def _render_droite_numerique(self, figure: GeometricFigure) -> str:
+        """Rendu d'une droite graduée (nombre line)"""
+        
+        # Extraire les paramètres
+        min_val = figure.longueurs_connues.get("min", 0)
+        max_val = figure.longueurs_connues.get("max", 10)
+        graduation = figure.longueurs_connues.get("graduation", 1)
+        
+        # Extraire les points avec abscisses
+        points_data = []
+        for point in figure.points:
+            abscisse_key = f"point_{point}_abscisse"
+            if abscisse_key in figure.longueurs_connues:
+                abscisse = figure.longueurs_connues[abscisse_key]
+                points_data.append({"name": point, "abscisse": abscisse})
+        
+        # Vérifier si on doit afficher les points
+        show_points = "show_point_" in str(figure.proprietes)
+        is_lire_abscisse = "lire_abscisse" in (figure.proprietes if figure.proprietes else [])
+        
+        data = {
+            "min": min_val,
+            "max": max_val,
+            "graduation": graduation,
+            "points": points_data,
+            "show_points": show_points or is_lire_abscisse,
+            "with_graduations": True,
+            "with_labels": True
+        }
+        
+        return self.renderer.render_number_line(data)
+    
     def _render_fallback_grid_with_points(self, figure: GeometricFigure) -> str:
         """Fallback : grille simple avec points pour les types non supportés"""
         
