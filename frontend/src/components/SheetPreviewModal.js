@@ -80,7 +80,8 @@ function SheetPreviewModal({ isOpen, onClose, previewData }) {
     return (
       <div key={question.id} className="mb-6">
         <p className="font-medium text-gray-900 mb-2">
-          <span className="font-bold">{questionNumber}.</span> {question.enonce_brut}
+          <span className="font-bold">{questionNumber}.</span>{' '}
+          <span dangerouslySetInnerHTML={{ __html: question.enonce_brut }} />
         </p>
         
         {/* Figure géométrique si présente */}
