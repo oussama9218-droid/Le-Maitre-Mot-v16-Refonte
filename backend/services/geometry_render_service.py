@@ -163,9 +163,24 @@ class GeometryRenderService:
             elif figure_type == "symetrie_centrale":
                 # Retourne un dict avec question et correction
                 return self._render_symetrie_centrale(figure)
+            # ✅ NOUVEAUX TYPES SPRINT
+            elif figure_type == "points_segments_droites":
+                return self._render_points_segments_droites(figure)
+            elif figure_type == "alignement_milieu":
+                return self._render_alignement_milieu(figure)
+            elif figure_type == "perpendiculaires_paralleles":
+                return self._render_perpendiculaires_paralleles(figure)
+            elif figure_type == "quadrilatere":
+                return self._render_quadrilatere(figure)
+            elif figure_type == "segment" or figure_type == "segments_comparaison":
+                return self._render_segment(figure)
+            elif figure_type == "carre":
+                # Carré = rectangle avec propriété carrée
+                return self._render_rectangle(figure)
             else:
                 logger.warning(f"Type de figure non supporté: {figure_type}")
-                return None
+                # Fallback : grille simple avec points
+                return self._render_fallback_grid_with_points(figure)
                 
         except Exception as e:
             logger.error(f"Erreur lors du rendu SVG: {e}", exc_info=True)
