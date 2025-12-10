@@ -541,10 +541,9 @@ const ExerciseGeneratorPage = () => {
                     <FileText className="h-5 w-5" />
                     Énoncé
                   </h3>
-                  <div 
-                    className="prose max-w-none bg-white p-4 rounded-lg border"
-                    dangerouslySetInnerHTML={{ __html: currentExercise.enonce_html }}
-                  />
+                  <div className="prose max-w-none bg-white p-4 rounded-lg border">
+                    <MathHtmlRenderer html={currentExercise.enonce_html} />
+                  </div>
                 </div>
 
                 {/* Note: La section "Figure SVG" séparée a été supprimée car la figure 
@@ -557,10 +556,9 @@ const ExerciseGeneratorPage = () => {
                     <CheckCircle className="h-5 w-5" />
                     Voir la correction
                   </summary>
-                  <div 
-                    className="mt-4 prose max-w-none"
-                    dangerouslySetInnerHTML={{ __html: currentExercise.solution_html }}
-                  />
+                  <div className="mt-4 prose max-w-none">
+                    <MathHtmlRenderer html={currentExercise.solution_html} />
+                  </div>
                 </details>
               </CardContent>
             </Card>
