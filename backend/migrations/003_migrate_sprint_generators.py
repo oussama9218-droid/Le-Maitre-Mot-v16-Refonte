@@ -23,7 +23,7 @@ import os
 # Configuration MongoDB
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/')
 db_client = AsyncIOMotorClient(MONGO_URL)
-db = db_client.mathalea_dev
+db = db_client.mathalea_db
 
 exercise_types_collection = db.exercise_types
 chapters_collection = db.chapters
