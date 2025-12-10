@@ -4819,37 +4819,46 @@ class MathGenerationService:
                 if critere == 2:
                     dernier_chiffre = nombre % 10
                     est_divisible = dernier_chiffre % 2 == 0
-                    etapes.append(f"Divisibilité par 2 : le dernier chiffre est {dernier_chiffre}, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 2")
+                    verdict = "est" if est_divisible else "n'est pas"
+                    etapes.append(f"Divisibilité par 2 : le dernier chiffre est {dernier_chiffre}, donc {nombre} {verdict} divisible par 2")
                     resultats.append(f"2: {'Oui' if est_divisible else 'Non'}")
                 
                 elif critere == 3:
                     somme_chiffres = sum(int(c) for c in str(nombre))
                     est_divisible = somme_chiffres % 3 == 0
-                    etapes.append(f"Divisibilité par 3 : somme des chiffres = {somme_chiffres}, {'divisible' if est_divisible else 'non divisible'} par 3, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 3")
+                    verdict_somme = 'divisible' if est_divisible else 'non divisible'
+                    verdict = "est" if est_divisible else "n'est pas"
+                    etapes.append(f"Divisibilité par 3 : somme des chiffres = {somme_chiffres}, {verdict_somme} par 3, donc {nombre} {verdict} divisible par 3")
                     resultats.append(f"3: {'Oui' if est_divisible else 'Non'}")
                 
                 elif critere == 4:
                     deux_derniers = nombre % 100
                     est_divisible = deux_derniers % 4 == 0
-                    etapes.append(f"Divisibilité par 4 : les deux derniers chiffres forment {deux_derniers}, {'divisible' if est_divisible else 'non divisible'} par 4, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 4")
+                    verdict_deux = 'divisible' if est_divisible else 'non divisible'
+                    verdict = "est" if est_divisible else "n'est pas"
+                    etapes.append(f"Divisibilité par 4 : les deux derniers chiffres forment {deux_derniers}, {verdict_deux} par 4, donc {nombre} {verdict} divisible par 4")
                     resultats.append(f"4: {'Oui' if est_divisible else 'Non'}")
                 
                 elif critere == 5:
                     dernier_chiffre = nombre % 10
                     est_divisible = dernier_chiffre in [0, 5]
-                    etapes.append(f"Divisibilité par 5 : le dernier chiffre est {dernier_chiffre}, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 5")
+                    verdict = "est" if est_divisible else "n'est pas"
+                    etapes.append(f"Divisibilité par 5 : le dernier chiffre est {dernier_chiffre}, donc {nombre} {verdict} divisible par 5")
                     resultats.append(f"5: {'Oui' if est_divisible else 'Non'}")
                 
                 elif critere == 9:
                     somme_chiffres = sum(int(c) for c in str(nombre))
                     est_divisible = somme_chiffres % 9 == 0
-                    etapes.append(f"Divisibilité par 9 : somme des chiffres = {somme_chiffres}, {'divisible' if est_divisible else 'non divisible'} par 9, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 9")
+                    verdict_somme = 'divisible' if est_divisible else 'non divisible'
+                    verdict = "est" if est_divisible else "n'est pas"
+                    etapes.append(f"Divisibilité par 9 : somme des chiffres = {somme_chiffres}, {verdict_somme} par 9, donc {nombre} {verdict} divisible par 9")
                     resultats.append(f"9: {'Oui' if est_divisible else 'Non'}")
                 
                 elif critere == 10:
                     dernier_chiffre = nombre % 10
                     est_divisible = dernier_chiffre == 0
-                    etapes.append(f"Divisibilité par 10 : le dernier chiffre est {dernier_chiffre}, donc {nombre} {'est' if est_divisible else \"n'est pas\"} divisible par 10")
+                    verdict = "est" if est_divisible else "n'est pas"
+                    etapes.append(f"Divisibilité par 10 : le dernier chiffre est {dernier_chiffre}, donc {nombre} {verdict} divisible par 10")
                     resultats.append(f"10: {'Oui' if est_divisible else 'Non'}")
             
             resultat = " | ".join(resultats)
