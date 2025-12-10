@@ -58,19 +58,21 @@ def build_enonce_html(enonce: str, svg: Optional[str] = None) -> str:
     """
     Construit l'énoncé HTML à partir de l'énoncé texte et du SVG
     
-    V1-BE-002-FIX: Échappement HTML pour prévenir les injections XSS
+    NOTE: L'énoncé n'est PAS échappé car il peut contenir du HTML valide
+    (tableaux de proportionnalité, etc.) généré par notre code interne.
     
     Args:
-        enonce: Énoncé textuel (sera échappé)
+        enonce: Énoncé textuel (peut contenir du HTML de tableaux, etc.)
         svg: SVG optionnel (non échappé car généré par notre code interne)
     
     Returns:
         HTML de l'énoncé
     """
-    # Échapper le texte de l'énoncé pour prévenir les injections XSS
-    enonce_escaped = escape(str(enonce))
+    # NOTE: On n'échappe PAS l'énoncé car il peut contenir du HTML valide
+    # (tableaux, formules, etc.) généré par notre propre code backend.
+    # Ce HTML est de confiance car il provient de math_generation_service.py
     
-    html = f"<div class='exercise-enonce'><p>{enonce_escaped}</p>"
+    html = f"<div class='exercise-enonce'><p>{enonce}</p>"
     
     # Le SVG n'est PAS échappé car il est généré par notre code interne de confiance
     if svg:
