@@ -3748,3 +3748,302 @@ class MathGenerationService:
                 ]
             )
 
+
+    
+    # ============================================================================
+    # SPRINT 3 - GÉNÉRATEURS 6e (G04, G05, N05, N06, N07)
+    # ============================================================================
+    
+    def _gen_triangles(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur les triangles (6e_G04)
+        
+        Concepts :
+        - Classer un triangle (équilatéral, isocèle, quelconque)
+        - Construire un triangle
+        - Vérifier propriétés (somme angles = 180°, inégalité triangulaire)
+        """
+        
+        points = self._get_next_geometry_points()
+        
+        types_exercices = ["classer", "construire", "verifier_propriete"]
+        
+        if difficulte == "facile":
+            type_exercice = "classer"
+            max_coord = 10
+        elif difficulte == "moyen":
+            type_exercice = "construire"
+            max_coord = 15
+        else:
+            type_exercice = "verifier_propriete"
+            max_coord = 20
+        
+        if type_exercice == "classer":
+            # Générer 3 longueurs de côtés
+            type_triangle = random.choice(["equilateral", "isocele", "quelconque"])
+            
+            if type_triangle == "equilateral":
+                cote = random.randint(4, 10)
+                ab = bc = ca = cote
+                classification = "équilatéral (3 côtés égaux)"
+            elif type_triangle == "isocele":
+                cote_egal = random.randint(5, 10)
+                cote_diff = random.randint(3, cote_egal - 1) if cote_egal > 3 else random.randint(cote_egal + 1, 12)
+                
+                # Vérifier l'inégalité triangulaire : la somme de deux côtés doit être > au 3ème
+                if cote_egal + cote_diff <= cote_egal:
+                    cote_diff = cote_egal - 2 if cote_egal > 2 else cote_egal + 2
+                
+                ab = bc = cote_egal
+                ca = cote_diff
+                classification = "isocèle (2 côtés égaux)"
+            else:  # quelconque
+                ab = random.randint(4, 8)
+                bc = random.randint(5, 9)
+                ca = random.randint(6, 10)
+                
+                # S'assurer que c'est vraiment quelconque
+                if ab == bc or bc == ca or ab == ca:
+                    ca = ab + bc - 1
+                
+                # Vérifier l'inégalité triangulaire
+                if ab + bc <= ca:
+                    ca = ab + bc - 1
+                if ab + ca <= bc:
+                    bc = ab + ca - 1
+                if bc + ca <= ab:
+                    ab = bc + ca - 1
+                
+                classification = "quelconque (3 côtés différents)"
+            
+            enonce = f"Classer le triangle {points[0]}{points[1]}{points[2]} selon ses côtés. Les côtés mesurent : {points[0]}{points[1]} = {ab} cm, {points[1]}{points[2]} = {bc} cm, {points[0]}{points[2]} = {ca} cm."
+            
+            etapes = [
+                f"{points[0]}{points[1]} = {ab} cm, {points[1]}{points[2]} = {bc} cm, {points[0]}{points[2]} = {ca} cm"
+            ]
+            
+            if type_triangle == "equilateral":
+                etapes.append(f"Les 3 côtés sont égaux : {ab} = {bc} = {ca}")
+                etapes.append(f"Le triangle {points[0]}{points[1]}{points[2]} est {classification}")
+            elif type_triangle == "isocele":
+                etapes.append(f"Deux côtés sont égaux : {points[0]}{points[1]} = {points[1]}{points[2]} = {cote_egal} cm")
+                etapes.append(f"Le triangle {points[0]}{points[1]}{points[2]} est {classification}")
+            else:
+                etapes.append(f"Les 3 côtés sont différents")
+                etapes.append(f"Le triangle {points[0]}{points[1]}{points[2]} est {classification}")
+            
+            resultat = f"Triangle {classification}"
+            
+            # Coordonnées pour le schéma
+            ax, ay = random.randint(2, max_coord - 4), random.randint(2, max_coord - 4)
+            bx = ax + ab
+            by = ay
+            
+            # Calculer C avec la loi des cosinus (approximation simple)
+            import math
+            angle = math.radians(60)  # Angle arbitraire pour visualisation
+            cx = ax + ca * math.cos(angle)
+            cy = ay + ca * math.sin(angle)
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                f"{points[2]}_x": int(cx),
+                f"{points[2]}_y": int(cy)
+            }
+            
+            figure = GeometricFigure(
+                type="triangle",
+                points=points[:3],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "triangle", type_triangle]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.TRIANGLE_QUELCONQUE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "classer",
+                    "enonce": enonce,
+                    "type_triangle": type_triangle,
+                    "ab": ab, "bc": bc, "ca": ca
+                },
+                solution_calculee={"resultat": resultat, "type": type_triangle},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Identification des mesures", "points": 0.5},
+                    {"etape": "Classification correcte", "points": 1.5}
+                ]
+            )
+        
+        elif type_exercice == "construire":
+            # Construire un triangle avec 3 points donnés
+            ax = random.randint(2, max_coord - 4)
+            ay = random.randint(2, max_coord - 4)
+            bx = random.randint(ax + 3, max_coord - 2)
+            by = random.randint(ay - 2, ay + 2)
+            cx = random.randint(ax + 1, max_coord - 2)
+            cy = random.randint(ay + 3, max_coord)
+            
+            # Calculer les longueurs
+            import math
+            ab = round(math.sqrt((bx - ax)**2 + (by - ay)**2), 1)
+            bc = round(math.sqrt((cx - bx)**2 + (cy - by)**2), 1)
+            ca = round(math.sqrt((ax - cx)**2 + (ay - cy)**2), 1)
+            
+            enonce = f"Construire le triangle {points[0]}{points[1]}{points[2]} avec les coordonnées : {points[0]}({ax}, {ay}), {points[1]}({bx}, {by}), {points[2]}({cx}, {cy})."
+            
+            etapes = [
+                f"1. Placer le point {points[0]}({ax}, {ay})",
+                f"2. Placer le point {points[1]}({bx}, {by})",
+                f"3. Placer le point {points[2]}({cx}, {cy})",
+                f"4. Tracer les segments [{points[0]}{points[1]}], [{points[1]}{points[2]}], et [{points[2]}{points[0]}]",
+                f"Le triangle a pour côtés : {points[0]}{points[1]} ≈ {ab} cm, {points[1]}{points[2]} ≈ {bc} cm, {points[2]}{points[0]} ≈ {ca} cm"
+            ]
+            
+            resultat = f"Triangle {points[0]}{points[1]}{points[2]} construit"
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                f"{points[2]}_x": cx,
+                f"{points[2]}_y": cy
+            }
+            
+            figure = GeometricFigure(
+                type="triangle",
+                points=points[:3],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "triangle", "construction"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.TRIANGLE_QUELCONQUE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "construire",
+                    "enonce": enonce,
+                    "points": points[:3]
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Placement des points", "points": 1.0},
+                    {"etape": "Tracé des segments", "points": 1.0}
+                ]
+            )
+        
+        else:  # verifier_propriete
+            # Vérifier la somme des angles ou l'inégalité triangulaire
+            propriete = random.choice(["somme_angles", "inegalite_triangulaire"])
+            
+            if propriete == "somme_angles":
+                # Générer 2 angles, calculer le 3ème
+                angle_a = random.randint(40, 80)
+                angle_b = random.randint(40, 80)
+                angle_c = 180 - angle_a - angle_b
+                
+                # S'assurer que tous les angles sont positifs
+                if angle_c <= 0:
+                    angle_a = random.randint(40, 60)
+                    angle_b = random.randint(40, 60)
+                    angle_c = 180 - angle_a - angle_b
+                
+                enonce = f"Dans le triangle {points[0]}{points[1]}{points[2]}, on connaît deux angles : angle en {points[0]} = {angle_a}° et angle en {points[1]} = {angle_b}°. Calculer l'angle en {points[2]}."
+                
+                etapes = [
+                    "Dans un triangle, la somme des angles vaut toujours 180°",
+                    f"angle {points[0]} + angle {points[1]} + angle {points[2]} = 180°",
+                    f"{angle_a}° + {angle_b}° + angle {points[2]} = 180°",
+                    f"angle {points[2]} = 180° - {angle_a}° - {angle_b}°",
+                    f"angle {points[2]} = {angle_c}°"
+                ]
+                
+                resultat = f"{angle_c}°"
+                
+            else:  # inegalite_triangulaire
+                # Vérifier si 3 longueurs peuvent former un triangle
+                peut_former = random.choice([True, False])
+                
+                if peut_former:
+                    a = random.randint(4, 10)
+                    b = random.randint(4, 10)
+                    c = random.randint(max(abs(a - b) + 1, 3), a + b - 1)
+                else:
+                    a = random.randint(5, 10)
+                    b = random.randint(3, 7)
+                    c = a + b + 2  # Viole l'inégalité
+                
+                enonce = f"Peut-on construire un triangle avec des côtés de longueurs {a} cm, {b} cm et {c} cm ? Justifier avec l'inégalité triangulaire."
+                
+                etapes = [
+                    "Inégalité triangulaire : la somme de deux côtés doit être strictement supérieure au troisième",
+                    f"Vérification 1 : {a} + {b} = {a + b} {'>' if a + b > c else '<='} {c}",
+                    f"Vérification 2 : {a} + {c} = {a + c} {'>' if a + c > b else '<='} {b}",
+                    f"Vérification 3 : {b} + {c} = {b + c} {'>' if b + c > a else '<='} {a}"
+                ]
+                
+                if peut_former:
+                    etapes.append(f"Toutes les inégalités sont vérifiées, donc OUI, on peut construire un triangle.")
+                    resultat = "Oui, le triangle peut être construit"
+                else:
+                    etapes.append(f"Au moins une inégalité n'est pas vérifiée, donc NON, on ne peut pas construire un triangle.")
+                    resultat = "Non, le triangle ne peut pas être construit"
+            
+            # Schéma simple pour visualisation
+            ax, ay = 3, 3
+            bx, by = 10, 3
+            cx, cy = 6, 8
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                f"{points[2]}_x": cx,
+                f"{points[2]}_y": cy
+            }
+            
+            figure = GeometricFigure(
+                type="triangle",
+                points=points[:3],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "triangle", propriete]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.TRIANGLE_QUELCONQUE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "verifier_propriete",
+                    "enonce": enonce,
+                    "propriete": propriete
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Application de la propriété", "points": 1.0},
+                    {"etape": "Calcul/Vérification correcte", "points": 1.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève connaît bien la propriété utilisée",
+                    "S'assurer de la rigueur dans les calculs"
+                ]
+            )
+
