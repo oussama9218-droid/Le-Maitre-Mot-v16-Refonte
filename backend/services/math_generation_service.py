@@ -4910,3 +4910,295 @@ class MathGenerationService:
                 ]
             )
 
+
+    
+    # ============================================================================
+    # SPRINT 4 - GÉNÉRATEURS 6e FINAL (N08, N09, GM01, GM02, GM03, SP02)
+    # ============================================================================
+    
+    def _gen_fractions_partage(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur les fractions comme partage et quotient (6e_N08)
+        
+        Concepts :
+        - Partager un objet en parts égales
+        - Représenter une fraction
+        - Fraction comme quotient de division
+        """
+        
+        types_exercices = ["partager", "representer", "calculer_quotient"]
+        
+        if difficulte == "facile":
+            type_exercice = "partager"
+            denominateur = random.choice([2, 3, 4, 5, 6, 8])
+            numerateur = random.randint(1, denominateur - 1)
+        elif difficulte == "moyen":
+            type_exercice = "representer"
+            denominateur = random.choice([4, 5, 6, 8, 10, 12])
+            numerateur = random.randint(1, denominateur - 1)
+        else:
+            type_exercice = "calculer_quotient"
+            denominateur = random.randint(5, 20)
+            numerateur = random.randint(1, denominateur - 1)
+        
+        if type_exercice == "partager":
+            # Partager un objet (gâteau, pizza, etc.)
+            objets = ["gâteau", "pizza", "tablette de chocolat", "tarte"]
+            objet = random.choice(objets)
+            
+            enonce = f"Un {objet} est partagé en {denominateur} parts égales. Marie mange {numerateur} part{'s' if numerateur > 1 else ''}. Quelle fraction du {objet} a-t-elle mangée ?"
+            
+            etapes = [
+                f"{numerateur} part{'s' if numerateur > 1 else ''} sur {denominateur} = {numerateur}/{denominateur}",
+                f"Marie a mangé {numerateur}/{denominateur} du {objet}."
+            ]
+            
+            resultat = f"{numerateur}/{denominateur}"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_FRACTIONS,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "partager",
+                    "enonce": enonce,
+                    "numerateur": numerateur,
+                    "denominateur": denominateur,
+                    "objet": objet
+                },
+                solution_calculee={"resultat": resultat, "numerateur": numerateur, "denominateur": denominateur},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Fraction correcte", "points": 2.0}
+                ]
+            )
+        
+        elif type_exercice == "representer":
+            enonce = f"Représenter la fraction {numerateur}/{denominateur} en coloriant des cases sur une grille de {denominateur} cases."
+            
+            etapes = [
+                f"La fraction {numerateur}/{denominateur} signifie {numerateur} partie(s) sur {denominateur}",
+                f"On colorie {numerateur} case(s) sur un total de {denominateur} cases",
+                f"Résultat : {numerateur}/{denominateur}"
+            ]
+            
+            resultat = f"{numerateur}/{denominateur} représenté"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_FRACTIONS,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "representer",
+                    "enonce": enonce,
+                    "numerateur": numerateur,
+                    "denominateur": denominateur
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Compréhension de la fraction", "points": 1.0},
+                    {"etape": "Représentation correcte", "points": 1.0}
+                ]
+            )
+        
+        else:  # calculer_quotient
+            # Fraction comme quotient
+            dividende = numerateur
+            diviseur = denominateur
+            
+            enonce = f"Écrire sous forme de fraction le quotient de la division : {dividende} ÷ {diviseur}"
+            
+            etapes = [
+                f"Un quotient peut s'écrire comme une fraction",
+                f"{dividende} ÷ {diviseur} = {dividende}/{diviseur}",
+                f"Le dividende {dividende} devient le numérateur",
+                f"Le diviseur {diviseur} devient le dénominateur"
+            ]
+            
+            resultat = f"{dividende}/{diviseur}"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_FRACTIONS,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "calculer_quotient",
+                    "enonce": enonce,
+                    "dividende": dividende,
+                    "diviseur": diviseur
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Écriture en fraction", "points": 2.0}
+                ],
+                conseils_prof=[
+                    "Insister sur le lien entre division et fraction",
+                    "Vérifier que l'élève place bien dividende/diviseur"
+                ]
+            )
+    
+    def _gen_fractions_simples(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur les fractions simples de l'unité (6e_N09)
+        
+        Concepts :
+        - Lire des fractions simples (1/2, 1/3, 1/4)
+        - Comparer des fractions simples
+        - Calculer une partie d'un nombre
+        """
+        
+        types_exercices = ["lire_fraction", "comparer", "calculer_partie"]
+        
+        if difficulte == "facile":
+            type_exercice = "lire_fraction"
+            fractions_simples = [(1, 2), (1, 3), (1, 4), (1, 5)]
+        elif difficulte == "moyen":
+            type_exercice = "comparer"
+            fractions_simples = [(1, 2), (1, 3), (1, 4), (1, 5), (1, 6)]
+        else:
+            type_exercice = "calculer_partie"
+            fractions_simples = [(1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 8)]
+        
+        if type_exercice == "lire_fraction":
+            num, denom = random.choice(fractions_simples)
+            
+            noms = {2: "demi", 3: "tiers", 4: "quart", 5: "cinquième"}
+            nom_fraction = noms.get(denom, f"1/{denom}")
+            
+            enonce = f"Lire et écrire la fraction suivante : {num}/{denom}"
+            
+            etapes = [
+                f"{num}/{denom} se lit : un {nom_fraction}",
+                f"Cela représente 1 partie sur {denom} parties égales"
+            ]
+            
+            resultat = f"un {nom_fraction}"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_FRACTIONS,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "lire_fraction",
+                    "enonce": enonce,
+                    "numerateur": num,
+                    "denominateur": denom
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Lecture correcte", "points": 2.0}
+                ]
+            )
+        
+        elif type_exercice == "comparer":
+            frac1 = random.choice(fractions_simples)
+            frac2 = random.choice([f for f in fractions_simples if f != frac1])
+            
+            num1, denom1 = frac1
+            num2, denom2 = frac2
+            
+            enonce = f"Comparer les fractions {num1}/{denom1} et {num2}/{denom2}. Laquelle est la plus grande ?"
+            
+            # Réduction au même dénominateur (PPCM)
+            import math
+            ppcm = (denom1 * denom2) // math.gcd(denom1, denom2)
+            
+            num1_ppcm = num1 * (ppcm // denom1)
+            num2_ppcm = num2 * (ppcm // denom2)
+            
+            etapes = [
+                f"Réduction au même dénominateur : {ppcm}",
+                f"{num1}/{denom1} = {num1_ppcm}/{ppcm}",
+                f"{num2}/{denom2} = {num2_ppcm}/{ppcm}",
+            ]
+            
+            if num1_ppcm > num2_ppcm:
+                etapes.append(f"{num1_ppcm}/{ppcm} > {num2_ppcm}/{ppcm}, donc {num1}/{denom1} > {num2}/{denom2}")
+                resultat = f"{num1}/{denom1} > {num2}/{denom2}"
+            elif num1_ppcm < num2_ppcm:
+                etapes.append(f"{num1_ppcm}/{ppcm} < {num2_ppcm}/{ppcm}, donc {num1}/{denom1} < {num2}/{denom2}")
+                resultat = f"{num1}/{denom1} < {num2}/{denom2}"
+            else:
+                etapes.append(f"{num1_ppcm}/{ppcm} = {num2_ppcm}/{ppcm}, donc {num1}/{denom1} = {num2}/{denom2}")
+                resultat = f"{num1}/{denom1} = {num2}/{denom2}"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_FRACTIONS,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "comparer",
+                    "enonce": enonce,
+                    "frac1": frac1,
+                    "frac2": frac2
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Réduction au même dénominateur", "points": 1.0},
+                    {"etape": "Comparaison correcte", "points": 1.0}
+                ]
+            )
+        
+        else:  # calculer_partie
+            num, denom = random.choice(fractions_simples)
+            
+            # Choisir un nombre divisible par denom
+            multiple = random.randint(3, 20)
+            nombre = denom * multiple
+            
+            enonce = f"Calculer {num}/{denom} de {nombre}."
+            
+            resultat = (num * nombre) // denom
+            
+            etapes = [
+                f"{num}/{denom} de {nombre} signifie : ({nombre} ÷ {denom}) × {num}",
+                f"{nombre} ÷ {denom} = {nombre // denom}",
+                f"{nombre // denom} × {num} = {resultat}",
+                f"Réponse : {resultat}"
+            ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_FRACTIONS,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "calculer_partie",
+                    "enonce": enonce,
+                    "numerateur": num,
+                    "denominateur": denom,
+                    "nombre": nombre
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=str(resultat),
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Division par le dénominateur", "points": 1.0},
+                    {"etape": "Multiplication par le numérateur", "points": 1.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève comprend 'de' = multiplication",
+                    "Insister sur l'ordre : diviser puis multiplier"
+                ]
+            )
+
