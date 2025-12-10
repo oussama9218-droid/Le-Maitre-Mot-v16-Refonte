@@ -3374,3 +3374,159 @@ class MathGenerationService:
             ]
         )
 
+
+    
+    def _gen_comparer_ranger_entiers(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur comparer et ranger les nombres entiers (6e_N02)
+        
+        Concepts :
+        - Comparer deux nombres (>, <, =)
+        - Ranger plusieurs nombres
+        - Encadrer un nombre
+        """
+        
+        types_exercices = ["comparer", "ranger", "encadrer"]
+        
+        if difficulte == "facile":
+            type_exercice = "comparer"
+            nombres = [random.randint(1, 100) for _ in range(2)]
+        elif difficulte == "moyen":
+            type_exercice = random.choice(["comparer", "ranger"])
+            nombres = [random.randint(100, 1000) for _ in range(random.randint(3, 4))]
+        else:
+            type_exercice = random.choice(types_exercices)
+            nombres = [random.randint(1000, 10000) for _ in range(random.randint(4, 5))]
+        
+        if type_exercice == "comparer":
+            a, b = nombres[0], nombres[1]
+            enonce = f"Comparer les nombres {a} et {b}. Utiliser le symbole <, > ou =."
+            
+            if a > b:
+                symbole = ">"
+                resultat = f"{a} > {b}"
+                etapes = [
+                    f"{a} > {b}",
+                    f"Le nombre {a} est plus grand que {b}."
+                ]
+            elif a < b:
+                symbole = "<"
+                resultat = f"{a} < {b}"
+                etapes = [
+                    f"{a} < {b}",
+                    f"Le nombre {b} est plus grand que {a}."
+                ]
+            else:
+                symbole = "="
+                resultat = f"{a} = {b}"
+                etapes = [
+                    f"{a} = {b}",
+                    "Les deux nombres sont égaux."
+                ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "comparer",
+                    "enonce": enonce,
+                    "a": a,
+                    "b": b
+                },
+                solution_calculee={"resultat": resultat, "symbole": symbole},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Comparaison correcte", "points": 2.0}
+                ]
+            )
+        
+        elif type_exercice == "ranger":
+            ordre = random.choice(["croissant", "décroissant"])
+            enonce = f"Ranger les nombres {', '.join(map(str, nombres))} dans l'ordre {ordre}."
+            
+            if ordre == "croissant":
+                nombres_tries = sorted(nombres)
+                resultat = ", ".join(map(str, nombres_tries))
+                symbole_ordre = " < "
+            else:
+                nombres_tries = sorted(nombres, reverse=True)
+                resultat = ", ".join(map(str, nombres_tries))
+                symbole_ordre = " > "
+            
+            etapes = [
+                f"Ordre {ordre} : {symbole_ordre.join(map(str, nombres_tries))}",
+                f"Réponse : {resultat}"
+            ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "ranger",
+                    "enonce": enonce,
+                    "nombres": nombres,
+                    "ordre": ordre
+                },
+                solution_calculee={"resultat": resultat, "nombres_tries": nombres_tries},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Ordre correct", "points": 2.0}
+                ]
+            )
+        
+        else:  # encadrer
+            nombre = random.choice(nombres)
+            
+            # Encadrer entre deux centaines ou milliers selon la difficulté
+            if difficulte == "moyen":
+                # Encadrer entre deux centaines
+                centaine_inf = (nombre // 100) * 100
+                centaine_sup = centaine_inf + 100
+                enonce = f"Encadrer le nombre {nombre} entre deux centaines consécutives."
+                resultat = f"{centaine_inf} < {nombre} < {centaine_sup}"
+                etapes = [
+                    f"{nombre} est entre {centaine_inf} et {centaine_sup}",
+                    f"{centaine_inf} < {nombre} < {centaine_sup}"
+                ]
+            else:
+                # Encadrer entre deux milliers
+                millier_inf = (nombre // 1000) * 1000
+                millier_sup = millier_inf + 1000
+                enonce = f"Encadrer le nombre {nombre} entre deux milliers consécutifs."
+                resultat = f"{millier_inf} < {nombre} < {millier_sup}"
+                etapes = [
+                    f"{nombre} est entre {millier_inf} et {millier_sup}",
+                    f"{millier_inf} < {nombre} < {millier_sup}"
+                ]
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.CALCUL_DECIMAUX,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "encadrer",
+                    "enonce": enonce,
+                    "nombre": nombre
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Encadrement correct", "points": 2.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'encadrement est bien entre deux valeurs consécutives",
+                    "Insister sur l'utilisation des symboles < et >"
+                ]
+            )
+
