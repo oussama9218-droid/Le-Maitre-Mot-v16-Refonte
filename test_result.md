@@ -947,6 +947,18 @@ frontend:
         comment: "SUCCÈS COMPLET (7/7 critères - 100%) - Bug entièrement corrigé. Navigation vers page Fiche réussie, sélection niveau '6e' et chapitre 'Proportionnalité simple dans des tableaux (2 exercices)' fonctionnelle. 14 exercices affichés correctement dans le catalogue (tous contiennent 'Proportionnalité'), aucun message 'Aucun exercice disponible pour cette sélection'. Ajout d'exercice au panier fonctionne (compteur '1 exercice(s)' mis à jour). Test chapitre alternatif 'Symétrie axiale (1 exercices)' avec 11 exercices affichés. Frontend utilise correctement l'endpoint dédié /api/mathalea/chapters/{chapter_code}/exercise-types."
 
 backend:
+  - task: "V1 Exercises API Bug Fixes Testing"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/exercises_routes.py, /app/backend/services/math_generation_service.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "SUCCÈS COMPLET (5/5 tests - 100%) - V1 exercises API endpoint /api/v1/exercises/generate fully operational. Bug 1 (HTML Tables): HTML tables properly rendered without escaping - <table style='border-collapse: collapse;'> visible, NO &lt;table escaping. Bug 2 (Fractions enonce): Contains proper mathematical instruction 'Calculer : \\frac{6}{3} + \\frac{10}{11}' instead of generic text. Bug 3 (Chapter mapping): 'Nombres en écriture fractionnaire' returns valid content without 'CHAPITRE NON MAPPÉ' error. Performance excellent: all responses < 0.1s. All 3 bug fixes completely verified and working correctly."
+
   - task: "SPRINT P0 - Correction libpangoft2-1.0-0"
     implemented: true
     working: true
