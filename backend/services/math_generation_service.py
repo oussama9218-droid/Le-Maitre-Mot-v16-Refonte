@@ -97,6 +97,15 @@ class MathGenerationService:
             "Comparer et ranger des nombres entiers": [MathExerciseType.CALCUL_DECIMAUX],
             "Addition et soustraction de nombres entiers": [MathExerciseType.CALCUL_RELATIFS],
             
+            # ========== 6e - Géométrie (SPRINT 3) ==========
+            "Triangles (construction et classification)": [MathExerciseType.TRIANGLE_QUELCONQUE],
+            "Quadrilatères usuels (carré, rectangle, losange, parallélogramme)": [MathExerciseType.RECTANGLE],
+            
+            # ========== 6e - Nombres et calculs (SPRINT 3) ==========
+            "Multiplication de nombres entiers": [MathExerciseType.CALCUL_DECIMAUX],
+            "Division euclidienne": [MathExerciseType.CALCUL_DECIMAUX],
+            "Multiples et diviseurs, critères de divisibilité": [MathExerciseType.CALCUL_DECIMAUX],
+            
             # ========== Chapitres multi-niveaux (6e, 5e, 4e, 3e) ==========
             "Fractions": [MathExerciseType.CALCUL_FRACTIONS],
             "Proportionnalité": [MathExerciseType.PROPORTIONNALITE],
