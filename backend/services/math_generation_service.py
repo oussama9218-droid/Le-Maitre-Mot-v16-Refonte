@@ -109,6 +109,7 @@ class MathGenerationService:
             # ========== 6e - Fractions (SPRINT 4) ==========
             "Fractions comme partage et quotient": [MathExerciseType.CALCUL_FRACTIONS],
             "Fractions simples de l'unité": [MathExerciseType.CALCUL_FRACTIONS],
+            "Nombres en écriture fractionnaire": [MathExerciseType.CALCUL_FRACTIONS],  # AJOUTÉ
             
             # ========== 6e - Grandeurs et mesures (SPRINT 4) ==========
             "Mesurer et comparer des longueurs": [MathExerciseType.CALCUL_DECIMAUX],
