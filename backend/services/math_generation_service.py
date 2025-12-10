@@ -2794,3 +2794,195 @@ class MathGenerationService:
                     "Insister sur la vérification du calcul"
                 ]
             )
+
+    
+    # ============================================================================
+    # SPRINT 2 - GÉNÉRATEURS 6e (G01, G02, N01, N02, N04)
+    # ============================================================================
+    
+    def _gen_points_segments_droites(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur points, segments, droites, demi-droites (6e_G01)
+        
+        Concepts :
+        - Identifier segment, droite, demi-droite
+        - Nommer correctement une figure
+        - Tracer une figure selon consignes
+        """
+        
+        points = self._get_next_geometry_points()
+        
+        types_exercices = ["identifier", "nommer", "tracer"]
+        
+        if difficulte == "facile":
+            type_exercice = "identifier"
+            max_coord = 10
+            nb_points = 2
+        elif difficulte == "moyen":
+            type_exercice = random.choice(["identifier", "nommer"])
+            max_coord = 15
+            nb_points = 3
+        else:
+            type_exercice = random.choice(types_exercices)
+            max_coord = 20
+            nb_points = 4
+        
+        # Générer coordonnées
+        coords = {}
+        for i in range(nb_points):
+            point = points[i]
+            coords[f"{point}_x"] = random.randint(2, max_coord - 2)
+            coords[f"{point}_y"] = random.randint(2, max_coord - 2)
+        
+        # Construire énoncé selon type
+        if type_exercice == "identifier":
+            figure_type = random.choice(["segment", "droite", "demi_droite"])
+            
+            if figure_type == "segment":
+                enonce = f"Sur la figure ci-dessous, la figure [{points[0]}{points[1]}] est-elle un segment, une droite ou une demi-droite ?"
+                etapes = [
+                    f"[{points[0]}{points[1]}] est un segment",
+                    f"Un segment est limité par deux points {points[0]} et {points[1]}",
+                    f"Il a une longueur mesurable"
+                ]
+                resultat = "segment"
+            elif figure_type == "droite":
+                enonce = f"Sur la figure ci-dessous, la figure ({points[0]}{points[1]}) est-elle un segment, une droite ou une demi-droite ?"
+                etapes = [
+                    f"({points[0]}{points[1]}) est une droite",
+                    "Une droite est illimitée des deux côtés",
+                    "Elle passe par les points mais n'a pas de longueur finie"
+                ]
+                resultat = "droite"
+            else:
+                enonce = f"Sur la figure ci-dessous, la figure [{points[0]}{points[1]}) est-elle un segment, une droite ou une demi-droite ?"
+                etapes = [
+                    f"[{points[0]}{points[1]}) est une demi-droite",
+                    f"Une demi-droite a une origine (point {points[0]}) et est illimitée dans un sens",
+                    f"Elle passe par {points[1]} mais continue à l'infini"
+                ]
+                resultat = "demi-droite"
+            
+            figure = GeometricFigure(
+                type="points_segments_droites",
+                points=points[:nb_points],
+                longueurs_connues=coords,
+                proprietes=["with_grid", figure_type]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.TRIANGLE_QUELCONQUE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "identifier",
+                    "enonce": enonce,
+                    "figure_type": figure_type,
+                    "points": points[:nb_points]
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Identification correcte", "points": 2.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève distingue bien segment/droite/demi-droite",
+                    "Insister sur la notation : [AB] segment, (AB) droite, [AB) demi-droite"
+                ]
+            )
+        
+        elif type_exercice == "nommer":
+            enonce = f"Sur la figure, nommer correctement la droite passant par les points {points[0]} et {points[1]}."
+            
+            etapes = [
+                f"La droite passant par {points[0]} et {points[1]} se note ({points[0]}{points[1]}) ou ({points[1]}{points[0]})",
+                "Les deux notations sont équivalentes",
+                "On utilise des parenthèses () pour une droite"
+            ]
+            
+            resultat = f"({points[0]}{points[1]})"
+            
+            figure = GeometricFigure(
+                type="points_segments_droites",
+                points=points[:nb_points],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "droite"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.TRIANGLE_QUELCONQUE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "nommer",
+                    "enonce": enonce,
+                    "points": points[:nb_points]
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Notation correcte", "points": 2.0}
+                ]
+            )
+        
+        else:  # tracer
+            figure_type = random.choice(["segment", "droite", "demi_droite"])
+            
+            if figure_type == "segment":
+                enonce = f"Tracer le segment [{points[0]}{points[1]}] reliant {points[0]}({coords[f'{points[0]}_x']}, {coords[f'{points[0]}_y']}) et {points[1]}({coords[f'{points[1]}_x']}, {coords[f'{points[1]}_y']})."
+                etapes = [
+                    f"1. Placer le point {points[0]}({coords[f'{points[0]}_x']}, {coords[f'{points[0]}_y']})",
+                    f"2. Placer le point {points[1]}({coords[f'{points[1]}_x']}, {coords[f'{points[1]}_y']})",
+                    f"3. Tracer le segment [{points[0]}{points[1]}] avec la règle"
+                ]
+            elif figure_type == "droite":
+                enonce = f"Tracer la droite ({points[0]}{points[1]}) passant par {points[0]}({coords[f'{points[0]}_x']}, {coords[f'{points[0]}_y']}) et {points[1]}({coords[f'{points[1]}_x']}, {coords[f'{points[1]}_y']})."
+                etapes = [
+                    f"1. Placer le point {points[0]}({coords[f'{points[0]}_x']}, {coords[f'{points[0]}_y']})",
+                    f"2. Placer le point {points[1]}({coords[f'{points[1]}_x']}, {coords[f'{points[1]}_y']})",
+                    f"3. Tracer la droite ({points[0]}{points[1]}) avec la règle (prolonger des deux côtés)"
+                ]
+            else:
+                enonce = f"Tracer la demi-droite [{points[0]}{points[1]}) d'origine {points[0]}({coords[f'{points[0]}_x']}, {coords[f'{points[0]}_y']}) passant par {points[1]}({coords[f'{points[1]}_x']}, {coords[f'{points[1]}_y']})."
+                etapes = [
+                    f"1. Placer le point {points[0]}({coords[f'{points[0]}_x']}, {coords[f'{points[0]}_y']})",
+                    f"2. Placer le point {points[1]}({coords[f'{points[1]}_x']}, {coords[f'{points[1]}_y']})",
+                    f"3. Tracer la demi-droite [{points[0]}{points[1]}) depuis {points[0]} vers {points[1]} et au-delà"
+                ]
+            
+            resultat = f"{figure_type.replace('_', '-')} tracé"
+            
+            figure = GeometricFigure(
+                type="points_segments_droites",
+                points=points[:nb_points],
+                longueurs_connues=coords,
+                proprietes=["with_grid", figure_type, "construction"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.TRIANGLE_QUELCONQUE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "tracer",
+                    "enonce": enonce,
+                    "figure_type": figure_type,
+                    "points": points[:nb_points]
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Placement des points", "points": 1.0},
+                    {"etape": "Tracé correct", "points": 1.0}
+                ]
+            )
+
