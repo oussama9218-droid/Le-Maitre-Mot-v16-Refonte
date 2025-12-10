@@ -5416,3 +5416,567 @@ class MathGenerationService:
                 ]
             )
 
+
+    
+    def _gen_perimetre_figures(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur le périmètre de figures usuelles (6e_GM02)
+        
+        Concepts :
+        - Calculer le périmètre d'un carré, rectangle
+        - Trouver un côté manquant
+        - Problèmes avec périmètre
+        """
+        
+        points = self._get_next_geometry_points()
+        
+        types_exercices = ["calculer_perimetre", "trouver_cote", "probleme"]
+        
+        if difficulte == "facile":
+            type_exercice = "calculer_perimetre"
+        elif difficulte == "moyen":
+            type_exercice = "trouver_cote"
+        else:
+            type_exercice = "probleme"
+        
+        if type_exercice == "calculer_perimetre":
+            # Calculer périmètre rectangle ou carré
+            figure_type = random.choice(["rectangle", "carre"])
+            
+            if figure_type == "rectangle":
+                longueur = random.randint(5, 15)
+                largeur = random.randint(3, 10)
+                
+                enonce = f"Calculer le périmètre d'un rectangle de longueur {longueur} cm et largeur {largeur} cm."
+                
+                perimetre = 2 * (longueur + largeur)
+                
+                etapes = [
+                    f"Formule du périmètre d'un rectangle : P = 2 × (L + l)",
+                    f"P = 2 × ({longueur} + {largeur})",
+                    f"P = 2 × {longueur + largeur}",
+                    f"P = {perimetre} cm"
+                ]
+                
+                resultat = f"{perimetre} cm"
+                
+                # Schéma
+                ax, ay = 2, 2
+                bx, by = ax + longueur, ay
+                cx, cy = bx, by + largeur
+                dx, dy = ax, cy
+            else:  # carre
+                cote = random.randint(4, 12)
+                
+                enonce = f"Calculer le périmètre d'un carré de côté {cote} cm."
+                
+                perimetre = 4 * cote
+                
+                etapes = [
+                    f"Formule du périmètre d'un carré : P = 4 × c",
+                    f"P = 4 × {cote}",
+                    f"P = {perimetre} cm"
+                ]
+                
+                resultat = f"{perimetre} cm"
+                
+                # Schéma
+                ax, ay = 2, 2
+                bx, by = ax + cote, ay
+                cx, cy = bx, by + cote
+                dx, dy = ax, cy
+                longueur = largeur = cote
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                f"{points[2]}_x": cx,
+                f"{points[2]}_y": cy,
+                "D_x": dx,
+                "D_y": dy
+            }
+            
+            figure = GeometricFigure(
+                type=figure_type,
+                points=points[:3] + ["D"],
+                longueurs_connues=coords,
+                proprietes=["with_grid", figure_type, "perimetre"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PERIMETRE_AIRE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "calculer_perimetre",
+                    "enonce": enonce,
+                    "figure": figure_type,
+                    "longueur": longueur,
+                    "largeur": largeur
+                },
+                solution_calculee={"resultat": resultat, "perimetre": perimetre},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Application de la formule", "points": 1.0},
+                    {"etape": "Calcul correct", "points": 1.0}
+                ]
+            )
+        
+        elif type_exercice == "trouver_cote":
+            # Trouver un côté manquant
+            perimetre = random.randint(30, 60)
+            longueur = random.randint(8, 20)
+            
+            # P = 2(L + l) donc l = P/2 - L
+            largeur = perimetre // 2 - longueur
+            
+            enonce = f"Un rectangle a un périmètre de {perimetre} cm et une longueur de {longueur} cm. Quelle est sa largeur ?"
+            
+            etapes = [
+                f"Formule : P = 2 × (L + l)",
+                f"{perimetre} = 2 × ({longueur} + l)",
+                f"{perimetre // 2} = {longueur} + l",
+                f"l = {perimetre // 2} - {longueur}",
+                f"l = {largeur} cm"
+            ]
+            
+            resultat = f"{largeur} cm"
+            
+            # Schéma
+            ax, ay = 2, 2
+            bx, by = ax + min(longueur, 15), ay
+            cx, cy = bx, by + min(largeur, 10)
+            dx, dy = ax, cy
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                f"{points[2]}_x": cx,
+                f"{points[2]}_y": cy,
+                "D_x": dx,
+                "D_y": dy
+            }
+            
+            figure = GeometricFigure(
+                type="rectangle",
+                points=points[:3] + ["D"],
+                longueurs_connues=coords,
+                proprietes=["with_grid", "rectangle", "perimetre", "trouver_cote"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PERIMETRE_AIRE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "trouver_cote",
+                    "enonce": enonce,
+                    "perimetre": perimetre,
+                    "longueur": longueur
+                },
+                solution_calculee={"resultat": resultat, "largeur": largeur},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Utilisation de la formule", "points": 1.0},
+                    {"etape": "Résolution correcte", "points": 1.0}
+                ]
+            )
+        
+        else:  # probleme
+            # Problème avec périmètre
+            longueur = random.randint(10, 20)
+            largeur = random.randint(5, 15)
+            perimetre = 2 * (longueur + largeur)
+            
+            enonce = f"Marie veut clôturer un jardin rectangulaire de {longueur} m de long et {largeur} m de large. Quelle longueur de clôture doit-elle acheter ?"
+            
+            etapes = [
+                "La longueur de clôture correspond au périmètre du jardin",
+                f"P = 2 × (L + l) = 2 × ({longueur} + {largeur})",
+                f"P = 2 × {longueur + largeur} = {perimetre} m",
+                f"Marie doit acheter {perimetre} m de clôture."
+            ]
+            
+            resultat = f"{perimetre} m"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PERIMETRE_AIRE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "probleme",
+                    "enonce": enonce,
+                    "longueur": longueur,
+                    "largeur": largeur
+                },
+                solution_calculee={"resultat": resultat, "perimetre": perimetre},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Compréhension du problème", "points": 0.5},
+                    {"etape": "Calcul du périmètre", "points": 1.5}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève identifie bien périmètre = clôture",
+                    "Insister sur l'unité (mètres)"
+                ]
+            )
+    
+    def _gen_aire_rectangle_carre(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur l'aire du rectangle et du carré (6e_GM03)
+        
+        Concepts :
+        - Calculer l'aire d'un rectangle/carré
+        - Trouver un côté à partir de l'aire
+        - Problèmes avec aires
+        """
+        
+        points = self._get_next_geometry_points()
+        
+        types_exercices = ["calculer_aire", "trouver_cote", "probleme"]
+        
+        if difficulte == "facile":
+            type_exercice = "calculer_aire"
+        elif difficulte == "moyen":
+            type_exercice = "trouver_cote"
+        else:
+            type_exercice = "probleme"
+        
+        if type_exercice == "calculer_aire":
+            # Calculer aire rectangle ou carré
+            figure_type = random.choice(["rectangle", "carre"])
+            
+            if figure_type == "rectangle":
+                longueur = random.randint(4, 10)
+                largeur = random.randint(2, 8)
+                
+                enonce = f"Calculer l'aire d'un rectangle de longueur {longueur} cm et largeur {largeur} cm."
+                
+                aire = longueur * largeur
+                
+                etapes = [
+                    f"Formule de l'aire d'un rectangle : A = L × l",
+                    f"A = {longueur} × {largeur}",
+                    f"A = {aire} cm²"
+                ]
+                
+                resultat = f"{aire} cm²"
+                
+                # Schéma
+                ax, ay = 2, 2
+                bx, by = ax + longueur, ay
+                cx, cy = bx, by + largeur
+                dx, dy = ax, cy
+            else:  # carre
+                cote = random.randint(3, 10)
+                
+                enonce = f"Calculer l'aire d'un carré de côté {cote} cm."
+                
+                aire = cote * cote
+                
+                etapes = [
+                    f"Formule de l'aire d'un carré : A = c × c = c²",
+                    f"A = {cote} × {cote}",
+                    f"A = {aire} cm²"
+                ]
+                
+                resultat = f"{aire} cm²"
+                
+                # Schéma
+                ax, ay = 2, 2
+                bx, by = ax + cote, ay
+                cx, cy = bx, by + cote
+                dx, dy = ax, cy
+                longueur = largeur = cote
+            
+            coords = {
+                f"{points[0]}_x": ax,
+                f"{points[0]}_y": ay,
+                f"{points[1]}_x": bx,
+                f"{points[1]}_y": by,
+                f"{points[2]}_x": cx,
+                f"{points[2]}_y": cy,
+                "D_x": dx,
+                "D_y": dy
+            }
+            
+            figure = GeometricFigure(
+                type=figure_type,
+                points=points[:3] + ["D"],
+                longueurs_connues=coords,
+                proprietes=["with_grid", figure_type, "aire"]
+            )
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PERIMETRE_AIRE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "calculer_aire",
+                    "enonce": enonce,
+                    "figure": figure_type,
+                    "longueur": longueur,
+                    "largeur": largeur
+                },
+                solution_calculee={"resultat": resultat, "aire": aire},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=figure,
+                points_bareme=[
+                    {"etape": "Application de la formule", "points": 1.0},
+                    {"etape": "Calcul correct", "points": 1.0}
+                ]
+            )
+        
+        elif type_exercice == "trouver_cote":
+            # Trouver un côté à partir de l'aire
+            longueur = random.randint(5, 15)
+            largeur = random.randint(3, 12)
+            aire = longueur * largeur
+            
+            enonce = f"Un rectangle a une aire de {aire} cm² et une longueur de {longueur} cm. Quelle est sa largeur ?"
+            
+            etapes = [
+                f"Formule : A = L × l",
+                f"{aire} = {longueur} × l",
+                f"l = {aire} ÷ {longueur}",
+                f"l = {largeur} cm"
+            ]
+            
+            resultat = f"{largeur} cm"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PERIMETRE_AIRE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "trouver_cote",
+                    "enonce": enonce,
+                    "aire": aire,
+                    "longueur": longueur
+                },
+                solution_calculee={"resultat": resultat, "largeur": largeur},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Utilisation de la formule", "points": 1.0},
+                    {"etape": "Calcul de la largeur", "points": 1.0}
+                ]
+            )
+        
+        else:  # probleme
+            # Problème avec aire
+            longueur = random.randint(8, 20)
+            largeur = random.randint(5, 15)
+            aire = longueur * largeur
+            
+            enonce = f"Marie veut peindre un mur rectangulaire de {longueur} m de long et {largeur} m de haut. Quelle surface doit-elle peindre ?"
+            
+            etapes = [
+                "La surface à peindre correspond à l'aire du mur",
+                f"A = L × l = {longueur} × {largeur}",
+                f"A = {aire} m²",
+                f"Marie doit peindre {aire} m²."
+            ]
+            
+            resultat = f"{aire} m²"
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.PERIMETRE_AIRE,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "probleme",
+                    "enonce": enonce,
+                    "longueur": longueur,
+                    "largeur": largeur
+                },
+                solution_calculee={"resultat": resultat, "aire": aire},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Compréhension du problème", "points": 0.5},
+                    {"etape": "Calcul de l'aire", "points": 1.5}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève identifie bien surface = aire",
+                    "Insister sur l'unité (m²)"
+                ]
+            )
+    
+    def _gen_diagrammes_barres(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Génère un exercice sur les diagrammes en barres et pictogrammes (6e_SP02)
+        
+        Concepts :
+        - Lire une valeur sur un diagramme
+        - Comparer deux valeurs
+        - Calculer un total
+        """
+        
+        types_exercices = ["lire_diagramme", "comparer", "calculer_total"]
+        
+        if difficulte == "facile":
+            type_exercice = "lire_diagramme"
+            nb_categories = 3
+            min_val, max_val = 5, 50
+        elif difficulte == "moyen":
+            type_exercice = "comparer"
+            nb_categories = 4
+            min_val, max_val = 20, 100
+        else:
+            type_exercice = "calculer_total"
+            nb_categories = 5
+            min_val, max_val = 50, 200
+        
+        # Générer des données
+        categories = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin"][:nb_categories]
+        valeurs = [random.randint(min_val, max_val) for _ in range(nb_categories)]
+        
+        if type_exercice == "lire_diagramme":
+            categorie_choisie = random.choice(categories)
+            index = categories.index(categorie_choisie)
+            valeur = valeurs[index]
+            
+            enonce = f"Sur le diagramme en barres représentant les ventes mensuelles, lire la valeur pour {categorie_choisie}."
+            
+            etapes = [
+                f"Sur le diagramme, la barre de {categorie_choisie} indique {valeur}",
+                f"Réponse : {valeur} ventes"
+            ]
+            
+            resultat = f"{valeur} ventes"
+            
+            # Données pour le diagramme
+            data_diagramme = {cat: val for cat, val in zip(categories, valeurs)}
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.STATISTIQUES,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "lire_diagramme",
+                    "enonce": enonce,
+                    "categories": categories,
+                    "valeurs": valeurs,
+                    "data": data_diagramme,
+                    "categorie_choisie": categorie_choisie
+                },
+                solution_calculee={"resultat": resultat, "valeur": valeur},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Lecture correcte", "points": 2.0}
+                ]
+            )
+        
+        elif type_exercice == "comparer":
+            # Choisir 2 catégories à comparer
+            cat1, cat2 = random.sample(categories, 2)
+            val1 = valeurs[categories.index(cat1)]
+            val2 = valeurs[categories.index(cat2)]
+            
+            enonce = f"Sur le diagramme en barres, comparer les ventes de {cat1} ({val1}) et {cat2} ({val2}). Quel mois a eu le plus de ventes ?"
+            
+            etapes = [
+                f"{cat1} : {val1} ventes",
+                f"{cat2} : {val2} ventes"
+            ]
+            
+            if val1 > val2:
+                etapes.append(f"{val1} > {val2}, donc {cat1} a eu le plus de ventes.")
+                resultat = f"{cat1} ({val1} ventes)"
+            elif val1 < val2:
+                etapes.append(f"{val2} > {val1}, donc {cat2} a eu le plus de ventes.")
+                resultat = f"{cat2} ({val2} ventes)"
+            else:
+                etapes.append(f"{val1} = {val2}, les deux mois ont eu le même nombre de ventes.")
+                resultat = f"Égalité ({val1} ventes)"
+            
+            data_diagramme = {cat: val for cat, val in zip(categories, valeurs)}
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.STATISTIQUES,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "comparer",
+                    "enonce": enonce,
+                    "categories": categories,
+                    "valeurs": valeurs,
+                    "data": data_diagramme,
+                    "cat1": cat1,
+                    "cat2": cat2
+                },
+                solution_calculee={"resultat": resultat},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Lecture des valeurs", "points": 1.0},
+                    {"etape": "Comparaison correcte", "points": 1.0}
+                ]
+            )
+        
+        else:  # calculer_total
+            total = sum(valeurs)
+            
+            enonce = f"Sur le diagramme en barres représentant les ventes mensuelles de {', '.join(categories)}, calculer le total des ventes."
+            
+            etapes = [
+                f"Ventes : {' + '.join([f'{cat}: {val}' for cat, val in zip(categories, valeurs)])}",
+                f"Total = {' + '.join(map(str, valeurs))}",
+                f"Total = {total} ventes"
+            ]
+            
+            resultat = f"{total} ventes"
+            
+            data_diagramme = {cat: val for cat, val in zip(categories, valeurs)}
+            
+            return MathExerciseSpec(
+                niveau=niveau,
+                chapitre=chapitre,
+                type_exercice=MathExerciseType.STATISTIQUES,
+                difficulte=DifficultyLevel(difficulte),
+                parametres={
+                    "type": "calculer_total",
+                    "enonce": enonce,
+                    "categories": categories,
+                    "valeurs": valeurs,
+                    "data": data_diagramme
+                },
+                solution_calculee={"resultat": resultat, "total": total},
+                etapes_calculees=etapes,
+                resultat_final=resultat,
+                figure_geometrique=None,
+                points_bareme=[
+                    {"etape": "Lecture de toutes les valeurs", "points": 1.0},
+                    {"etape": "Calcul du total", "points": 1.0}
+                ],
+                conseils_prof=[
+                    "Vérifier que l'élève lit bien toutes les barres",
+                    "Insister sur l'addition de toutes les valeurs"
+                ]
+            )
+
