@@ -952,12 +952,13 @@ class ExerciseTemplateService:
             
             # Gérer les différents types de retour
             if isinstance(result, dict):
-                # Pour symétrie axiale/centrale: retourne un dict
-                # Utiliser la figure complète (avec question et correction ensemble)
-                svg = result.get("figure_svg", "")
+                # Pour symétrie axiale/centrale/droite_numerique: retourne un dict
+                # ✅ CORRECTION PÉDAGOGIQUE: Utiliser figure_svg_question pour l'énoncé
+                # (pas de solution visible dans la question)
+                svg = result.get("figure_svg_question", "")
                 if not svg:
-                    # Fallback sur figure_svg_question si figure_svg n'existe pas
-                    svg = result.get("figure_svg_question", "")
+                    # Fallback sur figure_svg si figure_svg_question n'existe pas (rétrocompatibilité)
+                    svg = result.get("figure_svg", "")
                 return svg
             elif isinstance(result, str):
                 # Pour les autres types de figures: retourne directement le SVG
