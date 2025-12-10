@@ -916,9 +916,21 @@ class ExerciseTemplateService:
         # GÉNÉRER LE SVG si figure présente
         if spec.figure_geometrique:
             try:
-                figure_svg = self._render_figure_to_svg(spec.figure_geometrique)
-                if figure_svg:
-                    question["figure_html"] = figure_svg
+                # Obtenir le résultat complet du rendu (peut être string ou dict)
+                result = self._get_figure_render_result(spec.figure_geometrique)
+                
+                if result:
+                    # Gérer les deux versions (question et correction)
+                    if isinstance(result, dict):
+                        # Version question (sans solution)
+                        question["figure_html"] = result.get("figure_svg_question", result.get("figure_svg", ""))
+                        # Version correction (avec solution)
+                        question["figure_html_correction"] = result.get("figure_svg_correction", result.get("figure_svg", ""))
+                    else:
+                        # Format simple (string) - utiliser pour les deux
+                        question["figure_html"] = result
+                        question["figure_html_correction"] = result
+                    
                     question["data"]["figure"] = spec.figure_geometrique.dict()
                     logger.info(f"✅ Figure SVG générée pour question {question_number}")
                 else:
@@ -928,6 +940,19 @@ class ExerciseTemplateService:
                 # Continue sans figure plutôt que de crasher
         
         return question
+    
+    def _get_figure_render_result(self, figure: GeometricFigure):
+        """
+        Obtient le résultat complet du rendu (dict ou string)
+        Utilisé en interne pour accéder aux versions question et correction
+        """
+        try:
+            from services.geometry_render_service import GeometryRenderService
+            service = GeometryRenderService()
+            return service.render_figure_to_svg(figure)
+        except Exception as e:
+            logger.error(f"❌ Erreur lors du rendu SVG: {e}", exc_info=True)
+            return None
     
     def _render_figure_to_svg(self, figure: GeometricFigure) -> str:
         """
