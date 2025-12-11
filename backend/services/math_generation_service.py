@@ -103,8 +103,11 @@ class MathGenerationService:
             # Angles
             "Angles": [MathExerciseType.ANGLE_MESURE, MathExerciseType.ANGLE_VOCABULAIRE, MathExerciseType.ANGLE_PROPRIETES],
             
-            # Volumes
-            "Volumes": [MathExerciseType.VOLUME_PAVE, MathExerciseType.VOLUME],
+            # Volumes - 6e: pavé droit et cube
+            "Volumes": [MathExerciseType.VOLUME_PAVE, MathExerciseType.VOLUME, MathExerciseType.CONVERSIONS_UNITES],
+            
+            # Géométrie dans l'espace - 6e: solides, patrons, volumes
+            "Géométrie dans l'espace": [MathExerciseType.VOLUME_PAVE, MathExerciseType.VOLUME],
             
             # Données et tableaux
             "Lire et compléter des tableaux de données": [MathExerciseType.TABLEAU_LECTURE, MathExerciseType.TABLEAU_COMPLETER, MathExerciseType.STATISTIQUES],
