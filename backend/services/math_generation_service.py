@@ -6193,3 +6193,782 @@ class MathGenerationService:
                 ]
             )
 
+
+    # ==========================================================================
+    # VAGUE 1 - GÉNÉRATEURS 6ᵉ PRIORITÉ TRÈS HAUTE
+    # Réf: Google Sheet "LeMaitreMot-6e" - Vue Synthétique + Spécifications
+    # ==========================================================================
+    
+    def _gen_fraction_representation(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur: Représentation graphique des fractions (6N2-FRAC-REPR)
+        
+        Spécifications (feuillet 2):
+        - Facile: denom in [2,3,4], numerateur < denominateur
+        - Moyen: denom in [5,6,8,10]
+        - Avancé: fractions > 1, comparaison visuelle
+        
+        Énoncés modèles (feuillet 3):
+        - Facile: Quelle fraction du rectangle est coloriée?
+        - Moyen: Représenter 5/8 sur un diagramme circulaire
+        - Avancé: Comparer visuellement 3/4 et 5/6
+        """
+        
+        if difficulte == "facile":
+            denominateur = random.choice([2, 3, 4])
+            numerateur = random.randint(1, denominateur - 1)
+            type_diagramme = "rectangulaire"
+        elif difficulte == "moyen":
+            denominateur = random.choice([5, 6, 8, 10])
+            numerateur = random.randint(1, denominateur - 1)
+            type_diagramme = random.choice(["circulaire", "rectangulaire"])
+        else:  # avancé
+            denominateur = random.choice([3, 4, 5, 6])
+            numerateur = random.randint(denominateur + 1, denominateur * 2)  # fraction > 1
+            type_diagramme = "rectangulaire"
+        
+        # Générer le SVG de la figure
+        svg_figure = self._generate_fraction_svg(numerateur, denominateur, type_diagramme)
+        
+        # Déterminer le type d'exercice
+        if difficulte == "facile":
+            # Exercice de lecture : figure donnée, trouver la fraction
+            enonce = f"Quelle fraction du {type_diagramme.replace('rectangulaire', 'rectangle').replace('circulaire', 'disque')} est coloriée ?"
+            solution = f"La fraction coloriée est \\frac{{{numerateur}}}{{{denominateur}}}."
+            etapes = [
+                f"Le {type_diagramme.replace('rectangulaire', 'rectangle').replace('circulaire', 'disque')} est divisé en {denominateur} parties égales.",
+                f"{numerateur} parties sont coloriées.",
+                f"La fraction est donc \\frac{{{numerateur}}}{{{denominateur}}}."
+            ]
+        elif difficulte == "moyen":
+            # Exercice de représentation : fraction donnée, colorier
+            enonce = f"Représenter la fraction \\frac{{{numerateur}}}{{{denominateur}}} sur le diagramme {type_diagramme}."
+            solution = f"Il faut colorier {numerateur} parties sur les {denominateur} parties du diagramme."
+            etapes = [
+                f"Le diagramme est divisé en {denominateur} parties égales.",
+                f"La fraction \\frac{{{numerateur}}}{{{denominateur}}} signifie {numerateur} parties sur {denominateur}.",
+                f"On colorie donc {numerateur} parties."
+            ]
+        else:  # avancé
+            # Fraction impropre
+            parties_entieres = numerateur // denominateur
+            reste = numerateur % denominateur
+            enonce = f"Représenter la fraction \\frac{{{numerateur}}}{{{denominateur}}} sur des diagrammes. Combien de diagrammes complets sont nécessaires ?"
+            solution = f"\\frac{{{numerateur}}}{{{denominateur}}} = {parties_entieres} + \\frac{{{reste}}}{{{denominateur}}} = {parties_entieres} diagrammes complets et {reste}/{denominateur}."
+            etapes = [
+                f"\\frac{{{numerateur}}}{{{denominateur}}} = {numerateur} ÷ {denominateur}",
+                f"{numerateur} = {denominateur} × {parties_entieres} + {reste}",
+                f"Donc \\frac{{{numerateur}}}{{{denominateur}}} = {parties_entieres} + \\frac{{{reste}}}{{{denominateur}}}",
+                f"Il faut {parties_entieres} diagrammes complets et colorier {reste} parties sur {denominateur} dans le dernier."
+            ]
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.FRACTION_REPRESENTATION,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "numerateur": numerateur,
+                "denominateur": denominateur,
+                "type_diagramme": type_diagramme,
+                "code_ref": "6N2-FRAC-REPR"
+            },
+            solution_calculee={
+                "fraction": f"{numerateur}/{denominateur}",
+                "type_diagramme": type_diagramme
+            },
+            etapes_calculees=etapes,
+            resultat_final=f"\\frac{{{numerateur}}}{{{denominateur}}}",
+            figure_geometrique=GeometricFigure(
+                type="fraction_representation",
+                points=[],
+                longueurs_connues={"numerateur": numerateur, "denominateur": denominateur},
+                proprietes=[type_diagramme, f"svg:{svg_figure}"]
+            ),
+            points_bareme=[
+                {"etape": "Compréhension de la fraction", "points": 1.0},
+                {"etape": "Représentation correcte", "points": 1.0}
+            ]
+        )
+    
+    def _generate_fraction_svg(self, numerateur: int, denominateur: int, type_diagramme: str) -> str:
+        """Génère un SVG pour représenter une fraction"""
+        
+        if type_diagramme == "circulaire":
+            # Diagramme circulaire (camembert)
+            svg = '<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">'
+            cx, cy, r = 100, 100, 80
+            
+            for i in range(denominateur):
+                angle_start = (i * 360 / denominateur) - 90
+                angle_end = ((i + 1) * 360 / denominateur) - 90
+                
+                x1 = cx + r * math.cos(math.radians(angle_start))
+                y1 = cy + r * math.sin(math.radians(angle_start))
+                x2 = cx + r * math.cos(math.radians(angle_end))
+                y2 = cy + r * math.sin(math.radians(angle_end))
+                
+                large_arc = 1 if (angle_end - angle_start) > 180 else 0
+                
+                fill = "#4CAF50" if i < numerateur else "#E0E0E0"
+                
+                if denominateur == 1:
+                    svg += f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" stroke="#333" stroke-width="2"/>'
+                else:
+                    path = f'M {cx},{cy} L {x1},{y1} A {r},{r} 0 {large_arc},1 {x2},{y2} Z'
+                    svg += f'<path d="{path}" fill="{fill}" stroke="#333" stroke-width="1"/>'
+            
+            svg += '</svg>'
+            
+        else:  # rectangulaire
+            # Diagramme rectangulaire (barres)
+            svg = '<svg width="240" height="100" viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg">'
+            
+            bar_width = 220 / denominateur
+            bar_height = 60
+            start_x, start_y = 10, 20
+            
+            for i in range(denominateur):
+                x = start_x + i * bar_width
+                fill = "#4CAF50" if i < numerateur else "#E0E0E0"
+                svg += f'<rect x="{x}" y="{start_y}" width="{bar_width - 2}" height="{bar_height}" fill="{fill}" stroke="#333" stroke-width="1"/>'
+            
+            svg += f'<text x="120" y="95" text-anchor="middle" font-size="12">{numerateur}/{denominateur}</text>'
+            svg += '</svg>'
+        
+        return svg
+    
+    def _gen_prop_tableau(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur: Tableaux de proportionnalité (6N3-PROP-TAB)
+        
+        Spécifications:
+        - Facile: 2 colonnes, coefficient entier (×2, ×3, ×5)
+        - Moyen: 3-4 colonnes
+        - Avancé: coefficient décimal
+        
+        Énoncés modèles:
+        - Facile: Compléter [Quantité: 2, 4, ?] [Prix: 6, 12, 18]
+        - Moyen: Un vélo roule à vitesse constante. [Temps: 5, 10, 15] [Distance: 400, ?, ?]
+        - Avancé: 3 stylos coûtent 4,50€. Compléter pour 1, 5, 7 et 10 stylos.
+        """
+        
+        if difficulte == "facile":
+            # Coefficient entier simple
+            coeff = random.choice([2, 3, 4, 5])
+            valeurs_ligne1 = [random.randint(1, 5) for _ in range(3)]
+            valeurs_ligne2 = [v * coeff for v in valeurs_ligne1]
+            
+            # Masquer une valeur
+            pos_masquee = random.randint(0, 2)
+            valeur_masquee = valeurs_ligne2[pos_masquee]
+            valeurs_ligne2_affichees = valeurs_ligne2.copy()
+            valeurs_ligne2_affichees[pos_masquee] = "?"
+            
+            contexte = random.choice(["prix", "distance"])
+            if contexte == "prix":
+                ligne1_label = "Quantité"
+                ligne2_label = "Prix (€)"
+            else:
+                ligne1_label = "Temps (min)"
+                ligne2_label = "Distance (m)"
+            
+        elif difficulte == "moyen":
+            coeff = random.choice([2, 3, 4, 5, 8, 10])
+            valeurs_ligne1 = [random.randint(1, 10) for _ in range(4)]
+            valeurs_ligne2 = [v * coeff for v in valeurs_ligne1]
+            
+            # Masquer deux valeurs
+            positions_masquees = random.sample(range(4), 2)
+            valeurs_masquees = [valeurs_ligne2[p] for p in positions_masquees]
+            valeurs_ligne2_affichees = valeurs_ligne2.copy()
+            for p in positions_masquees:
+                valeurs_ligne2_affichees[p] = "?"
+            
+            pos_masquee = positions_masquees[0]
+            valeur_masquee = valeurs_masquees[0]
+            
+            contexte = "vélo"
+            ligne1_label = "Temps (min)"
+            ligne2_label = "Distance (m)"
+            
+        else:  # avancé
+            # Coefficient décimal
+            prix_unitaire = round(random.uniform(1.2, 3.5), 2)
+            valeurs_ligne1 = [1, 3, 5, 7, 10]
+            valeurs_ligne2 = [round(v * prix_unitaire, 2) for v in valeurs_ligne1]
+            
+            # On donne le prix pour 3, trouver le reste
+            positions_masquees = [0, 2, 3, 4]
+            valeurs_ligne2_affichees = ["?" if i in positions_masquees else valeurs_ligne2[i] for i in range(5)]
+            
+            pos_masquee = 0
+            valeur_masquee = valeurs_ligne2[0]
+            coeff = prix_unitaire
+            
+            contexte = "stylos"
+            ligne1_label = "Nb de stylos"
+            ligne2_label = "Prix (€)"
+        
+        # Construire le tableau HTML
+        table_html = '<table style="border-collapse: collapse; margin: 15px auto; border: 2px solid #333;">'
+        table_html += f'<tr><th style="border: 1px solid #333; padding: 8px; background-color: #f0f0f0;">{ligne1_label}</th>'
+        for v in valeurs_ligne1:
+            table_html += f'<td style="border: 1px solid #333; padding: 8px; text-align: center;">{v}</td>'
+        table_html += '</tr>'
+        table_html += f'<tr><th style="border: 1px solid #333; padding: 8px; background-color: #f0f0f0;">{ligne2_label}</th>'
+        for v in valeurs_ligne2_affichees:
+            bg = "background-color: #ffffcc;" if v == "?" else ""
+            table_html += f'<td style="border: 1px solid #333; padding: 8px; text-align: center; {bg}">{v}</td>'
+        table_html += '</tr></table>'
+        
+        enonce = f"Compléter le tableau de proportionnalité suivant.\n{table_html}"
+        
+        etapes = [
+            f"C'est un tableau de proportionnalité, donc on multiplie toujours par le même coefficient.",
+            f"Coefficient = {valeurs_ligne2[0]} ÷ {valeurs_ligne1[0]} = {coeff}",
+            f"Pour trouver les valeurs manquantes, on multiplie par {coeff}."
+        ]
+        
+        for i, v in enumerate(valeurs_ligne2_affichees):
+            if v == "?":
+                etapes.append(f"{valeurs_ligne1[i]} × {coeff} = {valeurs_ligne2[i]}")
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.PROP_TABLEAU,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "valeurs_ligne1": valeurs_ligne1,
+                "valeurs_ligne2": valeurs_ligne2,
+                "coefficient": coeff,
+                "code_ref": "6N3-PROP-TAB"
+            },
+            solution_calculee={
+                "coefficient": coeff,
+                "valeurs_completes": valeurs_ligne2
+            },
+            etapes_calculees=etapes,
+            resultat_final=f"Coefficient = {coeff}",
+            figure_geometrique=None,
+            points_bareme=[
+                {"etape": "Trouver le coefficient", "points": 1.0},
+                {"etape": "Calculer les valeurs manquantes", "points": 1.0}
+            ]
+        )
+    
+    def _gen_prop_achat(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur: Problèmes d'achats proportionnels (6N3-PROP-ACHAT)
+        
+        Spécifications:
+        - Facile: Prix unitaire × quantité
+        - Moyen: Comparaison de 2 prix
+        - Avancé: Problème multi-étapes avec rendu monnaie
+        
+        Énoncés modèles:
+        - Facile: Une gomme coûte 0,80€. Prix de 5 gommes?
+        - Moyen: Comparer 3kg à 2,40€/kg ou 5kg à 2,20€/kg
+        - Avancé: 4 cahiers à 1,20€ et 3 stylos à 0,90€. Avec 10€, combien reçoit-on?
+        """
+        
+        contextes = [
+            {"article": "gomme", "unite": "€", "prix_min": 0.5, "prix_max": 1.5},
+            {"article": "crayon", "unite": "€", "prix_min": 0.3, "prix_max": 0.9},
+            {"article": "cahier", "unite": "€", "prix_min": 1.0, "prix_max": 2.5},
+            {"article": "stylo", "unite": "€", "prix_min": 0.7, "prix_max": 1.8},
+            {"article": "règle", "unite": "€", "prix_min": 0.8, "prix_max": 2.0}
+        ]
+        
+        if difficulte == "facile":
+            ctx = random.choice(contextes)
+            prix_unitaire = round(random.uniform(ctx["prix_min"], ctx["prix_max"]), 2)
+            quantite = random.randint(3, 8)
+            total = round(prix_unitaire * quantite, 2)
+            
+            enonce = f"Une {ctx['article']} coûte {prix_unitaire:.2f} €. Quel est le prix de {quantite} {ctx['article']}s ?"
+            
+            etapes = [
+                f"Prix d'une {ctx['article']} = {prix_unitaire:.2f} €",
+                f"Prix de {quantite} {ctx['article']}s = {quantite} × {prix_unitaire:.2f} €",
+                f"Prix total = {total:.2f} €"
+            ]
+            
+            resultat = f"{total:.2f} €"
+            
+        elif difficulte == "moyen":
+            # Comparaison de 2 achats
+            article = random.choice(["pommes", "oranges", "tomates", "bananes"])
+            
+            quantite1 = random.randint(2, 5)
+            prix_kg1 = round(random.uniform(1.5, 3.5), 2)
+            total1 = round(quantite1 * prix_kg1, 2)
+            
+            quantite2 = random.randint(quantite1 + 1, quantite1 + 4)
+            # Prix légèrement différent pour rendre la comparaison intéressante
+            prix_kg2 = round(prix_kg1 * random.uniform(0.8, 1.2), 2)
+            total2 = round(quantite2 * prix_kg2, 2)
+            
+            enonce = f"Au marché, on peut acheter :\n- {quantite1} kg de {article} à {prix_kg1:.2f} €/kg\n- {quantite2} kg de {article} à {prix_kg2:.2f} €/kg\n\nQuel achat est le plus économique pour la même quantité de {article} ?"
+            
+            prix_par_kg_1 = prix_kg1
+            prix_par_kg_2 = prix_kg2
+            
+            if prix_par_kg_1 < prix_par_kg_2:
+                conclusion = f"L'achat 1 ({quantite1} kg à {prix_kg1:.2f} €/kg) est plus économique."
+            elif prix_par_kg_2 < prix_par_kg_1:
+                conclusion = f"L'achat 2 ({quantite2} kg à {prix_kg2:.2f} €/kg) est plus économique."
+            else:
+                conclusion = "Les deux achats sont équivalents."
+            
+            etapes = [
+                f"Achat 1 : {quantite1} kg × {prix_kg1:.2f} €/kg = {total1:.2f} €",
+                f"Achat 2 : {quantite2} kg × {prix_kg2:.2f} €/kg = {total2:.2f} €",
+                f"Prix au kg de l'achat 1 : {prix_kg1:.2f} €/kg",
+                f"Prix au kg de l'achat 2 : {prix_kg2:.2f} €/kg",
+                conclusion
+            ]
+            
+            resultat = conclusion
+            total = min(prix_kg1, prix_kg2)
+            
+        else:  # avancé
+            # Multi-étapes avec rendu monnaie
+            article1 = random.choice(["cahier", "classeur", "livre"])
+            article2 = random.choice(["stylo", "crayon", "feutre"])
+            
+            quantite1 = random.randint(2, 5)
+            prix1 = round(random.uniform(1.0, 2.5), 2)
+            
+            quantite2 = random.randint(2, 5)
+            prix2 = round(random.uniform(0.5, 1.5), 2)
+            
+            total1 = round(quantite1 * prix1, 2)
+            total2 = round(quantite2 * prix2, 2)
+            total = round(total1 + total2, 2)
+            
+            billet = 10 if total < 10 else 20
+            rendu = round(billet - total, 2)
+            
+            enonce = f"Martin achète {quantite1} {article1}s à {prix1:.2f} € l'unité et {quantite2} {article2}s à {prix2:.2f} € l'unité. Il paie avec un billet de {billet} €. Combien lui rend-on ?"
+            
+            etapes = [
+                f"Prix des {article1}s : {quantite1} × {prix1:.2f} € = {total1:.2f} €",
+                f"Prix des {article2}s : {quantite2} × {prix2:.2f} € = {total2:.2f} €",
+                f"Total des achats : {total1:.2f} + {total2:.2f} = {total:.2f} €",
+                f"Rendu : {billet} - {total:.2f} = {rendu:.2f} €"
+            ]
+            
+            resultat = f"{rendu:.2f} €"
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.PROP_ACHAT,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "code_ref": "6N3-PROP-ACHAT"
+            },
+            solution_calculee={"resultat": resultat},
+            etapes_calculees=etapes,
+            resultat_final=resultat,
+            figure_geometrique=None,
+            points_bareme=[
+                {"etape": "Calculs intermédiaires", "points": 1.5},
+                {"etape": "Résultat final", "points": 0.5}
+            ]
+        )
+    
+    def _gen_probleme_2_etapes(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur: Problèmes à 2 étapes (6P-PROB-2ET)
+        
+        Spécifications:
+        - Facile: 2 opérations consécutives simples
+        - Moyen: 2 opérations avec choix
+        - Avancé: 3 étapes
+        
+        Énoncés modèles:
+        - Facile: Addition puis soustraction
+        - Moyen: Multiplication + addition avec contexte
+        - Avancé: Problème complet de la vie courante
+        """
+        
+        contextes_facile = [
+            {
+                "situation": "billes",
+                "etape1_donnee": lambda: random.randint(20, 50),
+                "etape1_action": "gagne",
+                "etape1_valeur": lambda: random.randint(5, 15),
+                "etape2_action": "perd",
+                "etape2_valeur": lambda: random.randint(5, 15),
+                "question": "combien de billes a-t-il à la fin",
+                "op1": "+",
+                "op2": "-"
+            },
+            {
+                "situation": "bonbons",
+                "etape1_donnee": lambda: random.randint(30, 60),
+                "etape1_action": "mange",
+                "etape1_valeur": lambda: random.randint(5, 12),
+                "etape2_action": "donne",
+                "etape2_valeur": lambda: random.randint(5, 12),
+                "question": "combien de bonbons lui reste-t-il",
+                "op1": "-",
+                "op2": "-"
+            }
+        ]
+        
+        contextes_moyen = [
+            {
+                "situation": "livres",
+                "base_val": lambda: random.randint(3, 6),
+                "prix_unitaire": lambda: random.randint(8, 15),
+                "ajout": lambda: random.randint(10, 25),
+                "template": "Marie achète {n} livres à {p}€ chacun. Elle reçoit aussi {a}€ en cadeau. Combien d'argent a-t-elle dépensé/reçu au total?",
+                "ops": ["×", "+"]
+            }
+        ]
+        
+        if difficulte == "facile":
+            ctx = random.choice(contextes_facile)
+            initial = ctx["etape1_donnee"]()
+            val1 = ctx["etape1_valeur"]()
+            val2 = ctx["etape2_valeur"]()
+            
+            # S'assurer que les valeurs sont cohérentes
+            if ctx["op1"] == "+":
+                intermediaire = initial + val1
+            else:
+                intermediaire = initial - val1
+            
+            if ctx["op2"] == "+":
+                resultat = intermediaire + val2
+            else:
+                resultat = intermediaire - val2
+                # S'assurer qu'on n'a pas de résultat négatif
+                while resultat < 0:
+                    val2 = random.randint(1, intermediaire)
+                    resultat = intermediaire - val2
+            
+            prenom = random.choice(["Lucas", "Emma", "Léa", "Hugo", "Chloé", "Nathan"])
+            
+            enonce = f"{prenom} a {initial} {ctx['situation']}. Il en {ctx['etape1_action']} {val1}, puis il en {ctx['etape2_action']} {val2}. {ctx['question'].capitalize()} ?"
+            
+            etapes = [
+                f"Données : {prenom} a {initial} {ctx['situation']} au départ.",
+                f"Étape 1 : {initial} {ctx['op1']} {val1} = {intermediaire} {ctx['situation']}",
+                f"Étape 2 : {intermediaire} {ctx['op2']} {val2} = {resultat} {ctx['situation']}"
+            ]
+            
+            resultat_final = f"{resultat} {ctx['situation']}"
+            
+        elif difficulte == "moyen":
+            prenom = random.choice(["Sophie", "Thomas", "Julie", "Antoine", "Marie", "Paul"])
+            nb_articles = random.randint(3, 6)
+            prix = random.randint(5, 12)
+            bonus = random.randint(8, 20)
+            
+            total_achats = nb_articles * prix
+            total_final = total_achats + bonus
+            
+            article = random.choice(["cahier", "livre", "stylo"])
+            
+            enonce = f"{prenom} achète {nb_articles} {article}s à {prix}€ chacun. Son grand-père lui donne {bonus}€ supplémentaires. Quel est le montant total que {prenom} a dépensé et reçu ?"
+            
+            etapes = [
+                f"Prix des {article}s : {nb_articles} × {prix}€ = {total_achats}€",
+                f"Ajout du cadeau : {total_achats}€ + {bonus}€ = {total_final}€",
+                f"(Note : {prenom} a dépensé {total_achats}€ et reçu {bonus}€)"
+            ]
+            
+            resultat_final = f"Dépensé: {total_achats}€, Total avec cadeau: {total_final}€"
+            resultat = total_final
+            
+        else:  # avancé - 3 étapes
+            prenom = random.choice(["Alexandre", "Charlotte", "Mathis", "Clara", "Lucas", "Emma"])
+            
+            # Contexte : économies et achats
+            argent_initial = random.randint(50, 100)
+            argent_recu = random.randint(20, 40)
+            prix_article1 = random.randint(15, 35)
+            prix_article2 = random.randint(10, 25)
+            
+            total_argent = argent_initial + argent_recu
+            total_depenses = prix_article1 + prix_article2
+            reste = total_argent - total_depenses
+            
+            # S'assurer qu'il reste de l'argent
+            while reste < 0:
+                prix_article1 = random.randint(10, 25)
+                prix_article2 = random.randint(5, 15)
+                total_depenses = prix_article1 + prix_article2
+                reste = total_argent - total_depenses
+            
+            article1 = random.choice(["jeu vidéo", "livre", "vêtement"])
+            article2 = random.choice(["accessoire", "gadget", "BD"])
+            
+            enonce = f"{prenom} a {argent_initial}€ dans sa tirelire. Pour son anniversaire, il reçoit {argent_recu}€. Il achète un {article1} à {prix_article1}€ et un {article2} à {prix_article2}€. Combien d'argent lui reste-t-il ?"
+            
+            etapes = [
+                f"Argent initial : {argent_initial}€",
+                f"Après l'anniversaire : {argent_initial}€ + {argent_recu}€ = {total_argent}€",
+                f"Total des achats : {prix_article1}€ + {prix_article2}€ = {total_depenses}€",
+                f"Argent restant : {total_argent}€ - {total_depenses}€ = {reste}€"
+            ]
+            
+            resultat_final = f"{reste}€"
+            resultat = reste
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.PROBLEME_2_ETAPES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "code_ref": "6P-PROB-2ET"
+            },
+            solution_calculee={"resultat": resultat_final},
+            etapes_calculees=etapes,
+            resultat_final=resultat_final,
+            figure_geometrique=None,
+            points_bareme=[
+                {"etape": "Compréhension du problème", "points": 0.5},
+                {"etape": "Calculs intermédiaires", "points": 1.0},
+                {"etape": "Résultat final", "points": 0.5}
+            ],
+            conseils_prof=[
+                "Vérifier que l'élève identifie bien les données",
+                "S'assurer qu'il écrit chaque étape de calcul"
+            ]
+        )
+    
+    def _gen_nombres_lecture(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur: Lecture et écriture des nombres entiers (6N1-LECTURE)
+        
+        Spécifications:
+        - Facile: < 1000 sans zéros intercalaires
+        - Moyen: < 10000 avec zéros
+        - Avancé: < 1M avec classes multiples
+        
+        Énoncés modèles:
+        - Facile: Écrire en lettres : 347
+        - Moyen: Écrire en lettres : 5 042
+        - Avancé: Écrire 81000 en lettres et décomposer
+        """
+        
+        # Dictionnaire pour convertir en lettres
+        unites = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"]
+        dizaines = ["", "dix", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante", "quatre-vingt", "quatre-vingt"]
+        
+        def nombre_en_lettres(n):
+            """Convertit un nombre < 1000 en lettres (simplifié)"""
+            if n == 0:
+                return "zéro"
+            if n < 10:
+                return unites[n]
+            if n < 20:
+                specials = ["dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"]
+                return specials[n - 10]
+            if n < 100:
+                d, u = divmod(n, 10)
+                if d == 7 or d == 9:
+                    return dizaines[d] + ("-" if u else "") + (["dix", "onze", "douze", "treize", "quatorze", "quinze", "seize"][u] if d == 7 and u < 7 else nombre_en_lettres(10 + u) if d == 9 and u < 10 else unites[u])
+                if d == 8:
+                    return "quatre-vingts" if u == 0 else f"quatre-vingt-{unites[u]}"
+                return dizaines[d] + ("-" + unites[u] if u else "")
+            if n < 1000:
+                c, r = divmod(n, 100)
+                if c == 1:
+                    return "cent" + (" " + nombre_en_lettres(r) if r else "")
+                return unites[c] + "-cents" if r == 0 else unites[c] + "-cent-" + nombre_en_lettres(r)
+            return str(n)  # Fallback pour les grands nombres
+        
+        if difficulte == "facile":
+            # Nombre < 1000 sans zéros intercalaires
+            centaines = random.randint(1, 9)
+            dizaines_val = random.randint(1, 9)
+            unites_val = random.randint(1, 9)
+            nombre = centaines * 100 + dizaines_val * 10 + unites_val
+            
+            direction = random.choice(["chiffres_vers_lettres", "lettres_vers_chiffres"])
+            
+        elif difficulte == "moyen":
+            # Nombre < 10000 avec au moins un zéro intercalaire
+            milliers = random.randint(1, 9)
+            centaines = random.choice([0, random.randint(1, 9)])
+            dizaines_val = random.choice([0, random.randint(1, 9)]) if centaines != 0 else random.randint(1, 9)
+            unites_val = random.randint(0, 9)
+            nombre = milliers * 1000 + centaines * 100 + dizaines_val * 10 + unites_val
+            
+            direction = random.choice(["chiffres_vers_lettres", "lettres_vers_chiffres"])
+            
+        else:  # avancé
+            # Nombre < 1 000 000
+            nombre = random.randint(10000, 999999)
+            direction = "chiffres_vers_lettres"
+        
+        # Formater le nombre avec espaces
+        nombre_formate = f"{nombre:,}".replace(",", " ")
+        
+        # Conversion en lettres (simplifiée pour les grands nombres)
+        if nombre < 1000:
+            en_lettres = nombre_en_lettres(nombre)
+        else:
+            en_lettres = f"[{nombre_formate} en lettres]"  # Placeholder
+        
+        if direction == "chiffres_vers_lettres":
+            enonce = f"Écrire en lettres le nombre : {nombre_formate}"
+            solution = f"{nombre_formate} s'écrit : {en_lettres}"
+        else:
+            enonce = f"Écrire en chiffres : {en_lettres}"
+            solution = f"{en_lettres} s'écrit : {nombre_formate}"
+        
+        # Décomposition
+        decomposition = []
+        temp = nombre
+        puissances = [(1000000, "millions"), (1000, "milliers"), (100, "centaines"), (10, "dizaines"), (1, "unités")]
+        for val, nom in puissances:
+            if temp >= val:
+                q = temp // val
+                if q > 0:
+                    decomposition.append(f"{q} {nom}")
+                temp = temp % val
+        
+        etapes = [
+            f"Le nombre {nombre_formate} se décompose en :",
+            " + ".join(decomposition) if decomposition else "0",
+            f"En lettres : {en_lettres}"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.NOMBRES_LECTURE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "nombre": nombre,
+                "direction": direction,
+                "code_ref": "6N1-LECTURE"
+            },
+            solution_calculee={
+                "nombre": nombre,
+                "en_lettres": en_lettres,
+                "decomposition": decomposition
+            },
+            etapes_calculees=etapes,
+            resultat_final=en_lettres if direction == "chiffres_vers_lettres" else str(nombre_formate),
+            figure_geometrique=None,
+            points_bareme=[
+                {"etape": "Orthographe correcte", "points": 1.0},
+                {"etape": "Traits d'union", "points": 0.5}
+            ]
+        )
+    
+    def _gen_nombres_comparaison(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur: Comparaison et rangement de nombres entiers (6N1-COMP)
+        
+        Spécifications:
+        - Facile: 3-4 nombres de 2-3 chiffres
+        - Moyen: 5-6 nombres de 4-5 chiffres
+        - Avancé: 7-8 nombres + pièges (9999 vs 10000)
+        
+        Énoncés modèles:
+        - Facile: Ranger dans l'ordre croissant : 45 ; 12 ; 78 ; 34
+        - Moyen: Ordonner du plus petit au plus grand : 1 205 ; 1 025 ; 1 502 ; 1 250 ; 1 052
+        - Avancé: Populations de villes à classer
+        """
+        
+        if difficulte == "facile":
+            nb_nombres = random.randint(3, 4)
+            nombres = [random.randint(10, 999) for _ in range(nb_nombres)]
+            # S'assurer qu'il n'y a pas de doublons
+            nombres = list(set(nombres))
+            while len(nombres) < nb_nombres:
+                nombres.append(random.randint(10, 999))
+                nombres = list(set(nombres))
+                
+        elif difficulte == "moyen":
+            nb_nombres = random.randint(5, 6)
+            # Nombres avec préfixe commun pour rendre la comparaison plus intéressante
+            prefixe = random.randint(1, 9) * 1000
+            nombres = [prefixe + random.randint(0, 999) for _ in range(nb_nombres)]
+            nombres = list(set(nombres))
+            while len(nombres) < nb_nombres:
+                nombres.append(prefixe + random.randint(0, 999))
+                nombres = list(set(nombres))
+                
+        else:  # avancé
+            nb_nombres = random.randint(6, 8)
+            # Ajouter des pièges
+            nombres = []
+            # Piège classique : 9999 vs 10000
+            if random.random() < 0.5:
+                nombres.extend([9999, 10000, 10001])
+            else:
+                nombres.extend([99999, 100000, 100001])
+            
+            # Compléter avec d'autres nombres
+            while len(nombres) < nb_nombres:
+                n = random.randint(1000, 999999)
+                if n not in nombres:
+                    nombres.append(n)
+        
+        ordre = random.choice(["croissant", "décroissant"])
+        
+        # Formater les nombres
+        nombres_formates = [f"{n:,}".replace(",", " ") for n in nombres]
+        
+        # Trier
+        nombres_tries = sorted(nombres, reverse=(ordre == "décroissant"))
+        nombres_tries_formates = [f"{n:,}".replace(",", " ") for n in nombres_tries]
+        
+        enonce = f"Ranger les nombres suivants dans l'ordre {ordre} :\n{' ; '.join(nombres_formates)}"
+        
+        etapes = [
+            f"Nombres à ranger : {', '.join(nombres_formates)}",
+            f"Pour comparer, on regarde d'abord le nombre de chiffres, puis chiffre par chiffre de gauche à droite.",
+        ]
+        
+        # Ajouter des explications pour les pièges
+        if difficulte == "avancé":
+            if 9999 in nombres and 10000 in nombres:
+                etapes.append("Attention : 10 000 (5 chiffres) > 9 999 (4 chiffres)")
+            elif 99999 in nombres and 100000 in nombres:
+                etapes.append("Attention : 100 000 (6 chiffres) > 99 999 (5 chiffres)")
+        
+        etapes.append(f"Ordre {ordre} : {' < ' if ordre == 'croissant' else ' > '} ".join(nombres_tries_formates[:3]) + " ...")
+        
+        resultat = " < ".join(nombres_tries_formates) if ordre == "croissant" else " > ".join(nombres_tries_formates)
+        
+        return MathExerciseSpec(
+            niveau=niveau,
+            chapitre=chapitre,
+            type_exercice=MathExerciseType.NOMBRES_COMPARAISON,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "nombres": nombres,
+                "ordre": ordre,
+                "code_ref": "6N1-COMP"
+            },
+            solution_calculee={
+                "nombres_tries": nombres_tries,
+                "ordre": ordre
+            },
+            etapes_calculees=etapes,
+            resultat_final=resultat,
+            figure_geometrique=None,
+            points_bareme=[
+                {"etape": "Ordre correct", "points": 1.0},
+                {"etape": "Symboles corrects", "points": 0.5}
+            ]
+        )
