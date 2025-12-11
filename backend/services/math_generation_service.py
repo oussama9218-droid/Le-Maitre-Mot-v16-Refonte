@@ -1876,12 +1876,16 @@ class MathGenerationService:
                 proprietes=[f"axe_{axe_type}", f"axe_position_{axe_position}", f"symetriques_{sont_symetriques}"]
             )
             
+            # ✅ ÉNONCÉ PÉDAGOGIQUE DÉDIÉ
+            enonce = f"Les points {point_a}({point_a_x} ; {point_a_y}) et {point_b}({point_b_x} ; {point_b_y}) sont-ils symétriques par rapport à {axe_description} ? Justifier."
+            
             return MathExerciseSpec(
                 niveau=niveau,
                 chapitre=chapitre,
                 type_exercice=MathExerciseType.SYMETRIE_AXIALE,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,  # ✅ ÉNONCÉ DÉDIÉ
                     "type": "verifier_symetrie",
                     "point_a": point_a,
                     "point_b": point_b,
