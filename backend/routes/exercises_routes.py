@@ -259,31 +259,87 @@ def _build_fallback_enonce(spec, chapitre: str) -> str:
     responses={
         422: {
             "model": ErrorDetail,
-            "description": "Niveau ou chapitre invalide"
+            "description": "Niveau, chapitre ou code_officiel invalide"
         },
         500: {
             "description": "Erreur lors de la génération de l'exercice"
         }
     },
     summary="Générer un exercice mathématique",
-    description="Génère un exercice personnalisé avec énoncé, figure géométrique et solution"
+    description="""
+    Génère un exercice personnalisé avec énoncé, figure géométrique et solution.
+    
+    **Deux modes de fonctionnement :**
+    
+    1. **Mode legacy** : Utiliser `niveau` + `chapitre`
+       ```json
+       {"niveau": "6e", "chapitre": "Fractions", "difficulte": "moyen"}
+       ```
+    
+    2. **Mode officiel** : Utiliser `code_officiel` (référentiel 6e)
+       ```json
+       {"code_officiel": "6e_N08", "difficulte": "moyen"}
+       ```
+    
+    Si `code_officiel` est fourni, il a priorité sur `chapitre`.
+    """
 )
 async def generate_exercise(request: ExerciseGenerateRequest):
     """
-    Génère un exercice mathématique complet
+    Génère un exercice mathématique complet.
     
-    - **niveau**: Niveau scolaire (CP, CE1, 6e, 5e, etc.)
-    - **chapitre**: Chapitre du curriculum
-    - **type_exercice**: Type d'exercice (standard par défaut)
-    - **difficulte**: Niveau de difficulté (facile, moyen, difficile)
+    Args:
+        request: Requête avec niveau/chapitre (legacy) ou code_officiel (nouveau)
     
     Returns:
         Exercice généré avec énoncé HTML, SVG, solution et pdf_token
     """
-    logger.info(
-        f"Génération exercice: niveau={request.niveau}, "
-        f"chapitre={request.chapitre}, difficulté={request.difficulte}"
-    )
+    
+    # ============================================================================
+    # 0. RÉSOLUTION DU MODE (code_officiel vs legacy)
+    # ============================================================================
+    
+    curriculum_chapter: Optional[CurriculumChapter] = None
+    exercise_types_override: Optional[List[MathExerciseType]] = None
+    
+    if request.code_officiel:
+        # Mode code_officiel : chercher dans le référentiel
+        curriculum_chapter = get_chapter_by_official_code(request.code_officiel)
+        
+        if not curriculum_chapter:
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "error": "code_officiel_invalide",
+                    "message": f"Le code officiel '{request.code_officiel}' n'existe pas dans le référentiel.",
+                    "hint": "Utilisez un code au format 6e_N01, 6e_G01, etc."
+                }
+            )
+        
+        # Extraire les informations du référentiel
+        request.niveau = curriculum_chapter.niveau
+        request.chapitre = curriculum_chapter.chapitre_backend
+        
+        # Convertir les types d'exercices du référentiel en enum
+        if curriculum_chapter.exercise_types:
+            try:
+                exercise_types_override = [
+                    MathExerciseType[et] for et in curriculum_chapter.exercise_types
+                    if hasattr(MathExerciseType, et)
+                ]
+            except Exception as e:
+                logger.warning(f"Erreur conversion exercise_types pour {request.code_officiel}: {e}")
+        
+        logger.info(
+            f"Génération exercice (mode officiel): code={request.code_officiel}, "
+            f"chapitre_backend={request.chapitre}, exercise_types={curriculum_chapter.exercise_types}"
+        )
+    else:
+        # Mode legacy : utiliser niveau + chapitre directement
+        logger.info(
+            f"Génération exercice (mode legacy): niveau={request.niveau}, "
+            f"chapitre={request.chapitre}, difficulté={request.difficulte}"
+        )
     
     # ============================================================================
     # 1. VALIDATION DU NIVEAU
@@ -307,29 +363,31 @@ async def generate_exercise(request: ExerciseGenerateRequest):
         )
     
     # ============================================================================
-    # 2. VALIDATION DU CHAPITRE
+    # 2. VALIDATION DU CHAPITRE (sauf si code_officiel a été résolu)
     # ============================================================================
     
-    if not curriculum_service.validate_chapitre(request.niveau, request.chapitre):
-        chapitres_disponibles = curriculum_service.get_chapitres_disponibles(request.niveau)
-        
-        logger.warning(
-            f"Chapitre invalide: {request.chapitre} pour niveau {request.niveau}"
-        )
-        
-        raise HTTPException(
-            status_code=422,
-            detail={
-                "error": "chapitre_invalide",
-                "message": (
-                    f"Le chapitre '{request.chapitre}' n'existe pas pour le niveau '{request.niveau}'. "
-                    f"Chapitres disponibles : {', '.join(chapitres_disponibles[:10])}"
-                    + ("..." if len(chapitres_disponibles) > 10 else ".")
-                ),
-                "niveau": request.niveau,
-                "chapitres_disponibles": chapitres_disponibles
-            }
-        )
+    if not curriculum_chapter:
+        # Mode legacy : valider le chapitre
+        if not curriculum_service.validate_chapitre(request.niveau, request.chapitre):
+            chapitres_disponibles = curriculum_service.get_chapitres_disponibles(request.niveau)
+            
+            logger.warning(
+                f"Chapitre invalide: {request.chapitre} pour niveau {request.niveau}"
+            )
+            
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "error": "chapitre_invalide",
+                    "message": (
+                        f"Le chapitre '{request.chapitre}' n'existe pas pour le niveau '{request.niveau}'. "
+                        f"Chapitres disponibles : {', '.join(chapitres_disponibles[:10])}"
+                        + ("..." if len(chapitres_disponibles) > 10 else ".")
+                    ),
+                    "niveau": request.niveau,
+                    "chapitres_disponibles": chapitres_disponibles
+                }
+            )
     
     # ============================================================================
     # 3. GÉNÉRATION DE L'EXERCICE
@@ -337,13 +395,25 @@ async def generate_exercise(request: ExerciseGenerateRequest):
     
     try:
         # V1-BE-002-FIX: Utiliser l'instance globale (performance)
-        # Générer l'exercice avec le service math (génère 1 exercice)
-        specs = _math_service.generate_math_exercise_specs(
-            niveau=request.niveau,
-            chapitre=request.chapitre,
-            difficulte=request.difficulte,
-            nb_exercices=1
-        )
+        # Générer l'exercice avec le service math
+        
+        if exercise_types_override and len(exercise_types_override) > 0:
+            # Mode code_officiel : utiliser les types spécifiés dans le référentiel
+            specs = _math_service.generate_math_exercise_specs_with_types(
+                niveau=request.niveau,
+                chapitre=request.chapitre,
+                difficulte=request.difficulte,
+                exercise_types=exercise_types_override,
+                nb_exercices=1
+            )
+        else:
+            # Mode legacy : utiliser le mapping par chapitre
+            specs = _math_service.generate_math_exercise_specs(
+                niveau=request.niveau,
+                chapitre=request.chapitre,
+                difficulte=request.difficulte,
+                nb_exercices=1
+            )
         
         if not specs or len(specs) == 0:
             raise ValueError(f"Aucun exercice généré pour {request.niveau} - {request.chapitre}")
