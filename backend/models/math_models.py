@@ -124,6 +124,12 @@ class MathExerciseType(str, Enum):
     
     # Symétrie
     SYMETRIE_PROPRIETES = "symetrie_proprietes"
+    
+    # ========== GÉNÉRATEURS DÉDIÉS 6e (P1) ==========
+    CALCUL_MENTAL_DEDIE = "calcul_mental_dedie"
+    CALCUL_POSE_DEDIE = "calcul_pose_dedie"
+    CALCUL_INSTRUMENTE_DEDIE = "calcul_instrumente_dedie"
+    GRANDEURS_MESURES_DEDIE = "grandeurs_mesures_dedie"
 
 class GeometricFigure(BaseModel):
     """Définition structurée d'une figure géométrique"""
