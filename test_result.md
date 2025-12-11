@@ -1,6 +1,42 @@
 # Testing Protocol and Results
 
-## Latest Test Session - MathRenderer LaTeX Integration Testing - 2025-12-10 23:49:46
+## Latest Test Session - Corrections QA P0/P1 - 2025-12-11
+
+### Test Focus
+Corrections des bugs QA remontés par Perplexity :
+- P0-1: Reset des exercices au changement de niveau/chapitre
+- P0-2: Générateurs dédiés pour Fractions & Symétrie axiale (6e)
+- P1-1: Indicateur de chargement amélioré
+- P2-1: Bouton PDF désactivé avec label "(bientôt)"
+
+### Changes Made
+
+#### Frontend (ExerciseGeneratorPage.js)
+1. **P0-1**: Ajout `useEffect` pour reset `exercises`, `currentIndex`, `error` au changement de `selectedNiveau` ou `selectedChapitre`
+2. **P1-1**: Ajout indicateur de chargement amélioré sous le bouton "Générer"
+3. **P2-1**: Bouton PDF désactivé avec label "PDF (bientôt)"
+
+#### Backend (math_generation_service.py)
+1. **P0-2**: Ajout clé `"enonce"` dans `_gen_calcul_fractions()` - énoncé pédagogique complet
+2. **P0-2**: Ajout clé `"enonce"` dans `_gen_symetrie_axiale()` - 3 types d'exercices couverts :
+   - `trouver_symetrique`: "Construire le symétrique du point X par rapport à l'axe..."
+   - `verifier_symetrie`: "Les points A et B sont-ils symétriques par rapport à..."
+   - `completer_figure`: "Construire le symétrique du triangle ABC..."
+
+### API Tests (curl) - TOUS PASSÉS ✅
+
+| Chapitre | is_fallback | generator_code | Énoncé |
+|----------|-------------|----------------|--------|
+| Fractions | `false` ✅ | `6e_CALCUL_FRACTIONS` | "Calculer la somme/différence des fractions..." |
+| Symétrie axiale | `false` ✅ | `6e_SYMETRIE_AXIALE` | "Construire le symétrique du triangle DEF..." |
+| Proportionnalité | `false` ✅ | `6e_PROPORTIONNALITE` | "Compléter le tableau de proportionnalité..." |
+
+### Documentation créée
+- `/app/docs/CHAPITRES_COLLEGE_STATUS.md` - Statut des générateurs par chapitre (collège)
+
+---
+
+## Previous Test Session - MathRenderer LaTeX Integration Testing - 2025-12-10 23:49:46
 
 ### Test Focus
 Comprehensive testing of MathRenderer LaTeX integration on /generate page to verify proper rendering of mathematical content, HTML tables, and geometry figures without duplication.
