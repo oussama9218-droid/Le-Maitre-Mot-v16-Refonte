@@ -446,6 +446,16 @@ const ExerciseGeneratorPage = () => {
                 </>
               )}
             </Button>
+
+            {/* P1-1: Indicateur de chargement amélioré */}
+            {loading && (
+              <div className="flex items-center justify-center mt-4 p-4 bg-blue-50 rounded-lg">
+                <Loader2 className="h-5 w-5 animate-spin text-blue-600 mr-3" />
+                <span className="text-blue-800">
+                  Génération de {nbExercices} exercice{nbExercices > 1 ? 's' : ''} en cours...
+                </span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
