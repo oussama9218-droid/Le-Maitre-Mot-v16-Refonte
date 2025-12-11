@@ -219,6 +219,16 @@ const ExerciseGeneratorPage = () => {
     }
   }, [selectedNiveau]);
 
+  // P0-1: Reset des exercices quand niveau ou chapitre change
+  // Évite l'affichage des anciens exercices après changement de sélection
+  useEffect(() => {
+    // Vider les exercices générés précédemment
+    setExercises([]);
+    setCurrentIndex(0);
+    setError(null);
+    console.log('🔄 Reset exercices (changement niveau/chapitre)');
+  }, [selectedNiveau, selectedChapitre]);
+
   // Générer les exercices (appels parallèles)
   const generateExercises = async () => {
     if (!selectedNiveau || !selectedChapitre) {
