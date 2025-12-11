@@ -168,11 +168,11 @@ class MathGenerationService:
             # ========== Chapitres multi-niveaux (5e, 4e, 3e) - SANS 6e car déjà définis ==========
             # Note: "Fractions", "Proportionnalité", "Nombres entiers et décimaux" sont
             # définis en haut avec les générateurs Vague 1 pour le niveau 6e
+            # Note: "Volumes" et "Géométrie dans l'espace" sont définis plus haut (ligne 107)
             "Nombres relatifs": [MathExerciseType.CALCUL_RELATIFS],
             "Nombres rationnels": [MathExerciseType.CALCUL_FRACTIONS],
-            "Statistiques": [MathExerciseType.STATISTIQUES],
-            "Géométrie dans l'espace": [MathExerciseType.VOLUME],
-            "Volumes": [MathExerciseType.VOLUME],
+            "Statistiques": [MathExerciseType.STATISTIQUES, MathExerciseType.DIAGRAMME_BARRES],
+            # "Géométrie dans l'espace" et "Volumes" -> voir définitions plus haut
             "Puissances": [MathExerciseType.PUISSANCES],
             "Calcul littéral": [MathExerciseType.EQUATION_1ER_DEGRE, MathExerciseType.CALCUL_DECIMAUX],
             
