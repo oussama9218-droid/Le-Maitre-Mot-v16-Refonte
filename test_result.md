@@ -1146,7 +1146,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "MathRenderer LaTeX Integration Testing"
+    - "Wave 1 Generators Testing - V1 API 6e Level"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
