@@ -7897,13 +7897,16 @@ class MathGenerationService:
             10: "Un nombre est divisible par 10 si son dernier chiffre est 0."
         }[diviseur]
         
+        verdict = "est" if est_divisible else "n'est pas"
+        conclusion = f"{'Oui' if est_divisible else 'Non'}, {nombre} {verdict} divisible par {diviseur}."
+        
         return MathExerciseSpec(
             niveau=niveau, chapitre=chapitre,
             type_exercice=MathExerciseType.CRITERES_DIVISIBILITE,
             difficulte=DifficultyLevel(difficulte),
             parametres={"enonce": enonce, "nombre": nombre, "diviseur": diviseur, "code_ref": "6N-DIV"},
             solution_calculee={"divisible": est_divisible},
-            etapes_calculees=[critere, f"{'Oui' if est_divisible else 'Non'}, {nombre} {'est' if est_divisible else 'n\\'est pas'} divisible par {diviseur}."],
+            etapes_calculees=[critere, conclusion],
             resultat_final="Oui" if est_divisible else "Non"
         )
     
