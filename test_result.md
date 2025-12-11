@@ -1,15 +1,16 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Wave 1 Generators Testing V1 API 6e Level - 2025-12-11
+## Latest Test Session - Comprehensive 6e Generators Testing (Waves 1, 2 & 3) - 2025-12-11
 
 ### Test Focus
-Comprehensive testing of Wave 1 generators on V1 API for 6e level as requested:
-- Test Fraction Representation (6N2-FRAC-REPR) - Both generators present
-- Test Proportionnalité types (3 types) - Mix verification
-- Test Nombres entiers (3 types) - Generator diversity
-- Test enonce quality for PROP_TABLEAU - HTML table structure
-- Test enonce quality for NOMBRES_LECTURE - Writing instructions
-- Test enonce quality for FRACTION_REPRESENTATION - SVG visualization
+Comprehensive testing of new 6e generators (Waves 1, 2 & 3) coverage as requested:
+- Test Périmètres et aires (4 types) - 20 runs with mix verification
+- Test Angles (3 types) - 15 runs with all types present
+- Test Fractions (2 types) - 10 runs with both generators
+- Test Proportionnalité (3 types) - 15 runs with mix verification
+- Test Nombres entiers (3 types) - 15 runs with generator diversity
+- Test Géométrie dans le plan (5 types) - 20 runs with key generators
+- Test enonce quality for new generators - HTML tables, SVG, writing instructions
 
 ### Tests Executed (via Python test suite)
 
