@@ -88,16 +88,36 @@ class MathGenerationService:
             "Aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.CERCLE],
             
             # Géométrie
-            "Géométrie dans le plan": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.PROBLEME_2_ETAPES],
+            "Géométrie dans le plan": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.PROBLEME_2_ETAPES, MathExerciseType.TRIANGLE_CONSTRUCTION, MathExerciseType.QUADRILATERES],
             
             # Symétrie (déjà implémenté)
-            "Symétrie axiale": [MathExerciseType.SYMETRIE_AXIALE],
+            "Symétrie axiale": [MathExerciseType.SYMETRIE_AXIALE, MathExerciseType.SYMETRIE_PROPRIETES],
             "Symétrie axiale (points, segments, figures)": [MathExerciseType.SYMETRIE_AXIALE],
             
+            # ========== VAGUE 2 & 3 - 6e ==========
+            # Droites graduées
+            "Droite numérique et repérage": [MathExerciseType.DROITE_GRADUEE_ENTIERS, MathExerciseType.DROITE_GRADUEE_DECIMAUX],
+            "Droite graduée": [MathExerciseType.DROITE_GRADUEE_ENTIERS, MathExerciseType.DROITE_GRADUEE_DECIMAUX],
+            
+            # Angles
+            "Angles": [MathExerciseType.ANGLE_MESURE, MathExerciseType.ANGLE_VOCABULAIRE, MathExerciseType.ANGLE_PROPRIETES],
+            
+            # Volumes
+            "Volumes": [MathExerciseType.VOLUME_PAVE, MathExerciseType.VOLUME],
+            
+            # Données et tableaux
+            "Lire et compléter des tableaux de données": [MathExerciseType.TABLEAU_LECTURE, MathExerciseType.TABLEAU_COMPLETER, MathExerciseType.STATISTIQUES],
+            "Diagrammes en barres et pictogrammes": [MathExerciseType.DIAGRAMME_BARRES, MathExerciseType.STATISTIQUES],
+            
+            # Calculs avancés
+            "Priorités opératoires": [MathExerciseType.PRIORITES_OPERATIONS],
+            "Multiples et diviseurs, critères de divisibilité": [MathExerciseType.CRITERES_DIVISIBILITE, MathExerciseType.MULTIPLES],
+            
+            # Conversions
+            "Longueurs, masses, durées": [MathExerciseType.CONVERSIONS_UNITES, MathExerciseType.CALCUL_DECIMAUX],
+            
             # ========== 6e - Existants restants ==========
-            "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX],
-            "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX],
-            "Longueurs, masses, durées": [MathExerciseType.CALCUL_DECIMAUX],
+            "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.ENCADREMENT, MathExerciseType.ARRONDI],
             "Périmètres et aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.RECTANGLE],
             "Aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.CERCLE],
             "Angles": [MathExerciseType.TRIANGLE_QUELCONQUE],  # Angles dans triangles
