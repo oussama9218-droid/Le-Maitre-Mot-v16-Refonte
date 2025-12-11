@@ -984,6 +984,8 @@ class MathGenerationService:
         # ✅ ASSERT : Garantir valeurs positives
         assert longueur > 0 and largeur > 0, "Longueur et largeur doivent être > 0"
         
+        enonce = f"Soit le rectangle {points[0]}{points[1]}{points[2]}{points[3]} de longueur {longueur} cm et de largeur {largeur} cm. Calculer son périmètre et son aire."
+        
         figure = GeometricFigure(
             type="rectangle",
             points=points,
@@ -1003,6 +1005,7 @@ class MathGenerationService:
             type_exercice=MathExerciseType.RECTANGLE,
             difficulte=DifficultyLevel(difficulte),
             parametres={
+                "enonce": enonce,
                 "longueur": longueur,
                 "largeur": largeur,
                 "rectangle": f"{points[0]}{points[1]}{points[2]}{points[3]}"
