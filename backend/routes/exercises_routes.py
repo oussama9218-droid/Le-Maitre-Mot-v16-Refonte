@@ -174,9 +174,48 @@ def _build_fallback_enonce(spec, chapitre: str) -> str:
         figure = params.get("figure", params.get("type_figure", "figure"))
         return f"Calculer le périmètre et/ou l'aire de la {figure} donnée."
     
-    # Volume
+    # Volume - CORRIGÉ P0-001: Toujours inclure les dimensions dans l'énoncé
     if "volume" in type_exercice:
         solide = params.get("solide", params.get("type_solide", "solide"))
+        
+        # Cube : inclure l'arête
+        if solide == "cube":
+            arete = params.get("arete", params.get("cote", ""))
+            if arete:
+                return f"Calculer le volume d'un cube d'arête {arete} cm."
+        
+        # Pavé droit : inclure les 3 dimensions
+        elif solide == "pave" or solide == "pavé" or solide == "pave_droit":
+            longueur = params.get("longueur", params.get("L", ""))
+            largeur = params.get("largeur", params.get("l", ""))
+            hauteur = params.get("hauteur", params.get("h", ""))
+            if longueur and largeur and hauteur:
+                return f"Calculer le volume d'un pavé droit de dimensions {longueur} cm × {largeur} cm × {hauteur} cm."
+        
+        # Cylindre : inclure rayon et hauteur
+        elif solide == "cylindre":
+            rayon = params.get("rayon", params.get("r", ""))
+            hauteur = params.get("hauteur", params.get("h", ""))
+            if rayon and hauteur:
+                return f"Calculer le volume d'un cylindre de rayon {rayon} cm et de hauteur {hauteur} cm."
+        
+        # Prisme : inclure aire de base et hauteur
+        elif solide == "prisme":
+            aire_base = params.get("aire_base", "")
+            hauteur = params.get("hauteur", "")
+            if aire_base and hauteur:
+                return f"Calculer le volume d'un prisme d'aire de base {aire_base} cm² et de hauteur {hauteur} cm."
+        
+        # Fallback avec dimensions si disponibles
+        dimensions = []
+        for key in ["longueur", "largeur", "hauteur", "arete", "rayon", "L", "l", "h", "r"]:
+            if key in params and params[key]:
+                dimensions.append(f"{key}: {params[key]} cm")
+        
+        if dimensions:
+            dims_str = ", ".join(dimensions)
+            return f"Calculer le volume du {solide} ({dims_str})."
+        
         return f"Calculer le volume du {solide}."
     
     # Probabilités
