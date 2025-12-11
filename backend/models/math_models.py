@@ -175,4 +175,66 @@ class GeneratedMathExercise(BaseModel):
                 ] if self.spec.figure_geometrique.rectangle_en else []
             }
         
-        return exercise
+        return exercise    
+    # ========== VAGUE 2 - Générateurs 6e ==========
+    # Droites graduées
+    DROITE_GRADUEE_ENTIERS = "droite_graduee_entiers"  # 6N1-DROITE
+    DROITE_GRADUEE_DECIMAUX = "droite_graduee_decimaux"  # 6N2-DROITE
+    FRACTION_DROITE = "fraction_droite"  # 6N2-FRAC-DROITE
+    
+    # Fractions avancées
+    FRACTION_COMPARAISON = "fraction_comparaison"  # 6N2-FRAC-COMP
+    FRACTIONS_EGALES = "fractions_egales"  # Vague 3
+    
+    # Proportionnalité avancée
+    PROP_COEFFICIENT = "prop_coefficient"  # 6N3-PROP-COEFF
+    VITESSE_DUREE_DISTANCE = "vitesse_duree_distance"  # 6N3-VDD
+    PROP_GRAPHIQUE = "prop_graphique"  # Vague 3
+    
+    # Aires avancées
+    AIRE_TRIANGLE = "aire_triangle"  # 6G1-AIRE-TRI
+    AIRE_FIGURES_COMPOSEES = "aire_figures_composees"  # 6G1-AIRE-COMP
+    
+    # Volumes
+    VOLUME_PAVE = "volume_pave"  # 6G3-VOL-PAVE
+    
+    # Données et statistiques
+    TABLEAU_LECTURE = "tableau_lecture"  # 6D-TAB-LIRE
+    DIAGRAMME_BARRES = "diagramme_barres"  # 6D-DIAG-BAR
+    DIAGRAMME_CIRCULAIRE = "diagramme_circulaire"  # Vague 3
+    TABLEAU_COMPLETER = "tableau_completer"  # Vague 3
+    
+    # Problèmes
+    PROBLEME_1_ETAPE = "probleme_1_etape"  # 6P-PROB-1ET
+    
+    # Géométrie figures
+    TRIANGLE_CONSTRUCTION = "triangle_construction"  # 6G-TRI
+    QUADRILATERES = "quadrilateres"  # 6G-QUAD
+    ANGLE_MESURE = "angle_mesure"  # 6G-ANGLE
+    ANGLE_VOCABULAIRE = "angle_vocabulaire"  # Vague 3
+    ANGLE_PROPRIETES = "angle_proprietes"  # Vague 3
+    
+    # Calcul littéral
+    FORMULES = "formules"  # 6L-FORM
+    SUBSTITUTION = "substitution"  # Vague 3
+    
+    # ========== VAGUE 3 - Générateurs 6e ==========
+    # Nombres
+    DECOMPOSITION = "decomposition"
+    ENCADREMENT = "encadrement"
+    ARRONDI = "arrondi"
+    
+    # Calculs
+    PRIORITES_OPERATIONS = "priorites_operations"
+    PARENTHESES = "parentheses"
+    ERREURS_COURANTES = "erreurs_courantes"
+    
+    # Divisibilité
+    CRITERES_DIVISIBILITE = "criteres_divisibilite"
+    MULTIPLES = "multiples"
+    
+    # Conversions
+    CONVERSIONS_UNITES = "conversions_unites"
+    
+    # Symétrie
+    SYMETRIE_PROPRIETES = "symetrie_proprietes"
