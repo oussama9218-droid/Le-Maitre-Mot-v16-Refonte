@@ -84,8 +84,9 @@ class MathGenerationService:
             "Nombres entiers et décimaux": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.NOMBRES_LECTURE, MathExerciseType.NOMBRES_COMPARAISON],
             
             # Aires et périmètres
-            "Périmètres et aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.RECTANGLE],
-            "Aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.CERCLE],
+            "Périmètres et aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.RECTANGLE, MathExerciseType.AIRE_TRIANGLE, MathExerciseType.AIRE_FIGURES_COMPOSEES],
+            "Aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.AIRE_TRIANGLE, MathExerciseType.CERCLE],
+            "Aire du rectangle et du carré": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.AIRE_FIGURES_COMPOSEES],
             
             # Géométrie
             "Géométrie dans le plan": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.PROBLEME_2_ETAPES, MathExerciseType.TRIANGLE_CONSTRUCTION, MathExerciseType.QUADRILATERES],
@@ -118,8 +119,9 @@ class MathGenerationService:
             
             # ========== 6e - Existants restants ==========
             "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.ENCADREMENT, MathExerciseType.ARRONDI],
-            "Périmètres et aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.RECTANGLE],
-            "Aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.CERCLE],
+            "Périmètres et aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.RECTANGLE, MathExerciseType.AIRE_TRIANGLE, MathExerciseType.AIRE_FIGURES_COMPOSEES],
+            "Aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.AIRE_TRIANGLE, MathExerciseType.CERCLE],
+            "Aire du rectangle et du carré": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.AIRE_FIGURES_COMPOSEES],
             "Angles": [MathExerciseType.TRIANGLE_QUELCONQUE],  # Angles dans triangles
             "Géométrie - Triangles et quadrilatères": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],
             "Géométrie dans le plan": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],
