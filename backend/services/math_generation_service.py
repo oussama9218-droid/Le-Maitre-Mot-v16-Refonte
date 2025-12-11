@@ -294,7 +294,12 @@ class MathGenerationService:
             MathExerciseType.SYMETRIE_PROPRIETES: self._gen_symetrie_proprietes,
             MathExerciseType.TABLEAU_COMPLETER: self._gen_tableau_completer,
             MathExerciseType.DIAGRAMME_CIRCULAIRE: self._gen_diagramme_circulaire,
-            MathExerciseType.SUBSTITUTION: self._gen_substitution
+            MathExerciseType.SUBSTITUTION: self._gen_substitution,
+            # ========== GÉNÉRATEURS DÉDIÉS 6e (P1) ==========
+            MathExerciseType.CALCUL_MENTAL_DEDIE: self._gen_calcul_mental_dedie,
+            MathExerciseType.CALCUL_POSE_DEDIE: self._gen_calcul_pose_dedie,
+            MathExerciseType.CALCUL_INSTRUMENTE_DEDIE: self._gen_calcul_instrumente_dedie,
+            MathExerciseType.GRANDEURS_MESURES_DEDIE: self._gen_grandeurs_mesures_dedie
         }
         
         generator = generators.get(exercise_type)
