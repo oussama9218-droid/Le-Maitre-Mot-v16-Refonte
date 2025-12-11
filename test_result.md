@@ -1078,6 +1078,18 @@ frontend:
         comment: "SUCCÈS COMPLET (3/3 tests critiques - 100%) - MathRenderer LaTeX integration fully operational. TEST 1 (Fractions LaTeX): 6 KaTeX elements + 4 MathRenderer elements detected, fractions properly rendered as mathematical notation (not raw \\frac{}{}). TEST 2 (HTML Tables Proportionnalité): 1 HTML table properly rendered without raw HTML tags, table displays correctly with proper styling. TEST 3 (Geometry Figures): 14 SVG elements found with 0 duplicate figure sections, figures properly integrated into exercise content without duplication. All key scenarios from review request validated successfully - LaTeX formulas render as proper fractions, HTML tables display correctly, no duplicate figures detected."
 
 backend:
+  - task: "Wave 1 Generators Testing - V1 API 6e Level"
+    implemented: true
+    working: true
+    file: "/app/backend/services/math_generation_service.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "SUCCÈS COMPLET (6/6 tests - 100%) - Wave 1 generators fully operational on V1 API for 6e level. TEST 1 (Fraction Representation): Both 6e_CALCUL_FRACTIONS and 6e_FRACTION_REPRESENTATION generators found, all non-fallback. TEST 2 (Proportionnalité Types): Mix of 3 generators found (6e_PROPORTIONNALITE, 6e_PROP_TABLEAU, 6e_PROP_ACHAT), all non-fallback. TEST 3 (Nombres Entiers): Mix of 3 generators found (6e_CALCUL_DECIMAUX, 6e_NOMBRES_LECTURE, 6e_NOMBRES_COMPARAISON). TEST 4 (PROP_TABLEAU Quality): HTML table with border-collapse style and proper headers/data cells. TEST 5 (NOMBRES_LECTURE Quality): Contains 'Écrire en lettres' instruction and numbers to convert. TEST 6 (FRACTION_REPRESENTATION Quality): SVG with rectangles for fraction visualization. All Wave 1 generators working correctly with proper content quality."
+
   - task: "V1 Exercises API Bug Fixes Testing"
     implemented: true
     working: true
