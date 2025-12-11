@@ -72,10 +72,10 @@ class MathGenerationService:
             # Note: Utilise les chapitres existants du catalogue
             
             # Fractions - inclut représentation graphique, addition/soustraction
-            "Fractions": [MathExerciseType.CALCUL_FRACTIONS, MathExerciseType.FRACTION_REPRESENTATION],
+            "Fractions": [MathExerciseType.CALCUL_FRACTIONS, MathExerciseType.FRACTION_REPRESENTATION, MathExerciseType.FRACTION_COMPARAISON],
             "Fractions comme partage et quotient": [MathExerciseType.CALCUL_FRACTIONS, MathExerciseType.FRACTION_REPRESENTATION],
             "Fractions simples de l'unité": [MathExerciseType.CALCUL_FRACTIONS, MathExerciseType.FRACTION_REPRESENTATION],
-            "Nombres en écriture fractionnaire": [MathExerciseType.CALCUL_FRACTIONS],
+            "Nombres en écriture fractionnaire": [MathExerciseType.CALCUL_FRACTIONS, MathExerciseType.FRACTIONS_EGALES, MathExerciseType.FRACTION_COMPARAISON],
             
             # Proportionnalité - inclut tableaux et problèmes achats
             "Proportionnalité": [MathExerciseType.PROPORTIONNALITE, MathExerciseType.PROP_TABLEAU, MathExerciseType.PROP_ACHAT],
