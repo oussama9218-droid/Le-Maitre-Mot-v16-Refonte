@@ -1,7 +1,7 @@
 """
 Models Pydantic pour l'API Exercises v1
 """
-from pydantic import BaseModel, Field, validator, root_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Optional, Dict, Any
 
 
@@ -36,33 +36,30 @@ class ExerciseGenerateRequest(BaseModel):
         description="Nombre d'exercices à générer (1-10)"
     )
     
-    @root_validator
-    def validate_request_mode(cls, values):
+    @model_validator(mode='after')
+    def validate_request_mode(self):
         """
         Valide qu'au moins un mode de sélection est fourni.
         
         Si code_officiel est fourni, niveau peut être déduit.
         Sinon, niveau et chapitre doivent être fournis.
         """
-        code_officiel = values.get('code_officiel')
-        niveau = values.get('niveau')
-        chapitre = values.get('chapitre')
-        
-        if code_officiel:
+        if self.code_officiel:
             # Mode code_officiel : on déduit le niveau si non fourni
-            if not niveau and code_officiel.startswith(('6e_', '5e_', '4e_', '3e_')):
-                values['niveau'] = code_officiel.split('_')[0]
-            return values
+            if not self.niveau and self.code_officiel.startswith(('6e_', '5e_', '4e_', '3e_')):
+                self.niveau = self.code_officiel.split('_')[0]
+            return self
         
         # Mode legacy : niveau et chapitre requis
-        if not niveau or not chapitre:
+        if not self.niveau or not self.chapitre:
             raise ValueError(
                 "Soit 'code_officiel', soit 'niveau' et 'chapitre' doivent être fournis"
             )
         
-        return values
+        return self
     
-    @validator('difficulte')
+    @field_validator('difficulte')
+    @classmethod
     def validate_difficulte(cls, v):
         """Valide que la difficulté est dans les valeurs acceptées"""
         valeurs_valides = ['facile', 'moyen', 'difficile']
@@ -72,7 +69,8 @@ class ExerciseGenerateRequest(BaseModel):
             )
         return v
     
-    @validator('type_exercice')
+    @field_validator('type_exercice')
+    @classmethod
     def validate_type_exercice(cls, v):
         """Valide que le type d'exercice est dans les valeurs acceptées"""
         valeurs_valides = ['standard', 'avancé', 'simplifié']
@@ -83,9 +81,9 @@ class ExerciseGenerateRequest(BaseModel):
         return v
     
     class Config:
-        schema_extra = {
-            "examples": {
-                "mode_legacy": {
+        json_schema_extra = {
+            "examples": [
+                {
                     "summary": "Mode legacy (niveau + chapitre)",
                     "value": {
                         "niveau": "6e",
@@ -93,14 +91,14 @@ class ExerciseGenerateRequest(BaseModel):
                         "difficulte": "moyen"
                     }
                 },
-                "mode_officiel": {
+                {
                     "summary": "Mode officiel (code_officiel)",
                     "value": {
                         "code_officiel": "6e_N08",
                         "difficulte": "moyen"
                     }
                 }
-            }
+            ]
         }
 
 
