@@ -1028,6 +1028,7 @@ class MathGenerationService:
         if solide == "cube":
             arete = random.randint(3, 12)
             volume = arete ** 3
+            enonce = f"Calculer le volume d'un cube d'arête {arete} cm."
             
             etapes = [
                 f"Cube d'arête {arete} cm",
@@ -1042,6 +1043,7 @@ class MathGenerationService:
                 type_exercice=MathExerciseType.VOLUME,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,
                     "solide": "cube",
                     "arete": arete
                 },
@@ -1058,6 +1060,7 @@ class MathGenerationService:
             largeur = random.randint(4, 12)
             hauteur = random.randint(3, 10)
             volume = longueur * largeur * hauteur
+            enonce = f"Calculer le volume d'un pavé droit de dimensions {longueur} cm × {largeur} cm × {hauteur} cm."
             
             etapes = [
                 f"Pavé droit de dimensions {longueur} cm × {largeur} cm × {hauteur} cm",
@@ -1072,6 +1075,7 @@ class MathGenerationService:
                 type_exercice=MathExerciseType.VOLUME,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,
                     "solide": "pave",
                     "longueur": longueur,
                     "largeur": largeur,
