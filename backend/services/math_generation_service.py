@@ -117,8 +117,8 @@ class MathGenerationService:
             "Priorités opératoires": [MathExerciseType.PRIORITES_OPERATIONS],
             "Multiples et diviseurs, critères de divisibilité": [MathExerciseType.CRITERES_DIVISIBILITE, MathExerciseType.MULTIPLES],
             
-            # Conversions
-            "Longueurs, masses, durées": [MathExerciseType.CONVERSIONS_UNITES, MathExerciseType.CALCUL_DECIMAUX],
+            # Conversions - MISE À JOUR P1: Générateur dédié en priorité
+            "Longueurs, masses, durées": [MathExerciseType.GRANDEURS_MESURES_DEDIE, MathExerciseType.CONVERSIONS_UNITES],
             
             # ========== 6e - Calculs (Calcul mental, posés, instrumentés) ==========
             # MISE À JOUR P1: Utilisation des générateurs dédiés en priorité
