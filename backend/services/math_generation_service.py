@@ -117,6 +117,11 @@ class MathGenerationService:
             # Conversions
             "Longueurs, masses, durées": [MathExerciseType.CONVERSIONS_UNITES, MathExerciseType.CALCUL_DECIMAUX],
             
+            # ========== 6e - Calculs (Calcul mental, posés, instrumentés) ==========
+            "Calcul mental": [MathExerciseType.PRIORITES_OPERATIONS, MathExerciseType.CALCUL_DECIMAUX],
+            "Calculs posés": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.CALCUL_FRACTIONS],
+            "Calculs instrumentés": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.CONVERSIONS_UNITES],
+            
             # ========== 6e - Existants restants ==========
             "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.ENCADREMENT, MathExerciseType.ARRONDI],
             "Géométrie - Triangles et quadrilatères": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],
