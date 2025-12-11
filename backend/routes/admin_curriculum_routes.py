@@ -1,8 +1,10 @@
 """
 Routes API admin pour la gestion du curriculum.
 
-Endpoints READ-ONLY pour visualiser le référentiel pédagogique.
+Endpoints CRUD pour visualiser et modifier le référentiel pédagogique.
 Protection par flag d'environnement ADMIN_ENABLED.
+
+V2: Ajout des fonctionnalités d'édition (POST, PUT, DELETE)
 """
 
 from fastapi import APIRouter, HTTPException, Depends
@@ -14,6 +16,11 @@ from curriculum.loader import (
     get_curriculum_index,
     CurriculumChapter,
     validate_curriculum
+)
+from services.curriculum_persistence_service import (
+    ChapterCreateRequest,
+    ChapterUpdateRequest,
+    get_curriculum_persistence_service
 )
 from logger import get_logger
 
@@ -39,6 +46,7 @@ class AdminChapterResponse(BaseModel):
     tags: List[str] = []
     difficulte_min: int = 1
     difficulte_max: int = 3
+    schema_requis: bool = False
 
 
 class AdminCurriculumResponse(BaseModel):
@@ -58,6 +66,20 @@ class AdminValidationResponse(BaseModel):
     chapters_by_status: dict
     chapters_by_domaine: dict
     warnings: List[str] = []
+
+
+class ChapterCRUDResponse(BaseModel):
+    """Réponse pour les opérations CRUD"""
+    success: bool
+    message: str
+    chapter: Optional[AdminChapterResponse] = None
+
+
+class AvailableOptionsResponse(BaseModel):
+    """Options disponibles pour le formulaire d'édition"""
+    generators: List[str]
+    domaines: List[str]
+    statuts: List[str] = ["prod", "beta", "hidden"]
 
 
 # ============================================================================
@@ -119,8 +141,42 @@ def check_admin_enabled():
     return True
 
 
+def chapter_to_response(chapter: dict) -> AdminChapterResponse:
+    """Convertit un chapitre dict en AdminChapterResponse"""
+    exercise_types = chapter.get("exercise_types", [])
+    
+    return AdminChapterResponse(
+        code_officiel=chapter.get("code_officiel", ""),
+        domaine=chapter.get("domaine", ""),
+        libelle=chapter.get("libelle", ""),
+        generateurs=exercise_types,
+        has_diagramme=has_diagram_generator(exercise_types),
+        statut=chapter.get("statut", "beta"),
+        chapitre_backend=chapter.get("chapitre_backend", ""),
+        tags=chapter.get("tags", []),
+        difficulte_min=chapter.get("difficulte_min", 1),
+        difficulte_max=chapter.get("difficulte_max", 3),
+        schema_requis=chapter.get("schema_requis", False)
+    )
+
+
 # ============================================================================
-# ENDPOINTS
+# DEPENDENCY - Database injection
+# ============================================================================
+
+async def get_db():
+    """Dépendance pour obtenir la base de données"""
+    from server import db
+    return db
+
+
+async def get_persistence_service(db=Depends(get_db)):
+    """Dépendance pour obtenir le service de persistance"""
+    return get_curriculum_persistence_service(db)
+
+
+# ============================================================================
+# ENDPOINTS READ (V1)
 # ============================================================================
 
 @router.get(
@@ -158,7 +214,8 @@ async def get_curriculum_6e(admin_check: bool = Depends(check_admin_enabled)):
                 chapitre_backend=chapter.chapitre_backend,
                 tags=chapter.tags,
                 difficulte_min=chapter.difficulte_min,
-                difficulte_max=chapter.difficulte_max
+                difficulte_max=chapter.difficulte_max,
+                schema_requis=chapter.schema_requis
             ))
         
         # Statistiques
@@ -259,7 +316,8 @@ async def get_chapter_by_code(
         chapitre_backend=chapter.chapitre_backend,
         tags=chapter.tags,
         difficulte_min=chapter.difficulte_min,
-        difficulte_max=chapter.difficulte_max
+        difficulte_max=chapter.difficulte_max,
+        schema_requis=chapter.schema_requis
     )
 
 
@@ -282,3 +340,176 @@ async def get_curriculum_stats_endpoint(admin_check: bool = Depends(check_admin_
         "repartition_domaines": report["chapters_by_domaine"],
         "repartition_statuts": report["chapters_by_status"]
     }
+
+
+# ============================================================================
+# ENDPOINTS CRUD (V2)
+# ============================================================================
+
+@router.get(
+    "/curriculum/options",
+    response_model=AvailableOptionsResponse,
+    summary="Options disponibles pour l'édition",
+    description="Retourne les listes de générateurs, domaines et statuts disponibles."
+)
+async def get_available_options(
+    admin_check: bool = Depends(check_admin_enabled),
+    service=Depends(get_persistence_service)
+):
+    """
+    Récupère les options disponibles pour le formulaire d'édition.
+    """
+    generators = await service.get_available_generators()
+    domaines = await service.get_available_domaines()
+    
+    return AvailableOptionsResponse(
+        generators=generators,
+        domaines=domaines if domaines else [
+            "Nombres et calculs",
+            "Géométrie",
+            "Grandeurs et mesures",
+            "Organisation et gestion de données"
+        ],
+        statuts=["prod", "beta", "hidden"]
+    )
+
+
+@router.post(
+    "/curriculum/6e/chapters",
+    response_model=ChapterCRUDResponse,
+    summary="Créer un nouveau chapitre",
+    description="""
+    Crée un nouveau chapitre dans le référentiel 6e.
+    Le code_officiel doit être unique.
+    """
+)
+async def create_chapter(
+    request: ChapterCreateRequest,
+    admin_check: bool = Depends(check_admin_enabled),
+    service=Depends(get_persistence_service)
+):
+    """
+    Crée un nouveau chapitre dans le curriculum.
+    """
+    logger.info(f"Admin: Création du chapitre {request.code_officiel}")
+    
+    try:
+        chapter = await service.create_chapter(request)
+        
+        return ChapterCRUDResponse(
+            success=True,
+            message=f"Chapitre '{request.code_officiel}' créé avec succès",
+            chapter=chapter_to_response(chapter)
+        )
+        
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "validation_error",
+                "message": str(e)
+            }
+        )
+    except Exception as e:
+        logger.error(f"Admin: Erreur création chapitre: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erreur lors de la création: {str(e)}"
+        )
+
+
+@router.put(
+    "/curriculum/6e/chapters/{code_officiel}",
+    response_model=ChapterCRUDResponse,
+    summary="Mettre à jour un chapitre",
+    description="""
+    Met à jour un chapitre existant.
+    Seuls les champs fournis sont mis à jour.
+    """
+)
+async def update_chapter(
+    code_officiel: str,
+    request: ChapterUpdateRequest,
+    admin_check: bool = Depends(check_admin_enabled),
+    service=Depends(get_persistence_service)
+):
+    """
+    Met à jour un chapitre existant.
+    """
+    logger.info(f"Admin: Mise à jour du chapitre {code_officiel}")
+    
+    try:
+        chapter = await service.update_chapter(code_officiel, request)
+        
+        return ChapterCRUDResponse(
+            success=True,
+            message=f"Chapitre '{code_officiel}' mis à jour avec succès",
+            chapter=chapter_to_response(chapter)
+        )
+        
+    except ValueError as e:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "error": "not_found",
+                "message": str(e)
+            }
+        )
+    except Exception as e:
+        logger.error(f"Admin: Erreur mise à jour chapitre: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erreur lors de la mise à jour: {str(e)}"
+        )
+
+
+@router.delete(
+    "/curriculum/6e/chapters/{code_officiel}",
+    response_model=ChapterCRUDResponse,
+    summary="Supprimer un chapitre",
+    description="""
+    Supprime définitivement un chapitre du référentiel.
+    Cette action est irréversible.
+    """
+)
+async def delete_chapter(
+    code_officiel: str,
+    admin_check: bool = Depends(check_admin_enabled),
+    service=Depends(get_persistence_service)
+):
+    """
+    Supprime un chapitre du curriculum.
+    """
+    logger.info(f"Admin: Suppression du chapitre {code_officiel}")
+    
+    try:
+        deleted = await service.delete_chapter(code_officiel)
+        
+        if deleted:
+            return ChapterCRUDResponse(
+                success=True,
+                message=f"Chapitre '{code_officiel}' supprimé avec succès",
+                chapter=None
+            )
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Erreur lors de la suppression"
+            )
+        
+    except ValueError as e:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "error": "not_found",
+                "message": str(e)
+            }
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Admin: Erreur suppression chapitre: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erreur lors de la suppression: {str(e)}"
+        )
