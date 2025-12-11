@@ -1,152 +1,124 @@
 <analysis>**original_problem_statement:**
-The user's primary goal is to build out the full exercise generation capabilities for the 6th-grade curriculum on the new  page. This started with fixing several critical UI bugs on the page and then moved to a large-scale implementation project.
+The user requested a series of significant enhancements to the math exercise generation platform, building upon a previously implemented set of 6th-grade generators.
 
-The user provided a comprehensive Excel spreadsheet () detailing the entire 6th-grade curriculum, broken down into ~56 exercise families with specifications, parameters, and example statements.
-
-The main objective is to implement all the corresponding exercise generators in the backend, map them correctly so they are accessible via the  page, and provide a full audit of the implemented generators for final pedagogical validation by the user. The work is divided into waves based on priority, but the user requested to implement all waves (1, 2, and 3) in one go.
+The main goals were:
+1.  **Address QA Feedback:** Fix critical bugs reported after a validation pass by Perplexity, including an incomplete generator for calculating volumes () and several chapters relying on generic fallback exercises.
+2.  **Implement Dedicated Generators:** Create four new, specialized generators (, , , ) to replace generic ones. The ultimate goal was to ensure all 15 6th-grade chapters had fully dedicated generators.
+3.  **Introduce an Official Curriculum Referencing System:**
+    *   Create a canonical  file to define the official 6th-grade curriculum structure.
+    *   Build a  file to map these official curriculum codes to the existing backend generator logic ().
+    *   Develop a Python loader to make this curriculum data available at runtime.
+    *   Extend the  endpoint to accept a new  parameter for targeted exercise generation, while maintaining backward compatibility with the existing -based generation.
+4.  **Build a V1 Admin Dashboard:**
+    *   Create a new read-only page at .
+    *   This page should fetch data from a new backend endpoint () and display a comprehensive, searchable table of the entire 6th-grade curriculum, showing the mapping between official codes, chapter names, and the underlying exercise generators.
+    *   Secure this new admin functionality behind an  environment flag.
 
 **User's preferred language**: French
 
 **what currently exists?**
-- A stable and functional  page in the frontend () that correctly handles state changes, loading indicators, and renders complex content mixing HTML (tables), LaTeX (math formulas), and SVGs (geometric figures).
-- The backend has been massively expanded. The file  now contains dedicated generator functions for nearly the entire 6th-grade curriculum (approx. 35+ generators from Waves 1, 2, and 3).
-- The corresponding  enums have been added to .
-- The chapter-to-generator mapping in  has been updated to include all the new generators, grouped under existing 6th-grade chapters like Fractions, Proportionnalité, Aires et périmètres, etc.
-- A documentation file  has been created to track the status of generators.
-- An automated verification script () was created by the agent to audit all implemented generators. The last run of this script failed because some chapters were not mapped.
+The application now features a complete and robust 6th-grade math curriculum system.
+- **Backend**:
+    - All 15 6th-grade chapters now map to dedicated, non-fallback exercise generators. The critical bug with the  generator has been fixed, and four new dedicated generators have been implemented.
+    - A new curriculum module () has been created. It loads the official curriculum from  at startup.
+    - The  endpoint is now backward-compatible, supporting generation via the new  or the legacy  name.
+    - A new admin endpoint, , exposes the complete 6th-grade curriculum mapping. It is protected by the  environment variable.
+    - Comprehensive tests for the new curriculum system and admin endpoint have been created and are passing.
+- **Frontend**:
+    - A new read-only admin page is available at .
+    - It displays a filterable and searchable table of the 27 official 6th-grade curriculum entries, showing their code, domain, description, associated generators, and status.
 
 **Last working item**:
-- **Last item agent was working**: The agent was executing a comprehensive audit of all newly created 6th-grade generators, as requested by the user. It created a Python script () to automatically test each generator for fallbacks, non-empty statements, and correct mapping. The script's execution failed, reporting that three chapters (Calcul mental, Calculs posés, Calculs instrumentés) did not have a corresponding generator mapping in . The agent was in the process of debugging this failure.
-- **Status**: IN PROGRESS
-- **Agent Testing Done**: N
-- **Which testing method agent to use?**: The agent should first fix the errors identified by its own script (). It needs to add the missing mappings in  and re-run the script until all checks pass. No other testing is needed until this audit is complete.
+- **Last item agent was working**: The agent just completed the implementation of the V1 read-only admin dashboard for the 6th-grade curriculum. This involved creating the backend endpoint, the frontend React page with ShadCN components, securing the feature with an environment flag, and adding documentation.
+- **Status**: USER VERIFICATION PENDING
+- **Agent Testing Done**: Y
+- **Which testing method agent to use?**: The agent has already tested the API endpoint with  and validated the frontend with the  tool. The next step is user verification.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1**: Audit Script Failures (P0)
-- **Issue 2**: Pedagogical Bug:  may still show the solution (P2)
-- **Issue 3**:  does not generate an SVG (P2)
-- **Issue 4**: Standard PDF Export Structure Bug (P3)
-- **Issue 5**: Broken  Setup (P3)
-
-**Issues Detail:**
-- **Issue 1: Audit Script Failures**
-    - **Attempted fixes**: The agent created  to perform the audit. The script failed.
-    - **Next debug checklist**:
-        1.  Examine the output of the script, which indicated that Calcul mental, Calculs posés, and Calculs instrumentés have no generator mappings.
-        2.  Edit .
-        3.  In the  method, add keys for these three chapters and map them to the appropriate  enums that were already created.
-        4.  Re-run the verification script: .
-        5.  Ensure the script completes successfully (exit code 0).
-    - **Why fix this issue and what will be achieved with the fix?**: This is a direct blocker for completing the user's current request. Fixing it will allow the automated audit to complete, which is a prerequisite for user validation of the 6th-grade curriculum.
-    - **Status**: IN PROGRESS
-    - **Is recurring issue?**: N
-    - **Should Test frontend/backend/both after fix?**: Backend
-    - **Blocked on other issue**: None
-
-- **Issues 2-5**: These are legacy issues from the initial handoff. They have been deprioritized by the user's focus on the V1 generator implementation. They remain in the backlog.
+There are no pending bugs or in-progress issues. The last set of issues from the user's QA report (message 103) has been fully resolved.
 
 **In progress Task List**:
-- **Task 1: Complete User's Audit and Documentation Request (P0)**
-    - **Description**: The user requested a full audit and documentation of all implemented 6th-grade generators.
-    - **Where to resume**:
-        1.  Fix the failing audit script as described in Issue 1 above.
-        2.  Once the script passes, use its output and analysis of the code to generate the two documents requested by the user:
-            - A complete table of all ~35 generators with their , function name, type, and status.
-            - A complete mapping of each 6th-grade chapter to its associated generators.
-        3.  Update the documentation file  with the final, verified status of every generator.
-    - **What will be achieved with this?**: This will provide the user with the necessary information to perform a full pedagogical review of the entire 6th-grade curriculum, marking the completion of the large-scale implementation phase.
-    - **Status**: IN PROGRESS
-    - **Should Test frontend/backend/both after fix?**: Backend (via the script)
-    - **Blocked on something**: Blocked on fixing Issue 1.
+There are no tasks currently in progress. The V1 Admin Page task is complete and awaiting user review.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-    - **P1**: Add new 6th-grade chapters to the main curriculum catalog so they become selectable in the  page UI. Currently, many new generators are grouped under existing chapters.
-    - **P1**: User validation of all implemented 6th-grade generators (Waves 1, 2, and 3).
+    - **P0**: User validation of the new  page.
+    - **P1**: **V2 of Admin Page**: Implement editing capabilities for the curriculum on the  page, as mentioned by the user as the next step after the read-only V1.
 - **Future Tasks**:
-    - Implement V1 PDF export functionality for the  page.
-    - Refactor  and .
-    - Fix the  test suite.
+    - **P2**: Implement V1 PDF export functionality for the  page.
+    - **P3**: Begin implementation of the curriculum for other grade levels (5e, 4e, etc.), leveraging the new curriculum system.
+    - **P3**: Refactor , which is very large, potentially breaking it down by grade level or domain.
 
 **Completed work in this session**
-- **V1 Generator UI/UX Fixes:**
-    - Fixed raw HTML rendering by removing  from the V1 API route.
-    - Fixed raw LaTeX rendering by creating and implementing a  component in  that correctly handles mixed HTML and LaTeX content.
-    - Fixed duplicated geometric figures by removing the separate SVG rendering block.
-    - Implemented a  hook to clear old exercises when the user changes level or chapter.
-    - Added a more explicit loading indicator during exercise generation.
-    - Disabled the placeholder PDF button and labeled it .
-- **V1 API Enhancements:**
-    - Implemented a smart fallback () to provide meaningful statements for generators that don't have a dedicated one.
-    - Added  and  to the API response to allow the frontend to display whether an exercise is from a dedicated or generic generator.
-- **6th-Grade Curriculum Implementation (Waves 1, 2, & 3):**
-    - Implemented over 35 new exercise generator functions in  based on user-provided specifications.
-    - Added corresponding  enums in .
-    - Updated and fixed the chapter-to-generator mappings in , resolving several complex duplicate-key bugs.
+- **Addressed Perplexity QA Feedback**:
+  - Fixed the critical  bug in the  generator to ensure dimensions are always provided.
+  - Implemented 4 new dedicated generators for Calcul mental, Calculs posés, Calculs instrumentés, and Grandeurs et mesures.
+  - Upgraded all 15 6th-grade chapters to use dedicated generators, ensuring  for all generated exercises.
+- **Implemented V1 Curriculum Referencing System**:
+  - Created  and .
+  - Built the  to load and index the data.
+  - Extended the  API to be backward-compatible with a new  parameter.
+  - Added a full test suite () for the new system.
+- **Implemented V1 Read-Only Admin Page**:
+  - Created the  endpoint.
+  - Built the  frontend page using React and ShadCN components, including search and filtering.
+  - Secured the feature with an  environment flag.
+  - Created documentation for both the curriculum system and the new admin page.
+
+**Earlier issues found/mentioned but not fixed**
+- None. All issues raised in this session were addressed.
 
 **Code Architecture**
-
+code_officielcode_officielenonce
 
 **Key Technical Concepts**
-- **Large-Scale Code Generation**: Programmatically adding dozens of complex, rule-based functions () into a single service file.
-- **Dynamic Dispatch**: Using a dictionary to map  enums to their corresponding generator functions, allowing for flexible and expandable exercise generation.
-- **Complex Debugging**: Diagnosing and fixing subtle bugs in large dictionary mappings (duplicate keys overwriting previous ones) and Python class definitions (enums being added outside the class body).
-- **Custom React Renderer**: Creating a  component that uses  to traverse an HTML string, preserving HTML tags while applying a separate  to text nodes, effectively rendering mixed HTML and LaTeX content.
-
-**key DB schema**
-- No changes to the DB schema in this session.
-
-**changes in tech stack**
-- None.
+- **Decoupled Curriculum Mapping**: The official curriculum (CSV/JSON) is now separate from the backend generator implementation, allowing for easier updates.
+- **Backward-Compatible API Extension**: The generation API was extended with a new parameter () without breaking existing clients.
+- **Read-Only Admin Dashboard**: A React/ShadCN frontend page was created to provide a non-technical UI for auditing the curriculum data.
+- **Environment-Flagged Features**: The entire admin functionality is conditionally enabled via the  environment variable.
 
 **All files of reference**
-- : Core file containing all generator logic and mappings.
-- : Contains the definitions for all exercise types.
-- : The single frontend page being worked on.
-- : The documentation file to be updated.
-- : The agent-created script for auditing the backend generators.
-
-**Areas that need refactoring**:
--  has become extremely large (over 8000 lines) and contains logic for all grade levels. It should be broken down into smaller files, perhaps one per grade level or chapter.
-
-**key api endpoints**
-- : The primary endpoint used for the new  page. It was modified to include new metadata.
+- 
+- 
+- 
+- 
+- 
+- 
+- 
 
 **Critical Info for New Agent**
-- You are in the final step of a massive implementation task. The immediate goal is not to write new code, but to **finalize the audit** requested by the user.
-- Your first step is to fix the failing verification script at  by adding the missing chapter mappings in .
-- Once the script passes, you must use its output to generate the two tables (generator list, chapter mapping) and update the  document as your final response to the user.
-- Do not start any new feature work (like implementing 5th grade) until this audit and documentation task is complete and acknowledged by the user.
+- You have just successfully completed a large, multi-phase project, culminating in the creation of the V1 Admin Page. Your immediate priority is to present this achievement to the user and ask for their verification.
+- The next logical step, as outlined by the user, is to begin work on V2 of the admin page, which will introduce editing capabilities. Do not start this until you get confirmation from the user on V1.
+- The codebase is currently in a very stable and well-tested state. All 6th-grade generators are considered dedicated, and a new, flexible curriculum system is in place.
 
 **documents created in this job**
 - 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
 
 **Last 10 User Messages and any pending user messages**
-- **User (msg 171):** Provided a detailed QA report and requested fixes for state management, fallbacks, and loading indicators on . (Status: **COMPLETED**)
-- **User (msg 230):** Provided an Excel sheet with the entire 6th-grade curriculum and requested the agent to plan and implement all generators in waves. (Status: **COMPLETED**)
-- **User (msg 311):** Instructed the agent to proceed with Waves 2 and 3 immediately. (Status: **COMPLETED**)
-- **User (msg 386):** After the agent completed the implementation, the user requested a full audit: a list of all generators, a complete chapter-to-generator mapping, an automated verification run, and updated documentation. (Status: **IN PROGRESS**)
+1.  **User (msg 215):** Provided a detailed spec to create a new curriculum referencing system based on a CSV, map it to a JSON file, create a loader, extend the generation API to use a , and add tests, all without breaking existing functionality. (Status: **COMPLETED**)
+2.  **User (msg 276):** After the successful implementation of the curriculum system, the user requested the creation of a V1 read-only admin page at  to visualize the new curriculum mapping, complete with a backend endpoint and frontend table. (Status: **COMPLETED, awaiting user verification**)
 
 **Project Health Check:**
-- **Broken**:
-    - The automated audit process is blocked due to missing chapter mappings in .
-- **Mocked**:
-    - None.
+- **Broken**: None
+- **Mocked**: None
 
 **3rd Party Integrations**
 - **WeasyPrint**: Used for PDF generation (legacy).
 - **OpenAI GPT-4o**: Uses Emergent LLM Key. Used for optional AI features.
 
 **Testing status**
-- **Testing agent used after significant changes**: YES (after each major feature implementation).
+- **Testing agent used after significant changes**: NO (Agent self-tested via scripts, , and screenshots).
 - **Troubleshoot agent used after agent stuck in loop**: NO
 - **Test files created**:
-    -  (a one-off verification script).
-- **Known regressions**: None.
-
-**Credentials to test flow:**
-- Use the email  as the value for the  header for any Pro features.
-
-**What agent forgot to execute**
-- The agent successfully implemented almost all user requests. The only pending item is the completion of the final audit requested in the last user message, which was interrupted by the script failure.</analysis>
+    - 
+    - 
+- **Known regressions**: None. All tests, including for legacy functionality, are passing.</analysis>

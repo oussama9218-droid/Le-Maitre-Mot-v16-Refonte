@@ -4,7 +4,7 @@ Test du nouvel endpoint créé dans SPRINT 4 : GET /api/chapters/{chapter_code}/
 
 Contexte :
 - Nouvel endpoint dédié pour récupérer les ExerciseType d'un chapitre MathALÉA
-- Base URL backend : https://mathexercise-hub.preview.emergentagent.com
+- Base URL backend : https://math-navigator-2.preview.emergentagent.com
 - Collection MongoDB : exercise_types avec champ `chapter_code`
 
 Tests à effectuer :
@@ -22,7 +22,7 @@ import time
 from datetime import datetime
 
 class Sprint4ChaptersEndpointTester:
-    def __init__(self, base_url="https://mathexercise-hub.preview.emergentagent.com"):
+    def __init__(self, base_url="https://math-navigator-2.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
@@ -268,7 +268,7 @@ class Sprint4ChaptersEndpointTester:
 
 if __name__ == "__main__":
     print("🚀 Starting SPRINT 4 Chapters Endpoint Testing...")
-    print(f"   Backend URL: https://mathexercise-hub.preview.emergentagent.com")
+    print(f"   Backend URL: https://math-navigator-2.preview.emergentagent.com")
     print(f"   Test time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     tester = Sprint4ChaptersEndpointTester()
