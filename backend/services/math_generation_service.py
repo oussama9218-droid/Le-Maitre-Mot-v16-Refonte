@@ -536,7 +536,7 @@ class MathGenerationService:
     # Générateurs supplémentaires (simplifiés pour l'exemple)
     
     def _gen_calcul_fractions(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
-        """Génère un exercice de calculs avec fractions"""
+        """Génère un exercice de calculs avec fractions (6e collège)"""
         
         if difficulte == "facile":
             # Fractions simples avec dénominateurs petits
@@ -554,15 +554,27 @@ class MathGenerationService:
         if operation == "+":
             resultat = frac1 + frac2
             expression = f"\\frac{{{num1}}}{{{den1}}} + \\frac{{{num2}}}{{{den2}}}"
+            op_texte = "la somme"
         else:
             resultat = frac1 - frac2
             expression = f"\\frac{{{num1}}}{{{den1}}} - \\frac{{{num2}}}{{{den2}}}"
+            op_texte = "la différence"
+        
+        # Calcul du dénominateur commun (PGCD)
+        denom_commun = frac1.denominator * frac2.denominator // math.gcd(frac1.denominator, frac2.denominator)
+        
+        # Énoncé pédagogique complet
+        enonce = f"Calculer {op_texte} des fractions suivantes et donner le résultat sous forme de fraction irréductible :\n\n{expression}"
         
         etapes = [
             f"Expression : {expression}",
-            f"Trouver un dénominateur commun : {frac1.denominator * frac2.denominator // math.gcd(frac1.denominator, frac2.denominator)}",
-            f"Résultat : \\frac{{{resultat.numerator}}}{{{resultat.denominator}}}"
+            f"Dénominateur commun : {denom_commun}",
+            f"Calcul : {expression} = \\frac{{{resultat.numerator}}}{{{resultat.denominator}}}"
         ]
+        
+        # Ajouter l'étape de simplification si applicable
+        if resultat.numerator != num1 * den2 + num2 * den1 or resultat.denominator != denom_commun:
+            etapes.append(f"Simplification : \\frac{{{resultat.numerator}}}{{{resultat.denominator}}}")
         
         return MathExerciseSpec(
             niveau=niveau,
@@ -570,6 +582,7 @@ class MathGenerationService:
             type_exercice=MathExerciseType.CALCUL_FRACTIONS,
             difficulte=DifficultyLevel(difficulte),
             parametres={
+                "enonce": enonce,  # ✅ ÉNONCÉ DÉDIÉ pour éviter le fallback
                 "fraction1": f"{num1}/{den1}",
                 "fraction2": f"{num2}/{den2}",
                 "operation": operation,
@@ -577,7 +590,8 @@ class MathGenerationService:
             },
             solution_calculee={
                 "resultat_fraction": f"{resultat.numerator}/{resultat.denominator}",
-                "resultat_decimal": float(resultat)
+                "resultat_decimal": float(resultat),
+                "denom_commun": denom_commun
             },
             etapes_calculees=etapes,
             resultat_final=f"\\frac{{{resultat.numerator}}}{{{resultat.denominator}}}"
