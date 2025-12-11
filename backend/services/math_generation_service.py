@@ -304,6 +304,7 @@ class MathGenerationService:
             MathExerciseType.MULTIPLES: self._gen_multiples,
             MathExerciseType.CONVERSIONS_UNITES: self._gen_conversions_unites,
             MathExerciseType.ANGLE_VOCABULAIRE: self._gen_angle_vocabulaire,
+            MathExerciseType.ANGLE_PROPRIETES: self._gen_angle_proprietes,
             MathExerciseType.SYMETRIE_PROPRIETES: self._gen_symetrie_proprietes,
             MathExerciseType.TABLEAU_COMPLETER: self._gen_tableau_completer,
             MathExerciseType.DIAGRAMME_CIRCULAIRE: self._gen_diagramme_circulaire,
