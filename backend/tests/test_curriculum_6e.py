@@ -229,7 +229,8 @@ class TestAPIWithCodeOfficiel:
         # Le chapitre backend pour 6e_N08 est "Fractions"
         assert "Fractions" in response.chapitre or response.chapitre == "Fractions"
         assert response.enonce_html is not None
-        assert response.metadata.is_fallback == False
+        # metadata est un dict, pas un objet
+        assert response.metadata.get("is_fallback") == False
     
     @pytest.mark.asyncio
     async def test_api_with_code_officiel_proportionnalite(self):
