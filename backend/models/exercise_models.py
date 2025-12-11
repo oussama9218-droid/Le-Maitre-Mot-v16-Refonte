@@ -1,14 +1,26 @@
 """
 Models Pydantic pour l'API Exercises v1
 """
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, root_validator
 from typing import Optional, Dict, Any
 
 
 class ExerciseGenerateRequest(BaseModel):
-    """Request model pour la génération d'exercice"""
-    niveau: str = Field(..., description="Niveau scolaire (ex: 5e, CP, 2nde)")
-    chapitre: str = Field(..., description="Chapitre du curriculum")
+    """
+    Request model pour la génération d'exercice.
+    
+    Deux modes de fonctionnement :
+    1. Mode legacy : niveau + chapitre (comportement actuel)
+    2. Mode officiel : code_officiel (nouveau, basé sur le référentiel)
+    
+    Si code_officiel est fourni, il a priorité sur chapitre.
+    """
+    niveau: Optional[str] = Field(None, description="Niveau scolaire (ex: 6e, 5e, 4e, 3e)")
+    chapitre: Optional[str] = Field(None, description="Chapitre du curriculum (mode legacy)")
+    code_officiel: Optional[str] = Field(
+        None, 
+        description="Code officiel du chapitre (ex: 6e_N08). Si fourni, prioritaire sur 'chapitre'"
+    )
     type_exercice: str = Field(
         default="standard",
         description="Type d'exercice (standard, avancé, simplifié). Note V1: paramètre accepté mais non utilisé dans la logique de génération V1, réservé pour V2"
@@ -17,6 +29,38 @@ class ExerciseGenerateRequest(BaseModel):
         default="facile",
         description="Niveau de difficulté (facile, moyen, difficile)"
     )
+    nb_exercices: int = Field(
+        default=1,
+        ge=1,
+        le=10,
+        description="Nombre d'exercices à générer (1-10)"
+    )
+    
+    @root_validator
+    def validate_request_mode(cls, values):
+        """
+        Valide qu'au moins un mode de sélection est fourni.
+        
+        Si code_officiel est fourni, niveau peut être déduit.
+        Sinon, niveau et chapitre doivent être fournis.
+        """
+        code_officiel = values.get('code_officiel')
+        niveau = values.get('niveau')
+        chapitre = values.get('chapitre')
+        
+        if code_officiel:
+            # Mode code_officiel : on déduit le niveau si non fourni
+            if not niveau and code_officiel.startswith(('6e_', '5e_', '4e_', '3e_')):
+                values['niveau'] = code_officiel.split('_')[0]
+            return values
+        
+        # Mode legacy : niveau et chapitre requis
+        if not niveau or not chapitre:
+            raise ValueError(
+                "Soit 'code_officiel', soit 'niveau' et 'chapitre' doivent être fournis"
+            )
+        
+        return values
     
     @validator('difficulte')
     def validate_difficulte(cls, v):
@@ -40,11 +84,22 @@ class ExerciseGenerateRequest(BaseModel):
     
     class Config:
         schema_extra = {
-            "example": {
-                "niveau": "5e",
-                "chapitre": "Symétrie axiale",
-                "type_exercice": "standard",
-                "difficulte": "moyen"
+            "examples": {
+                "mode_legacy": {
+                    "summary": "Mode legacy (niveau + chapitre)",
+                    "value": {
+                        "niveau": "6e",
+                        "chapitre": "Fractions",
+                        "difficulte": "moyen"
+                    }
+                },
+                "mode_officiel": {
+                    "summary": "Mode officiel (code_officiel)",
+                    "value": {
+                        "code_officiel": "6e_N08",
+                        "difficulte": "moyen"
+                    }
+                }
             }
         }
 
