@@ -694,6 +694,8 @@ class MathGenerationService:
             expression = f"{a} × {b}"
             op_text = "multiplication"
         
+        enonce = f"Effectuer le calcul suivant : {expression}"
+        
         etapes = [
             f"Calcul : {expression}",
             f"Résultat : {resultat}"
@@ -705,6 +707,7 @@ class MathGenerationService:
             type_exercice=MathExerciseType.CALCUL_DECIMAUX,
             difficulte=DifficultyLevel(difficulte),
             parametres={
+                "enonce": enonce,
                 "a": a,
                 "b": b,
                 "operation": operation,
