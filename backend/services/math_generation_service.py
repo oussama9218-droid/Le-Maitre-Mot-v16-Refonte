@@ -934,6 +934,7 @@ class MathGenerationService:
             rayon = random.randint(3, 10)
             perimetre = round(2 * math.pi * rayon, 2)
             aire = round(math.pi * rayon * rayon, 2)
+            enonce = f"Calculer le périmètre et l'aire d'un cercle de rayon {rayon} cm."
             
             # Créer la figure géométrique du cercle
             figure = GeometricFigure(
@@ -948,6 +949,7 @@ class MathGenerationService:
                 type_exercice=MathExerciseType.PERIMETRE_AIRE,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,
                     "type": "trouver_valeur",  # Type pédagogique pour gabarits
                     "figure": "cercle",
                     "rayon": rayon
