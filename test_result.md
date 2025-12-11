@@ -86,22 +86,35 @@ Comprehensive testing of new 6e generators (Waves 1, 2 & 3) coverage as requeste
 - **Non-Fallback Status**: ✅ EXCELLENT - High percentage of dedicated generators (65-100% per chapter)
 
 ### Technical Validation
-- All API calls completed successfully with 200 status codes
-- Generator diversity confirmed across all tested chapters
+- All API calls completed successfully with 200 status codes (100 total calls)
+- Generator diversity confirmed across all tested chapters (19 unique generators)
 - Content quality meets expected standards for each generator type
 - SVG visualizations working for fraction representation
 - HTML tables properly structured for proportionnalité
 - Writing instructions present for nombres lecture exercises
+- Geometry construction exercises working (triangles, quadrilaterals)
+- Two-step problem generators operational
 
-### Wave 1 Generators Status
+### Waves 1, 2 & 3 Generators Status (Complete List)
+- **6e_AIRE_FIGURES_COMPOSEES**: ✅ WORKING (composite figure areas)
+- **6e_AIRE_TRIANGLE**: ✅ WORKING (triangle area calculations)
+- **6e_ANGLE_MESURE**: ✅ WORKING (angle measurements)
+- **6e_ANGLE_PROPRIETES**: ✅ WORKING (angle properties)
+- **6e_ANGLE_VOCABULAIRE**: ✅ WORKING (angle vocabulary)
+- **6e_CALCUL_DECIMAUX**: ✅ WORKING (decimal calculations)
 - **6e_CALCUL_FRACTIONS**: ✅ WORKING (fraction calculations)
 - **6e_FRACTION_REPRESENTATION**: ✅ WORKING (SVG fraction visualization)
-- **6e_PROPORTIONNALITE**: ✅ WORKING (basic proportionnalité)
-- **6e_PROP_TABLEAU**: ✅ WORKING (HTML table format)
-- **6e_PROP_ACHAT**: ✅ WORKING (purchase scenarios)
-- **6e_CALCUL_DECIMAUX**: ✅ WORKING (decimal calculations)
-- **6e_NOMBRES_LECTURE**: ✅ WORKING (number writing)
 - **6e_NOMBRES_COMPARAISON**: ✅ WORKING (number comparison)
+- **6e_NOMBRES_LECTURE**: ✅ WORKING (number writing)
+- **6e_PERIMETRE_AIRE**: ✅ WORKING (perimeter and area)
+- **6e_PROBLEME_2_ETAPES**: ✅ WORKING (two-step problems)
+- **6e_PROPORTIONNALITE**: ✅ WORKING (basic proportionnalité)
+- **6e_PROP_ACHAT**: ✅ WORKING (purchase scenarios)
+- **6e_PROP_TABLEAU**: ✅ WORKING (HTML table format)
+- **6e_QUADRILATERES**: ✅ WORKING (quadrilateral properties)
+- **6e_RECTANGLE**: ✅ WORKING (rectangle calculations)
+- **6e_TRIANGLE_CONSTRUCTION**: ✅ WORKING (triangle construction)
+- **6e_TRIANGLE_QUELCONQUE**: ✅ WORKING (general triangles)
 
 ---
 
