@@ -283,7 +283,38 @@ class MathGenerationService:
             MathExerciseType.PROP_ACHAT: self._gen_prop_achat,
             MathExerciseType.PROBLEME_2_ETAPES: self._gen_probleme_2_etapes,
             MathExerciseType.NOMBRES_LECTURE: self._gen_nombres_lecture,
-            MathExerciseType.NOMBRES_COMPARAISON: self._gen_nombres_comparaison
+            MathExerciseType.NOMBRES_COMPARAISON: self._gen_nombres_comparaison,
+            # ========== VAGUE 2 - Générateurs 6e ==========
+            MathExerciseType.DROITE_GRADUEE_ENTIERS: self._gen_droite_graduee_entiers,
+            MathExerciseType.DROITE_GRADUEE_DECIMAUX: self._gen_droite_graduee_decimaux,
+            MathExerciseType.FRACTION_DROITE: self._gen_fraction_droite,
+            MathExerciseType.FRACTION_COMPARAISON: self._gen_fraction_comparaison,
+            MathExerciseType.PROP_COEFFICIENT: self._gen_prop_coefficient,
+            MathExerciseType.VITESSE_DUREE_DISTANCE: self._gen_vitesse_duree_distance,
+            MathExerciseType.AIRE_TRIANGLE: self._gen_aire_triangle,
+            MathExerciseType.AIRE_FIGURES_COMPOSEES: self._gen_aire_figures_composees,
+            MathExerciseType.VOLUME_PAVE: self._gen_volume_pave,
+            MathExerciseType.TABLEAU_LECTURE: self._gen_tableau_lecture,
+            MathExerciseType.DIAGRAMME_BARRES: self._gen_diagramme_barres,
+            MathExerciseType.PROBLEME_1_ETAPE: self._gen_probleme_1_etape,
+            MathExerciseType.TRIANGLE_CONSTRUCTION: self._gen_triangle_construction,
+            MathExerciseType.QUADRILATERES: self._gen_quadrilateres,
+            MathExerciseType.ANGLE_MESURE: self._gen_angle_mesure,
+            MathExerciseType.FORMULES: self._gen_formules,
+            # ========== VAGUE 3 - Générateurs 6e ==========
+            MathExerciseType.FRACTIONS_EGALES: self._gen_fractions_egales,
+            MathExerciseType.DECOMPOSITION: self._gen_decomposition,
+            MathExerciseType.ENCADREMENT: self._gen_encadrement,
+            MathExerciseType.ARRONDI: self._gen_arrondi,
+            MathExerciseType.PRIORITES_OPERATIONS: self._gen_priorites_operations,
+            MathExerciseType.CRITERES_DIVISIBILITE: self._gen_criteres_divisibilite,
+            MathExerciseType.MULTIPLES: self._gen_multiples,
+            MathExerciseType.CONVERSIONS_UNITES: self._gen_conversions_unites,
+            MathExerciseType.ANGLE_VOCABULAIRE: self._gen_angle_vocabulaire,
+            MathExerciseType.SYMETRIE_PROPRIETES: self._gen_symetrie_proprietes,
+            MathExerciseType.TABLEAU_COMPLETER: self._gen_tableau_completer,
+            MathExerciseType.DIAGRAMME_CIRCULAIRE: self._gen_diagramme_circulaire,
+            MathExerciseType.SUBSTITUTION: self._gen_substitution
         }
         
         generator = generators.get(exercise_type)
