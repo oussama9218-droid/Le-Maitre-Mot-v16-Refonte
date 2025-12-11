@@ -14,52 +14,67 @@ Comprehensive testing of new 6e generators (Waves 1, 2 & 3) coverage as requeste
 
 ### Tests Executed (via Python test suite)
 
-#### Test 1 - Fraction Representation (6N2-FRAC-REPR) - Priority 1
-**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Fractions", "difficulte": "facile"}` (5 runs)
-**Result**: ✅ PASSED - Both generators present, all non-fallback
+#### Test 1 - Périmètres et aires (4 types) - Priority 1
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Périmètres et aires", "difficulte": "moyen"}` (20 runs)
+**Result**: ✅ PASSED - All 4 generator types found with good mix
 **Details**: 
-- Generator counts: 6e_CALCUL_FRACTIONS (3), 6e_FRACTION_REPRESENTATION (2)
-- All generators have is_fallback: false
-- Both expected generators found in test runs
+- Generator counts: 6e_AIRE_TRIANGLE (7), 6e_AIRE_FIGURES_COMPOSEES (6), 6e_RECTANGLE (4), 6e_PERIMETRE_AIRE (3)
+- All 4 expected generator types found: 6e_PERIMETRE_AIRE, 6e_RECTANGLE, 6e_AIRE_TRIANGLE, 6e_AIRE_FIGURES_COMPOSEES
+- Mix verification: ✅ VERIFIED - All expected generators present
+- Non-fallback generators: 13/20 (65% dedicated generators)
 
-#### Test 2 - Proportionnalité Types (3 types) - Priority 1
-**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Proportionnalité", "difficulte": "moyen"}` (10 runs)
-**Result**: ✅ PASSED - Mix of 3 generator types, all non-fallback
+#### Test 2 - Angles (3 types) - Priority 1
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Angles", "difficulte": "moyen"}` (15 runs)
+**Result**: ✅ PASSED - All 3 generator types found, 100% non-fallback
 **Details**:
-- Generator counts: 6e_PROP_TABLEAU (5), 6e_PROPORTIONNALITE (4), 6e_PROP_ACHAT (1)
-- All 3 expected generator types found
-- All generators have is_fallback: false
+- Generator counts: 6e_ANGLE_MESURE (7), 6e_ANGLE_PROPRIETES (6), 6e_ANGLE_VOCABULAIRE (2)
+- All 3 expected generator types found: 6e_ANGLE_MESURE, 6e_ANGLE_VOCABULAIRE, 6e_ANGLE_PROPRIETES
+- Mix verification: ✅ VERIFIED - Complete coverage of all angle types
+- All generators have is_fallback: false (100% dedicated)
 
-#### Test 3 - Nombres Entiers Types (3 types) - Priority 1
-**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Nombres entiers et décimaux", "difficulte": "moyen"}` (10 runs)
-**Result**: ✅ PASSED - Mix of 3 generator types
+#### Test 3 - Fractions (2 types) - Priority 1
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Fractions", "difficulte": "moyen"}` (10 runs)
+**Result**: ✅ PASSED - Both generator types found, 100% non-fallback
 **Details**:
-- Generator counts: 6e_NOMBRES_COMPARAISON (6), 6e_CALCUL_DECIMAUX (3), 6e_NOMBRES_LECTURE (1)
-- All 3 expected generator types found
+- Generator counts: 6e_FRACTION_REPRESENTATION (6), 6e_CALCUL_FRACTIONS (4)
+- Both expected generator types found: 6e_CALCUL_FRACTIONS, 6e_FRACTION_REPRESENTATION
+- Mix verification: ✅ VERIFIED - Both calculation and representation generators working
+- All generators have is_fallback: false (100% dedicated)
 
-#### Test 4 - PROP_TABLEAU Quality - Priority 2
-**Command**: Multiple calls until PROP_TABLEAU generator found
-**Result**: ✅ PASSED - HTML table with proper structure
+#### Test 4 - Proportionnalité (3 types) - Priority 1
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Proportionnalité", "difficulte": "moyen"}` (15 runs)
+**Result**: ✅ PASSED - All 3 generator types found, 100% non-fallback
 **Details**:
-- Found 6e_PROP_TABLEAU generator on attempt 3
-- HTML table present with border-collapse style
-- Headers and data cells properly structured
+- Generator counts: 6e_PROP_TABLEAU (5), 6e_PROPORTIONNALITE (5), 6e_PROP_ACHAT (5)
+- All 3 expected generator types found: 6e_PROPORTIONNALITE, 6e_PROP_TABLEAU, 6e_PROP_ACHAT
+- Mix verification: ✅ VERIFIED - Perfect distribution across all 3 types
+- All generators have is_fallback: false (100% dedicated)
 
-#### Test 5 - NOMBRES_LECTURE Quality - Priority 2
-**Command**: Multiple calls until NOMBRES_LECTURE generator found
-**Result**: ✅ PASSED - Contains writing instruction and numbers
+#### Test 5 - Nombres entiers (3 types) - Priority 1
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Nombres entiers et décimaux", "difficulte": "moyen"}` (15 runs)
+**Result**: ✅ PASSED - All 3 generator types found
 **Details**:
-- Found 6e_NOMBRES_LECTURE generator on attempt 2
-- Contains "Écrire en lettres" instruction
-- Numbers to convert present in content
+- Generator counts: 6e_CALCUL_DECIMAUX (7), 6e_NOMBRES_LECTURE (7), 6e_NOMBRES_COMPARAISON (1)
+- All 3 expected generator types found: 6e_CALCUL_DECIMAUX, 6e_NOMBRES_LECTURE, 6e_NOMBRES_COMPARAISON
+- Mix verification: ✅ VERIFIED - Good coverage with all types represented
+- Non-fallback generators: 8/15 (53% dedicated generators)
 
-#### Test 6 - FRACTION_REPRESENTATION Quality - Priority 2
-**Command**: Multiple calls until FRACTION_REPRESENTATION generator found
-**Result**: ✅ PASSED - SVG with geometric shapes for visualization
+#### Test 6 - Géométrie dans le plan (5 types) - Priority 1
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Géométrie dans le plan", "difficulte": "moyen"}` (20 runs)
+**Result**: ✅ PASSED - Key generator types found including TRIANGLE_CONSTRUCTION, QUADRILATERES, PROBLEME_2_ETAPES
 **Details**:
-- Found 6e_FRACTION_REPRESENTATION generator on attempt 2
-- SVG element present in enonce_html
-- Rectangles for fraction visualization confirmed
+- Generator counts: 6e_TRIANGLE_QUELCONQUE (6), 6e_PROBLEME_2_ETAPES (5), 6e_QUADRILATERES (4), 6e_RECTANGLE (3), 6e_TRIANGLE_CONSTRUCTION (2)
+- Key expected generators found: 6e_TRIANGLE_CONSTRUCTION, 6e_QUADRILATERES, 6e_PROBLEME_2_ETAPES
+- Mix verification: ✅ VERIFIED - All key geometry generators working
+- Non-fallback generators: 11/20 (55% dedicated generators)
+
+#### Test 7 - Enonce Quality for New Generators - Priority 2
+**Command**: Multiple targeted calls to test specific generator quality
+**Result**: ✅ PASSED - All quality checks passed (3/3)
+**Details**:
+- PROP_TABLEAU HTML tables: ✅ PASSED - Found on attempt 3, proper HTML table with border-collapse style and headers
+- NOMBRES_LECTURE writing instructions: ✅ PASSED - Found on attempt 1, contains writing instructions and numbers
+- FRACTION_REPRESENTATION SVG visualization: ✅ PASSED - Found on attempt 2, SVG with geometric shapes present
 
 ### Test Results Summary
 **Overall Results**: 6/6 tests passed (100.0%)
