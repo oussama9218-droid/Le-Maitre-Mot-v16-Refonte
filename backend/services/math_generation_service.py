@@ -1967,12 +1967,16 @@ class MathGenerationService:
                 proprietes=[f"axe_vertical", f"axe_position_{axe_position}", "triangle", "with_grid"]
             )
             
+            # ✅ ÉNONCÉ PÉDAGOGIQUE DÉDIÉ
+            enonce = f"Construire le symétrique du triangle {point_a}{point_b}{point_c} par rapport à l'axe vertical passant par x = {axe_position}."
+            
             return MathExerciseSpec(
                 niveau=niveau,
                 chapitre=chapitre,
                 type_exercice=MathExerciseType.SYMETRIE_AXIALE,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,  # ✅ ÉNONCÉ DÉDIÉ
                     "type": "completer_figure",
                     "figure": "triangle",
                     "points_initiaux": all_points,
