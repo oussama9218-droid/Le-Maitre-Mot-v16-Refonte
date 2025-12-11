@@ -1,9 +1,13 @@
 """
 Routes API v1 pour la génération d'exercices
 Endpoint: POST /api/v1/exercises/generate
+
+Modes de fonctionnement:
+1. Mode legacy: niveau + chapitre (comportement existant)
+2. Mode officiel: code_officiel (nouveau, basé sur le référentiel 6e)
 """
 from fastapi import APIRouter, HTTPException
-from typing import Optional
+from typing import Optional, List
 from html import escape
 import time
 import re
@@ -13,9 +17,11 @@ from models.exercise_models import (
     ExerciseGenerateResponse,
     ErrorDetail
 )
+from models.math_models import MathExerciseType
 from services.curriculum_service import curriculum_service
 from services.math_generation_service import MathGenerationService
 from services.geometry_render_service import GeometryRenderService
+from curriculum.loader import get_chapter_by_official_code, CurriculumChapter
 from logger import get_logger
 
 logger = get_logger()
