@@ -1710,12 +1710,16 @@ class MathGenerationService:
                 proprietes=[f"axe_{axe_type}", f"axe_position_{axe_position if axe_type != 'oblique' else 'y=x'}"]
             )
             
+            # ✅ ÉNONCÉ PÉDAGOGIQUE DÉDIÉ pour éviter le fallback
+            enonce = f"Construire le symétrique du point {point_original}({point_x} ; {point_y}) par rapport à {axe_description}."
+            
             return MathExerciseSpec(
                 niveau=niveau,
                 chapitre=chapitre,
                 type_exercice=MathExerciseType.SYMETRIE_AXIALE,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,  # ✅ ÉNONCÉ DÉDIÉ
                     "type": "trouver_symetrique",
                     "point_original": point_original,
                     "point_image": point_image,
