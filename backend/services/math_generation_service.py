@@ -1454,6 +1454,7 @@ class MathGenerationService:
                 type_exercice=MathExerciseType.CERCLE,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,
                     "type": "aire",
                     "rayon": rayon
                 },
@@ -1469,6 +1470,7 @@ class MathGenerationService:
         else:  # rayon depuis périmètre
             rayon = random.randint(5, 12)
             perimetre = round(2 * math.pi * rayon, 2)
+            enonce = f"Le périmètre d'un cercle est de {perimetre} cm. Calculer son rayon."
             
             etapes = [
                 f"Périmètre du cercle = {perimetre} cm",
@@ -1491,6 +1493,7 @@ class MathGenerationService:
                 type_exercice=MathExerciseType.CERCLE,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,
                     "type": "rayon_depuis_perimetre",
                     "perimetre": perimetre
                 },
