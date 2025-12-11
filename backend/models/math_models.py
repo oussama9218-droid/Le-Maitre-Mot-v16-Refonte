@@ -30,6 +30,21 @@ class MathExerciseType(str, Enum):
     POURCENTAGES = "pourcentages"
     ECHELLE = "echelle"
     
+    # ========== VAGUE 1 - Générateurs 6e ==========
+    # Fractions avancées
+    FRACTION_REPRESENTATION = "fraction_representation"  # 6N2-FRAC-REPR
+    
+    # Proportionnalité avancée
+    PROP_TABLEAU = "prop_tableau"  # 6N3-PROP-TAB
+    PROP_ACHAT = "prop_achat"  # 6N3-PROP-ACHAT
+    
+    # Problèmes
+    PROBLEME_2_ETAPES = "probleme_2_etapes"  # 6P-PROB-2ET
+    
+    # Nombres entiers
+    NOMBRES_LECTURE = "nombres_lecture"  # 6N1-LECTURE
+    NOMBRES_COMPARAISON = "nombres_comparaison"  # 6N1-COMP
+    
     # Géométrie
     TRIANGLE_RECTANGLE = "triangle_rectangle"
     TRIANGLE_QUELCONQUE = "triangle_quelconque"
