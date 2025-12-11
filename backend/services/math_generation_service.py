@@ -61,6 +61,54 @@ class MathGenerationService:
             
         return specs
     
+    def generate_math_exercise_specs_with_types(
+        self,
+        niveau: str,
+        chapitre: str,
+        difficulte: str,
+        exercise_types: List[MathExerciseType],
+        nb_exercices: int
+    ) -> List[MathExerciseSpec]:
+        """
+        Génère des exercices avec des types explicitement spécifiés.
+        
+        Cette méthode est utilisée par le mode code_officiel qui spécifie
+        directement les types d'exercices depuis le référentiel curriculum.
+        
+        Args:
+            niveau: Niveau scolaire (ex: "6e")
+            chapitre: Nom du chapitre backend pour le contexte
+            difficulte: Niveau de difficulté (facile, moyen, difficile)
+            exercise_types: Liste des MathExerciseType à utiliser
+            nb_exercices: Nombre d'exercices à générer
+            
+        Returns:
+            Liste des specs d'exercices générés
+        """
+        # Reset pour chaque génération
+        self.used_points_sets.clear()
+        
+        if not exercise_types:
+            # Fallback sur le mapping par chapitre si aucun type spécifié
+            return self.generate_math_exercise_specs(
+                niveau, chapitre, difficulte, nb_exercices
+            )
+        
+        specs = []
+        for i in range(nb_exercices):
+            # Choisir un type d'exercice parmi ceux spécifiés
+            exercise_type = random.choice(exercise_types)
+            
+            # Générer la spec selon le type
+            spec = self._generate_spec_by_type(
+                niveau, chapitre, exercise_type, difficulte
+            )
+            
+            if spec:
+                specs.append(spec)
+        
+        return specs
+    
     def _map_chapter_to_types(self, chapitre: str, niveau: str) -> List[MathExerciseType]:
         """Mappe les chapitres aux types d'exercices appropriés"""
         
