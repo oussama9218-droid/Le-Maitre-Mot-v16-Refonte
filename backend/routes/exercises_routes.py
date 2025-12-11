@@ -199,18 +199,25 @@ def _build_fallback_enonce(spec, chapitre: str) -> str:
             if rayon and hauteur:
                 return f"Calculer le volume d'un cylindre de rayon {rayon} cm et de hauteur {hauteur} cm."
         
-        # Prisme : inclure aire de base et hauteur
+        # Prisme : inclure base et hauteur
         elif solide == "prisme":
-            aire_base = params.get("aire_base", "")
+            base_longueur = params.get("base_longueur", "")
+            base_largeur = params.get("base_largeur", "")
             hauteur = params.get("hauteur", "")
-            if aire_base and hauteur:
-                return f"Calculer le volume d'un prisme d'aire de base {aire_base} cm² et de hauteur {hauteur} cm."
+            if base_longueur and base_largeur and hauteur:
+                return f"Calculer le volume d'un prisme droit à base rectangulaire de dimensions {base_longueur} cm × {base_largeur} cm et de hauteur {hauteur} cm."
+            elif hauteur:
+                aire_base = params.get("aire_base", "")
+                if aire_base:
+                    return f"Calculer le volume d'un prisme d'aire de base {aire_base} cm² et de hauteur {hauteur} cm."
         
         # Fallback avec dimensions si disponibles
         dimensions = []
-        for key in ["longueur", "largeur", "hauteur", "arete", "rayon", "L", "l", "h", "r"]:
+        for key, label in [("longueur", "L"), ("largeur", "l"), ("hauteur", "h"), 
+                           ("arete", "arête"), ("rayon", "r"), ("base_longueur", "base L"),
+                           ("base_largeur", "base l")]:
             if key in params and params[key]:
-                dimensions.append(f"{key}: {params[key]} cm")
+                dimensions.append(f"{label}={params[key]} cm")
         
         if dimensions:
             dims_str = ", ".join(dimensions)
