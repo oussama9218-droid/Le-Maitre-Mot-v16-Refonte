@@ -7688,3 +7688,534 @@ class MathGenerationService:
             etapes_calculees=etapes,
             resultat_final=str(resultat)
         )
+
+    # ==========================================================================
+    # VAGUE 3 - GÉNÉRATEURS 6ᵉ PRIORITÉ MOYENNE
+    # ==========================================================================
+    
+    def _gen_fractions_egales(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Fractions égales et simplification"""
+        
+        if difficulte == "facile":
+            facteur = random.choice([2, 3, 5])
+            num_simple = random.randint(1, 5)
+            den_simple = random.randint(num_simple + 1, 8)
+        else:
+            facteur = random.choice([2, 3, 4, 5, 6])
+            num_simple = random.randint(1, 8)
+            den_simple = random.randint(num_simple + 1, 12)
+        
+        num_grand = num_simple * facteur
+        den_grand = den_simple * facteur
+        
+        type_ex = random.choice(["trouver_egale", "simplifier"])
+        
+        if type_ex == "trouver_egale":
+            enonce = f"Trouver une fraction égale à \\frac{{{num_simple}}}{{{den_simple}}} avec un dénominateur de {den_grand}."
+            resultat = f"\\frac{{{num_grand}}}{{{den_grand}}}"
+            etapes = [f"On multiplie par {facteur}", f"\\frac{{{num_simple}}}{{{den_simple}}} = \\frac{{{num_simple}×{facteur}}}{{{den_simple}×{facteur}}} = \\frac{{{num_grand}}}{{{den_grand}}}"]
+        else:
+            enonce = f"Simplifier la fraction \\frac{{{num_grand}}}{{{den_grand}}}."
+            resultat = f"\\frac{{{num_simple}}}{{{den_simple}}}"
+            etapes = [f"PGCD({num_grand}, {den_grand}) = {facteur}", f"On divise par {facteur}", f"\\frac{{{num_grand}}}{{{den_grand}}} = \\frac{{{num_simple}}}{{{den_simple}}}"]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.FRACTIONS_EGALES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6N2-FRAC-EG"},
+            solution_calculee={"resultat": resultat},
+            etapes_calculees=etapes,
+            resultat_final=resultat
+        )
+    
+    def _gen_decomposition(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Décomposition des nombres"""
+        
+        if difficulte == "facile":
+            nombre = random.randint(100, 999)
+        elif difficulte == "moyen":
+            nombre = random.randint(1000, 9999)
+        else:
+            nombre = random.randint(10000, 999999)
+        
+        # Décomposer
+        decomp = []
+        n = nombre
+        puissance = 1
+        while n > 0:
+            chiffre = n % 10
+            if chiffre > 0:
+                if puissance == 1:
+                    decomp.insert(0, str(chiffre))
+                else:
+                    decomp.insert(0, f"{chiffre} × {puissance}")
+            n //= 10
+            puissance *= 10
+        
+        decomp_str = " + ".join(decomp)
+        
+        enonce = f"Décomposer le nombre {nombre:,} en utilisant les puissances de 10.".replace(",", " ")
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.DECOMPOSITION,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "nombre": nombre, "code_ref": "6N1-DECOMP"},
+            solution_calculee={"decomposition": decomp_str},
+            etapes_calculees=[f"Nombre : {nombre:,}".replace(",", " "), f"Décomposition : {decomp_str}"],
+            resultat_final=decomp_str
+        )
+    
+    def _gen_encadrement(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Encadrement de nombres"""
+        
+        if difficulte == "facile":
+            nombre = round(random.uniform(10, 100), 1)
+            precision = "unité"
+            inf = int(nombre)
+            sup = inf + 1
+        elif difficulte == "moyen":
+            nombre = round(random.uniform(1, 50), 2)
+            precision = random.choice(["unité", "dixième"])
+            if precision == "unité":
+                inf, sup = int(nombre), int(nombre) + 1
+            else:
+                inf = round(int(nombre * 10) / 10, 1)
+                sup = round(inf + 0.1, 1)
+        else:
+            nombre = round(random.uniform(0.1, 10), 3)
+            precision = random.choice(["dixième", "centième"])
+            if precision == "dixième":
+                inf = round(int(nombre * 10) / 10, 1)
+                sup = round(inf + 0.1, 1)
+            else:
+                inf = round(int(nombre * 100) / 100, 2)
+                sup = round(inf + 0.01, 2)
+        
+        enonce = f"Encadrer {nombre} à l'{precision} près."
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.ENCADREMENT,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "nombre": nombre, "precision": precision, "code_ref": "6N-ENCAD"},
+            solution_calculee={"inf": inf, "sup": sup},
+            etapes_calculees=[f"Nombre : {nombre}", f"Précision : à l'{precision} près", f"Encadrement : {inf} ≤ {nombre} < {sup}"],
+            resultat_final=f"{inf} ≤ {nombre} < {sup}"
+        )
+    
+    def _gen_arrondi(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Arrondi de nombres"""
+        
+        if difficulte == "facile":
+            nombre = round(random.uniform(10, 500), 1)
+            precision = "unité"
+        elif difficulte == "moyen":
+            nombre = round(random.uniform(1, 100), 2)
+            precision = random.choice(["unité", "dixième"])
+        else:
+            nombre = round(random.uniform(0.01, 50), 3)
+            precision = random.choice(["dixième", "centième"])
+        
+        if precision == "unité":
+            arrondi = round(nombre)
+        elif precision == "dixième":
+            arrondi = round(nombre, 1)
+        else:
+            arrondi = round(nombre, 2)
+        
+        enonce = f"Arrondir {nombre} à l'{precision} près."
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.ARRONDI,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "nombre": nombre, "precision": precision, "code_ref": "6N-ARRONDI"},
+            solution_calculee={"arrondi": arrondi},
+            etapes_calculees=[f"Nombre : {nombre}", f"On regarde le chiffre suivant l'{precision}", f"Arrondi : {arrondi}"],
+            resultat_final=str(arrondi)
+        )
+    
+    def _gen_priorites_operations(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Priorités opératoires"""
+        
+        if difficulte == "facile":
+            a, b, c = random.randint(2, 10), random.randint(2, 5), random.randint(1, 5)
+            expression = f"{a} + {b} × {c}"
+            resultat = a + b * c
+            etapes = [f"Multiplication d'abord : {b} × {c} = {b*c}", f"Puis addition : {a} + {b*c} = {resultat}"]
+        elif difficulte == "moyen":
+            a, b, c, d = random.randint(2, 10), random.randint(2, 5), random.randint(1, 5), random.randint(1, 5)
+            expression = f"{a} × {b} + {c} × {d}"
+            resultat = a * b + c * d
+            etapes = [f"Multiplications : {a}×{b}={a*b} et {c}×{d}={c*d}", f"Addition : {a*b} + {c*d} = {resultat}"]
+        else:
+            a, b, c = random.randint(2, 8), random.randint(2, 6), random.randint(1, 4)
+            expression = f"({a} + {b}) × {c}"
+            resultat = (a + b) * c
+            etapes = [f"Parenthèses d'abord : {a} + {b} = {a+b}", f"Puis multiplication : {a+b} × {c} = {resultat}"]
+        
+        enonce = f"Calculer : {expression}"
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.PRIORITES_OPERATIONS,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "expression": expression, "code_ref": "6C-PRIO"},
+            solution_calculee={"resultat": resultat},
+            etapes_calculees=etapes,
+            resultat_final=str(resultat)
+        )
+    
+    def _gen_criteres_divisibilite(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Critères de divisibilité"""
+        
+        diviseurs = [2, 3, 5, 9, 10]
+        diviseur = random.choice(diviseurs[:3] if difficulte == "facile" else diviseurs)
+        
+        # Générer un nombre
+        if random.random() < 0.5:
+            # Divisible
+            base = random.randint(10, 100)
+            nombre = base * diviseur
+            est_divisible = True
+        else:
+            # Non divisible
+            nombre = random.randint(100, 999)
+            while nombre % diviseur == 0:
+                nombre = random.randint(100, 999)
+            est_divisible = False
+        
+        enonce = f"Le nombre {nombre} est-il divisible par {diviseur} ? Justifier."
+        
+        critere = {
+            2: "Un nombre est divisible par 2 si son dernier chiffre est pair (0, 2, 4, 6, 8).",
+            3: "Un nombre est divisible par 3 si la somme de ses chiffres est divisible par 3.",
+            5: "Un nombre est divisible par 5 si son dernier chiffre est 0 ou 5.",
+            9: "Un nombre est divisible par 9 si la somme de ses chiffres est divisible par 9.",
+            10: "Un nombre est divisible par 10 si son dernier chiffre est 0."
+        }[diviseur]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.CRITERES_DIVISIBILITE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "nombre": nombre, "diviseur": diviseur, "code_ref": "6N-DIV"},
+            solution_calculee={"divisible": est_divisible},
+            etapes_calculees=[critere, f"{'Oui' if est_divisible else 'Non'}, {nombre} {'est' if est_divisible else 'n\\'est pas'} divisible par {diviseur}."],
+            resultat_final="Oui" if est_divisible else "Non"
+        )
+    
+    def _gen_multiples(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Multiples d'un nombre"""
+        
+        if difficulte == "facile":
+            nombre = random.choice([2, 3, 5, 10])
+            nb_multiples = 5
+        elif difficulte == "moyen":
+            nombre = random.randint(4, 9)
+            nb_multiples = 7
+        else:
+            nombre = random.randint(6, 15)
+            nb_multiples = 10
+        
+        multiples = [nombre * i for i in range(1, nb_multiples + 1)]
+        
+        type_ex = random.choice(["lister", "verifier", "trouver"])
+        
+        if type_ex == "lister":
+            enonce = f"Donner les {nb_multiples} premiers multiples de {nombre}."
+            resultat = ", ".join(map(str, multiples))
+        elif type_ex == "verifier":
+            test = random.choice([nombre * random.randint(2, 10), random.randint(10, 100)])
+            est_multiple = test % nombre == 0
+            enonce = f"{test} est-il un multiple de {nombre} ?"
+            resultat = f"{'Oui' if est_multiple else 'Non'} car {test} {'=' if est_multiple else '≠'} {nombre} × {test // nombre if est_multiple else '...'}"
+        else:
+            cible = random.randint(20, 100)
+            multiples_avant = [m for m in multiples if m <= cible]
+            enonce = f"Trouver tous les multiples de {nombre} inférieurs ou égaux à {cible}."
+            multiples_complets = [nombre * i for i in range(1, cible // nombre + 1)]
+            resultat = ", ".join(map(str, multiples_complets))
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.MULTIPLES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "nombre": nombre, "code_ref": "6N-MULT"},
+            solution_calculee={"multiples": multiples},
+            etapes_calculees=[f"Les multiples de {nombre} sont : {nombre}, {nombre*2}, {nombre*3}, ..."],
+            resultat_final=resultat
+        )
+    
+    def _gen_conversions_unites(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Conversions d'unités"""
+        
+        types_unites = [
+            {"nom": "longueur", "unites": ["km", "m", "dm", "cm", "mm"], "facteurs": [1000, 10, 10, 10]},
+            {"nom": "masse", "unites": ["kg", "g", "mg"], "facteurs": [1000, 1000]},
+            {"nom": "capacité", "unites": ["L", "dL", "cL", "mL"], "facteurs": [10, 10, 10]}
+        ]
+        
+        type_unite = random.choice(types_unites)
+        unites = type_unite["unites"]
+        
+        if difficulte == "facile":
+            idx_depart = random.randint(0, len(unites) - 2)
+            idx_arrivee = idx_depart + 1
+        else:
+            idx_depart, idx_arrivee = random.sample(range(len(unites)), 2)
+        
+        unite_depart = unites[idx_depart]
+        unite_arrivee = unites[idx_arrivee]
+        
+        valeur_depart = random.choice([1, 2, 5, 10, 25, 50, 100, 0.5, 0.25]) if difficulte != "facile" else random.randint(1, 100)
+        
+        # Calculer le facteur de conversion
+        facteurs = type_unite["facteurs"]
+        if idx_depart < idx_arrivee:
+            facteur = 1
+            for i in range(idx_depart, idx_arrivee):
+                facteur *= facteurs[i]
+            valeur_arrivee = valeur_depart * facteur
+        else:
+            facteur = 1
+            for i in range(idx_arrivee, idx_depart):
+                facteur *= facteurs[i]
+            valeur_arrivee = valeur_depart / facteur
+        
+        enonce = f"Convertir {valeur_depart} {unite_depart} en {unite_arrivee}."
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.CONVERSIONS_UNITES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "valeur": valeur_depart, "unite_depart": unite_depart, "unite_arrivee": unite_arrivee, "code_ref": "6M-CONV"},
+            solution_calculee={"resultat": valeur_arrivee},
+            etapes_calculees=[f"{valeur_depart} {unite_depart} = {valeur_arrivee} {unite_arrivee}"],
+            resultat_final=f"{valeur_arrivee} {unite_arrivee}"
+        )
+    
+    def _gen_angle_vocabulaire(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Vocabulaire des angles"""
+        
+        angle = random.randint(1, 179)
+        
+        if angle < 90:
+            type_angle = "aigu"
+            definition = "Un angle aigu mesure entre 0° et 90°."
+        elif angle == 90:
+            type_angle = "droit"
+            definition = "Un angle droit mesure exactement 90°."
+        else:
+            type_angle = "obtus"
+            definition = "Un angle obtus mesure entre 90° et 180°."
+        
+        type_ex = random.choice(["identifier", "donner_exemple"])
+        
+        if type_ex == "identifier":
+            enonce = f"Un angle mesure {angle}°. De quel type d'angle s'agit-il ?"
+            resultat = f"C'est un angle {type_angle}."
+        else:
+            type_demande = random.choice(["aigu", "droit", "obtus"])
+            if type_demande == "aigu":
+                exemple = random.randint(1, 89)
+            elif type_demande == "droit":
+                exemple = 90
+            else:
+                exemple = random.randint(91, 179)
+            enonce = f"Donner un exemple d'angle {type_demande}."
+            resultat = f"Exemple : {exemple}°"
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.ANGLE_VOCABULAIRE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6G-ANG-VOC"},
+            solution_calculee={"type": type_angle if type_ex == "identifier" else type_demande},
+            etapes_calculees=[definition],
+            resultat_final=resultat
+        )
+    
+    def _gen_symetrie_proprietes(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Propriétés de la symétrie axiale"""
+        
+        proprietes = [
+            "La symétrie axiale conserve les longueurs.",
+            "La symétrie axiale conserve les angles.",
+            "Un point et son symétrique sont à égale distance de l'axe.",
+            "Le segment joignant un point à son symétrique est perpendiculaire à l'axe.",
+            "L'axe de symétrie est la médiatrice du segment joignant un point à son symétrique."
+        ]
+        
+        propriete = random.choice(proprietes)
+        
+        type_ex = random.choice(["vrai_faux", "appliquer", "justifier"])
+        
+        if type_ex == "vrai_faux":
+            # Proposer une vraie ou fausse propriété
+            if random.random() < 0.7:
+                affirmation = propriete
+                reponse = "Vrai"
+            else:
+                affirmation = "La symétrie axiale modifie les angles."
+                reponse = "Faux"
+            enonce = f"Vrai ou Faux : {affirmation}"
+        elif type_ex == "appliquer":
+            longueur = random.randint(3, 10)
+            enonce = f"Un segment [AB] mesure {longueur} cm. Quelle est la longueur de son symétrique [A'B'] par rapport à un axe ?"
+            reponse = f"{longueur} cm (conservation des longueurs)"
+        else:
+            enonce = f"Pourquoi dit-on que la symétrie axiale est une isométrie ?"
+            reponse = "Car elle conserve les longueurs et les angles."
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.SYMETRIE_PROPRIETES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6G-SYM-PROP"},
+            solution_calculee={"reponse": reponse},
+            etapes_calculees=[propriete],
+            resultat_final=reponse
+        )
+    
+    def _gen_tableau_completer(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Compléter un tableau"""
+        
+        # Tableau simple à compléter
+        if difficulte == "facile":
+            colonnes = 3
+            operation = "+"
+        else:
+            colonnes = 4
+            operation = random.choice(["+", "×"])
+        
+        # Générer des données avec des cases manquantes
+        valeurs = [random.randint(2, 15) for _ in range(colonnes)]
+        if operation == "+":
+            resultats = [v + random.randint(5, 15) for v in valeurs]
+        else:
+            resultats = [v * random.randint(2, 5) for v in valeurs]
+        
+        # Masquer 2 valeurs
+        pos_masquees = random.sample(range(colonnes), min(2, colonnes))
+        valeurs_affichees = [v if i not in pos_masquees else "?" for i, v in enumerate(valeurs)]
+        
+        # Construire le tableau HTML
+        table_html = '<table style="border-collapse: collapse; margin: 10px auto;">'
+        table_html += '<tr><th style="border: 1px solid #333; padding: 8px;">Entrée</th>'
+        for v in valeurs_affichees:
+            bg = 'background-color: #ffffcc;' if v == "?" else ''
+            table_html += f'<td style="border: 1px solid #333; padding: 8px; text-align: center; {bg}">{v}</td>'
+        table_html += '</tr><tr><th style="border: 1px solid #333; padding: 8px;">Sortie</th>'
+        for r in resultats:
+            table_html += f'<td style="border: 1px solid #333; padding: 8px; text-align: center;">{r}</td>'
+        table_html += '</tr></table>'
+        
+        enonce = f"Compléter le tableau suivant (la règle est : sortie = entrée {operation} ?).\n{table_html}"
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.TABLEAU_COMPLETER,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6D-TAB-COMP"},
+            solution_calculee={"valeurs": valeurs, "resultats": resultats},
+            etapes_calculees=["Trouver la règle", f"Valeurs manquantes : {[valeurs[i] for i in pos_masquees]}"],
+            resultat_final=str(valeurs)
+        )
+    
+    def _gen_diagramme_circulaire(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Diagramme circulaire"""
+        
+        categories = random.choice([
+            ["Foot", "Basket", "Tennis", "Natation"],
+            ["Rouge", "Bleu", "Vert", "Jaune"],
+            ["Math", "Français", "Anglais", "Sport"]
+        ])
+        
+        # Générer des pourcentages qui font 100%
+        if difficulte == "facile":
+            valeurs = [25, 25, 25, 25]
+        else:
+            valeurs = []
+            reste = 100
+            for i in range(len(categories) - 1):
+                v = random.randint(10, reste - 10 * (len(categories) - i - 1))
+                valeurs.append(v)
+                reste -= v
+            valeurs.append(reste)
+        
+        # Générer SVG
+        svg = '<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">'
+        colors = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4"]
+        cx, cy, r = 100, 100, 80
+        
+        angle_cumul = -90
+        for i, (cat, val) in enumerate(zip(categories, valeurs)):
+            angle_sweep = val * 3.6
+            angle_end = angle_cumul + angle_sweep
+            
+            x1 = cx + r * math.cos(math.radians(angle_cumul))
+            y1 = cy + r * math.sin(math.radians(angle_cumul))
+            x2 = cx + r * math.cos(math.radians(angle_end))
+            y2 = cy + r * math.sin(math.radians(angle_end))
+            
+            large_arc = 1 if angle_sweep > 180 else 0
+            
+            if val == 100:
+                svg += f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{colors[i]}"/>'
+            else:
+                svg += f'<path d="M {cx},{cy} L {x1},{y1} A {r},{r} 0 {large_arc},1 {x2},{y2} Z" fill="{colors[i]}"/>'
+            
+            angle_cumul = angle_end
+        
+        svg += '</svg>'
+        
+        question = random.choice([
+            f"Quelle catégorie représente la plus grande part ?",
+            f"Quel pourcentage représente '{categories[0]}' ?"
+        ])
+        
+        enonce = f"Voici un diagramme circulaire.\n{question}"
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.DIAGRAMME_CIRCULAIRE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6D-DIAG-CIRC"},
+            solution_calculee={"categories": categories, "valeurs": valeurs},
+            etapes_calculees=[f"Catégories : {categories}", f"Valeurs : {valeurs}%"],
+            resultat_final=f"Max: {categories[valeurs.index(max(valeurs))]} ({max(valeurs)}%)",
+            figure_geometrique=GeometricFigure(type="diagramme_circulaire", points=[], longueurs_connues={}, proprietes=[f"svg:{svg}"])
+        )
+    
+    def _gen_substitution(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Substitution dans une expression"""
+        
+        if difficulte == "facile":
+            x = random.randint(1, 5)
+            expression = f"2 × x + 3"
+            resultat = 2 * x + 3
+        elif difficulte == "moyen":
+            x = random.randint(2, 8)
+            a, b = random.randint(2, 5), random.randint(1, 10)
+            expression = f"{a} × x + {b}"
+            resultat = a * x + b
+        else:
+            x = random.randint(1, 6)
+            a, b, c = random.randint(2, 4), random.randint(1, 5), random.randint(1, 10)
+            expression = f"{a} × x² + {b} × x + {c}"
+            resultat = a * x * x + b * x + c
+        
+        enonce = f"Calculer la valeur de l'expression {expression} pour x = {x}."
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.SUBSTITUTION,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "expression": expression, "x": x, "code_ref": "6L-SUBST"},
+            solution_calculee={"resultat": resultat},
+            etapes_calculees=[f"Pour x = {x} :", f"{expression} = {resultat}"],
+            resultat_final=str(resultat)
+        )
