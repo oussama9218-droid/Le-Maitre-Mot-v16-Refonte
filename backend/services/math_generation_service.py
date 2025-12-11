@@ -68,7 +68,32 @@ class MathGenerationService:
         # Pour des chapitres présents dans plusieurs niveaux, 
         # le mapping s'applique à tous les niveaux
         mapping = {
-            # ========== 6e ==========
+            # ========== VAGUE 1 - 6e - Priorité Très Haute ==========
+            # Fractions - Représentation graphique (6N2-FRAC-REPR)
+            "Fractions - Représentation": [MathExerciseType.FRACTION_REPRESENTATION],
+            "Représentation graphique des fractions": [MathExerciseType.FRACTION_REPRESENTATION],
+            
+            # Proportionnalité - Tableaux (6N3-PROP-TAB)
+            "Proportionnalité - Tableaux": [MathExerciseType.PROP_TABLEAU],
+            "Tableaux de proportionnalité": [MathExerciseType.PROP_TABLEAU],
+            
+            # Proportionnalité - Problèmes achats (6N3-PROP-ACHAT)
+            "Proportionnalité - Problèmes": [MathExerciseType.PROP_ACHAT],
+            "Problèmes d'achats": [MathExerciseType.PROP_ACHAT],
+            
+            # Problèmes 2 étapes (6P-PROB-2ET)
+            "Problèmes à 2 étapes": [MathExerciseType.PROBLEME_2_ETAPES],
+            "Problèmes multi-étapes": [MathExerciseType.PROBLEME_2_ETAPES],
+            
+            # Nombres entiers - Lecture/écriture (6N1-LECTURE)
+            "Lecture et écriture des nombres": [MathExerciseType.NOMBRES_LECTURE],
+            "Nombres entiers - Lecture": [MathExerciseType.NOMBRES_LECTURE],
+            
+            # Nombres entiers - Comparaison (6N1-COMP)
+            "Comparaison et rangement": [MathExerciseType.NOMBRES_COMPARAISON],
+            "Nombres entiers - Comparaison": [MathExerciseType.NOMBRES_COMPARAISON],
+            
+            # ========== 6e - Existants ==========
             "Nombres entiers et décimaux": [MathExerciseType.CALCUL_DECIMAUX],
             "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX],
             "Longueurs, masses, durées": [MathExerciseType.CALCUL_DECIMAUX],
