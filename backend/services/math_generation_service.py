@@ -119,15 +119,8 @@ class MathGenerationService:
             
             # ========== 6e - Existants restants ==========
             "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.ENCADREMENT, MathExerciseType.ARRONDI],
-            "Périmètres et aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.RECTANGLE, MathExerciseType.AIRE_TRIANGLE, MathExerciseType.AIRE_FIGURES_COMPOSEES],
-            "Aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.AIRE_TRIANGLE, MathExerciseType.CERCLE],
-            "Aire du rectangle et du carré": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.AIRE_FIGURES_COMPOSEES],
-            "Angles": [MathExerciseType.TRIANGLE_QUELCONQUE],  # Angles dans triangles
             "Géométrie - Triangles et quadrilatères": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],
-            "Géométrie dans le plan": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE],
-            "Perpendiculaires et parallèles à la règle et à l'équerre": [MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.RECTANGLE],  # ✅ AJOUT PROMPT 5
-            "Symétrie axiale": [MathExerciseType.SYMETRIE_AXIALE],  # ✅ Générateur symétrie axiale ajouté
-            "Symétrie axiale (points, segments, figures)": [MathExerciseType.SYMETRIE_AXIALE],  # ✅ Titre complet de la migration
+            "Perpendiculaires et parallèles à la règle et à l'équerre": [MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.RECTANGLE],
             "Symétrie centrale": [MathExerciseType.SYMETRIE_CENTRALE],  # ✅ Générateur symétrie centrale ajouté
             
             # ========== 6e - Nombres et calculs (SPRINT 1) ==========
