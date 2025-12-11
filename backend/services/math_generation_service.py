@@ -8216,3 +8216,37 @@ class MathGenerationService:
             etapes_calculees=[f"Pour x = {x} :", f"{expression} = {resultat}"],
             resultat_final=str(resultat)
         )
+
+    def _gen_angle_proprietes(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Propriétés des angles"""
+        
+        proprietes = [
+            ("complémentaires", "Deux angles complémentaires ont une somme de 90°.", 90),
+            ("supplémentaires", "Deux angles supplémentaires ont une somme de 180°.", 180),
+            ("opposés par le sommet", "Deux angles opposés par le sommet sont égaux.", None)
+        ]
+        
+        prop = random.choice(proprietes)
+        
+        if prop[2]:  # complémentaires ou supplémentaires
+            angle1 = random.randint(10, prop[2] - 10)
+            angle2 = prop[2] - angle1
+            enonce = f"Deux angles sont {prop[0]}. L'un mesure {angle1}°. Quelle est la mesure de l'autre ?"
+            resultat = f"{angle2}°"
+            etapes = [prop[1], f"L'autre angle = {prop[2]}° - {angle1}° = {angle2}°"]
+        else:  # opposés par le sommet
+            angle1 = random.randint(20, 160)
+            angle2 = angle1
+            enonce = f"Deux droites se coupent. Un angle mesure {angle1}°. Quelle est la mesure de l'angle opposé par le sommet ?"
+            resultat = f"{angle2}°"
+            etapes = [prop[1], f"L'angle opposé = {angle2}°"]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.ANGLE_PROPRIETES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6G-ANG-PROP"},
+            solution_calculee={"resultat": resultat},
+            etapes_calculees=etapes,
+            resultat_final=resultat
+        )
