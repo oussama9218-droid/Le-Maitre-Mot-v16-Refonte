@@ -737,6 +737,8 @@ class MathGenerationService:
             angle2 = 70
             angle3 = 50
         
+        enonce = f"Dans le triangle {points[0]}{points[1]}{points[2]}, l'angle en {points[0]} mesure {angle1}° et l'angle en {points[1]} mesure {angle2}°. Calculer l'angle en {points[2]}."
+        
         figure = GeometricFigure(
             type="triangle",
             points=points,
@@ -760,6 +762,7 @@ class MathGenerationService:
             type_exercice=MathExerciseType.TRIANGLE_QUELCONQUE,
             difficulte=DifficultyLevel(difficulte),
             parametres={
+                "enonce": enonce,
                 "triangle": f"{points[0]}{points[1]}{points[2]}",
                 "angle1": angle1,
                 "angle2": angle2
