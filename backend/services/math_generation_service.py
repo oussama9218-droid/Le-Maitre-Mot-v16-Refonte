@@ -156,9 +156,9 @@ class MathGenerationService:
             "Multiples et diviseurs, critères de divisibilité": [MathExerciseType.CALCUL_DECIMAUX],
             
             # ========== 6e - Fractions (SPRINT 4) ==========
-            "Fractions comme partage et quotient": [MathExerciseType.CALCUL_FRACTIONS],
-            "Fractions simples de l'unité": [MathExerciseType.CALCUL_FRACTIONS],
-            "Nombres en écriture fractionnaire": [MathExerciseType.CALCUL_FRACTIONS],  # AJOUTÉ
+            # NOTE: "Fractions comme partage...", "Fractions simples...", "Nombres en écriture..."
+            # sont déjà définis dans VAGUE 1 (lignes 75-78) avec des mappings complets
+            # Ne pas redéfinir ici pour éviter l'écrasement !
             
             # ========== 6e - Grandeurs et mesures (SPRINT 4) ==========
             "Mesurer et comparer des longueurs": [MathExerciseType.CALCUL_DECIMAUX],
