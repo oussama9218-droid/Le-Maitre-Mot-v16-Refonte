@@ -8236,3 +8236,450 @@ class MathGenerationService:
             etapes_calculees=etapes,
             resultat_final=resultat
         )
+
+    # ========== GÉNÉRATEURS DÉDIÉS 6e (P1) ==========
+    
+    def _gen_calcul_mental_dedie(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur dédié: Calcul mental niveau 6e
+        Petits calculs rapides sans KaTeX, sans tableau
+        Types: additions, multiplications, doubles/moitiés, priorités
+        """
+        
+        if difficulte == "facile":
+            type_calcul = random.choice(["addition", "multiplication", "double"])
+        elif difficulte == "moyen":
+            type_calcul = random.choice(["addition", "soustraction", "multiplication", "double", "moitie"])
+        else:
+            type_calcul = random.choice(["addition_multiple", "multiplication", "priorite", "double", "moitie"])
+        
+        if type_calcul == "addition":
+            a = random.randint(10, 99)
+            b = random.randint(10, 99)
+            resultat = a + b
+            enonce = f"Calculer mentalement : {a} + {b}"
+            etapes = [f"{a} + {b} = {resultat}"]
+            
+        elif type_calcul == "soustraction":
+            a = random.randint(50, 150)
+            b = random.randint(10, min(a-1, 99))
+            resultat = a - b
+            enonce = f"Calculer mentalement : {a} - {b}"
+            etapes = [f"{a} - {b} = {resultat}"]
+            
+        elif type_calcul == "addition_multiple":
+            a = random.randint(10, 50)
+            b = random.randint(10, 50)
+            c = random.randint(10, 50)
+            resultat = a + b + c
+            enonce = f"Calculer mentalement : {a} + {b} + {c}"
+            etapes = [f"{a} + {b} = {a+b}", f"{a+b} + {c} = {resultat}"]
+            
+        elif type_calcul == "multiplication":
+            a = random.randint(2, 12)
+            b = random.randint(2, 12)
+            resultat = a * b
+            enonce = f"Calculer mentalement : {a} × {b}"
+            etapes = [f"{a} × {b} = {resultat}"]
+            
+        elif type_calcul == "double":
+            a = random.randint(15, 500)
+            resultat = a * 2
+            enonce = f"Calculer le double de {a}"
+            etapes = [f"Double de {a} = {a} × 2 = {resultat}"]
+            
+        elif type_calcul == "moitie":
+            a = random.randint(10, 500) * 2  # Nombre pair
+            resultat = a // 2
+            enonce = f"Calculer la moitié de {a}"
+            etapes = [f"Moitié de {a} = {a} ÷ 2 = {resultat}"]
+            
+        else:  # priorite
+            a = random.randint(2, 10)
+            b = random.randint(2, 5)
+            c = random.randint(1, 10)
+            resultat = a + b * c
+            enonce = f"Calculer mentalement : {a} + {b} × {c}"
+            etapes = [
+                f"Priorité : d'abord la multiplication",
+                f"{b} × {c} = {b*c}",
+                f"{a} + {b*c} = {resultat}"
+            ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.CALCUL_MENTAL_DEDIE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "type_calcul": type_calcul,
+                "code_ref": "6C-MENTAL"
+            },
+            solution_calculee={"resultat": resultat},
+            etapes_calculees=etapes,
+            resultat_final=str(resultat)
+        )
+
+    def _gen_calcul_pose_dedie(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur dédié: Calcul posé niveau 6e
+        Opérations à poser verticalement (addition, soustraction, multiplication)
+        Inclut les étapes de calcul
+        """
+        
+        if difficulte == "facile":
+            operation = random.choice(["addition", "soustraction"])
+            if operation == "addition":
+                a = random.randint(100, 999)
+                b = random.randint(100, 999)
+            else:
+                a = random.randint(500, 999)
+                b = random.randint(100, a-1)
+        elif difficulte == "moyen":
+            operation = random.choice(["addition", "soustraction", "multiplication"])
+            if operation in ["addition", "soustraction"]:
+                a = random.randint(1000, 9999)
+                b = random.randint(100, min(a-1, 9999)) if operation == "soustraction" else random.randint(1000, 9999)
+            else:
+                a = random.randint(10, 99)
+                b = random.randint(10, 99)
+        else:
+            operation = random.choice(["addition", "soustraction", "multiplication"])
+            if operation in ["addition", "soustraction"]:
+                a = random.randint(10000, 99999)
+                b = random.randint(1000, min(a-1, 99999)) if operation == "soustraction" else random.randint(10000, 99999)
+            else:
+                a = random.randint(100, 999)
+                b = random.randint(10, 99)
+        
+        if operation == "addition":
+            resultat = a + b
+            symbole = "+"
+            enonce = f"Poser et effectuer l'addition suivante : {a} + {b}"
+            etapes = [
+                f"On pose l'addition verticalement :",
+                f"  {a:>6}",
+                f"+ {b:>6}",
+                f"────────",
+                f"  {resultat:>6}",
+                f"Résultat : {resultat}"
+            ]
+        elif operation == "soustraction":
+            resultat = a - b
+            symbole = "-"
+            enonce = f"Poser et effectuer la soustraction suivante : {a} - {b}"
+            etapes = [
+                f"On pose la soustraction verticalement :",
+                f"  {a:>6}",
+                f"- {b:>6}",
+                f"────────",
+                f"  {resultat:>6}",
+                f"Résultat : {resultat}"
+            ]
+        else:  # multiplication
+            resultat = a * b
+            symbole = "×"
+            enonce = f"Poser et effectuer la multiplication suivante : {a} × {b}"
+            # Calcul détaillé
+            etapes = [
+                f"On pose la multiplication verticalement :",
+                f"    {a:>5}",
+                f"  × {b:>5}",
+                f"──────────"
+            ]
+            # Produits partiels si b >= 10
+            if b >= 10:
+                unite = b % 10
+                dizaine = b // 10
+                if unite > 0:
+                    etapes.append(f"    {a * unite:>5}  ({a} × {unite})")
+                if dizaine > 0:
+                    etapes.append(f"   {a * dizaine:>5}0  ({a} × {dizaine}0)")
+                etapes.append(f"──────────")
+            etapes.append(f"   {resultat:>6}")
+            etapes.append(f"Résultat : {resultat}")
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.CALCUL_POSE_DEDIE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "a": a,
+                "b": b,
+                "operation": operation,
+                "code_ref": "6C-POSE"
+            },
+            solution_calculee={"resultat": resultat, "operation": operation},
+            etapes_calculees=etapes,
+            resultat_final=str(resultat)
+        )
+
+    def _gen_calcul_instrumente_dedie(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur dédié: Calcul instrumenté niveau 6e
+        Exercices adaptés à l'utilisation de la calculatrice
+        Types: ordre de grandeur, arrondi, estimation, calculs complexes
+        """
+        
+        contextes = [
+            ("prix", "€", ["achat", "budget", "économies"]),
+            ("distance", "km", ["trajet", "voyage", "parcours"]),
+            ("masse", "kg", ["courses", "colis", "ingrédients"]),
+            ("duree", "h", ["temps", "durée", "horaire"])
+        ]
+        
+        if difficulte == "facile":
+            type_calcul = random.choice(["ordre_grandeur", "arrondi_simple"])
+        elif difficulte == "moyen":
+            type_calcul = random.choice(["ordre_grandeur", "arrondi", "calcul_decimal"])
+        else:
+            type_calcul = random.choice(["estimation", "calcul_complexe", "arrondi_precision"])
+        
+        contexte = random.choice(contextes)
+        unite = contexte[1]
+        
+        if type_calcul == "ordre_grandeur":
+            # Estimer le résultat d'un calcul
+            a = random.randint(10, 99) + random.random()
+            b = random.randint(10, 99) + random.random()
+            a = round(a, 2)
+            b = round(b, 2)
+            resultat_exact = round(a + b, 2)
+            ordre = round(resultat_exact, -1)  # Arrondi à la dizaine
+            
+            enonce = f"Sans calculatrice, estimer l'ordre de grandeur de {a} + {b}. Puis vérifier avec la calculatrice."
+            etapes = [
+                f"Estimation : {round(a)} + {round(b)} ≈ {round(a) + round(b)}",
+                f"Calcul exact à la calculatrice : {a} + {b} = {resultat_exact}",
+                f"Ordre de grandeur : environ {ordre}"
+            ]
+            resultat = resultat_exact
+            
+        elif type_calcul in ["arrondi_simple", "arrondi"]:
+            nombre = round(random.uniform(10, 1000), 3)
+            precision = random.choice([0, 1, 2]) if type_calcul == "arrondi" else random.choice([0, 1])
+            
+            if precision == 0:
+                resultat = round(nombre)
+                precision_txt = "à l'unité"
+            elif precision == 1:
+                resultat = round(nombre, 1)
+                precision_txt = "au dixième"
+            else:
+                resultat = round(nombre, 2)
+                precision_txt = "au centième"
+            
+            enonce = f"À l'aide de la calculatrice, arrondir {nombre} {precision_txt}."
+            etapes = [
+                f"Nombre : {nombre}",
+                f"Arrondi {precision_txt} : {resultat}"
+            ]
+            
+        elif type_calcul == "arrondi_precision":
+            nombre = round(random.uniform(100, 10000), 4)
+            precision = random.choice([-1, -2, 0, 1, 2])
+            
+            if precision == -2:
+                resultat = round(nombre, -2)
+                precision_txt = "à la centaine"
+            elif precision == -1:
+                resultat = round(nombre, -1)
+                precision_txt = "à la dizaine"
+            elif precision == 0:
+                resultat = round(nombre)
+                precision_txt = "à l'unité"
+            elif precision == 1:
+                resultat = round(nombre, 1)
+                precision_txt = "au dixième"
+            else:
+                resultat = round(nombre, 2)
+                precision_txt = "au centième"
+            
+            enonce = f"À l'aide de la calculatrice, arrondir {nombre} {precision_txt}."
+            etapes = [
+                f"Nombre : {nombre}",
+                f"Arrondi {precision_txt} : {resultat}"
+            ]
+            
+        elif type_calcul == "calcul_decimal":
+            a = round(random.uniform(10, 100), 2)
+            b = round(random.uniform(1, 50), 2)
+            operation = random.choice(["+", "-", "×"])
+            
+            if operation == "+":
+                resultat = round(a + b, 2)
+            elif operation == "-":
+                if a < b:
+                    a, b = b, a
+                resultat = round(a - b, 2)
+            else:
+                resultat = round(a * b, 2)
+            
+            enonce = f"Utiliser la calculatrice pour effectuer : {a} {operation} {b}"
+            etapes = [
+                f"Calcul : {a} {operation} {b}",
+                f"Résultat : {resultat}"
+            ]
+            
+        else:  # calcul_complexe ou estimation
+            a = round(random.uniform(10, 100), 2)
+            b = round(random.uniform(2, 20), 2)
+            c = round(random.uniform(1, 10), 2)
+            resultat = round(a * b + c, 2)
+            
+            theme = random.choice(contexte[2])
+            enonce = f"Pour un {theme}, on calcule : {a} × {b} + {c}. Utiliser la calculatrice pour trouver le résultat."
+            etapes = [
+                f"Calcul : {a} × {b} + {c}",
+                f"Étape 1 : {a} × {b} = {round(a*b, 2)}",
+                f"Étape 2 : {round(a*b, 2)} + {c} = {resultat}",
+                f"Résultat : {resultat} {unite}"
+            ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.CALCUL_INSTRUMENTE_DEDIE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "type_calcul": type_calcul,
+                "code_ref": "6C-INSTR"
+            },
+            solution_calculee={"resultat": resultat},
+            etapes_calculees=etapes,
+            resultat_final=str(resultat)
+        )
+
+    def _gen_grandeurs_mesures_dedie(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur dédié: Grandeurs et mesures niveau 6e
+        Longueurs, masses, durées - Conversions unité → unité
+        Progressivité adaptée au niveau 6e
+        """
+        
+        # Définition des conversions par type
+        conversions = {
+            "longueur": {
+                "facile": [
+                    ("m", "cm", 100, "multiplier par 100"),
+                    ("cm", "mm", 10, "multiplier par 10"),
+                    ("km", "m", 1000, "multiplier par 1000"),
+                ],
+                "moyen": [
+                    ("m", "mm", 1000, "multiplier par 1000"),
+                    ("km", "m", 1000, "multiplier par 1000"),
+                    ("cm", "m", 0.01, "diviser par 100"),
+                    ("mm", "cm", 0.1, "diviser par 10"),
+                ],
+                "difficile": [
+                    ("km", "cm", 100000, "multiplier par 100 000"),
+                    ("mm", "m", 0.001, "diviser par 1000"),
+                    ("m", "km", 0.001, "diviser par 1000"),
+                ]
+            },
+            "masse": {
+                "facile": [
+                    ("kg", "g", 1000, "multiplier par 1000"),
+                    ("g", "mg", 1000, "multiplier par 1000"),
+                ],
+                "moyen": [
+                    ("kg", "g", 1000, "multiplier par 1000"),
+                    ("g", "kg", 0.001, "diviser par 1000"),
+                    ("mg", "g", 0.001, "diviser par 1000"),
+                ],
+                "difficile": [
+                    ("t", "kg", 1000, "multiplier par 1000"),
+                    ("kg", "t", 0.001, "diviser par 1000"),
+                    ("g", "mg", 1000, "multiplier par 1000"),
+                ]
+            },
+            "duree": {
+                "facile": [
+                    ("h", "min", 60, "multiplier par 60"),
+                    ("min", "s", 60, "multiplier par 60"),
+                ],
+                "moyen": [
+                    ("h", "min", 60, "multiplier par 60"),
+                    ("min", "h", 1/60, "diviser par 60"),
+                    ("h", "s", 3600, "multiplier par 3600"),
+                ],
+                "difficile": [
+                    ("jour", "h", 24, "multiplier par 24"),
+                    ("h", "s", 3600, "multiplier par 3600"),
+                    ("min", "h", 1/60, "diviser par 60"),
+                ]
+            }
+        }
+        
+        # Choisir un type de grandeur
+        type_grandeur = random.choice(["longueur", "masse", "duree"])
+        conv_list = conversions[type_grandeur].get(difficulte, conversions[type_grandeur]["moyen"])
+        
+        # Choisir une conversion
+        unite_depart, unite_arrivee, facteur, methode = random.choice(conv_list)
+        
+        # Générer une valeur adaptée
+        if difficulte == "facile":
+            valeur = random.randint(1, 20)
+        elif difficulte == "moyen":
+            valeur = random.choice([random.randint(1, 100), round(random.uniform(0.5, 10), 1)])
+        else:
+            valeur = random.choice([random.randint(1, 1000), round(random.uniform(0.01, 100), 2)])
+        
+        # Calculer le résultat
+        resultat = valeur * facteur
+        if isinstance(resultat, float):
+            resultat = round(resultat, 3)
+            # Nettoyer les décimales inutiles
+            if resultat == int(resultat):
+                resultat = int(resultat)
+        
+        # Contexte réaliste
+        contextes = {
+            "longueur": [
+                f"Un terrain mesure {valeur} {unite_depart}.",
+                f"La distance entre deux villes est de {valeur} {unite_depart}.",
+                f"Une règle mesure {valeur} {unite_depart}.",
+            ],
+            "masse": [
+                f"Un sac de farine pèse {valeur} {unite_depart}.",
+                f"Une voiture a une masse de {valeur} {unite_depart}.",
+                f"Un colis pèse {valeur} {unite_depart}.",
+            ],
+            "duree": [
+                f"Un film dure {valeur} {unite_depart}.",
+                f"Le trajet prend {valeur} {unite_depart}.",
+                f"Une récréation dure {valeur} {unite_depart}.",
+            ]
+        }
+        
+        contexte = random.choice(contextes[type_grandeur])
+        enonce = f"{contexte} Convertir cette mesure en {unite_arrivee}."
+        
+        etapes = [
+            f"Valeur de départ : {valeur} {unite_depart}",
+            f"Conversion : {methode}",
+            f"Calcul : {valeur} × {facteur} = {resultat}" if facteur >= 1 else f"Calcul : {valeur} ÷ {int(1/facteur)} = {resultat}",
+            f"Résultat : {resultat} {unite_arrivee}"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.GRANDEURS_MESURES_DEDIE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "valeur": valeur,
+                "unite_depart": unite_depart,
+                "unite_arrivee": unite_arrivee,
+                "type_grandeur": type_grandeur,
+                "code_ref": "6M-GRAND"
+            },
+            solution_calculee={
+                "resultat": resultat,
+                "unite": unite_arrivee
+            },
+            etapes_calculees=etapes,
+            resultat_final=f"{resultat} {unite_arrivee}"
+        )
