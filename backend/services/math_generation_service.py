@@ -849,6 +849,7 @@ class MathGenerationService:
             largeur = random.randint(4, 12)
             perimetre = 2 * (longueur + largeur)
             aire = longueur * largeur
+            enonce = f"Calculer le périmètre et l'aire d'un rectangle de longueur {longueur} cm et de largeur {largeur} cm."
             
             # Créer la figure géométrique du rectangle
             points = self._get_next_geometry_points()[:4]  # 4 points pour rectangle
@@ -868,6 +869,7 @@ class MathGenerationService:
                 type_exercice=MathExerciseType.PERIMETRE_AIRE,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,
                     "type": "trouver_valeur",  # Type pédagogique pour gabarits
                     "figure": "rectangle",
                     "longueur": longueur,
@@ -890,6 +892,7 @@ class MathGenerationService:
             cote = random.randint(5, 15)
             perimetre = 4 * cote
             aire = cote * cote
+            enonce = f"Calculer le périmètre et l'aire d'un carré de côté {cote} cm."
             
             # Créer la figure géométrique du carré (rectangle avec longueur = largeur)
             points = self._get_next_geometry_points()[:4]
@@ -909,6 +912,7 @@ class MathGenerationService:
                 type_exercice=MathExerciseType.PERIMETRE_AIRE,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,
                     "type": "trouver_valeur",  # Type pédagogique pour gabarits
                     "figure": "carre",
                     "cote": cote
