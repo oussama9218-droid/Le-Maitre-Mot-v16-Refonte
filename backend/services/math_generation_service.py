@@ -129,44 +129,22 @@ class MathGenerationService:
             "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.ENCADREMENT, MathExerciseType.ARRONDI],
             "Géométrie - Triangles et quadrilatères": [MathExerciseType.RECTANGLE, MathExerciseType.PERIMETRE_AIRE],
             "Perpendiculaires et parallèles à la règle et à l'équerre": [MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.RECTANGLE],
-            "Symétrie centrale": [MathExerciseType.SYMETRIE_CENTRALE],  # ✅ Générateur symétrie centrale ajouté
+            "Symétrie centrale": [MathExerciseType.SYMETRIE_CENTRALE],
             
-            # ========== 6e - Nombres et calculs (SPRINT 1) ==========
-            "Droite numérique et repérage": [MathExerciseType.CALCUL_DECIMAUX],
-            
-            # ========== 6e - Organisation et gestion de données (SPRINT 1) ==========
-            "Lire et compléter des tableaux de données": [MathExerciseType.STATISTIQUES],
-            
-            # ========== 6e - Géométrie (SPRINT 2) ==========
-            "Points, segments, droites, demi-droites": [MathExerciseType.TRIANGLE_QUELCONQUE],
-            "Alignement, milieu d'un segment": [MathExerciseType.TRIANGLE_QUELCONQUE],
-            
-            # ========== 6e - Nombres et calculs (SPRINT 2) ==========
-            "Lire et écrire les nombres entiers": [MathExerciseType.CALCUL_DECIMAUX],
-            "Comparer et ranger des nombres entiers": [MathExerciseType.CALCUL_DECIMAUX],
-            "Addition et soustraction de nombres entiers": [MathExerciseType.CALCUL_RELATIFS],
-            
-            # ========== 6e - Géométrie (SPRINT 3) ==========
-            "Triangles (construction et classification)": [MathExerciseType.TRIANGLE_QUELCONQUE],
-            "Quadrilatères usuels (carré, rectangle, losange, parallélogramme)": [MathExerciseType.RECTANGLE],
-            
-            # ========== 6e - Nombres et calculs (SPRINT 3) ==========
-            "Multiplication de nombres entiers": [MathExerciseType.CALCUL_DECIMAUX],
-            "Division euclidienne": [MathExerciseType.CALCUL_DECIMAUX],
-            "Multiples et diviseurs, critères de divisibilité": [MathExerciseType.CALCUL_DECIMAUX],
-            
-            # ========== 6e - Fractions (SPRINT 4) ==========
-            # NOTE: "Fractions comme partage...", "Fractions simples...", "Nombres en écriture..."
-            # sont déjà définis dans VAGUE 1 (lignes 75-78) avec des mappings complets
-            # Ne pas redéfinir ici pour éviter l'écrasement !
-            
-            # ========== 6e - Grandeurs et mesures (SPRINT 4) ==========
-            "Mesurer et comparer des longueurs": [MathExerciseType.CALCUL_DECIMAUX],
-            "Périmètre de figures usuelles": [MathExerciseType.PERIMETRE_AIRE],
-            "Aire du rectangle et du carré": [MathExerciseType.PERIMETRE_AIRE],
-            
-            # ========== 6e - Organisation et gestion de données (SPRINT 4) ==========
-            "Diagrammes en barres et pictogrammes": [MathExerciseType.STATISTIQUES],
+            # ========== 6e - Chapitres supplémentaires (non dans curriculum principal) ==========
+            # NOTE: Ces chapitres sont utilisés pour des sous-thèmes spécifiques
+            # Ils ont des générateurs dédiés dans chapter_specific_generators
+            "Points, segments, droites, demi-droites": [MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.RECTANGLE],
+            "Alignement, milieu d'un segment": [MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.RECTANGLE],
+            "Lire et écrire les nombres entiers": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.NOMBRES_LECTURE],
+            "Comparer et ranger des nombres entiers": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.NOMBRES_COMPARAISON],
+            "Addition et soustraction de nombres entiers": [MathExerciseType.CALCUL_RELATIFS, MathExerciseType.CALCUL_DECIMAUX],
+            "Triangles (construction et classification)": [MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.TRIANGLE_CONSTRUCTION],
+            "Quadrilatères usuels (carré, rectangle, losange, parallélogramme)": [MathExerciseType.RECTANGLE, MathExerciseType.QUADRILATERES],
+            "Multiplication de nombres entiers": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.PRIORITES_OPERATIONS],
+            "Division euclidienne": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.CRITERES_DIVISIBILITE],
+            "Mesurer et comparer des longueurs": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.CONVERSIONS_UNITES],
+            "Périmètre de figures usuelles": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.RECTANGLE],
             
             # ========== Chapitres multi-niveaux (5e, 4e, 3e) - SANS 6e car déjà définis ==========
             # Note: "Fractions", "Proportionnalité", "Nombres entiers et décimaux" sont
