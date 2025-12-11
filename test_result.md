@@ -1,6 +1,94 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Corrections QA P0/P1 - 2025-12-11
+## Latest Test Session - Wave 1 Generators Testing V1 API 6e Level - 2025-12-11
+
+### Test Focus
+Comprehensive testing of Wave 1 generators on V1 API for 6e level as requested:
+- Test Fraction Representation (6N2-FRAC-REPR) - Both generators present
+- Test Proportionnalité types (3 types) - Mix verification
+- Test Nombres entiers (3 types) - Generator diversity
+- Test enonce quality for PROP_TABLEAU - HTML table structure
+- Test enonce quality for NOMBRES_LECTURE - Writing instructions
+- Test enonce quality for FRACTION_REPRESENTATION - SVG visualization
+
+### Tests Executed (via Python test suite)
+
+#### Test 1 - Fraction Representation (6N2-FRAC-REPR) - Priority 1
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Fractions", "difficulte": "facile"}` (5 runs)
+**Result**: ✅ PASSED - Both generators present, all non-fallback
+**Details**: 
+- Generator counts: 6e_CALCUL_FRACTIONS (3), 6e_FRACTION_REPRESENTATION (2)
+- All generators have is_fallback: false
+- Both expected generators found in test runs
+
+#### Test 2 - Proportionnalité Types (3 types) - Priority 1
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Proportionnalité", "difficulte": "moyen"}` (10 runs)
+**Result**: ✅ PASSED - Mix of 3 generator types, all non-fallback
+**Details**:
+- Generator counts: 6e_PROP_TABLEAU (5), 6e_PROPORTIONNALITE (4), 6e_PROP_ACHAT (1)
+- All 3 expected generator types found
+- All generators have is_fallback: false
+
+#### Test 3 - Nombres Entiers Types (3 types) - Priority 1
+**Command**: `POST /api/v1/exercises/generate` with `{"niveau": "6e", "chapitre": "Nombres entiers et décimaux", "difficulte": "moyen"}` (10 runs)
+**Result**: ✅ PASSED - Mix of 3 generator types
+**Details**:
+- Generator counts: 6e_NOMBRES_COMPARAISON (6), 6e_CALCUL_DECIMAUX (3), 6e_NOMBRES_LECTURE (1)
+- All 3 expected generator types found
+
+#### Test 4 - PROP_TABLEAU Quality - Priority 2
+**Command**: Multiple calls until PROP_TABLEAU generator found
+**Result**: ✅ PASSED - HTML table with proper structure
+**Details**:
+- Found 6e_PROP_TABLEAU generator on attempt 3
+- HTML table present with border-collapse style
+- Headers and data cells properly structured
+
+#### Test 5 - NOMBRES_LECTURE Quality - Priority 2
+**Command**: Multiple calls until NOMBRES_LECTURE generator found
+**Result**: ✅ PASSED - Contains writing instruction and numbers
+**Details**:
+- Found 6e_NOMBRES_LECTURE generator on attempt 2
+- Contains "Écrire en lettres" instruction
+- Numbers to convert present in content
+
+#### Test 6 - FRACTION_REPRESENTATION Quality - Priority 2
+**Command**: Multiple calls until FRACTION_REPRESENTATION generator found
+**Result**: ✅ PASSED - SVG with geometric shapes for visualization
+**Details**:
+- Found 6e_FRACTION_REPRESENTATION generator on attempt 2
+- SVG element present in enonce_html
+- Rectangles for fraction visualization confirmed
+
+### Test Results Summary
+**Overall Results**: 6/6 tests passed (100.0%)
+
+**Wave 1 Generators Assessment**:
+- **Generator Diversity**: ✅ VERIFIED - Multiple generator types working for each chapter
+- **Content Quality**: ✅ VERIFIED - Proper HTML tables, SVG visualizations, writing instructions
+- **Non-Fallback Status**: ✅ VERIFIED - All generators marked as dedicated (is_fallback: false)
+
+### Technical Validation
+- All API calls completed successfully with 200 status codes
+- Generator diversity confirmed across all tested chapters
+- Content quality meets expected standards for each generator type
+- SVG visualizations working for fraction representation
+- HTML tables properly structured for proportionnalité
+- Writing instructions present for nombres lecture exercises
+
+### Wave 1 Generators Status
+- **6e_CALCUL_FRACTIONS**: ✅ WORKING (fraction calculations)
+- **6e_FRACTION_REPRESENTATION**: ✅ WORKING (SVG fraction visualization)
+- **6e_PROPORTIONNALITE**: ✅ WORKING (basic proportionnalité)
+- **6e_PROP_TABLEAU**: ✅ WORKING (HTML table format)
+- **6e_PROP_ACHAT**: ✅ WORKING (purchase scenarios)
+- **6e_CALCUL_DECIMAUX**: ✅ WORKING (decimal calculations)
+- **6e_NOMBRES_LECTURE**: ✅ WORKING (number writing)
+- **6e_NOMBRES_COMPARAISON**: ✅ WORKING (number comparison)
+
+---
+
+## Previous Test Session - Corrections QA P0/P1 - 2025-12-11
 
 ### Test Focus
 Corrections des bugs QA remontés par Perplexity :
