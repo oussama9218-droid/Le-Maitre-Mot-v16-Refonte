@@ -145,9 +145,9 @@ class MathGenerationService:
             # ========== 6e - Organisation et gestion de données (SPRINT 4) ==========
             "Diagrammes en barres et pictogrammes": [MathExerciseType.STATISTIQUES],
             
-            # ========== Chapitres multi-niveaux (6e, 5e, 4e, 3e) ==========
-            "Fractions": [MathExerciseType.CALCUL_FRACTIONS],
-            "Proportionnalité": [MathExerciseType.PROPORTIONNALITE],
+            # ========== Chapitres multi-niveaux (5e, 4e, 3e) - SANS 6e car déjà définis ==========
+            # Note: "Fractions", "Proportionnalité", "Nombres entiers et décimaux" sont
+            # définis en haut avec les générateurs Vague 1 pour le niveau 6e
             "Nombres relatifs": [MathExerciseType.CALCUL_RELATIFS],
             "Nombres rationnels": [MathExerciseType.CALCUL_FRACTIONS],
             "Statistiques": [MathExerciseType.STATISTIQUES],
