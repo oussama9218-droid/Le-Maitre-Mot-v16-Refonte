@@ -11,7 +11,7 @@ from datetime import datetime
 
 class ComprehensiveGeometricTester:
     def __init__(self):
-        self.base_url = "https://math-drill-creator.preview.emergentagent.com"
+        self.base_url = "https://mathexercise-hub.preview.emergentagent.com"
         self.api_url = f"{self.base_url}/api"
         self.results = {
             "cercles": {"total": 0, "coherent": 0, "issues": []},

@@ -1077,7 +1077,7 @@ async def send_magic_link_email(email: str, token: str):
             return False
         
         # Generate magic link URL
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://math-drill-creator.preview.emergentagent.com')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://mathexercise-hub.preview.emergentagent.com')
         magic_link = f"{frontend_url}/login/verify?token={token}"
         
         # Email content
