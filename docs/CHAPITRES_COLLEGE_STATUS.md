@@ -15,6 +15,27 @@
 | **Nouveaux types d'exercices** | - | +4 |
 | **Corrections P0** | 1 | 1 ✅ |
 
+
+## 🆕 Référentiel Curriculum Officiel
+
+> **Nouveau !** Le référentiel pédagogique 6e est maintenant disponible.
+
+Le mapping officiel entre les codes du programme et les générateurs se trouve dans :
+- `docs/CURRICULUM_OFFICIEL.csv` - Programme officiel (27 chapitres)
+- `backend/curriculum/curriculum_6e.json` - Mapping JSON
+- `docs/CURRICULUM_6E_REFERENTIEL.md` - Documentation complète
+
+### Utilisation API
+
+```http
+POST /api/v1/exercises/generate
+{"code_officiel": "6e_N08", "difficulte": "moyen"}
+```
+
+Le mode legacy (`niveau` + `chapitre`) reste inchangé et fonctionnel.
+
+---
+
 ---
 
 ## ✅ Corrections P0 Appliquées
