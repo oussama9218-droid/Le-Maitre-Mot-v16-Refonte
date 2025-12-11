@@ -1277,6 +1277,7 @@ function App() {
         <Route path="/builder/:sheetId" element={<SheetBuilderPage />} />
         <Route path="/sheets" element={<MySheetsPage />} />
         <Route path="/pro/settings" element={<ProSettingsPage />} />
+        <Route path="/admin/curriculum" element={<Curriculum6eAdminPage />} />
         <Route path="/*" element={<MainApp />} />
       </Routes>
     </BrowserRouter>
