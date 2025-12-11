@@ -253,7 +253,14 @@ class MathGenerationService:
             MathExerciseType.THALES: self._gen_thales,
             MathExerciseType.TRIGONOMETRIE: self._gen_trigonometrie,
             MathExerciseType.SYMETRIE_AXIALE: self._gen_symetrie_axiale,
-            MathExerciseType.SYMETRIE_CENTRALE: self._gen_symetrie_centrale
+            MathExerciseType.SYMETRIE_CENTRALE: self._gen_symetrie_centrale,
+            # ========== VAGUE 1 - Générateurs 6e ==========
+            MathExerciseType.FRACTION_REPRESENTATION: self._gen_fraction_representation,
+            MathExerciseType.PROP_TABLEAU: self._gen_prop_tableau,
+            MathExerciseType.PROP_ACHAT: self._gen_prop_achat,
+            MathExerciseType.PROBLEME_2_ETAPES: self._gen_probleme_2_etapes,
+            MathExerciseType.NOMBRES_LECTURE: self._gen_nombres_lecture,
+            MathExerciseType.NOMBRES_COMPARAISON: self._gen_nombres_comparaison
         }
         
         generator = generators.get(exercise_type)
