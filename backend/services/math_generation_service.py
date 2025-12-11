@@ -7026,3 +7026,665 @@ class MathGenerationService:
                 {"etape": "Symboles corrects", "points": 0.5}
             ]
         )
+
+    # ==========================================================================
+    # VAGUE 2 - GÉNÉRATEURS 6ᵉ PRIORITÉ HAUTE
+    # ==========================================================================
+    
+    def _gen_droite_graduee_entiers(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Droite graduée - nombres entiers (6N1-DROITE)"""
+        
+        if difficulte == "facile":
+            debut = random.choice([0, 10, 100])
+            pas = random.choice([1, 2, 5])
+            nb_graduations = 6
+        elif difficulte == "moyen":
+            debut = random.choice([0, 50, 200, 1000])
+            pas = random.choice([5, 10, 25, 50])
+            nb_graduations = 8
+        else:
+            debut = random.choice([0, 100, 500, 1000])
+            pas = random.choice([25, 50, 100, 250])
+            nb_graduations = 10
+        
+        # Générer les positions sur la droite
+        valeurs = [debut + i * pas for i in range(nb_graduations)]
+        
+        # Choisir un point à placer/lire
+        index_mystere = random.randint(1, nb_graduations - 2)
+        valeur_mystere = valeurs[index_mystere]
+        
+        type_exercice = random.choice(["lire", "placer"])
+        
+        if type_exercice == "lire":
+            enonce = f"Lire l'abscisse du point A sur la droite graduée ci-dessous."
+            solution = f"L'abscisse du point A est {valeur_mystere}."
+        else:
+            enonce = f"Placer le point A d'abscisse {valeur_mystere} sur la droite graduée ci-dessous."
+            solution = f"Le point A se place sur la graduation {valeur_mystere}."
+        
+        etapes = [
+            f"La droite est graduée de {pas} en {pas}.",
+            f"Elle commence à {debut}.",
+            f"Réponse : {valeur_mystere}"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.DROITE_GRADUEE_ENTIERS,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "debut": debut, "pas": pas, "valeur_mystere": valeur_mystere, "code_ref": "6N1-DROITE"},
+            solution_calculee={"valeur": valeur_mystere},
+            etapes_calculees=etapes,
+            resultat_final=str(valeur_mystere),
+            figure_geometrique=GeometricFigure(type="droite_graduee", points=[], longueurs_connues={"debut": debut, "pas": pas, "mystere": valeur_mystere}, proprietes=["entiers", type_exercice])
+        )
+    
+    def _gen_droite_graduee_decimaux(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Droite graduée - nombres décimaux (6N2-DROITE)"""
+        
+        if difficulte == "facile":
+            debut = 0
+            pas = 0.1
+            nb_graduations = 11
+        elif difficulte == "moyen":
+            debut = random.choice([0, 1, 2])
+            pas = random.choice([0.1, 0.2, 0.5])
+            nb_graduations = 11
+        else:
+            debut = round(random.uniform(0, 5), 1)
+            pas = random.choice([0.05, 0.1, 0.25])
+            nb_graduations = 11
+        
+        valeurs = [round(debut + i * pas, 2) for i in range(nb_graduations)]
+        index_mystere = random.randint(1, nb_graduations - 2)
+        valeur_mystere = valeurs[index_mystere]
+        
+        enonce = f"Lire l'abscisse du point M sur la droite graduée (pas de {pas})."
+        
+        etapes = [
+            f"La droite commence à {debut}.",
+            f"Chaque graduation représente {pas}.",
+            f"Le point M est à la {index_mystere}ème graduation après {debut}.",
+            f"Donc M = {debut} + {index_mystere} × {pas} = {valeur_mystere}"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.DROITE_GRADUEE_DECIMAUX,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "debut": debut, "pas": pas, "valeur_mystere": valeur_mystere, "code_ref": "6N2-DROITE"},
+            solution_calculee={"valeur": valeur_mystere},
+            etapes_calculees=etapes,
+            resultat_final=str(valeur_mystere)
+        )
+    
+    def _gen_fraction_droite(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Fraction sur droite graduée (6N2-FRAC-DROITE)"""
+        
+        if difficulte == "facile":
+            denominateur = random.choice([2, 4])
+        elif difficulte == "moyen":
+            denominateur = random.choice([3, 5, 6])
+        else:
+            denominateur = random.choice([8, 10, 12])
+        
+        numerateur = random.randint(1, denominateur * 2 - 1)
+        
+        type_ex = random.choice(["lire", "placer"])
+        
+        if type_ex == "lire":
+            enonce = f"La droite ci-dessous est graduée en {denominateur}èmes. Lire l'abscisse du point P sous forme de fraction."
+        else:
+            enonce = f"Placer le point P d'abscisse \\frac{{{numerateur}}}{{{denominateur}}} sur la droite graduée en {denominateur}èmes."
+        
+        etapes = [
+            f"La droite est partagée en {denominateur}èmes.",
+            f"Le point P correspond à {numerateur} graduations.",
+            f"L'abscisse est donc \\frac{{{numerateur}}}{{{denominateur}}}."
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.FRACTION_DROITE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "numerateur": numerateur, "denominateur": denominateur, "code_ref": "6N2-FRAC-DROITE"},
+            solution_calculee={"fraction": f"{numerateur}/{denominateur}"},
+            etapes_calculees=etapes,
+            resultat_final=f"\\frac{{{numerateur}}}{{{denominateur}}}"
+        )
+    
+    def _gen_fraction_comparaison(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Comparaison de fractions (6N2-FRAC-COMP)"""
+        
+        if difficulte == "facile":
+            # Même dénominateur
+            den = random.choice([3, 4, 5, 6])
+            num1, num2 = random.sample(range(1, den + 3), 2)
+            f1, f2 = f"\\frac{{{num1}}}{{{den}}}", f"\\frac{{{num2}}}{{{den}}}"
+            comparaison = "<" if num1 < num2 else ">"
+            explication = f"Même dénominateur : on compare les numérateurs. {num1} {'<' if num1 < num2 else '>'} {num2}"
+        elif difficulte == "moyen":
+            # Même numérateur
+            num = random.randint(1, 5)
+            den1, den2 = random.sample([2, 3, 4, 5, 6, 8], 2)
+            f1, f2 = f"\\frac{{{num}}}{{{den1}}}", f"\\frac{{{num}}}{{{den2}}}"
+            comparaison = ">" if den1 < den2 else "<"  # Plus le dénominateur est grand, plus la fraction est petite
+            explication = f"Même numérateur : plus le dénominateur est grand, plus la fraction est petite."
+        else:
+            # Dénominateurs différents
+            from fractions import Fraction
+            f1_obj = Fraction(random.randint(1, 5), random.randint(2, 6))
+            f2_obj = Fraction(random.randint(1, 5), random.randint(2, 6))
+            f1, f2 = f"\\frac{{{f1_obj.numerator}}}{{{f1_obj.denominator}}}", f"\\frac{{{f2_obj.numerator}}}{{{f2_obj.denominator}}}"
+            comparaison = "<" if f1_obj < f2_obj else (">" if f1_obj > f2_obj else "=")
+            explication = "Réduire au même dénominateur pour comparer."
+        
+        enonce = f"Comparer les fractions {f1} et {f2}."
+        
+        etapes = [explication, f"Donc {f1} {comparaison} {f2}"]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.FRACTION_COMPARAISON,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6N2-FRAC-COMP"},
+            solution_calculee={"comparaison": comparaison},
+            etapes_calculees=etapes,
+            resultat_final=f"{f1} {comparaison} {f2}"
+        )
+    
+    def _gen_prop_coefficient(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Coefficient de proportionnalité (6N3-PROP-COEFF)"""
+        
+        if difficulte == "facile":
+            coeff = random.choice([2, 3, 4, 5])
+        elif difficulte == "moyen":
+            coeff = random.choice([1.5, 2.5, 0.5, 4, 6])
+        else:
+            coeff = round(random.uniform(0.2, 3.5), 2)
+        
+        val1 = random.randint(2, 10)
+        val2 = round(val1 * coeff, 2)
+        
+        enonce = f"Dans un tableau de proportionnalité, {val1} correspond à {val2}. Quel est le coefficient de proportionnalité ?"
+        
+        etapes = [
+            f"Coefficient = valeur d'arrivée ÷ valeur de départ",
+            f"Coefficient = {val2} ÷ {val1}",
+            f"Coefficient = {coeff}"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.PROP_COEFFICIENT,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6N3-PROP-COEFF"},
+            solution_calculee={"coefficient": coeff},
+            etapes_calculees=etapes,
+            resultat_final=str(coeff)
+        )
+    
+    def _gen_vitesse_duree_distance(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Problèmes vitesse/durée/distance (6N3-VDD)"""
+        
+        type_probleme = random.choice(["distance", "duree", "vitesse"])
+        
+        if difficulte == "facile":
+            vitesse = random.choice([30, 50, 60, 100])  # km/h "ronds"
+            duree = random.choice([1, 2, 3])  # heures entières
+        elif difficulte == "moyen":
+            vitesse = random.choice([40, 45, 50, 60, 80, 90])
+            duree = random.choice([1.5, 2, 2.5, 3])
+        else:
+            vitesse = random.randint(30, 120)
+            duree = round(random.uniform(0.5, 4), 1)
+        
+        distance = round(vitesse * duree, 1)
+        
+        vehicule = random.choice(["voiture", "train", "vélo", "bus"])
+        
+        if type_probleme == "distance":
+            enonce = f"Un {vehicule} roule à {vitesse} km/h pendant {duree} heure(s). Quelle distance parcourt-il ?"
+            inconnue = distance
+            formule = f"Distance = Vitesse × Durée = {vitesse} × {duree} = {distance} km"
+        elif type_probleme == "duree":
+            enonce = f"Un {vehicule} parcourt {distance} km à {vitesse} km/h. Combien de temps met-il ?"
+            inconnue = duree
+            formule = f"Durée = Distance ÷ Vitesse = {distance} ÷ {vitesse} = {duree} h"
+        else:
+            enonce = f"Un {vehicule} parcourt {distance} km en {duree} heure(s). Quelle est sa vitesse ?"
+            inconnue = vitesse
+            formule = f"Vitesse = Distance ÷ Durée = {distance} ÷ {duree} = {vitesse} km/h"
+        
+        etapes = [
+            "Formules : d = v × t, t = d ÷ v, v = d ÷ t",
+            formule
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.VITESSE_DUREE_DISTANCE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6N3-VDD"},
+            solution_calculee={"resultat": inconnue},
+            etapes_calculees=etapes,
+            resultat_final=str(inconnue)
+        )
+    
+    def _gen_aire_triangle(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Aire du triangle (6G1-AIRE-TRI)"""
+        
+        if difficulte == "facile":
+            base = random.choice([4, 6, 8, 10])
+            hauteur = random.choice([2, 3, 4, 5])
+        elif difficulte == "moyen":
+            base = random.randint(5, 15)
+            hauteur = random.randint(3, 12)
+        else:
+            base = round(random.uniform(3, 15), 1)
+            hauteur = round(random.uniform(2, 10), 1)
+        
+        aire = round((base * hauteur) / 2, 2)
+        
+        enonce = f"Calculer l'aire d'un triangle de base {base} cm et de hauteur {hauteur} cm."
+        
+        etapes = [
+            "Formule : Aire = (base × hauteur) ÷ 2",
+            f"Aire = ({base} × {hauteur}) ÷ 2",
+            f"Aire = {base * hauteur} ÷ 2",
+            f"Aire = {aire} cm²"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.AIRE_TRIANGLE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "base": base, "hauteur": hauteur, "code_ref": "6G1-AIRE-TRI"},
+            solution_calculee={"aire": aire},
+            etapes_calculees=etapes,
+            resultat_final=f"{aire} cm²"
+        )
+    
+    def _gen_aire_figures_composees(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Aire de figures composées (6G1-AIRE-COMP)"""
+        
+        if difficulte == "facile":
+            # Rectangle + carré
+            L1, l1 = random.randint(4, 8), random.randint(2, 4)
+            c = random.randint(2, 3)
+            aire1 = L1 * l1
+            aire2 = c * c
+            aire_totale = aire1 + aire2
+            description = f"La figure est composée d'un rectangle de {L1} cm × {l1} cm et d'un carré de côté {c} cm."
+            etapes_detail = [f"Aire rectangle = {L1} × {l1} = {aire1} cm²", f"Aire carré = {c} × {c} = {aire2} cm²"]
+        elif difficulte == "moyen":
+            # Grand rectangle - petit rectangle (forme en L)
+            L, l = random.randint(8, 12), random.randint(6, 8)
+            L2, l2 = random.randint(2, 4), random.randint(2, 4)
+            aire_grand = L * l
+            aire_petit = L2 * l2
+            aire_totale = aire_grand - aire_petit
+            description = f"La figure est un rectangle de {L} cm × {l} cm avec un trou rectangulaire de {L2} cm × {l2} cm."
+            etapes_detail = [f"Aire grand rectangle = {L} × {l} = {aire_grand} cm²", f"Aire trou = {L2} × {l2} = {aire_petit} cm²", "Aire = Grand - Petit"]
+        else:
+            # Rectangle + triangle
+            L, l = random.randint(6, 10), random.randint(4, 6)
+            base_tri, h_tri = L, random.randint(2, 4)
+            aire_rect = L * l
+            aire_tri = (base_tri * h_tri) / 2
+            aire_totale = aire_rect + aire_tri
+            description = f"La figure est un rectangle de {L} cm × {l} cm surmonté d'un triangle de base {base_tri} cm et hauteur {h_tri} cm."
+            etapes_detail = [f"Aire rectangle = {L} × {l} = {aire_rect} cm²", f"Aire triangle = ({base_tri} × {h_tri}) ÷ 2 = {aire_tri} cm²"]
+        
+        enonce = f"Calculer l'aire de la figure composée suivante.\n{description}"
+        
+        etapes = etapes_detail + [f"Aire totale = {aire_totale} cm²"]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.AIRE_FIGURES_COMPOSEES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6G1-AIRE-COMP"},
+            solution_calculee={"aire": aire_totale},
+            etapes_calculees=etapes,
+            resultat_final=f"{aire_totale} cm²"
+        )
+    
+    def _gen_volume_pave(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Volume du pavé droit (6G3-VOL-PAVE)"""
+        
+        if difficulte == "facile":
+            L, l, h = random.randint(2, 5), random.randint(2, 4), random.randint(1, 3)
+        elif difficulte == "moyen":
+            L, l, h = random.randint(4, 10), random.randint(3, 8), random.randint(2, 6)
+        else:
+            L = round(random.uniform(3, 10), 1)
+            l = round(random.uniform(2, 8), 1)
+            h = round(random.uniform(2, 6), 1)
+        
+        volume = round(L * l * h, 2)
+        
+        enonce = f"Calculer le volume d'un pavé droit de dimensions {L} cm × {l} cm × {h} cm."
+        
+        etapes = [
+            "Formule : Volume = Longueur × largeur × hauteur",
+            f"Volume = {L} × {l} × {h}",
+            f"Volume = {volume} cm³"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.VOLUME_PAVE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "L": L, "l": l, "h": h, "code_ref": "6G3-VOL-PAVE"},
+            solution_calculee={"volume": volume},
+            etapes_calculees=etapes,
+            resultat_final=f"{volume} cm³"
+        )
+    
+    def _gen_tableau_lecture(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Lecture de tableaux de données (6D-TAB-LIRE)"""
+        
+        sujets = [
+            {"titre": "Notes de contrôle", "colonnes": ["Élève", "Maths", "Français", "Anglais"], "type": "notes"},
+            {"titre": "Températures de la semaine", "colonnes": ["Jour", "Matin", "Midi", "Soir"], "type": "temperatures"},
+            {"titre": "Prix des fruits", "colonnes": ["Fruit", "Prix/kg", "Quantité", "Total"], "type": "prix"}
+        ]
+        
+        sujet = random.choice(sujets)
+        
+        if sujet["type"] == "notes":
+            noms = random.sample(["Alice", "Bob", "Clara", "David", "Emma"], 3)
+            donnees = [[nom, random.randint(8, 18), random.randint(8, 18), random.randint(8, 18)] for nom in noms]
+            question = random.choice([
+                f"Quelle est la note de {noms[0]} en Maths ?",
+                f"Qui a la meilleure note en Français ?",
+                f"Calculer la moyenne de {noms[1]} sur les 3 matières."
+            ])
+        elif sujet["type"] == "temperatures":
+            jours = ["Lundi", "Mardi", "Mercredi"]
+            donnees = [[jour, random.randint(5, 15), random.randint(12, 22), random.randint(8, 18)] for jour in jours]
+            question = "Quel jour a-t-il fait le plus chaud à midi ?"
+        else:
+            fruits = ["Pommes", "Oranges", "Bananes"]
+            donnees = [[fruit, round(random.uniform(1.5, 4), 2), random.randint(1, 5), 0] for fruit in fruits]
+            for d in donnees:
+                d[3] = round(d[1] * d[2], 2)
+            question = "Quel est le total de l'achat ?"
+        
+        # Construire tableau HTML
+        table_html = f'<table style="border-collapse: collapse; margin: 10px auto;">'
+        table_html += '<tr>' + ''.join([f'<th style="border: 1px solid #333; padding: 8px; background: #f0f0f0;">{col}</th>' for col in sujet["colonnes"]]) + '</tr>'
+        for row in donnees:
+            table_html += '<tr>' + ''.join([f'<td style="border: 1px solid #333; padding: 8px; text-align: center;">{val}</td>' for val in row]) + '</tr>'
+        table_html += '</table>'
+        
+        enonce = f"Voici un tableau présentant les {sujet['titre'].lower()}.\n{table_html}\n\n{question}"
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.TABLEAU_LECTURE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6D-TAB-LIRE"},
+            solution_calculee={"question": question},
+            etapes_calculees=["Lire attentivement le tableau.", "Repérer la ligne et la colonne correspondantes."],
+            resultat_final="Voir tableau"
+        )
+    
+    def _gen_diagramme_barres(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Diagramme en barres (6D-DIAG-BAR)"""
+        
+        categories = random.choice([
+            ["Rouge", "Bleu", "Vert", "Jaune"],
+            ["Foot", "Basket", "Tennis", "Natation"],
+            ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"]
+        ])
+        
+        valeurs = [random.randint(2, 15) for _ in categories]
+        max_val = max(valeurs)
+        
+        # Générer SVG du diagramme
+        svg_width, svg_height = 400, 250
+        bar_width = 50
+        spacing = 20
+        max_bar_height = 180
+        
+        svg = f'<svg width="{svg_width}" height="{svg_height}" xmlns="http://www.w3.org/2000/svg">'
+        svg += f'<rect x="0" y="0" width="{svg_width}" height="{svg_height}" fill="white"/>'
+        
+        colors = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7"]
+        
+        for i, (cat, val) in enumerate(zip(categories, valeurs)):
+            x = 50 + i * (bar_width + spacing)
+            bar_height = (val / max_val) * max_bar_height
+            y = svg_height - 40 - bar_height
+            
+            svg += f'<rect x="{x}" y="{y}" width="{bar_width}" height="{bar_height}" fill="{colors[i % len(colors)]}"/>'
+            svg += f'<text x="{x + bar_width/2}" y="{svg_height - 20}" text-anchor="middle" font-size="10">{cat}</text>'
+            svg += f'<text x="{x + bar_width/2}" y="{y - 5}" text-anchor="middle" font-size="10">{val}</text>'
+        
+        svg += '</svg>'
+        
+        question = random.choice([
+            f"Quelle catégorie a la plus grande valeur ?",
+            f"Calculer la somme de toutes les valeurs.",
+            f"Quelle est la différence entre la plus grande et la plus petite valeur ?"
+        ])
+        
+        enonce = f"Voici un diagramme en barres.\n{question}"
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.DIAGRAMME_BARRES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6D-DIAG-BAR"},
+            solution_calculee={"valeurs": valeurs, "max": max_val, "somme": sum(valeurs)},
+            etapes_calculees=["Lire les hauteurs des barres.", f"Valeurs : {valeurs}"],
+            resultat_final=f"Max: {max_val}, Somme: {sum(valeurs)}",
+            figure_geometrique=GeometricFigure(type="diagramme_barres", points=[], longueurs_connues={}, proprietes=[f"svg:{svg}"])
+        )
+    
+    def _gen_probleme_1_etape(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Problèmes à 1 étape (6P-PROB-1ET)"""
+        
+        operations = ["addition", "soustraction", "multiplication", "division"]
+        operation = random.choice(operations)
+        
+        prenom = random.choice(["Lucas", "Emma", "Léa", "Hugo", "Chloé", "Nathan", "Jade", "Louis"])
+        
+        if operation == "addition":
+            a, b = random.randint(20, 100), random.randint(10, 50)
+            contexte = random.choice([
+                f"{prenom} a {a} billes. Il en gagne {b}. Combien en a-t-il maintenant ?",
+                f"Un livre coûte {a}€. Les frais de port sont de {b}€. Quel est le prix total ?"
+            ])
+            resultat = a + b
+            calcul = f"{a} + {b} = {resultat}"
+        elif operation == "soustraction":
+            a = random.randint(50, 150)
+            b = random.randint(10, a - 10)
+            contexte = random.choice([
+                f"{prenom} a {a}€. Elle dépense {b}€. Combien lui reste-t-il ?",
+                f"Un réservoir contient {a} litres. On en utilise {b}. Combien reste-t-il ?"
+            ])
+            resultat = a - b
+            calcul = f"{a} - {b} = {resultat}"
+        elif operation == "multiplication":
+            a, b = random.randint(3, 12), random.randint(2, 8)
+            contexte = random.choice([
+                f"Un paquet contient {a} gâteaux. {prenom} achète {b} paquets. Combien de gâteaux a-t-il ?",
+                f"Une boîte contient {a} crayons. Il y a {b} boîtes. Combien de crayons au total ?"
+            ])
+            resultat = a * b
+            calcul = f"{a} × {b} = {resultat}"
+        else:  # division
+            b = random.randint(2, 8)
+            resultat = random.randint(3, 15)
+            a = b * resultat
+            contexte = random.choice([
+                f"{prenom} veut partager {a} bonbons entre {b} amis. Combien chacun reçoit-il ?",
+                f"On range {a} livres dans {b} étagères (même nombre par étagère). Combien par étagère ?"
+            ])
+            calcul = f"{a} ÷ {b} = {resultat}"
+        
+        enonce = contexte
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.PROBLEME_1_ETAPE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6P-PROB-1ET"},
+            solution_calculee={"resultat": resultat},
+            etapes_calculees=[f"Opération : {operation}", calcul],
+            resultat_final=str(resultat)
+        )
+    
+    def _gen_triangle_construction(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Construction de triangles (6G-TRI)"""
+        
+        types_triangles = ["quelconque", "isocèle", "équilatéral", "rectangle"]
+        type_tri = random.choice(types_triangles[:3] if difficulte == "facile" else types_triangles)
+        
+        if type_tri == "équilatéral":
+            cote = random.randint(4, 8)
+            enonce = f"Construire un triangle équilatéral ABC de côté {cote} cm."
+            proprietes = f"Les 3 côtés mesurent {cote} cm."
+            etapes = [f"Tracer [AB] = {cote} cm", f"Compas ouvert à {cote} cm, tracer un arc depuis A", "Idem depuis B", "L'intersection est C"]
+        elif type_tri == "isocèle":
+            base = random.randint(4, 8)
+            cotes = random.randint(5, 10)
+            enonce = f"Construire un triangle isocèle ABC avec AB = {base} cm et AC = BC = {cotes} cm."
+            proprietes = f"Base {base} cm, côtés égaux {cotes} cm."
+            etapes = [f"Tracer [AB] = {base} cm", f"Compas ouvert à {cotes} cm depuis A et B", "L'intersection est C"]
+        elif type_tri == "rectangle":
+            a, b = random.randint(3, 6), random.randint(4, 8)
+            enonce = f"Construire un triangle ABC rectangle en A avec AB = {a} cm et AC = {b} cm."
+            proprietes = f"Angle droit en A, côtés {a} et {b} cm."
+            etapes = [f"Tracer [AB] = {a} cm", "Tracer une perpendiculaire en A", f"Reporter AC = {b} cm sur cette perpendiculaire", "Relier B et C"]
+        else:
+            a, b, c = sorted([random.randint(4, 10) for _ in range(3)])
+            c = min(c, a + b - 1)  # Inégalité triangulaire
+            enonce = f"Construire un triangle ABC avec AB = {a} cm, BC = {b} cm et AC = {c} cm."
+            proprietes = f"Côtés : {a}, {b}, {c} cm."
+            etapes = [f"Tracer [AB] = {a} cm", f"Arc de centre A, rayon {c} cm", f"Arc de centre B, rayon {b} cm", "L'intersection est C"]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.TRIANGLE_CONSTRUCTION,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "type": type_tri, "code_ref": "6G-TRI"},
+            solution_calculee={"type": type_tri, "proprietes": proprietes},
+            etapes_calculees=etapes,
+            resultat_final=proprietes
+        )
+    
+    def _gen_quadrilateres(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Quadrilatères (6G-QUAD)"""
+        
+        types = ["carré", "rectangle", "losange", "parallélogramme"]
+        type_quad = random.choice(types[:2] if difficulte == "facile" else types)
+        
+        if type_quad == "carré":
+            cote = random.randint(3, 8)
+            enonce = f"Construire un carré ABCD de côté {cote} cm."
+            proprietes = ["4 côtés égaux", "4 angles droits", "Diagonales égales et perpendiculaires"]
+            perimetre = 4 * cote
+            aire = cote * cote
+        elif type_quad == "rectangle":
+            L, l = random.randint(5, 10), random.randint(3, 6)
+            enonce = f"Construire un rectangle ABCD avec AB = {L} cm et BC = {l} cm. Calculer son périmètre et son aire."
+            proprietes = ["Côtés opposés égaux", "4 angles droits", "Diagonales égales"]
+            perimetre = 2 * (L + l)
+            aire = L * l
+        elif type_quad == "losange":
+            cote = random.randint(4, 8)
+            enonce = f"Construire un losange ABCD de côté {cote} cm."
+            proprietes = ["4 côtés égaux", "Diagonales perpendiculaires", "Angles opposés égaux"]
+            perimetre = 4 * cote
+            aire = "Dépend des diagonales"
+        else:
+            a, b = random.randint(5, 10), random.randint(3, 7)
+            enonce = f"Construire un parallélogramme ABCD avec AB = {a} cm et BC = {b} cm."
+            proprietes = ["Côtés opposés parallèles et égaux", "Angles opposés égaux", "Diagonales se coupent en leur milieu"]
+            perimetre = 2 * (a + b)
+            aire = "Dépend de la hauteur"
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.QUADRILATERES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "type": type_quad, "code_ref": "6G-QUAD"},
+            solution_calculee={"type": type_quad, "perimetre": perimetre, "aire": aire},
+            etapes_calculees=[f"Type : {type_quad}", f"Propriétés : {', '.join(proprietes)}"],
+            resultat_final=f"Périmètre = {perimetre} cm"
+        )
+    
+    def _gen_angle_mesure(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Mesure d'angles (6G-ANGLE)"""
+        
+        if difficulte == "facile":
+            angle = random.choice([30, 45, 60, 90, 120, 135, 150])
+        elif difficulte == "moyen":
+            angle = random.randint(10, 170)
+        else:
+            angle = random.randint(5, 175)
+        
+        type_angle = "aigu" if angle < 90 else ("droit" if angle == 90 else "obtus")
+        
+        type_exercice = random.choice(["mesurer", "construire", "calculer"])
+        
+        if type_exercice == "mesurer":
+            enonce = f"Mesurer l'angle ABC à l'aide d'un rapporteur."
+            etapes = ["Placer le centre du rapporteur sur le sommet B", "Aligner un côté avec la graduation 0°", f"Lire la mesure sur l'autre côté : {angle}°"]
+        elif type_exercice == "construire":
+            enonce = f"Construire un angle ABC de mesure {angle}°."
+            etapes = ["Tracer une demi-droite [BA)", f"Placer le rapporteur et marquer {angle}°", "Tracer la demi-droite [BC)"]
+        else:
+            angle2 = 180 - angle
+            enonce = f"Les angles ABC et CBD sont supplémentaires. Si ABC = {angle}°, quelle est la mesure de CBD ?"
+            etapes = ["Angles supplémentaires : leur somme fait 180°", f"CBD = 180° - {angle}° = {angle2}°"]
+            angle = angle2
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.ANGLE_MESURE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "angle": angle, "type_angle": type_angle, "code_ref": "6G-ANGLE"},
+            solution_calculee={"angle": angle, "type": type_angle},
+            etapes_calculees=etapes,
+            resultat_final=f"{angle}° ({type_angle})"
+        )
+    
+    def _gen_formules(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """Générateur: Utilisation de formules (6L-FORM)"""
+        
+        formules = [
+            {"nom": "Périmètre carré", "formule": "P = 4 × c", "vars": {"c": random.randint(2, 10)}, "calcul": lambda v: 4 * v["c"]},
+            {"nom": "Aire carré", "formule": "A = c × c", "vars": {"c": random.randint(2, 8)}, "calcul": lambda v: v["c"] ** 2},
+            {"nom": "Périmètre rectangle", "formule": "P = 2 × (L + l)", "vars": {"L": random.randint(5, 12), "l": random.randint(2, 6)}, "calcul": lambda v: 2 * (v["L"] + v["l"])},
+            {"nom": "Aire rectangle", "formule": "A = L × l", "vars": {"L": random.randint(4, 10), "l": random.randint(2, 8)}, "calcul": lambda v: v["L"] * v["l"]}
+        ]
+        
+        formule = random.choice(formules)
+        resultat = formule["calcul"](formule["vars"])
+        
+        vars_str = ", ".join([f"{k} = {v}" for k, v in formule["vars"].items()])
+        
+        enonce = f"Utiliser la formule {formule['formule']} pour calculer avec {vars_str}."
+        
+        etapes = [
+            f"Formule : {formule['formule']}",
+            f"Valeurs : {vars_str}",
+            f"Résultat : {resultat}"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.FORMULES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={"enonce": enonce, "code_ref": "6L-FORM"},
+            solution_calculee={"resultat": resultat},
+            etapes_calculees=etapes,
+            resultat_final=str(resultat)
+        )
