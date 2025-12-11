@@ -515,13 +515,17 @@ const ExerciseGeneratorPage = () => {
                       <span className="ml-2">Variation</span>
                     </Button>
                     
+                    {/* P2-1: Bouton PDF avec label "prochainement" */}
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => downloadPDF(currentExercise)}
+                      disabled={true}
+                      className="opacity-60 cursor-not-allowed"
+                      title="Export PDF bientôt disponible"
                     >
                       <Download className="h-4 w-4" />
-                      <span className="ml-2">PDF</span>
+                      <span className="ml-2">PDF (bientôt)</span>
                     </Button>
                   </div>
                 </div>
