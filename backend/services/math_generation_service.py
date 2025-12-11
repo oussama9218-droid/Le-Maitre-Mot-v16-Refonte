@@ -121,9 +121,10 @@ class MathGenerationService:
             "Longueurs, masses, durées": [MathExerciseType.CONVERSIONS_UNITES, MathExerciseType.CALCUL_DECIMAUX],
             
             # ========== 6e - Calculs (Calcul mental, posés, instrumentés) ==========
-            "Calcul mental": [MathExerciseType.PRIORITES_OPERATIONS, MathExerciseType.CALCUL_DECIMAUX],
-            "Calculs posés": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.CALCUL_FRACTIONS],
-            "Calculs instrumentés": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.CONVERSIONS_UNITES],
+            # MISE À JOUR P1: Utilisation des générateurs dédiés en priorité
+            "Calcul mental": [MathExerciseType.CALCUL_MENTAL_DEDIE, MathExerciseType.PRIORITES_OPERATIONS],
+            "Calculs posés": [MathExerciseType.CALCUL_POSE_DEDIE, MathExerciseType.CALCUL_DECIMAUX],
+            "Calculs instrumentés": [MathExerciseType.CALCUL_INSTRUMENTE_DEDIE, MathExerciseType.ARRONDI],
             
             # ========== 6e - Existants restants ==========
             "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.ENCADREMENT, MathExerciseType.ARRONDI],
