@@ -69,32 +69,33 @@ class MathGenerationService:
         # le mapping s'applique à tous les niveaux
         mapping = {
             # ========== VAGUE 1 - 6e - Priorité Très Haute ==========
-            # Fractions - Représentation graphique (6N2-FRAC-REPR)
-            "Fractions - Représentation": [MathExerciseType.FRACTION_REPRESENTATION],
-            "Représentation graphique des fractions": [MathExerciseType.FRACTION_REPRESENTATION],
+            # Note: Utilise les chapitres existants du catalogue
             
-            # Proportionnalité - Tableaux (6N3-PROP-TAB)
-            "Proportionnalité - Tableaux": [MathExerciseType.PROP_TABLEAU],
-            "Tableaux de proportionnalité": [MathExerciseType.PROP_TABLEAU],
+            # Fractions - inclut représentation graphique, addition/soustraction
+            "Fractions": [MathExerciseType.CALCUL_FRACTIONS, MathExerciseType.FRACTION_REPRESENTATION],
+            "Fractions comme partage et quotient": [MathExerciseType.CALCUL_FRACTIONS, MathExerciseType.FRACTION_REPRESENTATION],
+            "Fractions simples de l'unité": [MathExerciseType.CALCUL_FRACTIONS, MathExerciseType.FRACTION_REPRESENTATION],
+            "Nombres en écriture fractionnaire": [MathExerciseType.CALCUL_FRACTIONS],
             
-            # Proportionnalité - Problèmes achats (6N3-PROP-ACHAT)
-            "Proportionnalité - Problèmes": [MathExerciseType.PROP_ACHAT],
-            "Problèmes d'achats": [MathExerciseType.PROP_ACHAT],
+            # Proportionnalité - inclut tableaux et problèmes achats
+            "Proportionnalité": [MathExerciseType.PROPORTIONNALITE, MathExerciseType.PROP_TABLEAU, MathExerciseType.PROP_ACHAT],
             
-            # Problèmes 2 étapes (6P-PROB-2ET)
-            "Problèmes à 2 étapes": [MathExerciseType.PROBLEME_2_ETAPES],
-            "Problèmes multi-étapes": [MathExerciseType.PROBLEME_2_ETAPES],
+            # Nombres entiers - inclut lecture/écriture et comparaison
+            "Nombres entiers et décimaux": [MathExerciseType.CALCUL_DECIMAUX, MathExerciseType.NOMBRES_LECTURE, MathExerciseType.NOMBRES_COMPARAISON],
             
-            # Nombres entiers - Lecture/écriture (6N1-LECTURE)
-            "Lecture et écriture des nombres": [MathExerciseType.NOMBRES_LECTURE],
-            "Nombres entiers - Lecture": [MathExerciseType.NOMBRES_LECTURE],
+            # Aires et périmètres
+            "Périmètres et aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.RECTANGLE],
+            "Aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.CERCLE],
             
-            # Nombres entiers - Comparaison (6N1-COMP)
-            "Comparaison et rangement": [MathExerciseType.NOMBRES_COMPARAISON],
-            "Nombres entiers - Comparaison": [MathExerciseType.NOMBRES_COMPARAISON],
+            # Géométrie
+            "Géométrie dans le plan": [MathExerciseType.RECTANGLE, MathExerciseType.TRIANGLE_QUELCONQUE, MathExerciseType.PROBLEME_2_ETAPES],
             
-            # ========== 6e - Existants ==========
-            "Nombres entiers et décimaux": [MathExerciseType.CALCUL_DECIMAUX],
+            # Symétrie (déjà implémenté)
+            "Symétrie axiale": [MathExerciseType.SYMETRIE_AXIALE],
+            "Symétrie axiale (points, segments, figures)": [MathExerciseType.SYMETRIE_AXIALE],
+            
+            # ========== 6e - Existants restants ==========
+            "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX],
             "Nombres décimaux": [MathExerciseType.CALCUL_DECIMAUX],
             "Longueurs, masses, durées": [MathExerciseType.CALCUL_DECIMAUX],
             "Périmètres et aires": [MathExerciseType.PERIMETRE_AIRE, MathExerciseType.RECTANGLE],
