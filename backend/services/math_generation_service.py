@@ -1093,6 +1093,7 @@ class MathGenerationService:
             rayon = random.randint(3, 10)
             hauteur = random.randint(5, 15)
             volume = round(math.pi * rayon * rayon * hauteur, 2)
+            enonce = f"Calculer le volume d'un cylindre de rayon {rayon} cm et de hauteur {hauteur} cm."
             
             etapes = [
                 f"Cylindre de rayon {rayon} cm et hauteur {hauteur} cm",
@@ -1108,6 +1109,7 @@ class MathGenerationService:
                 type_exercice=MathExerciseType.VOLUME,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,
                     "solide": "cylindre",
                     "rayon": rayon,
                     "hauteur": hauteur
@@ -1126,6 +1128,7 @@ class MathGenerationService:
             hauteur = random.randint(6, 15)
             aire_base = base_longueur * base_largeur
             volume = aire_base * hauteur
+            enonce = f"Calculer le volume d'un prisme droit à base rectangulaire ({base_longueur} cm × {base_largeur} cm) et de hauteur {hauteur} cm."
             
             etapes = [
                 f"Prisme droit à base rectangulaire ({base_longueur} cm × {base_largeur} cm), hauteur {hauteur} cm",
@@ -1140,6 +1143,7 @@ class MathGenerationService:
                 type_exercice=MathExerciseType.VOLUME,
                 difficulte=DifficultyLevel(difficulte),
                 parametres={
+                    "enonce": enonce,
                     "solide": "prisme",
                     "base_longueur": base_longueur,
                     "base_largeur": base_largeur,
