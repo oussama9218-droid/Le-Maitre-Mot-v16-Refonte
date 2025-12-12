@@ -1157,27 +1157,34 @@ Test complet de la nouvelle fonctionnalité "Export Pro" avec sélecteur de temp
 ## Agent Communication
 
 ### Latest Communication - Testing Agent to Main Agent
-**Date**: 2025-12-12 15:30:00
+**Date**: 2025-12-12 16:45:00
 **Agent**: testing
 **Message**: 
-ADMIN PAGE V2 CRUD API TESTING COMPLETED - FULL SUCCESS:
+ADMIN PAGE V2 FRONTEND UI TESTING COMPLETED - FULL SUCCESS:
 
-✅ **RESULT**: All Admin Page V2 CRUD APIs are fully operational (7/7 tests passed - 100%).
+✅ **RESULT**: All Admin Page V2 frontend UI functionality is fully operational (7/7 UI tests passed - 100%).
 
-🔍 **COMPREHENSIVE TESTING PERFORMED**:
-- Test 1: GET /api/admin/curriculum/options → ✅ 66 generators, 4 domaines, 3 statuts
-- Test 2: GET /api/admin/curriculum/6e → ✅ Initial count: 27 chapitres
-- Test 3: POST /api/admin/curriculum/6e/chapters → ✅ Chapter created successfully
-- Test 4: GET /api/admin/curriculum/6e/{code} → ✅ Data correctly persisted
-- Test 5: PUT /api/admin/curriculum/6e/chapters/{code} → ✅ Updates working
-- Test 6: Error handling → ✅ 400/404 responses correct
-- Test 7: DELETE /api/admin/curriculum/6e/chapters/{code} → ✅ Deletion working
-- Test 8: Count verification → ✅ No data leakage
+🔍 **COMPREHENSIVE UI TESTING PERFORMED**:
+- Test 1: Page Load → ✅ Title, V2 subtitle, stats cards (27 chapitres, 15 schémas, 4 domaines, 27 prod)
+- Test 2: Table Display → ✅ 27 rows, all 7 columns, 27 edit + 27 delete buttons
+- Test 3: Add Modal → ✅ Opens with all form fields, validation working
+- Test 4: Edit Modal → ✅ Pre-populated fields, code field disabled correctly
+- Test 5: Delete Confirmation → ✅ Warning dialog with chapter information
+- Test 6: Search & Filter → ✅ Text search and domain filtering functional
+- Test 7: Form Validation → ✅ Error messages for required fields
 
-✅ **CRUD OPERATIONS VALIDATED**:
-- **Create**: Successfully creates chapters with all fields
-- **Read**: Retrieves chapters with correct data integrity
-- **Update**: Persists changes correctly to MongoDB and JSON
+✅ **UI COMPONENTS VALIDATED**:
+- **Add Modal**: All form fields present (Code officiel, Libellé, Domaine, Statut, Schema switch, Difficulty selectors, Generators)
+- **Edit Modal**: Pre-populated with existing data, code field properly disabled
+- **Delete Dialog**: Confirmation with warning message and chapter details
+- **Search**: Filters by code/libellé (tested with "G01")
+- **Table**: Complete display with action buttons for each row
+- **Form Validation**: Error messages displayed for empty required fields
+
+✅ **BACKEND INTEGRATION CONFIRMED** (Previous session):
+- All CRUD APIs working correctly (7/7 tests passed)
+- MongoDB persistence and JSON sync operational
+- Error handling and data integrity verified
 - **Delete**: Removes chapters and triggers index reload
 - **Options**: Provides all necessary form data (generators, domaines, statuts)
 
