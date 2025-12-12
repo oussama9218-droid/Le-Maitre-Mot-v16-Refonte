@@ -15433,6 +15433,22 @@ if __name__ == "__main__":
                     if data['issues']:
                         print(f"   {category}: {len(data['issues'])} issues")
             sys.exit(0 if success else 1)
+        elif test_mode == "admin-crud":
+            # Run Admin Page V2 CRUD API tests
+            print("🔧 RUNNING ADMIN PAGE V2 CRUD API TESTS")
+            success, results = tester.test_admin_curriculum_crud_apis()
+            print(f"\n🔧 Admin CRUD API Test: {'PASSED' if success else 'FAILED'}")
+            if success:
+                passed_tests = sum(results.values())
+                total_tests = len(results)
+                print(f"✅ Success rate: {(passed_tests/total_tests)*100:.1f}% ({passed_tests}/{total_tests} tests)")
+                print("✅ All CRUD operations working correctly")
+            else:
+                print("🚨 ADMIN CRUD API ISSUES DETECTED:")
+                for test_name, passed in results.items():
+                    if not passed:
+                        print(f"   ❌ {test_name}: FAILED")
+            sys.exit(0 if success else 1)
         elif test_mode == "race-condition":
             # Legacy support for race condition tests
             run_magic_link_race_condition_tests()
