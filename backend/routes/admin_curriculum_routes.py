@@ -330,7 +330,6 @@ async def get_curriculum_stats_endpoint(admin_check: bool = Depends(check_admin_
     """
     Retourne des statistiques globales.
     """
-    index = get_curriculum_index()
     report = validate_curriculum()
     
     return {
