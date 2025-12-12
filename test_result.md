@@ -27,16 +27,62 @@ Implementation and testing of Admin Page V2 with CRUD capabilities for curriculu
 5. Added success/error toast messages
 6. Updated version to "V2 - Édition"
 
-### API Tests (curl) - ALL PASSED ✅
+### API Tests (Comprehensive Testing Suite) - ALL PASSED ✅
 
 | Operation | Endpoint | Result |
 |-----------|----------|--------|
 | GET curriculum | /api/admin/curriculum/6e | ✅ 27 chapitres |
-| GET options | /api/admin/curriculum/options | ✅ 66 generators, 4 domaines |
-| POST create | /api/admin/curriculum/6e/chapters | ✅ Chapitre '6e_TEST01' créé |
-| PUT update | /api/admin/curriculum/6e/chapters/6e_TEST01 | ✅ Chapitre mis à jour |
-| GET verify | /api/admin/curriculum/6e/6e_TEST01 | ✅ Modifications confirmées |
-| DELETE | /api/admin/curriculum/6e/chapters/6e_TEST01 | ✅ Chapitre supprimé |
+| GET options | /api/admin/curriculum/options | ✅ 66 generators, 4 domaines, 3 statuts |
+| POST create | /api/admin/curriculum/6e/chapters | ✅ Chapitre '6e_TEST_CRUD' créé |
+| GET read | /api/admin/curriculum/6e/6e_TEST_CRUD | ✅ Données correctement sauvegardées |
+| PUT update | /api/admin/curriculum/6e/chapters/6e_TEST_CRUD | ✅ Modifications persistées |
+| DELETE | /api/admin/curriculum/6e/chapters/6e_TEST_CRUD | ✅ Chapitre supprimé |
+| Error handling | Various endpoints | ✅ 400/404 errors correctly returned |
+| Count verification | /api/admin/curriculum/6e | ✅ Count returned to original (27) |
+
+### Comprehensive Test Results (7/7 tests passed - 100%)
+
+#### Test 1: GET /api/admin/curriculum/options ✅
+- Found 66 generators available for selection
+- Found 4 domaines (Nombres et calculs, Géométrie, etc.)
+- Found 3 statuts (prod, beta, hidden)
+- All required data structures present
+
+#### Test 2: Initial Count Verification ✅
+- Retrieved initial curriculum count: 27 chapitres
+- Baseline established for cleanup verification
+
+#### Test 3: POST Create Chapter ✅
+- Successfully created test chapter "6e_TEST_CRUD"
+- All fields correctly saved (code_officiel, libelle, domaine, etc.)
+- Response includes success flag and chapter data
+
+#### Test 4: GET Read Chapter ✅
+- Successfully retrieved created chapter by code_officiel
+- All data matches original input (code_officiel, libelle, domaine)
+- Field verification passed
+
+#### Test 5: PUT Update Chapter ✅
+- Successfully updated chapter with new values:
+  - libelle: "Test CRUD Chapitre Modifié"
+  - statut: "prod" (changed from "beta")
+  - difficulte_max: 2 (changed from 3)
+- All changes correctly persisted
+
+#### Test 6: Error Handling ✅
+- Duplicate code_officiel correctly rejected (400)
+- Update non-existent chapter returns 404
+- Delete non-existent chapter returns 404
+- All error responses include appropriate detail messages
+
+#### Test 7: DELETE Chapter ✅
+- Successfully deleted test chapter
+- Verification GET request returns 404 (chapter no longer exists)
+- Cleanup completed successfully
+
+#### Test 8: Count Verification ✅
+- Final count matches initial count (27 chapitres)
+- No data leakage or persistence issues
 
 ### Frontend Tests (Screenshot) - ALL PASSED ✅
 
