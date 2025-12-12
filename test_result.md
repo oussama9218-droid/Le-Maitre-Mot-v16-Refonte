@@ -1,6 +1,68 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Comprehensive 6e Generators Testing (Waves 1, 2 & 3) - 2025-12-11
+## Latest Test Session - Admin Page V2 CRUD Implementation - 2025-12-12
+
+### Test Focus
+Implementation and testing of Admin Page V2 with CRUD capabilities for curriculum management.
+
+### Changes Made
+
+#### Backend (curriculum_persistence_service.py - NEW)
+1. Created CurriculumPersistenceService class for MongoDB persistence
+2. Added ChapterCreateRequest and ChapterUpdateRequest Pydantic models
+3. Implemented CRUD operations with MongoDB sync to JSON file
+4. Auto-reload of curriculum index after modifications
+
+#### Backend (admin_curriculum_routes.py - MODIFIED)
+1. Added POST /api/admin/curriculum/6e/chapters - Create chapter
+2. Added PUT /api/admin/curriculum/6e/chapters/{code} - Update chapter
+3. Added DELETE /api/admin/curriculum/6e/chapters/{code} - Delete chapter
+4. Added GET /api/admin/curriculum/options - Get available generators/domaines
+
+#### Frontend (Curriculum6eAdminPage.js - MODIFIED)
+1. Added "Ajouter" button in header
+2. Added edit (pencil) and delete (trash) buttons per row
+3. Implemented create/edit modal with all fields
+4. Implemented delete confirmation dialog
+5. Added success/error toast messages
+6. Updated version to "V2 - Édition"
+
+### API Tests (curl) - ALL PASSED ✅
+
+| Operation | Endpoint | Result |
+|-----------|----------|--------|
+| GET curriculum | /api/admin/curriculum/6e | ✅ 27 chapitres |
+| GET options | /api/admin/curriculum/options | ✅ 66 generators, 4 domaines |
+| POST create | /api/admin/curriculum/6e/chapters | ✅ Chapitre '6e_TEST01' créé |
+| PUT update | /api/admin/curriculum/6e/chapters/6e_TEST01 | ✅ Chapitre mis à jour |
+| GET verify | /api/admin/curriculum/6e/6e_TEST01 | ✅ Modifications confirmées |
+| DELETE | /api/admin/curriculum/6e/chapters/6e_TEST01 | ✅ Chapitre supprimé |
+
+### Frontend Tests (Screenshot) - ALL PASSED ✅
+
+| Test | Result |
+|------|--------|
+| Page loads with V2 title | ✅ "Administration Curriculum 6e - V2 - Édition" |
+| Stats cards display | ✅ 27 chapitres, 15 schémas, 4 domaines, 27 prod |
+| Ajouter button visible | ✅ Found in header |
+| Edit buttons per row | ✅ 27 pencil icons |
+| Delete buttons per row | ✅ 27 trash icons |
+| Add modal opens | ✅ All fields present |
+| Edit modal opens | ✅ Pre-filled with chapter data |
+| Code officiel disabled in edit | ✅ Confirmed |
+
+### Status Summary
+- **Backend CRUD APIs**: ✅ FULLY OPERATIONAL
+- **Frontend Add Modal**: ✅ WORKING
+- **Frontend Edit Modal**: ✅ WORKING  
+- **Frontend Delete Dialog**: ✅ WORKING
+- **MongoDB Persistence**: ✅ WORKING
+- **JSON File Sync**: ✅ WORKING
+- **Curriculum Index Reload**: ✅ WORKING
+
+---
+
+## Previous Test Session - Comprehensive 6e Generators Testing (Waves 1, 2 & 3) - 2025-12-11
 
 ### Test Focus
 Comprehensive testing of new 6e generators (Waves 1, 2 & 3) coverage as requested:
