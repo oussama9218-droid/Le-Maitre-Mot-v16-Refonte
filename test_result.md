@@ -84,18 +84,27 @@ Implementation and testing of Admin Page V2 with CRUD capabilities for curriculu
 - Final count matches initial count (27 chapitres)
 - No data leakage or persistence issues
 
-### Frontend Tests (Screenshot) - ALL PASSED ✅
+### Frontend Tests (Comprehensive UI Testing) - ALL PASSED ✅
 
 | Test | Result |
 |------|--------|
 | Page loads with V2 title | ✅ "Administration Curriculum 6e - V2 - Édition" |
 | Stats cards display | ✅ 27 chapitres, 15 schémas, 4 domaines, 27 prod |
-| Ajouter button visible | ✅ Found in header |
-| Edit buttons per row | ✅ 27 pencil icons |
-| Delete buttons per row | ✅ 27 trash icons |
-| Add modal opens | ✅ All fields present |
-| Edit modal opens | ✅ Pre-filled with chapter data |
-| Code officiel disabled in edit | ✅ Confirmed |
+| Table structure | ✅ All 7 columns (Code, Domaine, Libellé, Générateurs, Schéma, Statut, Actions) |
+| Table data | ✅ 27 rows displayed with complete chapter information |
+| Ajouter button | ✅ Opens modal with title "Ajouter un chapitre" |
+| Add modal form fields | ✅ All required fields present (Code officiel, Libellé, Domaine, etc.) |
+| Form validation | ✅ Error messages displayed for empty required fields |
+| Edit buttons per row | ✅ 27 pencil icons, each opens edit modal |
+| Edit modal functionality | ✅ Pre-filled with chapter data, code field disabled |
+| Delete buttons per row | ✅ 27 trash icons, each opens confirmation dialog |
+| Delete confirmation | ✅ Shows chapter info and warning message |
+| Search functionality | ✅ Filters results by code/libellé (tested with "G01") |
+| Domain filter | ✅ Filter dropdown present and functional |
+| Generators section | ✅ Clickable badges for generator selection |
+| Schema switch | ✅ Toggle for schema requirement |
+| Difficulty selectors | ✅ Min/Max difficulty dropdowns |
+| Status selector | ✅ Prod/Beta/Hidden options with visual indicators |
 
 ### Testing Agent Validation - 2025-12-12 15:30:00
 
