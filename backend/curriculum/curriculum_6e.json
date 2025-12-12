@@ -582,7 +582,7 @@
     {
       "niveau": "6e",
       "code_officiel": "6e_TEST01",
-      "libelle": "Test Chapitre V2",
+      "libelle": "Test Chapitre V2 Modifié",
       "domaine": "Nombres et calculs",
       "chapitre_backend": "Test Backend",
       "exercise_types": [
@@ -591,7 +591,7 @@
       "schema_requis": false,
       "difficulte_min": 1,
       "difficulte_max": 2,
-      "statut": "beta",
+      "statut": "prod",
       "tags": [],
       "contexts": []
     }
