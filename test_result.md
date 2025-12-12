@@ -106,28 +106,37 @@ Implementation and testing of Admin Page V2 with CRUD capabilities for curriculu
 | Difficulty selectors | ✅ Min/Max difficulty dropdowns |
 | Status selector | ✅ Prod/Beta/Hidden options with visual indicators |
 
-### Testing Agent Validation - 2025-12-12 15:30:00
+### Testing Agent Validation - 2025-12-12 16:45:00
 
 **Agent**: testing  
-**Task**: Comprehensive validation of Admin Page V2 CRUD APIs  
-**Test Suite**: `/app/test_admin_crud.py`  
-**Backend URL**: https://math-navigator-2.preview.emergentagent.com  
+**Task**: Comprehensive validation of Admin Page V2 CRUD Frontend UI  
+**Test Suite**: Playwright browser automation testing  
+**Frontend URL**: https://math-navigator-2.preview.emergentagent.com/admin/curriculum  
 
-**Test Results**: ✅ ALL TESTS PASSED (7/7 - 100%)
+**Test Results**: ✅ ALL UI TESTS PASSED (7/7 - 100%)
 
-**Key Validations**:
-- ✅ All CRUD operations (Create, Read, Update, Delete) working correctly
-- ✅ Error handling properly implemented (400/404 responses)
-- ✅ Data persistence verified through MongoDB and JSON sync
-- ✅ Field validation and data integrity maintained
-- ✅ Curriculum index auto-reload functioning
-- ✅ No data leakage or count discrepancies
-- ✅ All API endpoints responding within expected timeframes (<30s)
+**Frontend UI Validations**:
+- ✅ Page Load: Title, subtitle "V2 - Édition", and stats cards verified
+- ✅ Table Display: 27 rows with all 7 columns and action buttons
+- ✅ Add Modal: Opens correctly with all form fields and validation
+- ✅ Edit Modal: Pre-populated fields, disabled code field, proper functionality
+- ✅ Delete Confirmation: Warning dialog with chapter information
+- ✅ Search/Filter: Text search and domain filtering working correctly
+- ✅ Form Validation: Error messages displayed for required fields
 
-**Performance Metrics**:
-- Average response time: <2 seconds per API call
-- All operations completed successfully without timeouts
-- MongoDB persistence and JSON file sync working seamlessly
+**UI Component Verification**:
+- Stats Cards: 27 chapitres, 15 schémas, 4 domaines, 27 production
+- Action Buttons: 27 edit (pencil) + 27 delete (trash) buttons
+- Form Fields: Code officiel, Libellé, Domaine, Statut, Schema switch, Difficulty selectors
+- Generators: Clickable badges for multi-selection
+- Modals: Proper opening/closing with correct titles and content
+
+**Backend API Integration**: ✅ VERIFIED (Previous session)
+- All CRUD operations (Create, Read, Update, Delete) working correctly
+- Error handling properly implemented (400/404 responses)
+- Data persistence verified through MongoDB and JSON sync
+- Field validation and data integrity maintained
+- Curriculum index auto-reload functioning
 
 ### Status Summary
 - **Backend CRUD APIs**: ✅ FULLY OPERATIONAL
