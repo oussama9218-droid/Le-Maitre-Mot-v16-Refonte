@@ -248,7 +248,7 @@ const ExerciseGeneratorPage = () => {
   // Générer les exercices
   const generateExercises = async () => {
     if (!selectedItem) {
-      setError("Veuillez sélectionner un chapitre");
+      setError("Veuillez sélectionner un {`chapitre`});
       return;
     }
 
@@ -267,7 +267,7 @@ const ExerciseGeneratorPage = () => {
         const macroGroup = catalog.macro_groups.find(mg => mg.label === macroLabel);
         
         if (!macroGroup || macroGroup.codes_officiels.length === 0) {
-          throw new Error(`Groupe "${macroLabel}" sans codes officiels`);
+          throw new Error(`Groupe sans codes officiels`);
         }
         
         codeOfficiel = selectCodeFromMacro(macroGroup.codes_officiels);
@@ -463,7 +463,7 @@ const ExerciseGeneratorPage = () => {
                 </label>
                 <Select value={selectedItem} onValueChange={setSelectedItem}>
                   <SelectTrigger>
-                    <SelectValue placeholder={viewMode === "simple" ? "Choisir un thème" : "Choisir un chapitre"} />
+                    <SelectValue placeholder={viewMode === "simple" ? "Choisir un {"thème"} : "Choisir un {`chapitre`}} />
                   </SelectTrigger>
                   <SelectContent>
                     {displayItems.map((item) => (
@@ -704,11 +704,11 @@ const ExerciseGeneratorPage = () => {
             <CardContent className="py-12 text-center text-gray-500">
               <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <p className="text-lg">
-                Sélectionnez un {viewMode === "simple" ? "thème" : "chapitre"}, puis cliquez sur "Générer" pour commencer
+                Sélectionnez un {viewMode === "simple" ? "{"thème"} : "{`chapitre`}}, puis cliquez sur "Générer" pour commencer
               </p>
               <p className="text-sm mt-2 text-gray-400">
                 {viewMode === "simple" 
-                  ? "Le mode simple regroupe les chapitres par thème" 
+                  ? "Le mode simple regroupe les chapitres par {"thème"} 
                   : "Le mode officiel affiche les 27 chapitres du programme"
                 }
               </p>
