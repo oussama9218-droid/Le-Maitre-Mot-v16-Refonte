@@ -2077,3 +2077,62 @@ Correction de l'intégration PRO dans ExerciseGeneratorPage:
 - **Badge PREMIUM exercice**: ✅ IMPLÉMENTÉ
 - **Backend PREMIUM**: ✅ FONCTIONNEL (déjà corrigé)
 
+
+---
+
+## Test Session - Fix Variation PREMIUM - 2025-12-13
+
+### Test Focus
+Correction définitive du bug de Variation pour les exercices PREMIUM:
+- La variation doit respecter le statut PREMIUM de l'exercice COURANT
+- Variation PREMIUM → PREMIUM (même générateur)
+- Variation STANDARD → STANDARD (pas d'upgrade accidentel)
+
+### Correction appliquée
+
+#### Frontend (ExerciseGeneratorPage.js - generateVariation)
+```javascript
+// IMPORTANT: Pour une variation, on doit respecter le type de l'exercice COURANT
+const currentExerciseForVariation = exercises[index];
+const isCurrentPremium = currentExerciseForVariation?.metadata?.is_premium === true;
+
+// Si l'exercice courant est PREMIUM, la variation DOIT être PREMIUM aussi
+if (isCurrentPremium) {
+  payload.offer = "pro";
+}
+// Si STANDARD, on ne met PAS offer: "pro" pour garder la cohérence
+```
+
+### Tests Backend (12/12 - 100%)
+
+| Test | Résultat | Description |
+|------|----------|-------------|
+| test_standard_generation_6e_gm07 | ✅ | Mode gratuit retourne is_premium=false |
+| test_standard_generation_fractions | ✅ | Fractions fonctionne normalement |
+| test_pro_generation_6e_gm07 | ✅ | Mode PRO retourne is_premium=true |
+| test_pro_response_structure | ✅ | Structure réponse compatible frontend |
+| test_pro_content_quality | ✅ | Contenu PREMIUM de qualité |
+| test_legacy_fractions | ✅ | Mode legacy compatible |
+| test_variation_standard | ✅ | Variation standard fonctionne |
+| test_variation_pro | ✅ | Variation PRO fonctionne |
+| test_invalid_code_officiel | ✅ | Erreurs gérées correctement |
+| **test_variation_premium_stays_premium** | ✅ | **Variation PREMIUM reste PREMIUM** |
+| **test_variation_standard_stays_standard** | ✅ | **Variation STANDARD reste STANDARD** |
+| **test_no_accidental_premium_upgrade** | ✅ | **Pas d'upgrade accidentel** |
+
+### Critères de validation
+
+| Critère | Statut |
+|---------|--------|
+| Mode PRO: /generate → OK | ✅ |
+| Mode PRO: bouton Variation → OK | ✅ |
+| metadata.is_premium reste true après variation | ✅ |
+| generator_code reste 6e_DUREES_PREMIUM | ✅ |
+| Mode gratuit: comportement inchangé | ✅ |
+| Aucune régression | ✅ |
+
+### Status Summary
+- **Fix Variation PREMIUM**: ✅ IMPLÉMENTÉ ET VALIDÉ
+- **Tests Backend**: ✅ 12/12 PASSENT
+- **Règle généralisable**: ✅ (vérification via metadata.is_premium)
+
