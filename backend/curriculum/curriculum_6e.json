@@ -137,7 +137,7 @@
       "niveau": "6e",
       "code_officiel": "6e_G07",
       "domaine": "Géométrie",
-      "libelle": "Symétrie axiale (points, segments, figures)",
+      "libelle": "Symétrie axiale(TEST_MODIF_2) (points, segments, figures)",
       "chapitre_backend": "Symétrie axiale",
       "exercise_types": [
         "SYMETRIE_AXIALE",
