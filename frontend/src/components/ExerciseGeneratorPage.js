@@ -362,16 +362,27 @@ const ExerciseGeneratorPage = () => {
       
       const seed = Date.now() + Math.random() * 1000;
       
-      // Construire le payload avec offer: "pro" si utilisateur PRO
+      // IMPORTANT: Pour une variation, on doit respecter le type de l'exercice COURANT
+      // Si l'exercice courant est PREMIUM, la variation doit aussi être PREMIUM
+      const currentExerciseForVariation = exercises[index];
+      const isCurrentPremium = currentExerciseForVariation?.metadata?.is_premium === true;
+      
+      // Construire le payload
       const payload = {
         code_officiel: codeOfficiel,
         difficulte: difficulte,
         seed: seed
       };
       
-      // Ajouter offer: "pro" pour les utilisateurs PRO
-      if (isPro) {
+      // Si l'exercice courant est PREMIUM, la variation DOIT être PREMIUM aussi
+      // Sinon, on utilise le statut PRO de l'utilisateur pour les nouvelles générations
+      if (isCurrentPremium) {
         payload.offer = "pro";
+        console.log('🔄 Variation PREMIUM demandée (exercice courant est PREMIUM)');
+      } else if (isPro) {
+        // Utilisateur PRO mais exercice standard → génération standard (pas de forçage PREMIUM)
+        // On NE MET PAS offer: "pro" pour garder la cohérence avec l'exercice d'origine
+        console.log('🔄 Variation STANDARD demandée (exercice courant est standard)');
       }
       
       const response = await axios.post(`${API_V1}/generate`, payload);
@@ -380,7 +391,7 @@ const ExerciseGeneratorPage = () => {
       newExercises[index] = response.data;
       setExercises(newExercises);
       
-      console.log('✅ Variation générée via', codeOfficiel, isPro ? '(PRO)' : '(FREE)');
+      console.log('✅ Variation générée via', codeOfficiel, isCurrentPremium ? '(PREMIUM)' : '(STANDARD)');
       
     } catch (error) {
       console.error("Erreur lors de la génération de variation:", error);
