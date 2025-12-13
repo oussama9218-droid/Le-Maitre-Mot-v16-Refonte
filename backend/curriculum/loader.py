@@ -293,5 +293,170 @@ def validate_curriculum() -> Dict[str, any]:
     return report
 
 
+# ============================================================================
+# CATALOGUE FRONTEND (API pour /generate)
+# ============================================================================
+
+class MacroGroup:
+    """Groupe macro pour la vue simplifiée."""
+    
+    def __init__(self, label: str, codes_officiels: List[str], description: str = ""):
+        self.label = label
+        self.codes_officiels = codes_officiels
+        self.description = description
+
+
+def _load_macro_groups() -> List[Dict]:
+    """
+    Charge les macro groups depuis le fichier JSON.
+    
+    Returns:
+        Liste des macro groups avec leurs codes officiels
+    """
+    if not os.path.exists(CURRICULUM_6E_PATH):
+        return []
+    
+    with open(CURRICULUM_6E_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    
+    return data.get("macro_groups", [])
+
+
+def get_catalog(level: str = "6e") -> Dict:
+    """
+    Génère le catalogue complet pour le frontend.
+    
+    Structure retournée:
+    {
+        "level": "6e",
+        "domains": [
+            {
+                "name": "Grandeurs et mesures",
+                "chapters": [
+                    {
+                        "code_officiel": "6e_GM07",
+                        "libelle": "Lecture de l'heure",
+                        "status": "prod",
+                        "schema_requis": true,
+                        "difficulty_min": 1,
+                        "difficulty_max": 3,
+                        "generators": ["LECTURE_HORLOGE", ...]
+                    }
+                ]
+            }
+        ],
+        "macro_groups": [
+            {
+                "label": "Longueurs, masses, durées",
+                "codes_officiels": ["6e_GM01", "6e_GM05", "6e_GM06", "6e_GM07"],
+                "status": "prod",
+                "description": "Mesures et conversions"
+            }
+        ]
+    }
+    
+    Args:
+        level: Niveau scolaire (par défaut "6e")
+        
+    Returns:
+        Dictionnaire du catalogue pour le frontend
+    """
+    if level != "6e":
+        return {
+            "level": level,
+            "domains": [],
+            "macro_groups": [],
+            "error": f"Niveau '{level}' non supporté pour l'instant"
+        }
+    
+    index = get_curriculum_index()
+    
+    # Construire les domaines avec chapitres
+    domains = []
+    for domaine_name in sorted(index.by_domaine.keys()):
+        chapters_list = index.by_domaine[domaine_name]
+        
+        chapters_data = []
+        for chapter in sorted(chapters_list, key=lambda c: c.code_officiel):
+            chapters_data.append({
+                "code_officiel": chapter.code_officiel,
+                "libelle": chapter.libelle,
+                "status": chapter.statut,
+                "schema_requis": chapter.schema_requis,
+                "difficulty_min": chapter.difficulte_min,
+                "difficulty_max": chapter.difficulte_max,
+                "generators": chapter.exercise_types,
+                "has_svg": any(
+                    gen in chapter.exercise_types 
+                    for gen in ["LECTURE_HORLOGE", "CALCUL_DUREE", "SYMETRIE_AXIALE", 
+                               "TRIANGLE_QUELCONQUE", "RECTANGLE", "CERCLE", "FRACTION_REPRESENTATION"]
+                )
+            })
+        
+        domains.append({
+            "name": domaine_name,
+            "chapters": chapters_data
+        })
+    
+    # Charger les macro groups depuis le JSON
+    raw_macro_groups = _load_macro_groups()
+    
+    # Enrichir les macro groups avec le status calculé
+    macro_groups = []
+    for mg in raw_macro_groups:
+        codes = mg.get("codes_officiels", [])
+        
+        # Calculer le status du groupe (prod si au moins un chapitre est prod)
+        statuses = []
+        generators_count = 0
+        for code in codes:
+            chapter = index.by_official_code.get(code)
+            if chapter:
+                statuses.append(chapter.statut)
+                generators_count += len(chapter.exercise_types)
+        
+        if "prod" in statuses:
+            group_status = "prod"
+        elif "beta" in statuses:
+            group_status = "beta"
+        else:
+            group_status = "hidden"
+        
+        macro_groups.append({
+            "label": mg.get("label", ""),
+            "codes_officiels": codes,
+            "description": mg.get("description", ""),
+            "status": group_status,
+            "total_generators": generators_count
+        })
+    
+    return {
+        "level": level,
+        "domains": domains,
+        "macro_groups": macro_groups,
+        "total_chapters": len(index.by_official_code),
+        "total_macro_groups": len(macro_groups)
+    }
+
+
+def get_codes_for_macro_group(label: str) -> List[str]:
+    """
+    Récupère les codes officiels associés à un macro group.
+    
+    Args:
+        label: Libellé du macro group (ex: "Longueurs, masses, durées")
+        
+    Returns:
+        Liste des codes officiels, ou liste vide si non trouvé
+    """
+    macro_groups = _load_macro_groups()
+    
+    for mg in macro_groups:
+        if mg.get("label") == label:
+            return mg.get("codes_officiels", [])
+    
+    return []
+
+
 # Charger automatiquement au premier import (optionnel, peut être fait paresseusement)
 # load_curriculum_6e()
