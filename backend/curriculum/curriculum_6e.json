@@ -250,7 +250,7 @@
         "GRANDEURS_MESURES_DEDIE",
         "CONVERSIONS_UNITES"
       ],
-      "schema_requis": false,
+      "schema_requis": true,
       "difficulte_min": 1,
       "difficulte_max": 3,
       "statut": "prod",
@@ -281,38 +281,6 @@
         "conversions"
       ],
       "contexts": []
-    },
-    {
-      "niveau": "6e",
-      "code_officiel": "6e_GM07",
-      "domaine": "Grandeurs et mesures",
-      "libelle": "Durées et lecture de l'heure",
-      "chapitre_backend": "Durées et lecture de l'heure",
-      "exercise_types": [
-        "LECTURE_HORLOGE",
-        "CONVERSION_DUREES",
-        "CALCUL_DUREE",
-        "PROBLEME_DUREES"
-      ],
-      "schema_requis": true,
-      "difficulte_min": 1,
-      "difficulte_max": 3,
-      "statut": "prod",
-      "tags": [
-        "durées",
-        "heures",
-        "minutes",
-        "horloge",
-        "conversion",
-        "problèmes"
-      ],
-      "contexts": [
-        "film",
-        "trajet",
-        "sport",
-        "école",
-        "cuisine"
-      ]
     },
     {
       "niveau": "6e",
