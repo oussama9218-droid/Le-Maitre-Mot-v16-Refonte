@@ -304,11 +304,20 @@ const ExerciseGeneratorPage = () => {
       for (let i = 0; i < nbExercices; i++) {
         const seed = Date.now() + i;
         
-        const promise = axios.post(`${API_V1}/generate`, {
+        // Construire le payload avec offer: "pro" si utilisateur PRO
+        const payload = {
           code_officiel: codeOfficiel,
           difficulte: difficulte,
           seed: seed
-        });
+        };
+        
+        // Ajouter offer: "pro" pour les utilisateurs PRO
+        if (isPro) {
+          payload.offer = "pro";
+          console.log(`🌟 Mode PRO activé pour ${codeOfficiel}`);
+        }
+        
+        const promise = axios.post(`${API_V1}/generate`, payload);
         
         promises.push(promise);
       }
@@ -317,7 +326,7 @@ const ExerciseGeneratorPage = () => {
       const generatedExercises = responses.map(response => response.data);
       
       setExercises(generatedExercises);
-      console.log('✅ Exercices générés:', generatedExercises.length, 'via', codeOfficiel);
+      console.log('✅ Exercices générés:', generatedExercises.length, 'via', codeOfficiel, isPro ? '(PRO)' : '(FREE)');
       
     } catch (error) {
       console.error("Erreur lors de la génération:", error);
