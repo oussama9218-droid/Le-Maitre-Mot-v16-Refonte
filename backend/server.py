@@ -4755,6 +4755,10 @@ app.include_router(exercises_router, tags=["Exercises v1"])
 from routes.admin_curriculum_routes import router as admin_curriculum_router
 app.include_router(admin_curriculum_router, tags=["Admin Curriculum"])
 
+# Route catalogue curriculum (pour /generate)
+from routes.curriculum_catalog_routes import router as curriculum_catalog_router
+app.include_router(curriculum_catalog_router, tags=["Curriculum Catalog"])
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
