@@ -140,6 +140,11 @@ class MathExerciseType(str, Enum):
     CALCUL_DUREE = "calcul_duree"
     # Type 4: Problèmes contextualisés sur les durées
     PROBLEME_DUREES = "probleme_durees"
+    
+    # ========== GÉNÉRATEUR PREMIUM: DURÉES (6e_GM07) ==========
+    # Générateur de qualité manuel scolaire professionnel
+    # Activé uniquement pour l'offre PRO
+    DUREES_PREMIUM = "durees_premium"
 
 class GeometricFigure(BaseModel):
     """Définition structurée d'une figure géométrique"""
