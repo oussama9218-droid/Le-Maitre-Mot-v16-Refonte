@@ -414,12 +414,12 @@ async def generate_exercise(request: ExerciseGenerateRequest):
         
         if use_premium and premium_generators:
             # Utiliser le générateur premium
-            from models.math_models import MathExerciseType
+            # Note: MathExerciseType est déjà importé en haut via math_models
             specs = _math_service.generate_math_exercise_specs_with_types(
                 niveau=request.niveau,
                 chapitre=request.chapitre,
                 difficulte=request.difficulte,
-                exercise_types=[MathExerciseType(g) for g in premium_generators],
+                exercise_types=[MathExerciseType[g] for g in premium_generators],  # Accès par nom (clé)
                 nb_exercices=1
             )
         elif exercise_types_override and len(exercise_types_override) > 0:
