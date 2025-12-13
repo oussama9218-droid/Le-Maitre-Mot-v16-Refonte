@@ -135,64 +135,62 @@ class TestDureesLectureHeure:
         print("TEST 2: Génération avec code_officiel")
         print("="*80)
         
-        test_data = {
-            "code_officiel": "6e_GM07",
-            "difficulte": "facile",
-            "nb_exercices": 5
-        }
+        # Test multiple generations to get different types
+        all_generator_types = set()
+        svg_exercises = []
+        total_exercises = 0
         
-        success, response = self.run_test(
-            "POST generate with code_officiel",
-            "POST",
-            "v1/exercises/generate",
-            200,
-            data=test_data,
-            timeout=60
-        )
-        
-        if success and isinstance(response, list):
-            print(f"   Généré {len(response)} exercices")
+        for attempt in range(10):  # Multiple attempts to get variety
+            test_data = {
+                "code_officiel": "6e_GM07",
+                "difficulte": "facile",
+                "nb_exercices": 1
+            }
             
-            # Analyser les types de générateurs utilisés
-            generator_types = set()
-            svg_exercises = []
+            success, response = self.run_test(
+                f"POST generate attempt {attempt + 1}",
+                "POST",
+                "v1/exercises/generate",
+                200,
+                data=test_data,
+                timeout=60
+            )
             
-            for i, exercise in enumerate(response):
-                generator_code = exercise.get('metadata', {}).get('generator_code', '')
+            if success and isinstance(response, dict):  # Single exercise response
+                total_exercises += 1
+                generator_code = response.get('metadata', {}).get('generator_code', '')
                 exercise_type = self._extract_exercise_type(generator_code)
-                generator_types.add(exercise_type)
+                all_generator_types.add(exercise_type)
                 
-                print(f"   Exercice {i+1}: {generator_code} ({exercise_type})")
+                print(f"   Exercice {attempt+1}: {generator_code} ({exercise_type})")
                 
                 # Vérifier SVG pour LECTURE_HORLOGE et CALCUL_DUREE
                 if exercise_type in ["LECTURE_HORLOGE", "CALCUL_DUREE"]:
-                    svg_content = exercise.get('svg', '')
+                    svg_content = response.get('svg', '')
                     if svg_content:
-                        svg_exercises.append((i+1, exercise_type, svg_content))
+                        svg_exercises.append((attempt+1, exercise_type, svg_content))
                         print(f"     ✅ SVG présent ({len(svg_content)} caractères)")
                     else:
                         print(f"     ❌ SVG manquant pour {exercise_type}")
-            
-            # Vérifier que les 4 types sont utilisés
-            expected_types = {"LECTURE_HORLOGE", "CONVERSION_DUREES", "CALCUL_DUREE", "PROBLEME_DUREES"}
-            found_types = generator_types.intersection(expected_types)
-            
-            print(f"   Types trouvés: {found_types}")
-            print(f"   Types attendus: {expected_types}")
-            
-            types_check = len(found_types) >= 3  # Au moins 3 des 4 types
-            svg_check = len(svg_exercises) > 0  # Au moins un SVG
-            
-            self.test_results["generation_by_code"] = types_check and svg_check
-            self.test_results["exercise_types_found"].update(found_types)
-            
-            # Stocker les exercices SVG pour analyse détaillée
-            self.svg_exercises = svg_exercises
-            
-            return types_check and svg_check, response
-        else:
-            self.test_results["generation_by_code"] = False
-            return False, {}
+        
+        # Vérifier que les 4 types sont utilisés
+        expected_types = {"LECTURE_HORLOGE", "CONVERSION_DUREES", "CALCUL_DUREE", "PROBLEME_DUREES"}
+        found_types = all_generator_types.intersection(expected_types)
+        
+        print(f"\n   Types trouvés: {found_types}")
+        print(f"   Types attendus: {expected_types}")
+        print(f"   Total exercices générés: {total_exercises}")
+        
+        types_check = len(found_types) >= 3  # Au moins 3 des 4 types
+        svg_check = len(svg_exercises) > 0  # Au moins un SVG
+        
+        self.test_results["generation_by_code"] = types_check and svg_check
+        self.test_results["exercise_types_found"].update(found_types)
+        
+        # Stocker les exercices SVG pour analyse détaillée
+        self.svg_exercises = svg_exercises
+        
+        return types_check and svg_check, {"types_found": found_types, "svg_count": len(svg_exercises)}
 
     def test_3_generation_by_name(self):
         """Test 3: Génération avec nom de chapitre"""
