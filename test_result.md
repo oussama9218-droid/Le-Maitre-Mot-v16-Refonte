@@ -1864,3 +1864,36 @@ Correction de deux bugs critiques dans l'implémentation du générateur PREMIUM
 ### Files Modified
 - `/app/backend/routes/exercises_routes.py` - Suppression import redondant + correction accès enum
 
+
+---
+
+## Test Session - Frontend PRO Integration Fix - 2025-12-13
+
+### Test Focus
+Correction de l'intégration PRO dans ExerciseGeneratorPage:
+- Le frontend n'envoyait pas `offer: "pro"` dans les requêtes API
+- Les utilisateurs PRO n'accédaient pas aux générateurs premium
+
+### Corrections appliquées
+
+#### Frontend (ExerciseGeneratorPage.js)
+1. **Détection PRO ajoutée**: Lecture de `localStorage` pour détecter l'utilisateur PRO
+2. **Envoi offer: "pro"**: Ajout du paramètre dans generateExercises() et generateVariation()
+3. **Badge PRO header**: Affichage indicateur PRO dans le header
+4. **Badge PREMIUM exercice**: Affichage badge ⭐ PREMIUM quand `metadata.is_premium=true`
+
+### Tests Backend (curl)
+
+| Test | Résultat | Détails |
+|------|----------|---------|
+| Mode Standard (sans PRO) | ✅ OK | is_premium: false, generator: CONVERSION_DUREES |
+| Mode PRO (offer=pro) | ✅ OK | is_premium: true, generator: DUREES_PREMIUM |
+| Non-régression Legacy | ✅ OK | Fractions fonctionne normalement |
+
+### Status Summary
+- **Détection PRO frontend**: ✅ IMPLÉMENTÉ
+- **Envoi offer: "pro"**: ✅ IMPLÉMENTÉ
+- **Badge PRO header**: ✅ IMPLÉMENTÉ
+- **Badge PREMIUM exercice**: ✅ IMPLÉMENTÉ
+- **Backend PREMIUM**: ✅ FONCTIONNEL (déjà corrigé)
+
