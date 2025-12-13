@@ -1,6 +1,59 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Migration Curriculum vers /generate - 2025-12-13
+## Latest Test Session - Validation Générateur PREMIUM 6e_GM07 - 2025-12-13
+
+### Test Focus
+Validation complète du générateur PREMIUM pour le chapitre "Durées et lecture de l'heure" (6e_GM07) après correction de deux bugs critiques:
+1. UnboundLocalError sur `get_chapter_by_official_code` (import redondant supprimé)
+2. 'DUREES_PREMIUM' is not a valid MathExerciseType (changement de `MathExerciseType(g)` à `MathExerciseType[g]`)
+
+### Tests Exécutés - Tous Passés ✅ (6/6 - 100%)
+
+| Test | Description | Résultat | Détails |
+|------|-------------|----------|---------|
+| Test 1 | Mode Standard (sans premium) | ✅ PASSED | is_premium: false, generator: LECTURE_HORLOGE |
+| Test 2 | Mode PREMIUM (offer=pro) | ✅ PASSED | is_premium: true, generator: DUREES_PREMIUM |
+| Test 3 | Contenu PREMIUM (5 générations) | ✅ PASSED | 5/5 premium, variété énoncés: 5/5, conversions: 5/5 |
+| Test 4 | Mode Legacy (compatibilité) | ✅ PASSED | Génération Fractions fonctionnelle |
+| Test 5 | Non-régression autres chapitres | ✅ PASSED | 6e_N08 (Fractions) et 6e_G07 (Symétrie) OK |
+| Test 6 | Erreur code_officiel invalide | ✅ PASSED | HTTP 422 correctement retourné |
+
+### Critères de Succès - Tous Validés ✅
+
+- ✅ **Mode PREMIUM activé**: offer=pro active bien le générateur DUREES_PREMIUM
+- ✅ **Mode Standard correct**: sans offer=pro, is_premium=false avec générateurs standards
+- ✅ **Qualité PREMIUM**: Énoncés avec conversions (h, min, sec) et contextes variés
+- ✅ **Non-régression**: Autres chapitres (Fractions, Symétrie axiale) fonctionnent
+- ✅ **Gestion d'erreurs**: Code_officiel invalide retourne HTTP 422 approprié
+- ✅ **Compatibilité Legacy**: Mode ancien (niveau + chapitre) toujours fonctionnel
+
+### Validation Technique
+
+**Backend URL**: https://exercisefix.preview.emergentagent.com  
+**Temps total**: 0.61s (performance excellente)  
+**API Endpoint**: POST /api/v1/exercises/generate  
+
+**Générateurs Testés**:
+- Mode Standard: LECTURE_HORLOGE, CALCUL_DUREE, CONVERSION_DUREES, PROBLEME_DUREES
+- Mode PREMIUM: DUREES_PREMIUM (exclusif offer=pro)
+
+**Qualité Contenu PREMIUM**:
+- 100% des générations premium contiennent des conversions temporelles
+- Variété parfaite des énoncés (5 énoncés différents sur 5 générations)
+- Contextes pédagogiques appropriés (films, voyages, sports, école)
+
+### Status Summary
+- **Générateur PREMIUM**: ✅ COMPLÈTEMENT FONCTIONNEL
+- **Bug Fix 1 (UnboundLocalError)**: ✅ RÉSOLU
+- **Bug Fix 2 (MathExerciseType)**: ✅ RÉSOLU  
+- **Mode Standard**: ✅ OPÉRATIONNEL (is_premium=false)
+- **Mode PREMIUM**: ✅ OPÉRATIONNEL (is_premium=true, DUREES_PREMIUM)
+- **Non-régression**: ✅ VALIDÉE (autres chapitres OK)
+- **Gestion d'erreurs**: ✅ APPROPRIÉE (HTTP 422 pour codes invalides)
+
+---
+
+## Previous Test Session - Migration Curriculum vers /generate - 2025-12-13
 
 ### Test Focus
 Migration de /generate vers le référentiel curriculum officiel avec:
