@@ -393,7 +393,7 @@ const ExerciseGeneratorPage = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <GraduationCap className="h-10 w-10 text-blue-600 mr-3" />
-            <h1 className="text-4xl font-bold text-gray-900">Générateur d'exercices</h1>
+            <h1 className="text-4xl font-bold text-gray-900">Générateur d&apos;exercices</h1>
           </div>
           <p className="text-lg text-gray-600">
             Programme officiel de 6e • {catalog?.total_chapters || 0} chapitres disponibles
