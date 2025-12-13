@@ -686,7 +686,7 @@ const Curriculum6eAdminPage = () => {
                 <Input
                   id="code_officiel"
                   value={formData.code_officiel}
-                  onChange={(e) => setFormData(prev => ({ ...prev, code_officiel: e.target.value.toUpperCase() }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, code_officiel: e.target.value }))}
                   placeholder="6e_N01"
                   disabled={modalMode === 'edit'}
                   className={formErrors.code_officiel ? 'border-red-500' : ''}
