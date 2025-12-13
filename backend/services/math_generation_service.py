@@ -8779,3 +8779,760 @@ class MathGenerationService:
             etapes_calculees=etapes,
             resultat_final=f"{resultat} {unite_arrivee}"
         )
+
+    # ============================================================================
+    # CHAPITRE MODÈLE : DURÉES ET LECTURE DE L'HEURE (6e)
+    # Niveau de qualité : MANUEL SCOLAIRE PROFESSIONNEL
+    # ============================================================================
+    
+    def _generate_clock_svg(
+        self, 
+        hours: int, 
+        minutes: int, 
+        show_numbers: bool = True,
+        show_marks: bool = True,
+        size: int = 200,
+        label: str = None
+    ) -> str:
+        """
+        Génère une horloge analogique SVG de qualité professionnelle.
+        
+        Args:
+            hours: Heure (0-23, sera convertie en 0-11)
+            minutes: Minutes (0-59)
+            show_numbers: Afficher les chiffres (1-12)
+            show_marks: Afficher les graduations
+            size: Taille du SVG en pixels
+            label: Étiquette optionnelle sous l'horloge
+            
+        Returns:
+            SVG complet de l'horloge
+        """
+        cx, cy = size // 2, size // 2  # Centre
+        radius = size // 2 - 15  # Rayon avec marge
+        
+        # Convertir en format 12h
+        h12 = hours % 12
+        
+        # Calculer les angles (0° = 12h, sens horaire)
+        # Aiguille des heures : 30° par heure + 0.5° par minute
+        hour_angle = (h12 * 30) + (minutes * 0.5) - 90
+        # Aiguille des minutes : 6° par minute
+        minute_angle = (minutes * 6) - 90
+        
+        # Convertir en radians
+        hour_rad = math.radians(hour_angle)
+        minute_rad = math.radians(minute_angle)
+        
+        # Longueurs des aiguilles
+        hour_length = radius * 0.5
+        minute_length = radius * 0.75
+        
+        # Coordonnées des extrémités
+        hour_x = cx + hour_length * math.cos(hour_rad)
+        hour_y = cy + hour_length * math.sin(hour_rad)
+        minute_x = cx + minute_length * math.cos(minute_rad)
+        minute_y = cy + minute_length * math.sin(minute_rad)
+        
+        # Construire le SVG
+        svg_height = size + 30 if label else size
+        svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {size} {svg_height}" width="{size}" height="{svg_height}">
+  <!-- Fond blanc avec bordure -->
+  <circle cx="{cx}" cy="{cy}" r="{radius}" fill="white" stroke="#333" stroke-width="3"/>
+  <circle cx="{cx}" cy="{cy}" r="{radius-2}" fill="none" stroke="#666" stroke-width="1"/>
+'''
+        
+        # Graduations et chiffres
+        if show_marks:
+            for i in range(60):
+                angle = math.radians(i * 6 - 90)
+                if i % 5 == 0:
+                    # Grande graduation (heures)
+                    inner_r = radius - 12
+                    outer_r = radius - 4
+                    stroke_width = 2
+                else:
+                    # Petite graduation (minutes)
+                    inner_r = radius - 8
+                    outer_r = radius - 4
+                    stroke_width = 1
+                
+                x1 = cx + inner_r * math.cos(angle)
+                y1 = cy + inner_r * math.sin(angle)
+                x2 = cx + outer_r * math.cos(angle)
+                y2 = cy + outer_r * math.sin(angle)
+                
+                svg += f'  <line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#333" stroke-width="{stroke_width}"/>\n'
+        
+        # Chiffres des heures
+        if show_numbers:
+            number_radius = radius - 25
+            for i in range(1, 13):
+                angle = math.radians(i * 30 - 90)
+                num_x = cx + number_radius * math.cos(angle)
+                num_y = cy + number_radius * math.sin(angle) + 5  # Ajustement vertical
+                svg += f'  <text x="{num_x:.1f}" y="{num_y:.1f}" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">{i}</text>\n'
+        
+        # Aiguille des heures (épaisse, noire)
+        svg += f'''  <!-- Aiguille des heures -->
+  <line x1="{cx}" y1="{cy}" x2="{hour_x:.1f}" y2="{hour_y:.1f}" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+'''
+        
+        # Aiguille des minutes (fine, noire)
+        svg += f'''  <!-- Aiguille des minutes -->
+  <line x1="{cx}" y1="{cy}" x2="{minute_x:.1f}" y2="{minute_y:.1f}" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+'''
+        
+        # Centre de l'horloge
+        svg += f'''  <!-- Centre -->
+  <circle cx="{cx}" cy="{cy}" r="5" fill="#222"/>
+'''
+        
+        # Étiquette optionnelle
+        if label:
+            svg += f'  <text x="{cx}" y="{size + 20}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">{label}</text>\n'
+        
+        svg += '</svg>'
+        return svg
+    
+    def _gen_lecture_horloge(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur Type 1: LECTURE D'HORLOGE ANALOGIQUE
+        
+        Niveau didactique:
+        - Facile: heures pleines (8h00, 3h00)
+        - Moyen: quarts d'heure et demi-heures (9h15, 2h30, 11h45)
+        - Difficile: intervalles de 5 minutes (7h35, 10h50)
+        
+        SVG OBLIGATOIRE avec horloge analogique lisible.
+        """
+        
+        # Définir les heures selon la difficulté
+        if difficulte == "facile":
+            # Heures pleines uniquement
+            hours = random.randint(1, 12)
+            minutes = 0
+            precision = "heure pleine"
+        elif difficulte == "moyen":
+            # Quarts d'heure
+            hours = random.randint(1, 12)
+            minutes = random.choice([0, 15, 30, 45])
+            precision = "quart d'heure"
+        else:
+            # Intervalles de 5 minutes
+            hours = random.randint(1, 12)
+            minutes = random.choice([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55])
+            precision = "5 minutes"
+        
+        # Contextes variés pour rendre l'exercice concret
+        contextes = [
+            "Léa regarde sa montre avant de partir à l'école.",
+            "Le réveil de Théo affiche cette heure.",
+            "L'horloge de la salle de classe indique cette heure.",
+            "Paul vérifie l'heure sur l'horloge de la cuisine.",
+            "Emma regarde la pendule du salon."
+        ]
+        
+        contexte = random.choice(contextes)
+        
+        # Générer le SVG de l'horloge
+        clock_svg = self._generate_clock_svg(hours, minutes, label="Horloge")
+        
+        # Construire l'énoncé
+        enonce = f"{contexte}\n\nQuelle heure est-il ?"
+        
+        # Construire la réponse formatée
+        if minutes == 0:
+            heure_str = f"{hours} h 00" if hours < 12 else "12 h 00"
+            heure_mots = f"{hours} heure{'s' if hours > 1 else ''}"
+        elif minutes == 15:
+            heure_str = f"{hours} h 15"
+            heure_mots = f"{hours} heure{'s' if hours > 1 else ''} et quart"
+        elif minutes == 30:
+            heure_str = f"{hours} h 30"
+            heure_mots = f"{hours} heure{'s' if hours > 1 else ''} et demie"
+        elif minutes == 45:
+            heure_suivante = hours + 1 if hours < 12 else 1
+            heure_str = f"{hours} h 45"
+            heure_mots = f"{heure_suivante} heure{'s' if heure_suivante > 1 else ''} moins le quart"
+        else:
+            heure_str = f"{hours} h {minutes:02d}"
+            heure_mots = f"{hours} heure{'s' if hours > 1 else ''} {minutes}"
+        
+        # Étapes de résolution pédagogiques
+        etapes = [
+            "1. Observer l'horloge :",
+            f"   - La petite aiguille (des heures) indique {hours}.",
+            f"   - La grande aiguille (des minutes) indique {minutes // 5 if minutes > 0 else 12} (soit {minutes} minutes).",
+            f"2. Lire l'heure : {heure_str}",
+            f"3. On peut aussi dire : {heure_mots}."
+        ]
+        
+        # Erreurs fréquentes à éviter (conseils pédagogiques)
+        conseils = [
+            "Attention : la petite aiguille indique les heures, la grande les minutes.",
+            "Pour les minutes, chaque graduation représente 5 minutes.",
+            f"Vérification : à {hours} h {minutes:02d}, la grande aiguille pointe vers le {minutes // 5 if minutes > 0 else 12}."
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.LECTURE_HORLOGE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "figure_svg": clock_svg,
+                "heures": hours,
+                "minutes": minutes,
+                "precision": precision,
+                "contexte": contexte,
+                "code_ref": "6M-HEURE-LECT"
+            },
+            solution_calculee={
+                "heure_numerique": heure_str,
+                "heure_mots": heure_mots,
+                "heures": hours,
+                "minutes": minutes
+            },
+            etapes_calculees=etapes,
+            resultat_final=heure_str,
+            conseils_prof=conseils
+        )
+    
+    def _gen_conversion_durees(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur Type 2: CONVERSIONS DE DURÉES
+        
+        Types de conversions:
+        - Facile: h → min (entiers simples)
+        - Moyen: min → h + min (avec reste), h min → min
+        - Difficile: conversions combinées, nombres plus grands
+        
+        Pas de figure SVG obligatoire.
+        """
+        
+        if difficulte == "facile":
+            # Heures vers minutes (entiers simples)
+            type_conv = random.choice(["h_vers_min", "min_vers_h_simple"])
+            
+            if type_conv == "h_vers_min":
+                heures = random.randint(1, 5)
+                resultat = heures * 60
+                
+                enonce = f"Convertir {heures} heure{'s' if heures > 1 else ''} en minutes."
+                
+                etapes = [
+                    f"1. Rappel : 1 heure = 60 minutes",
+                    f"2. Calcul : {heures} × 60 = {resultat}",
+                    f"3. Donc {heures} h = {resultat} min"
+                ]
+                
+                resultat_str = f"{resultat} min"
+                
+            else:  # min_vers_h_simple (multiples de 60)
+                heures = random.randint(1, 4)
+                minutes_total = heures * 60
+                
+                enonce = f"Convertir {minutes_total} minutes en heures."
+                
+                etapes = [
+                    f"1. Rappel : 60 minutes = 1 heure",
+                    f"2. Calcul : {minutes_total} ÷ 60 = {heures}",
+                    f"3. Donc {minutes_total} min = {heures} h"
+                ]
+                
+                resultat_str = f"{heures} h"
+                resultat = heures
+                
+        elif difficulte == "moyen":
+            type_conv = random.choice(["min_vers_h_min", "h_min_vers_min"])
+            
+            if type_conv == "min_vers_h_min":
+                # Minutes vers heures + minutes (avec reste)
+                heures = random.randint(1, 4)
+                minutes_reste = random.randint(1, 59)
+                minutes_total = heures * 60 + minutes_reste
+                
+                enonce = f"Convertir {minutes_total} minutes en heures et minutes."
+                
+                etapes = [
+                    f"1. Diviser par 60 pour trouver les heures",
+                    f"2. {minutes_total} ÷ 60 = {heures} reste {minutes_reste}",
+                    f"3. Quotient = {heures} (heures), Reste = {minutes_reste} (minutes)",
+                    f"4. Donc {minutes_total} min = {heures} h {minutes_reste} min"
+                ]
+                
+                resultat_str = f"{heures} h {minutes_reste} min"
+                resultat = {"heures": heures, "minutes": minutes_reste}
+                
+            else:  # h_min_vers_min
+                heures = random.randint(1, 3)
+                minutes = random.randint(5, 55)
+                minutes_total = heures * 60 + minutes
+                
+                enonce = f"Convertir {heures} h {minutes} min en minutes."
+                
+                etapes = [
+                    f"1. Convertir les heures en minutes : {heures} × 60 = {heures * 60} min",
+                    f"2. Ajouter les minutes restantes : {heures * 60} + {minutes} = {minutes_total}",
+                    f"3. Donc {heures} h {minutes} min = {minutes_total} min"
+                ]
+                
+                resultat_str = f"{minutes_total} min"
+                resultat = minutes_total
+                
+        else:  # difficile
+            type_conv = random.choice(["h_vers_min_grand", "min_vers_h_min_grand", "double_conversion"])
+            
+            if type_conv == "h_vers_min_grand":
+                heures = random.randint(5, 12)
+                minutes = random.randint(10, 50)
+                minutes_total = heures * 60 + minutes
+                
+                enonce = f"Convertir {heures} h {minutes} min en minutes."
+                
+                etapes = [
+                    f"1. Convertir les heures : {heures} × 60 = {heures * 60} min",
+                    f"2. Ajouter les minutes : {heures * 60} + {minutes} = {minutes_total}",
+                    f"3. Donc {heures} h {minutes} min = {minutes_total} min"
+                ]
+                
+                resultat_str = f"{minutes_total} min"
+                resultat = minutes_total
+                
+            elif type_conv == "min_vers_h_min_grand":
+                minutes_total = random.randint(150, 600)
+                heures = minutes_total // 60
+                minutes_reste = minutes_total % 60
+                
+                enonce = f"Convertir {minutes_total} minutes en heures et minutes."
+                
+                etapes = [
+                    f"1. Diviser par 60 : {minutes_total} ÷ 60",
+                    f"2. Quotient : {heures} (nombre d'heures)",
+                    f"3. Reste : {minutes_total} - ({heures} × 60) = {minutes_reste} (minutes)",
+                    f"4. Donc {minutes_total} min = {heures} h {minutes_reste} min"
+                ]
+                
+                resultat_str = f"{heures} h {minutes_reste} min"
+                resultat = {"heures": heures, "minutes": minutes_reste}
+                
+            else:  # double_conversion (avec secondes)
+                heures = random.randint(1, 2)
+                minutes = random.randint(10, 30)
+                secondes = heures * 3600 + minutes * 60
+                
+                enonce = f"Combien de secondes y a-t-il dans {heures} h {minutes} min ?"
+                
+                etapes = [
+                    f"1. Rappel : 1 h = 60 min = 3600 s",
+                    f"2. Heures en secondes : {heures} × 3600 = {heures * 3600} s",
+                    f"3. Minutes en secondes : {minutes} × 60 = {minutes * 60} s",
+                    f"4. Total : {heures * 3600} + {minutes * 60} = {secondes} s"
+                ]
+                
+                resultat_str = f"{secondes} s"
+                resultat = secondes
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.CONVERSION_DUREES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "type_conversion": type_conv if 'type_conv' in locals() else "conversion",
+                "code_ref": "6M-HEURE-CONV"
+            },
+            solution_calculee={"resultat": resultat if isinstance(resultat, (int, float)) else resultat_str},
+            etapes_calculees=etapes,
+            resultat_final=resultat_str
+        )
+    
+    def _gen_calcul_duree(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur Type 3: CALCUL DE DURÉE ENTRE DEUX INSTANTS
+        
+        Niveaux:
+        - Facile: même heure (ex: 14h10 à 14h45)
+        - Moyen: passage d'une heure à l'autre (ex: 14h25 à 15h10)
+        - Difficile: plusieurs heures (ex: 9h45 à 12h30)
+        
+        SVG RECOMMANDÉ : deux horloges côte à côte
+        """
+        
+        if difficulte == "facile":
+            # Durée dans la même heure
+            heure = random.randint(8, 17)
+            min_debut = random.choice([0, 5, 10, 15, 20])
+            min_fin = min_debut + random.randint(10, 40)
+            if min_fin >= 60:
+                min_fin = min_fin - 5
+            
+            h_fin = heure
+            duree_min = min_fin - min_debut
+            
+        elif difficulte == "moyen":
+            # Passage d'une heure
+            heure = random.randint(8, 16)
+            min_debut = random.randint(15, 50)
+            h_fin = heure + 1
+            min_fin = random.randint(5, 45)
+            
+            duree_min = (60 - min_debut) + min_fin
+            
+        else:
+            # Plusieurs heures
+            heure = random.randint(8, 12)
+            min_debut = random.randint(15, 55)
+            nb_heures = random.randint(2, 4)
+            h_fin = heure + nb_heures
+            min_fin = random.randint(0, 45)
+            
+            duree_min = (60 - min_debut) + (nb_heures - 1) * 60 + min_fin
+        
+        # Calculer les heures et minutes de durée
+        duree_h = duree_min // 60
+        duree_m = duree_min % 60
+        
+        # Contextes variés
+        contextes = [
+            ("film", f"Un film commence à {heure} h {min_debut:02d} et se termine à {h_fin} h {min_fin:02d}."),
+            ("trajet", f"Le train part à {heure} h {min_debut:02d} et arrive à {h_fin} h {min_fin:02d}."),
+            ("cours", f"Le cours de mathématiques commence à {heure} h {min_debut:02d} et se termine à {h_fin} h {min_fin:02d}."),
+            ("sport", f"L'entraînement de football débute à {heure} h {min_debut:02d} et finit à {h_fin} h {min_fin:02d}."),
+            ("visite", f"La visite du musée commence à {heure} h {min_debut:02d} et se termine à {h_fin} h {min_fin:02d}.")
+        ]
+        
+        type_contexte, contexte = random.choice(contextes)
+        
+        # Générer les SVG des deux horloges
+        clock1_svg = self._generate_clock_svg(heure, min_debut, size=150, label="Début")
+        clock2_svg = self._generate_clock_svg(h_fin, min_fin, size=150, label="Fin")
+        
+        # Combiner les deux horloges
+        combined_svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 200" width="350" height="200">
+  <g transform="translate(0, 0)">{clock1_svg.replace('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 180" width="150" height="180">', '').replace('</svg>', '')}</g>
+  <g transform="translate(180, 0)">{clock2_svg.replace('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 180" width="150" height="180">', '').replace('</svg>', '')}</g>
+  <text x="175" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#666">→</text>
+</svg>'''
+        
+        enonce = f"{contexte}\n\nQuelle est la durée totale ?"
+        
+        # Étapes de résolution (méthode par étapes)
+        if duree_h == 0:
+            etapes = [
+                f"1. Heure de début : {heure} h {min_debut:02d}",
+                f"2. Heure de fin : {h_fin} h {min_fin:02d}",
+                f"3. Calcul : {min_fin} - {min_debut} = {duree_min} min",
+                f"4. La durée est de {duree_min} minutes."
+            ]
+            resultat_str = f"{duree_min} min"
+        else:
+            etapes = [
+                f"1. Heure de début : {heure} h {min_debut:02d}",
+                f"2. Heure de fin : {h_fin} h {min_fin:02d}",
+                f"3. Méthode : calculer par étapes",
+                f"   • De {heure} h {min_debut:02d} à {heure + 1} h 00 : {60 - min_debut} min",
+            ]
+            if h_fin - heure > 1:
+                etapes.append(f"   • De {heure + 1} h 00 à {h_fin} h 00 : {h_fin - heure - 1} h = {(h_fin - heure - 1) * 60} min")
+            etapes.extend([
+                f"   • De {h_fin} h 00 à {h_fin} h {min_fin:02d} : {min_fin} min",
+                f"4. Total : {duree_min} min = {duree_h} h {duree_m} min"
+            ])
+            resultat_str = f"{duree_h} h {duree_m} min" if duree_m > 0 else f"{duree_h} h"
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.CALCUL_DUREE,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "figure_svg": combined_svg,
+                "heure_debut": heure,
+                "min_debut": min_debut,
+                "heure_fin": h_fin,
+                "min_fin": min_fin,
+                "contexte": type_contexte,
+                "code_ref": "6M-HEURE-CALC"
+            },
+            solution_calculee={
+                "duree_minutes": duree_min,
+                "duree_heures": duree_h,
+                "duree_minutes_reste": duree_m
+            },
+            etapes_calculees=etapes,
+            resultat_final=resultat_str
+        )
+    
+    def _gen_probleme_durees(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur Type 4: PROBLÈMES CONTEXTUALISÉS SUR LES DURÉES
+        
+        Contextes variés et réalistes:
+        - Film et cinéma
+        - Trajets et transports
+        - Entraînement sportif
+        - Journée scolaire
+        - Recettes de cuisine
+        
+        Chaque problème a un contexte concret - INTERDICTION D'ÉNONCÉS ABSTRAITS.
+        """
+        
+        if difficulte == "facile":
+            # Problèmes simples à une étape
+            type_prob = random.choice(["film", "trajet", "sport"])
+            
+            if type_prob == "film":
+                duree_min = random.choice([90, 105, 120, 135, 150])
+                duree_h = duree_min // 60
+                duree_m = duree_min % 60
+                
+                films = ["Le Roi Lion", "Harry Potter", "La Reine des Neiges", "Les Minions", "Spider-Man"]
+                film = random.choice(films)
+                
+                enonce = f"Le film « {film} » dure {duree_min} minutes.\nCombien de temps dure-t-il en heures et minutes ?"
+                
+                etapes = [
+                    f"1. Durée du film : {duree_min} minutes",
+                    f"2. Conversion : {duree_min} ÷ 60 = {duree_h} reste {duree_m}",
+                    f"3. Donc {duree_min} min = {duree_h} h {duree_m} min",
+                    f"4. Le film dure {duree_h} heure{'s' if duree_h > 1 else ''} et {duree_m} minutes."
+                ]
+                
+                resultat_str = f"{duree_h} h {duree_m} min"
+                
+            elif type_prob == "trajet":
+                heure_depart = random.randint(8, 14)
+                duree_h = random.randint(1, 2)
+                duree_m = random.choice([0, 15, 30, 45])
+                
+                h_arrivee = heure_depart + duree_h
+                m_arrivee = duree_m
+                
+                villes = [("Paris", "Lyon"), ("Marseille", "Nice"), ("Bordeaux", "Toulouse"), ("Lille", "Bruxelles")]
+                ville_dep, ville_arr = random.choice(villes)
+                
+                enonce = f"Un train part de {ville_dep} à {heure_depart} h 00.\nLe trajet dure {duree_h} h {duree_m if duree_m > 0 else '00'} min.\nÀ quelle heure arrive-t-il à {ville_arr} ?"
+                
+                etapes = [
+                    f"1. Heure de départ : {heure_depart} h 00",
+                    f"2. Durée du trajet : {duree_h} h {duree_m:02d} min",
+                    f"3. Calcul de l'arrivée :",
+                    f"   {heure_depart} h 00 + {duree_h} h {duree_m:02d} = {h_arrivee} h {m_arrivee:02d}",
+                    f"4. Le train arrive à {h_arrivee} h {m_arrivee:02d}."
+                ]
+                
+                resultat_str = f"{h_arrivee} h {m_arrivee:02d}"
+                duree_min = duree_h * 60 + duree_m
+                
+            else:  # sport
+                duree_min = random.choice([45, 60, 75, 90])
+                duree_h = duree_min // 60
+                duree_m = duree_min % 60
+                
+                sports = ["football", "basket", "natation", "tennis", "gymnastique"]
+                sport = random.choice(sports)
+                
+                enonce = f"L'entraînement de {sport} dure {duree_min} minutes.\nExprimer cette durée en heures et minutes."
+                
+                if duree_h == 0:
+                    resultat_str = f"{duree_min} min"
+                    etapes = [
+                        f"1. Durée : {duree_min} minutes",
+                        f"2. {duree_min} < 60, donc moins d'une heure",
+                        f"3. L'entraînement dure {duree_min} minutes (ou 0 h {duree_min} min)."
+                    ]
+                else:
+                    resultat_str = f"{duree_h} h {duree_m} min" if duree_m > 0 else f"{duree_h} h"
+                    etapes = [
+                        f"1. Durée : {duree_min} minutes",
+                        f"2. {duree_min} ÷ 60 = {duree_h} reste {duree_m}",
+                        f"3. L'entraînement dure {duree_h} h {duree_m} min."
+                    ]
+                    
+        elif difficulte == "moyen":
+            # Problèmes à deux étapes
+            type_prob = random.choice(["cinema", "journee_scolaire", "cuisine"])
+            
+            if type_prob == "cinema":
+                heure_debut = random.randint(14, 18)
+                duree_film = random.randint(90, 140)
+                duree_pub = random.randint(10, 20)
+                
+                duree_totale = duree_film + duree_pub
+                fin_h = heure_debut + duree_totale // 60
+                fin_m = duree_totale % 60
+                
+                enonce = f"La séance de cinéma commence à {heure_debut} h 00.\nIl y a {duree_pub} minutes de publicités, puis le film dure {duree_film} minutes.\nÀ quelle heure se termine la séance ?"
+                
+                etapes = [
+                    f"1. Durée totale : publicités + film",
+                    f"   {duree_pub} + {duree_film} = {duree_totale} min",
+                    f"2. Conversion : {duree_totale} ÷ 60 = {duree_totale // 60} h {duree_totale % 60} min",
+                    f"3. Heure de fin : {heure_debut} h 00 + {duree_totale // 60} h {duree_totale % 60} min",
+                    f"4. La séance se termine à {fin_h} h {fin_m:02d}."
+                ]
+                
+                resultat_str = f"{fin_h} h {fin_m:02d}"
+                duree_min = duree_totale
+                
+            elif type_prob == "journee_scolaire":
+                debut_matin = 8
+                fin_matin = 12
+                debut_aprem = 14
+                fin_aprem = 16
+                
+                duree_matin = (fin_matin - debut_matin) * 60
+                duree_aprem = (fin_aprem - debut_aprem) * 60
+                duree_totale = duree_matin + duree_aprem
+                
+                enonce = f"Une journée scolaire se déroule ainsi :\n• Matin : de {debut_matin} h à {fin_matin} h\n• Après-midi : de {debut_aprem} h à {fin_aprem} h\n\nQuelle est la durée totale de cours dans la journée ?"
+                
+                etapes = [
+                    f"1. Durée du matin : {fin_matin} - {debut_matin} = {fin_matin - debut_matin} h = {duree_matin} min",
+                    f"2. Durée de l'après-midi : {fin_aprem} - {debut_aprem} = {fin_aprem - debut_aprem} h = {duree_aprem} min",
+                    f"3. Durée totale : {duree_matin} + {duree_aprem} = {duree_totale} min",
+                    f"4. Conversion : {duree_totale} min = {duree_totale // 60} h",
+                    f"5. La journée compte {duree_totale // 60} heures de cours."
+                ]
+                
+                resultat_str = f"{duree_totale // 60} h"
+                duree_min = duree_totale
+                
+            else:  # cuisine
+                temps_prep = random.randint(15, 30)
+                temps_cuisson = random.randint(30, 60)
+                temps_repos = random.randint(10, 20)
+                
+                duree_totale = temps_prep + temps_cuisson + temps_repos
+                
+                plats = ["un gâteau au chocolat", "une tarte aux pommes", "des crêpes", "un gratin"]
+                plat = random.choice(plats)
+                
+                enonce = f"Pour préparer {plat}, il faut :\n• {temps_prep} min de préparation\n• {temps_cuisson} min de cuisson\n• {temps_repos} min de repos\n\nCombien de temps faut-il en tout ?"
+                
+                etapes = [
+                    f"1. Préparation : {temps_prep} min",
+                    f"2. Cuisson : {temps_cuisson} min",
+                    f"3. Repos : {temps_repos} min",
+                    f"4. Total : {temps_prep} + {temps_cuisson} + {temps_repos} = {duree_totale} min",
+                    f"5. Conversion : {duree_totale} min = {duree_totale // 60} h {duree_totale % 60} min"
+                ]
+                
+                if duree_totale % 60 == 0:
+                    resultat_str = f"{duree_totale // 60} h"
+                else:
+                    resultat_str = f"{duree_totale // 60} h {duree_totale % 60} min"
+                    
+                duree_min = duree_totale
+                
+        else:  # difficile
+            # Problèmes complexes à plusieurs étapes
+            type_prob = random.choice(["voyage", "planning", "competition"])
+            
+            if type_prob == "voyage":
+                h_depart = random.randint(6, 9)
+                m_depart = random.choice([0, 15, 30, 45])
+                
+                trajet1 = random.randint(45, 90)
+                pause = random.randint(15, 30)
+                trajet2 = random.randint(60, 120)
+                
+                duree_totale = trajet1 + pause + trajet2
+                
+                h_arrivee = h_depart + (m_depart + duree_totale) // 60
+                m_arrivee = (m_depart + duree_totale) % 60
+                
+                enonce = f"La famille Martin part en vacances.\nIls quittent la maison à {h_depart} h {m_depart:02d}.\n• Premier trajet : {trajet1} min\n• Pause déjeuner : {pause} min\n• Deuxième trajet : {trajet2} min\n\nÀ quelle heure arrivent-ils à destination ?"
+                
+                etapes = [
+                    f"1. Durée totale du voyage :",
+                    f"   {trajet1} + {pause} + {trajet2} = {duree_totale} min",
+                    f"2. Conversion : {duree_totale} min = {duree_totale // 60} h {duree_totale % 60} min",
+                    f"3. Calcul de l'heure d'arrivée :",
+                    f"   Départ : {h_depart} h {m_depart:02d}",
+                    f"   + {duree_totale // 60} h {duree_totale % 60} min",
+                    f"   = {h_arrivee} h {m_arrivee:02d}",
+                    f"4. Ils arrivent à {h_arrivee} h {m_arrivee:02d}."
+                ]
+                
+                resultat_str = f"{h_arrivee} h {m_arrivee:02d}"
+                duree_min = duree_totale
+                
+            elif type_prob == "planning":
+                activites = [
+                    ("Cours de français", random.randint(45, 55)),
+                    ("Récréation", random.randint(10, 15)),
+                    ("Cours de maths", random.randint(45, 55)),
+                    ("Déjeuner", random.randint(45, 60)),
+                    ("Cours de sport", random.randint(50, 60))
+                ]
+                
+                h_debut = 8
+                m_debut = 30
+                
+                duree_totale = sum(a[1] for a in activites)
+                h_fin = h_debut + (m_debut + duree_totale) // 60
+                m_fin = (m_debut + duree_totale) % 60
+                
+                activites_str = "\n".join([f"• {nom} : {duree} min" for nom, duree in activites])
+                
+                enonce = f"Voici le planning de la matinée de Jules qui commence à {h_debut} h {m_debut:02d} :\n{activites_str}\n\nÀ quelle heure Jules termine-t-il sa journée ?"
+                
+                etapes = [
+                    "1. Additionner toutes les durées :",
+                    f"   {' + '.join([str(a[1]) for a in activites])} = {duree_totale} min",
+                    f"2. Conversion : {duree_totale} min = {duree_totale // 60} h {duree_totale % 60} min",
+                    f"3. Heure de fin :",
+                    f"   {h_debut} h {m_debut:02d} + {duree_totale // 60} h {duree_totale % 60} min = {h_fin} h {m_fin:02d}",
+                    f"4. Jules termine à {h_fin} h {m_fin:02d}."
+                ]
+                
+                resultat_str = f"{h_fin} h {m_fin:02d}"
+                duree_min = duree_totale
+                
+            else:  # competition
+                h_debut = random.randint(9, 14)
+                nb_matchs = random.randint(3, 5)
+                duree_match = random.randint(20, 30)
+                pause_matchs = random.randint(5, 10)
+                
+                duree_totale = nb_matchs * duree_match + (nb_matchs - 1) * pause_matchs
+                h_fin = h_debut + duree_totale // 60
+                m_fin = duree_totale % 60
+                
+                sports = ["handball", "volley", "basket", "badminton"]
+                sport = random.choice(sports)
+                
+                enonce = f"Un tournoi de {sport} commence à {h_debut} h 00.\nIl y a {nb_matchs} matchs de {duree_match} minutes chacun.\nEntre chaque match, il y a {pause_matchs} minutes de pause.\n\nÀ quelle heure se termine le tournoi ?"
+                
+                etapes = [
+                    f"1. Temps des matchs : {nb_matchs} × {duree_match} = {nb_matchs * duree_match} min",
+                    f"2. Temps des pauses : {nb_matchs - 1} × {pause_matchs} = {(nb_matchs - 1) * pause_matchs} min",
+                    f"   (il y a {nb_matchs - 1} pauses entre {nb_matchs} matchs)",
+                    f"3. Durée totale : {nb_matchs * duree_match} + {(nb_matchs - 1) * pause_matchs} = {duree_totale} min",
+                    f"4. Conversion : {duree_totale} min = {duree_totale // 60} h {duree_totale % 60} min",
+                    f"5. Heure de fin : {h_debut} h 00 + {duree_totale // 60} h {duree_totale % 60} min = {h_fin} h {m_fin:02d}",
+                    f"6. Le tournoi se termine à {h_fin} h {m_fin:02d}."
+                ]
+                
+                resultat_str = f"{h_fin} h {m_fin:02d}"
+                duree_min = duree_totale
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.PROBLEME_DUREES,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "type_probleme": type_prob,
+                "code_ref": "6M-HEURE-PROB"
+            },
+            solution_calculee={
+                "duree_minutes": duree_min,
+                "resultat": resultat_str
+            },
+            etapes_calculees=etapes,
+            resultat_final=resultat_str
+        )
