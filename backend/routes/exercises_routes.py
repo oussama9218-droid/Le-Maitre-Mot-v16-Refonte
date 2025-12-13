@@ -535,7 +535,10 @@ async def generate_exercise(request: ExerciseGenerateRequest):
         "has_figure": spec.figure_geometrique is not None or svg_question is not None,
         # Nouveaux champs pour debug/identification du générateur
         "is_fallback": is_fallback,
-        "generator_code": generator_code
+        "generator_code": generator_code,
+        # Champs PREMIUM
+        "is_premium": use_premium if 'use_premium' in locals() else False,
+        "offer": request.offer
     }
     
     # ============================================================================
