@@ -12,13 +12,14 @@ Ces tests valident:
 import requests
 import pytest
 import json
+import time
 from typing import Dict, Any
 
 BASE_URL = "https://exercisefix.preview.emergentagent.com"
 API_URL = f"{BASE_URL}/api/v1/exercises"
 
 
-def generate_exercise(payload: Dict[str, Any]) -> Dict[str, Any]:
+def generate_exercise(payload: Dict[str, Any]) -> tuple:
     """Génère un exercice via l'API"""
     response = requests.post(
         f"{API_URL}/generate",
@@ -133,13 +134,16 @@ class TestVariation:
     """Tests des variations (même endpoint /generate avec seed différent)"""
     
     def test_variation_standard(self):
-        """Variation en mode standard"""
+        """Variation en mode standard - doit produire des contenus différents"""
         # Génération initiale
         data1, status1 = generate_exercise({
             "code_officiel": "6e_GM07",
             "difficulte": "moyen",
             "seed": 12345
         })
+        
+        # Attendre pour avoir un timestamp différent
+        time.sleep(1.1)
         
         # Variation (seed différent)
         data2, status2 = generate_exercise({
@@ -150,7 +154,7 @@ class TestVariation:
         
         assert status1 == 200
         assert status2 == 200
-        # Les deux doivent avoir des IDs différents
+        # Les deux doivent avoir des IDs différents (timestamp différent)
         assert data1["id_exercice"] != data2["id_exercice"]
     
     def test_variation_pro(self):
@@ -162,6 +166,9 @@ class TestVariation:
             "offer": "pro",
             "seed": 11111
         })
+        
+        # Attendre pour avoir un timestamp différent
+        time.sleep(1.1)
         
         # Variation PRO (seed différent)
         data2, status2 = generate_exercise({
@@ -176,6 +183,8 @@ class TestVariation:
         # Les deux doivent être PREMIUM
         assert data1.get("metadata", {}).get("is_premium") == True
         assert data2.get("metadata", {}).get("is_premium") == True
+        # Les deux doivent avoir des IDs différents
+        assert data1["id_exercice"] != data2["id_exercice"]
 
 
 class TestErrorHandling:
