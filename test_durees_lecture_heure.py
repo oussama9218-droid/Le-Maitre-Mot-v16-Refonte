@@ -202,7 +202,7 @@ class TestDureesLectureHeure:
             "chapitre": "Durées et lecture de l'heure",
             "niveau": "6e",
             "difficulte": "moyen",
-            "nb_exercices": 3
+            "nb_exercices": 1
         }
         
         success, response = self.run_test(
@@ -214,18 +214,17 @@ class TestDureesLectureHeure:
             timeout=60
         )
         
-        if success and isinstance(response, list):
-            print(f"   Généré {len(response)} exercices par nom de chapitre")
+        if success and isinstance(response, dict):  # Single exercise response
+            print(f"   Généré 1 exercice par nom de chapitre")
             
-            # Vérifier que les exercices sont bien du bon chapitre
-            chapter_match = True
-            for i, exercise in enumerate(response):
-                generator_code = exercise.get('metadata', {}).get('generator_code', '')
-                if not generator_code.startswith('6e_'):
-                    chapter_match = False
-                    print(f"   ❌ Exercice {i+1}: Code générateur incorrect {generator_code}")
-                else:
-                    print(f"   ✅ Exercice {i+1}: {generator_code}")
+            # Vérifier que l'exercice est bien du bon chapitre
+            generator_code = response.get('metadata', {}).get('generator_code', '')
+            chapter_match = generator_code.startswith('6e_') and any(x in generator_code for x in ['LECTURE_HORLOGE', 'CONVERSION_DUREES', 'CALCUL_DUREE', 'PROBLEME_DUREES'])
+            
+            if chapter_match:
+                print(f"   ✅ Exercice: {generator_code}")
+            else:
+                print(f"   ❌ Code générateur incorrect: {generator_code}")
             
             self.test_results["generation_by_name"] = chapter_match
             return chapter_match, response
