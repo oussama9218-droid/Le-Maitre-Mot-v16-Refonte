@@ -385,7 +385,7 @@ class CurriculumMigrationTester:
         
         if status_code == 200:
             is_fallback = response.get('metadata', {}).get('is_fallback', True)
-            has_svg = bool(response.get('figure_svg') or response.get('figure_svg_question'))
+            has_svg = bool(response.get('svg') or response.get('figure_svg') or response.get('figure_svg_question'))
             
             details['symetrie_is_fallback'] = is_fallback
             details['symetrie_has_svg'] = has_svg
