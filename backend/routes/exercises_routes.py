@@ -321,12 +321,29 @@ async def generate_exercise(request: ExerciseGenerateRequest):
         request.chapitre = curriculum_chapter.chapitre_backend
         
         # Convertir les types d'exercices du référentiel en enum
+        # IMPORTANT: En mode gratuit, filtrer les générateurs premium
         if curriculum_chapter.exercise_types:
             try:
+                # Liste des générateurs premium à exclure en mode gratuit
+                premium_only_generators = ["DUREES_PREMIUM"]
+                
+                # Filtrer selon l'offre
+                if request.offer == "pro":
+                    # Mode PRO: tous les générateurs disponibles
+                    filtered_types = curriculum_chapter.exercise_types
+                else:
+                    # Mode gratuit: exclure les générateurs premium
+                    filtered_types = [
+                        et for et in curriculum_chapter.exercise_types
+                        if et not in premium_only_generators
+                    ]
+                
                 exercise_types_override = [
-                    MathExerciseType[et] for et in curriculum_chapter.exercise_types
+                    MathExerciseType[et] for et in filtered_types
                     if hasattr(MathExerciseType, et)
                 ]
+                
+                logger.info(f"Types d'exercices filtrés pour {request.code_officiel} (offer={request.offer}): {filtered_types}")
             except Exception as e:
                 logger.warning(f"Erreur conversion exercise_types pour {request.code_officiel}: {e}")
         
