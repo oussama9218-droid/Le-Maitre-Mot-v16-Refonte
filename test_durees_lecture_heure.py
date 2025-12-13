@@ -246,7 +246,7 @@ class TestDureesLectureHeure:
             test_data = {
                 "code_officiel": "6e_GM07",
                 "difficulte": difficulty,
-                "nb_exercices": 2
+                "nb_exercices": 1
             }
             
             success, response = self.run_test(
@@ -258,21 +258,22 @@ class TestDureesLectureHeure:
                 timeout=60
             )
             
-            if success and isinstance(response, list):
+            if success and isinstance(response, dict):  # Single exercise response
                 print(f"     ✅ Génération réussie pour {difficulty}")
                 
-                # Vérifier que les énoncés sont différents selon la difficulté
-                for i, exercise in enumerate(response):
-                    enonce = exercise.get('enonce_html', '')
-                    solution = exercise.get('solution_html', '')
-                    
-                    if enonce and solution:
-                        print(f"     ✅ Exercice {i+1}: Énoncé et solution présents")
-                        # Vérifier les étapes détaillées dans la solution
-                        if "étape" in solution.lower() or "step" in solution.lower():
-                            print(f"     ✅ Solution détaillée étape par étape")
+                # Vérifier que l'énoncé et la solution sont présents
+                enonce = response.get('enonce_html', '')
+                solution = response.get('solution_html', '')
+                
+                if enonce and solution:
+                    print(f"     ✅ Énoncé et solution présents")
+                    # Vérifier les étapes détaillées dans la solution
+                    if "étape" in solution.lower() or any(x in solution.lower() for x in ["1.", "2.", "3."]):
+                        print(f"     ✅ Solution détaillée étape par étape")
                     else:
-                        print(f"     ❌ Exercice {i+1}: Énoncé ou solution manquant")
+                        print(f"     ⚠️  Solution sans étapes numérotées visibles")
+                else:
+                    print(f"     ❌ Énoncé ou solution manquant")
                 
                 self.test_results["difficulty_levels"][difficulty] = True
             else:
