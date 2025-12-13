@@ -144,6 +144,23 @@ const ExerciseGeneratorPage = () => {
   
   // Historique des codes utilisés (pour rotation)
   const [usedCodes, setUsedCodes] = useState([]);
+  
+  // États PRO - Détection de l'utilisateur premium
+  const [isPro, setIsPro] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  
+  // Initialiser l'authentification PRO
+  useEffect(() => {
+    const storedSessionToken = localStorage.getItem('lemaitremot_session_token');
+    const storedEmail = localStorage.getItem('lemaitremot_user_email');
+    const loginMethod = localStorage.getItem('lemaitremot_login_method');
+    
+    if (storedSessionToken && storedEmail && loginMethod === 'session') {
+      setUserEmail(storedEmail);
+      setIsPro(true);
+      console.log('🌟 Mode PRO activé:', storedEmail);
+    }
+  }, []);
 
   // Charger le catalogue au montage
   useEffect(() => {
