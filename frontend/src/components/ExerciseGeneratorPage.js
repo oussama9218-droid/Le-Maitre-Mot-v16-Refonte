@@ -686,6 +686,12 @@ const ExerciseGeneratorPage = () => {
                   {currentExercise.metadata?.difficulte && (
                     <Badge variant="secondary">{currentExercise.metadata.difficulte}</Badge>
                   )}
+                  {/* Badge PREMIUM si l'exercice est généré en mode PRO */}
+                  {currentExercise.metadata?.is_premium && (
+                    <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100 border border-purple-300">
+                      ⭐ PREMIUM
+                    </Badge>
+                  )}
                   {currentExercise.metadata?.is_fallback === false ? (
                     <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
                       ✓ Générateur dédié
