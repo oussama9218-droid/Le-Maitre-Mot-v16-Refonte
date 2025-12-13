@@ -296,11 +296,12 @@
       "niveau": "6e",
       "code_officiel": "6e_GM05",
       "domaine": "Grandeurs et mesures",
-      "libelle": "Durées et lecture de l'heure",
+      "libelle": "Durées : conversions et calculs",
       "chapitre_backend": "Longueurs, masses, durées",
       "exercise_types": [
-        "GRANDEURS_MESURES_DEDIE",
-        "CONVERSIONS_UNITES"
+        "CONVERSION_DUREES",
+        "CALCUL_DUREE",
+        "PROBLEME_DUREES"
       ],
       "schema_requis": true,
       "difficulte_min": 1,
@@ -308,10 +309,15 @@
       "statut": "prod",
       "tags": [
         "durées",
-        "heure",
-        "conversions"
+        "conversions",
+        "calcul"
       ],
-      "contexts": []
+      "contexts": [
+        "film",
+        "trajet",
+        "sport",
+        "école"
+      ]
     },
     {
       "niveau": "6e",
@@ -333,6 +339,35 @@
         "conversions"
       ],
       "contexts": []
+    },
+    {
+      "niveau": "6e",
+      "code_officiel": "6e_GM07",
+      "domaine": "Grandeurs et mesures",
+      "libelle": "Lecture de l'heure (horloge analogique)",
+      "chapitre_backend": "Durées et lecture de l'heure",
+      "exercise_types": [
+        "LECTURE_HORLOGE",
+        "CALCUL_DUREE",
+        "CONVERSION_DUREES",
+        "PROBLEME_DUREES"
+      ],
+      "schema_requis": true,
+      "difficulte_min": 1,
+      "difficulte_max": 3,
+      "statut": "prod",
+      "tags": [
+        "heure",
+        "horloge",
+        "lecture",
+        "SVG"
+      ],
+      "contexts": [
+        "école",
+        "sport",
+        "film",
+        "cuisine"
+      ]
     },
     {
       "niveau": "6e",
