@@ -168,6 +168,14 @@ class MathGenerationService:
             # Conversions - MISE À JOUR P1: Générateur dédié en priorité
             "Longueurs, masses, durées": [MathExerciseType.GRANDEURS_MESURES_DEDIE, MathExerciseType.CONVERSIONS_UNITES],
             
+            # ========== CHAPITRE MODÈLE: DURÉES ET LECTURE DE L'HEURE ==========
+            "Durées et lecture de l'heure": [
+                MathExerciseType.LECTURE_HORLOGE,
+                MathExerciseType.CONVERSION_DUREES,
+                MathExerciseType.CALCUL_DUREE,
+                MathExerciseType.PROBLEME_DUREES
+            ],
+            
             # ========== 6e - Calculs (Calcul mental, posés, instrumentés) ==========
             # MISE À JOUR P1: Utilisation des générateurs dédiés en priorité
             "Calcul mental": [MathExerciseType.CALCUL_MENTAL_DEDIE, MathExerciseType.PRIORITES_OPERATIONS],
