@@ -1,6 +1,65 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Chapitre "Durées et lecture de l'heure" (6e_GM07) Testing - 2025-12-12
+## Latest Test Session - Chapitre Modèle "Durées et lecture de l'heure" - 2025-12-13
+
+### Test Focus
+Implementation of a professional-quality reference chapter for 6th grade: "Durées et lecture de l'heure" with 4 dedicated exercise generators.
+
+### Changes Made
+
+#### Backend (math_models.py)
+- Added 4 new MathExerciseType enums:
+  - LECTURE_HORLOGE (clock reading with SVG)
+  - CONVERSION_DUREES (duration conversions)
+  - CALCUL_DUREE (duration calculation with dual clock SVG)
+  - PROBLEME_DUREES (contextualized problems)
+
+#### Backend (math_generation_service.py)
+- Added `_generate_clock_svg()` helper function for professional analog clock SVG
+- Implemented `_gen_lecture_horloge()` - Clock reading with mandatory SVG
+- Implemented `_gen_conversion_durees()` - Duration conversions (h↔min)
+- Implemented `_gen_calcul_duree()` - Duration calculation with two clocks SVG
+- Implemented `_gen_probleme_durees()` - Contextualized problems (film, travel, sports, school)
+- Added chapter mapping "Durées et lecture de l'heure"
+
+#### Backend (exercises_routes.py)
+- Fixed SVG extraction from parametres["figure_svg"]
+- Updated has_figure metadata to include SVG from parameters
+
+#### Curriculum (curriculum_6e.json)
+- Added chapter 6e_GM07 "Durées et lecture de l'heure" with all 4 generators
+
+### Test Results
+
+| Test | Result |
+|------|--------|
+| Curriculum check (6e_GM07) | ✅ |
+| Generation by code_officiel | ✅ |
+| LECTURE_HORLOGE SVG | ✅ (7354 chars, with clock face, hands, numbers) |
+| CALCUL_DUREE SVG | ✅ (14673 chars, dual clocks) |
+| CONVERSION_DUREES | ✅ (no SVG needed) |
+| PROBLEME_DUREES | ✅ (contextualized problems) |
+| 3 difficulty levels | ✅ (facile, moyen, difficile) |
+| Step-by-step solutions | ✅ |
+| metadata.is_fallback | ✅ (all false) |
+
+### SVG Quality Verification
+- Clock face: circle with border, 60 graduation marks
+- Hour numbers: 1-12 positioned correctly
+- Hour hand: thick, short
+- Minute hand: thin, long
+- Center dot: visible
+- Labels: "Début" and "Fin" for CALCUL_DUREE
+
+### Status Summary
+- **Backend Generators**: ✅ ALL 4 WORKING
+- **SVG Generation**: ✅ PROFESSIONAL QUALITY
+- **Pedagogical Content**: ✅ TEXTBOOK LEVEL
+- **Exercise Variety**: ✅ Multiple variants per type
+
+---
+
+## Previous Test Session - Chapitre "Durées et lecture de l'heure" (6e_GM07) Testing - 2025-12-12
 
 ### Test Focus
 Comprehensive testing of the new chapter "Durées et lecture de l'heure" (6e_GM07) with its 4 exercise types and SVG generation capabilities.
