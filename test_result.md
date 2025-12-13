@@ -1,6 +1,54 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Validation Curriculum Migration vers /generate - 2025-12-13
+## Latest Test Session - Migration Curriculum vers /generate - 2025-12-13
+
+### Test Focus
+Migration de /generate vers le référentiel curriculum officiel avec:
+- Endpoint catalogue pour alimenter le frontend
+- Toggle Mode Simple / Mode Officiel
+- Génération via code_officiel uniquement (plus de legacy hardcodé)
+
+### Tests d'Acceptation - Tous Passés ✅
+
+| Test | Description | Résultat |
+|------|-------------|----------|
+| Test 1 | GET /api/v1/curriculum/6e/catalog | ✅ 28 chapitres, 10 macro groups |
+| Test 2 | Mode Simple (macro group rotation) | ✅ 6e_GM07 utilisé, SVG trouvés |
+| Test 3 | Mode Officiel (6e_GM07 direct) | ✅ 4 types de générateurs, SVGs |
+| Test 4 | Non-régression (Fractions, Symétrie) | ✅ Tout fonctionne |
+| Test 5 | Validation structure réponse | ✅ Tous champs présents |
+| Test 6 | Compatibilité legacy | ✅ {"chapitre": "Fractions"} OK |
+
+### Changes Made
+
+#### Backend
+- **curriculum/curriculum_6e.json**: Ajout macro_groups, version 2, 6e_GM07
+- **curriculum/loader.py**: Fonctions get_catalog() et get_codes_for_macro_group()
+- **routes/curriculum_catalog_routes.py**: Nouveau endpoint GET /api/v1/curriculum/{level}/catalog
+
+#### Frontend
+- **ExerciseGeneratorPage.js**: Refonte complète V2
+  - Chargement catalogue depuis API
+  - Toggle Simple/Officiel
+  - Génération via code_officiel
+  - Rotation des codes en mode macro
+
+### Bug Fix "Longueurs, masses, durées" n'affiche pas GM07
+- **Cause**: /generate utilisait des listes hardcodées, pas le référentiel
+- **Fix**: Macro group "Longueurs, masses, durées" inclut maintenant ["6e_GM01","6e_GM05","6e_GM06","6e_GM07"]
+- **Résultat**: Les exercices de lecture d'heure avec SVG horloge sont maintenant générés
+
+### Status Summary
+- **Catalogue API**: ✅ OPÉRATIONNEL
+- **Frontend V2**: ✅ OPÉRATIONNEL
+- **Mode Simple**: ✅ AVEC ROTATION
+- **Mode Officiel**: ✅ 28 CHAPITRES
+- **SVG Horloges**: ✅ FONCTIONNEL
+- **Legacy API**: ✅ COMPATIBLE
+
+---
+
+## Previous Test Session - Validation Curriculum Migration vers /generate - 2025-12-13
 
 ### Test Focus
 Comprehensive validation of curriculum migration to /api/v1/exercises/generate endpoint with 6 mandatory acceptance tests covering catalog structure, generation modes, non-regression, response validation, and legacy compatibility.
