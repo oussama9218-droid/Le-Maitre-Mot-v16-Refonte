@@ -245,7 +245,7 @@ const Curriculum6eAdminPage = () => {
     
     if (!formData.code_officiel.trim()) {
       errors.code_officiel = 'Le code officiel est requis';
-    } else if (!/^6e_[A-Z0-9]+$/.test(formData.code_officiel)) {
+    } else if (!/^\d+[eE]_[A-Za-z0-9]+$/.test(formData.code_officiel)) {
       errors.code_officiel = 'Format invalide (ex: 6e_N01)';
     }
     
