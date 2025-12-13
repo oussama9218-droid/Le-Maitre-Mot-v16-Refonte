@@ -430,13 +430,19 @@ async def generate_exercise(request: ExerciseGenerateRequest):
         )
     
     # ============================================================================
-    # 4. GÉNÉRATION DU SVG (si figure géométrique présente)
+    # 4. GÉNÉRATION DU SVG (si figure géométrique présente OU figure_svg dans paramètres)
     # ============================================================================
     
     svg_question = None
     svg_correction = None
     
-    if spec.figure_geometrique:
+    # D'abord vérifier si un SVG est directement fourni dans les paramètres
+    if spec.parametres and spec.parametres.get("figure_svg"):
+        svg_question = spec.parametres.get("figure_svg")
+        svg_correction = spec.parametres.get("figure_svg_correction", svg_question)
+        logger.info(f"SVG fourni dans paramètres: {len(svg_question or '')} chars")
+    
+    elif spec.figure_geometrique:
         try:
             # V1-BE-002-FIX: Utiliser l'instance globale (performance)
             result = _geom_service.render_figure_to_svg(spec.figure_geometrique)
