@@ -463,7 +463,7 @@ const ExerciseGeneratorPage = () => {
                 </label>
                 <Select value={selectedItem} onValueChange={setSelectedItem}>
                   <SelectTrigger>
-                    <SelectValue placeholder={viewMode === "simple" ? "Choisir un {"thème"} : "Choisir un {`chapitre`}} />
+                    <SelectValue placeholder={viewMode === "simple" ? "Choisir un thème" : "Choisir un chapitre"} />
                   </SelectTrigger>
                   <SelectContent>
                     {displayItems.map((item) => (
