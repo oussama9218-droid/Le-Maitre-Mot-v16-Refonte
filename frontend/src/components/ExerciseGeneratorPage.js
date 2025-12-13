@@ -428,9 +428,16 @@ const ExerciseGeneratorPage = () => {
           <div className="flex items-center justify-center mb-4">
             <GraduationCap className="h-10 w-10 text-blue-600 mr-3" />
             <h1 className="text-4xl font-bold text-gray-900">Générateur d&apos;exercices</h1>
+            {/* Badge PRO si utilisateur connecté */}
+            {isPro && (
+              <Badge className="ml-3 bg-purple-600 text-white hover:bg-purple-700">
+                ⭐ PRO
+              </Badge>
+            )}
           </div>
           <p className="text-lg text-gray-600">
             Programme officiel de 6e • {catalog?.total_chapters || 0} chapitres disponibles
+            {isPro && <span className="text-purple-600 ml-2">• Générateurs premium activés</span>}
           </p>
         </div>
 
