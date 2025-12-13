@@ -1,22 +1,24 @@
 /**
- * ExerciseGeneratorPage - Générateur d'exercice simplifié (V1)
+ * ExerciseGeneratorPage - Générateur d'exercice (V2)
  * 
- * Nouveau mode de génération basé sur l'API V1 /api/v1/exercises/generate
- * Permet de générer 1, 3 ou 5 exercices d'un chapitre avec:
- * - Pagination des résultats
- * - Variation d'un exercice
- * - Export PDF
+ * Migration vers le référentiel officiel:
+ * - Charge le catalogue depuis /api/v1/curriculum/6e/catalog
+ * - Toggle Mode Simple / Mode Officiel
+ * - Génère toujours via code_officiel
  * 
- * Note: Ce composant est isolé et n'impacte pas le legacy (DocumentWizard, SheetBuilder)
+ * Mode Simple: chapitres macro regroupés
+ * Mode Officiel: 27 chapitres officiels du programme
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Badge } from "./ui/badge";
 import { Alert, AlertDescription } from "./ui/alert";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
 import { 
   BookOpen, 
   FileText, 
@@ -27,41 +29,33 @@ import {
   ChevronRight,
   AlertCircle,
   CheckCircle,
-  GraduationCap
+  GraduationCap,
+  Settings2,
+  Layers,
+  List
 } from "lucide-react";
 import MathRenderer from "./MathRenderer";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API_V1 = `${BACKEND_URL}/api/v1/exercises`;
+const CATALOG_API = `${BACKEND_URL}/api/v1/curriculum`;
 
 /**
  * MathHtmlRenderer - Composant pour rendre du HTML contenant du LaTeX
- * 
- * Ce composant gère les contenus mixtes (HTML + LaTeX) en:
- * 1. Préservant la structure HTML (tableaux, listes, divs, etc.)
- * 2. Appliquant MathRenderer aux zones de texte contenant du LaTeX
- * 
- * Utilisé pour l'API V1 qui renvoie du HTML avec des formules LaTeX.
  */
 const MathHtmlRenderer = ({ html, className = "" }) => {
   if (!html) {
     return null;
   }
 
-  // Fonction pour extraire le contenu texte principal et le rendre avec MathRenderer
-  // tout en préservant les éléments HTML (tables, SVG, etc.)
   const renderMixedContent = (htmlContent) => {
-    // Parser le HTML pour séparer les éléments HTML des textes contenant du LaTeX
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');
     
-    // Fonction récursive pour traiter les nœuds
     const processNode = (node, index = 0) => {
       if (node.nodeType === Node.TEXT_NODE) {
-        // Nœud texte : vérifier s'il contient du LaTeX
         const text = node.textContent;
         if (text && text.trim()) {
-          // Vérifier si le texte contient des patterns LaTeX
           const hasLatex = /\\(?:frac|sqrt|times|div|pm|cdot|leq|geq|neq|approx|[a-zA-Z]+)\{/.test(text) ||
                           /\^{[^}]+}/.test(text) ||
                           /_\{[^}]+\}/.test(text);
@@ -77,7 +71,6 @@ const MathHtmlRenderer = ({ html, className = "" }) => {
       if (node.nodeType === Node.ELEMENT_NODE) {
         const tagName = node.tagName.toLowerCase();
         
-        // Éléments qui doivent être rendus en HTML brut (SVG, tables, etc.)
         const rawHtmlElements = ['svg', 'table', 'img', 'br', 'hr'];
         if (rawHtmlElements.includes(tagName)) {
           return (
@@ -88,45 +81,28 @@ const MathHtmlRenderer = ({ html, className = "" }) => {
           );
         }
         
-        // Pour les autres éléments, traiter récursivement les enfants
         const children = Array.from(node.childNodes).map((child, i) => 
           processNode(child, index * 100 + i)
         ).filter(Boolean);
         
-        // Recréer l'élément avec ses enfants traités
         const props = { key: `elem-${index}` };
-        
-        // Copier les attributs importants
         if (node.className) props.className = node.className;
         if (node.id) props.id = node.id;
         
-        // Mapper les tags HTML vers React
         const reactTagMap = {
-          'div': 'div',
-          'p': 'p',
-          'span': 'span',
-          'strong': 'strong',
-          'b': 'b',
-          'em': 'em',
-          'i': 'i',
-          'ol': 'ol',
-          'ul': 'ul',
-          'li': 'li',
+          'div': 'div', 'p': 'p', 'span': 'span', 'strong': 'strong', 'b': 'b',
+          'em': 'em', 'i': 'i', 'ol': 'ol', 'ul': 'ul', 'li': 'li',
           'h1': 'h1', 'h2': 'h2', 'h3': 'h3', 'h4': 'h4', 'h5': 'h5', 'h6': 'h6',
-          'a': 'a',
-          'sup': 'sup',
-          'sub': 'sub'
+          'a': 'a', 'sup': 'sup', 'sub': 'sub'
         };
         
         const ReactTag = reactTagMap[tagName] || 'span';
-        
         return React.createElement(ReactTag, props, children.length > 0 ? children : null);
       }
       
       return null;
     };
     
-    // Traiter le body du document parsé
     const bodyChildren = Array.from(doc.body.childNodes).map((node, i) => 
       processNode(node, i)
     ).filter(Boolean);
@@ -142,12 +118,18 @@ const MathHtmlRenderer = ({ html, className = "" }) => {
 };
 
 const ExerciseGeneratorPage = () => {
+  // État du catalogue
+  const [catalog, setCatalog] = useState(null);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+  
+  // Mode d'affichage: "simple" (macro) ou "officiel" (micro)
+  const [viewMode, setViewMode] = useState("simple");
+  
   // États pour le formulaire
-  const [niveaux, setNiveaux] = useState([]);
-  const [chapitres, setChapitres] = useState([]);
-  const [selectedNiveau, setSelectedNiveau] = useState("");
-  const [selectedChapitre, setSelectedChapitre] = useState("");
+  const [selectedItem, setSelectedItem] = useState(""); // code_officiel ou label macro
+  const [selectedDomaine, setSelectedDomaine] = useState("all");
   const [nbExercices, setNbExercices] = useState(1);
+  const [difficulte, setDifficulte] = useState("moyen");
   
   // États pour la génération
   const [loading, setLoading] = useState(false);
@@ -159,80 +141,114 @@ const ExerciseGeneratorPage = () => {
   
   // États pour les variations
   const [loadingVariation, setLoadingVariation] = useState(false);
+  
+  // Historique des codes utilisés (pour rotation)
+  const [usedCodes, setUsedCodes] = useState([]);
 
-  // Charger les niveaux et chapitres depuis l'API health
+  // Charger le catalogue au montage
   useEffect(() => {
-    fetchCurriculumData();
+    fetchCatalog();
   }, []);
 
-  const fetchCurriculumData = async () => {
+  const fetchCatalog = async () => {
+    setCatalogLoading(true);
     try {
-      const response = await axios.get(`${API_V1}/health`);
-      const curriculum = response.data.curriculum;
-      
-      setNiveaux(curriculum.niveaux || []);
-      console.log('✅ Niveaux chargés:', curriculum.niveaux);
+      const response = await axios.get(`${CATALOG_API}/6e/catalog`);
+      setCatalog(response.data);
+      console.log('✅ Catalogue chargé:', response.data.total_chapters, 'chapitres,', response.data.total_macro_groups, 'groupes macro');
     } catch (error) {
-      console.error("Erreur lors du chargement du curriculum:", error);
-      setError("Impossible de charger les niveaux disponibles");
+      console.error("Erreur lors du chargement du catalogue:", error);
+      setError("Impossible de charger le catalogue");
+    } finally {
+      setCatalogLoading(false);
     }
   };
 
-  const fetchChapitres = async (niveau) => {
-    try {
-      // Appel à l'API backend pour obtenir les chapitres d'un niveau
-      // Pour l'instant, on simule avec l'API health qui ne donne pas les chapitres par niveau
-      // On fera un appel à /api/catalog comme dans MainApp
-      const response = await axios.get(`${BACKEND_URL}/api/catalog`);
-      const catalog = response.data.catalog || [];
+  // Obtenir les items à afficher selon le mode
+  const getDisplayItems = useCallback(() => {
+    if (!catalog) return [];
+    
+    if (viewMode === "simple") {
+      // Mode macro: retourne les macro_groups
+      return catalog.macro_groups
+        .filter(mg => mg.status !== "hidden")
+        .map(mg => ({
+          value: `macro:${mg.label}`,
+          label: mg.label,
+          description: mg.description,
+          codes: mg.codes_officiels,
+          status: mg.status,
+          hasGenerators: mg.total_generators > 0
+        }));
+    } else {
+      // Mode officiel: retourne les chapitres
+      let chapters = [];
+      catalog.domains.forEach(domain => {
+        domain.chapters.forEach(ch => {
+          if (ch.status !== "hidden") {
+            chapters.push({
+              value: ch.code_officiel,
+              label: ch.libelle,
+              domain: domain.name,
+              code: ch.code_officiel,
+              status: ch.status,
+              hasSvg: ch.has_svg,
+              hasGenerators: ch.generators.length > 0
+            });
+          }
+        });
+      });
       
-      // Trouver la matière Mathématiques
-      const maths = catalog.find(m => m.name === "Mathématiques");
-      if (!maths) {
-        setChapitres([]);
-        return;
+      // Filtrer par domaine si sélectionné
+      if (selectedDomaine !== "all") {
+        chapters = chapters.filter(ch => ch.domain === selectedDomaine);
       }
       
-      // Trouver le niveau sélectionné
-      const niveauData = maths.levels.find(l => l.name === niveau);
-      if (!niveauData) {
-        setChapitres([]);
-        return;
-      }
-      
-      // Extraire les chapitres
-      const allChapters = niveauData.chapters || [];
-      setChapitres(allChapters);
-      console.log('✅ Chapitres chargés pour', niveau, ':', allChapters.length);
-      
-    } catch (error) {
-      console.error("Erreur lors du chargement des chapitres:", error);
-      setChapitres([]);
+      return chapters;
     }
-  };
+  }, [catalog, viewMode, selectedDomaine]);
 
-  // Charger les chapitres quand le niveau change
-  useEffect(() => {
-    if (selectedNiveau) {
-      fetchChapitres(selectedNiveau);
-      setSelectedChapitre(""); // Reset du chapitre
-    }
-  }, [selectedNiveau]);
+  // Obtenir les domaines disponibles
+  const getDomaines = useCallback(() => {
+    if (!catalog) return [];
+    return catalog.domains.map(d => d.name);
+  }, [catalog]);
 
-  // P0-1: Reset des exercices quand niveau ou chapitre change
-  // Évite l'affichage des anciens exercices après changement de sélection
+  // Reset quand le mode change
   useEffect(() => {
-    // Vider les exercices générés précédemment
+    setSelectedItem("");
+    setSelectedDomaine("all");
     setExercises([]);
     setCurrentIndex(0);
     setError(null);
-    console.log('🔄 Reset exercices (changement niveau/chapitre)');
-  }, [selectedNiveau, selectedChapitre]);
+  }, [viewMode]);
 
-  // Générer les exercices (appels parallèles)
+  // Fonction pour choisir un code_officiel depuis un macro group (avec rotation)
+  const selectCodeFromMacro = useCallback((codes) => {
+    if (!codes || codes.length === 0) return null;
+    
+    // Filtrer les codes déjà utilisés récemment
+    const availableCodes = codes.filter(code => !usedCodes.includes(code));
+    
+    // Si tous les codes ont été utilisés, reset et recommencer
+    const codesToChooseFrom = availableCodes.length > 0 ? availableCodes : codes;
+    
+    // Choisir aléatoirement
+    const selectedCode = codesToChooseFrom[Math.floor(Math.random() * codesToChooseFrom.length)];
+    
+    // Mémoriser le code utilisé (garder les 10 derniers)
+    setUsedCodes(prev => {
+      const newUsed = [...prev, selectedCode].slice(-10);
+      return newUsed;
+    });
+    
+    return selectedCode;
+  }, [usedCodes]);
+
+  // Générer les exercices
   const generateExercises = async () => {
-    if (!selectedNiveau || !selectedChapitre) {
-      setError("Veuillez sélectionner un niveau et un chapitre");
+    if (!selectedItem) {
+      setError("Veuillez sélectionner un chapitre");
       return;
     }
 
@@ -242,68 +258,95 @@ const ExerciseGeneratorPage = () => {
     setCurrentIndex(0);
 
     try {
-      // Créer un tableau de promesses pour les appels parallèles
+      // Déterminer le code_officiel à utiliser
+      let codeOfficiel;
+      
+      if (selectedItem.startsWith("macro:")) {
+        // Mode macro: choisir un code parmi le groupe
+        const macroLabel = selectedItem.replace("macro:", "");
+        const macroGroup = catalog.macro_groups.find(mg => mg.label === macroLabel);
+        
+        if (!macroGroup || macroGroup.codes_officiels.length === 0) {
+          throw new Error(`Groupe "${macroLabel}" sans codes officiels`);
+        }
+        
+        codeOfficiel = selectCodeFromMacro(macroGroup.codes_officiels);
+        console.log(`📦 Mode macro "${macroLabel}" → code sélectionné: ${codeOfficiel}`);
+      } else {
+        // Mode officiel: utiliser directement le code
+        codeOfficiel = selectedItem;
+        console.log(`📋 Mode officiel → code: ${codeOfficiel}`);
+      }
+      
+      if (!codeOfficiel) {
+        throw new Error("Impossible de déterminer le code officiel");
+      }
+
+      // Créer les appels parallèles
       const promises = [];
       for (let i = 0; i < nbExercices; i++) {
-        // Seed différent pour chaque exercice
         const seed = Date.now() + i;
         
         const promise = axios.post(`${API_V1}/generate`, {
-          niveau: selectedNiveau,
-          chapitre: selectedChapitre,
-          difficulte: "moyen",
+          code_officiel: codeOfficiel,
+          difficulte: difficulte,
           seed: seed
         });
         
         promises.push(promise);
       }
 
-      // Exécuter tous les appels en parallèle
       const responses = await Promise.all(promises);
-      
-      // Extraire les données des réponses
       const generatedExercises = responses.map(response => response.data);
       
       setExercises(generatedExercises);
-      console.log('✅ Exercices générés:', generatedExercises.length);
+      console.log('✅ Exercices générés:', generatedExercises.length, 'via', codeOfficiel);
       
     } catch (error) {
       console.error("Erreur lors de la génération:", error);
       
-      // Gestion des erreurs 422 (niveau/chapitre invalide)
       if (error.response?.status === 422) {
         const detail = error.response.data.detail;
-        setError(detail.message || "Niveau ou chapitre invalide");
+        setError(detail.message || "Chapitre invalide ou non disponible");
       } else {
-        setError(error.response?.data?.detail || "Erreur lors de la génération des exercices");
+        setError(error.message || "Erreur lors de la génération des exercices");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Générer une variation d'un exercice spécifique
+  // Générer une variation
   const generateVariation = async (index) => {
-    if (!selectedNiveau || !selectedChapitre) return;
+    if (!selectedItem) return;
 
     setLoadingVariation(true);
     
     try {
+      // Même logique que generateExercises pour déterminer le code
+      let codeOfficiel;
+      
+      if (selectedItem.startsWith("macro:")) {
+        const macroLabel = selectedItem.replace("macro:", "");
+        const macroGroup = catalog.macro_groups.find(mg => mg.label === macroLabel);
+        codeOfficiel = selectCodeFromMacro(macroGroup?.codes_officiels || []);
+      } else {
+        codeOfficiel = selectedItem;
+      }
+      
       const seed = Date.now() + Math.random() * 1000;
       
       const response = await axios.post(`${API_V1}/generate`, {
-        niveau: selectedNiveau,
-        chapitre: selectedChapitre,
-        difficulte: "moyen",
+        code_officiel: codeOfficiel,
+        difficulte: difficulte,
         seed: seed
       });
       
-      // Remplacer l'exercice à cet index
       const newExercises = [...exercises];
       newExercises[index] = response.data;
       setExercises(newExercises);
       
-      console.log('✅ Variation générée pour exercice', index + 1);
+      console.log('✅ Variation générée via', codeOfficiel);
       
     } catch (error) {
       console.error("Erreur lors de la génération de variation:", error);
@@ -315,27 +358,33 @@ const ExerciseGeneratorPage = () => {
 
   // Navigation
   const goToPrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
+    if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
   };
 
   const goToNext = () => {
-    if (currentIndex < exercises.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
+    if (currentIndex < exercises.length - 1) setCurrentIndex(currentIndex + 1);
   };
 
-  // Export PDF (utilise le pdf_token de l'exercice)
+  // Export PDF (placeholder)
   const downloadPDF = (exercise) => {
-    // Pour la V1, le pdf_token est l'id_exercice
-    // On pourrait implémenter un endpoint /api/v1/exercises/{id}/pdf plus tard
-    // Pour l'instant, afficher un message
     alert(`Export PDF pour l'exercice ${exercise.id_exercice}\n\nFonctionnalité en cours d'implémentation...`);
-    console.log('PDF token:', exercise.pdf_token);
   };
 
   const currentExercise = exercises[currentIndex];
+  const displayItems = getDisplayItems();
+  const domaines = getDomaines();
+
+  // Loading du catalogue
+  if (catalogLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Chargement du référentiel...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -344,64 +393,116 @@ const ExerciseGeneratorPage = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <GraduationCap className="h-10 w-10 text-blue-600 mr-3" />
-            <h1 className="text-4xl font-bold text-gray-900">Générateur d'exercice</h1>
+            <h1 className="text-4xl font-bold text-gray-900">Générateur d'exercices</h1>
           </div>
           <p className="text-lg text-gray-600">
-            Générez rapidement 1 à 5 exercices d'un chapitre
+            Programme officiel de 6e • {catalog?.total_chapters || 0} chapitres disponibles
           </p>
         </div>
 
         {/* Formulaire de configuration */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              Configuration
-            </CardTitle>
-            <CardDescription>
-              Sélectionnez le niveau et le chapitre pour générer vos exercices
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Configuration
+                </CardTitle>
+                <CardDescription>
+                  Sélectionnez un chapitre pour générer vos exercices
+                </CardDescription>
+              </div>
+              
+              {/* Toggle Mode Simple / Officiel */}
+              <div className="flex items-center gap-3 bg-gray-100 px-4 py-2 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-gray-500" />
+                  <Label htmlFor="view-mode" className="text-sm text-gray-600">Simple</Label>
+                </div>
+                <Switch
+                  id="view-mode"
+                  checked={viewMode === "officiel"}
+                  onCheckedChange={(checked) => setViewMode(checked ? "officiel" : "simple")}
+                />
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="view-mode" className="text-sm text-gray-600">Officiel</Label>
+                  <List className="h-4 w-4 text-gray-500" />
+                </div>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              {/* Sélecteur de niveau */}
-              <div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+              {/* Filtre par domaine (mode officiel uniquement) */}
+              {viewMode === "officiel" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Domaine
+                  </label>
+                  <Select value={selectedDomaine} onValueChange={setSelectedDomaine}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Tous les domaines" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tous les domaines</SelectItem>
+                      {domaines.map((domaine) => (
+                        <SelectItem key={domaine} value={domaine}>
+                          {domaine}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Sélecteur de chapitre / groupe macro */}
+              <div className={viewMode === "officiel" ? "md:col-span-1" : "md:col-span-2"}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Niveau
+                  {viewMode === "simple" ? "Thème" : "Chapitre officiel"}
                 </label>
-                <Select value={selectedNiveau} onValueChange={setSelectedNiveau}>
+                <Select value={selectedItem} onValueChange={setSelectedItem}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Choisir un niveau" />
+                    <SelectValue placeholder={viewMode === "simple" ? "Choisir un thème" : "Choisir un chapitre"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {niveaux.map((niveau) => (
-                      <SelectItem key={niveau} value={niveau}>
-                        {niveau}
+                    {displayItems.map((item) => (
+                      <SelectItem 
+                        key={item.value} 
+                        value={item.value}
+                        disabled={!item.hasGenerators}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>{item.label}</span>
+                          {item.hasSvg && (
+                            <Badge variant="outline" className="text-xs">SVG</Badge>
+                          )}
+                          {item.status === "beta" && (
+                            <Badge variant="secondary" className="text-xs">beta</Badge>
+                          )}
+                          {!item.hasGenerators && (
+                            <Badge variant="destructive" className="text-xs">indispo</Badge>
+                          )}
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* Sélecteur de chapitre */}
+              {/* Difficulté */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Chapitre
+                  Difficulté
                 </label>
-                <Select 
-                  value={selectedChapitre} 
-                  onValueChange={setSelectedChapitre}
-                  disabled={!selectedNiveau}
-                >
+                <Select value={difficulte} onValueChange={setDifficulte}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Choisir un chapitre" />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {chapitres.map((chapitre) => (
-                      <SelectItem key={chapitre} value={chapitre}>
-                        {chapitre}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="facile">Facile</SelectItem>
+                    <SelectItem value="moyen">Moyen</SelectItem>
+                    <SelectItem value="difficile">Difficile</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -409,7 +510,7 @@ const ExerciseGeneratorPage = () => {
               {/* Nombre d'exercices */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nombre d'exercices
+                  Nombre
                 </label>
                 <Select 
                   value={nbExercices.toString()} 
@@ -427,10 +528,27 @@ const ExerciseGeneratorPage = () => {
               </div>
             </div>
 
+            {/* Info sur le mode sélectionné */}
+            {selectedItem && (
+              <div className="mb-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
+                {selectedItem.startsWith("macro:") ? (
+                  <>
+                    <Settings2 className="h-4 w-4 inline mr-2" />
+                    <strong>Mode simple :</strong> Un chapitre sera sélectionné automatiquement parmi le groupe
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4 inline mr-2" />
+                    <strong>Code officiel :</strong> {selectedItem}
+                  </>
+                )}
+              </div>
+            )}
+
             {/* Bouton Générer */}
             <Button 
               onClick={generateExercises}
-              disabled={!selectedNiveau || !selectedChapitre || loading}
+              disabled={!selectedItem || loading}
               className="w-full"
               size="lg"
             >
@@ -447,7 +565,6 @@ const ExerciseGeneratorPage = () => {
               )}
             </Button>
 
-            {/* P1-1: Indicateur de chargement amélioré */}
             {loading && (
               <div className="flex items-center justify-center mt-4 p-4 bg-blue-50 rounded-lg">
                 <Loader2 className="h-5 w-5 animate-spin text-blue-600 mr-3" />
@@ -470,7 +587,6 @@ const ExerciseGeneratorPage = () => {
         {/* Affichage des exercices */}
         {exercises.length > 0 && currentExercise && (
           <div className="space-y-6">
-            {/* Navigation et actions */}
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-4">
@@ -515,7 +631,6 @@ const ExerciseGeneratorPage = () => {
                       <span className="ml-2">Variation</span>
                     </Button>
                     
-                    {/* P2-1: Bouton PDF avec label "prochainement" */}
                     <Button
                       variant="outline"
                       size="sm"
@@ -537,7 +652,6 @@ const ExerciseGeneratorPage = () => {
                   {currentExercise.metadata?.difficulte && (
                     <Badge variant="secondary">{currentExercise.metadata.difficulte}</Badge>
                   )}
-                  {/* Badge générateur dédié vs fallback (pour debug) */}
                   {currentExercise.metadata?.is_fallback === false ? (
                     <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
                       ✓ Générateur dédié
@@ -547,7 +661,6 @@ const ExerciseGeneratorPage = () => {
                       ⚠ Exercice générique (beta)
                     </Badge>
                   ) : null}
-                  {/* Code générateur pour debug (visible au survol) */}
                   {currentExercise.metadata?.generator_code && (
                     <Badge 
                       variant="outline" 
@@ -559,7 +672,7 @@ const ExerciseGeneratorPage = () => {
                   )}
                 </div>
 
-                {/* Énoncé (inclut la figure si présente via enonce_html) */}
+                {/* Énoncé */}
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                     <FileText className="h-5 w-5" />
@@ -570,11 +683,7 @@ const ExerciseGeneratorPage = () => {
                   </div>
                 </div>
 
-                {/* Note: La section "Figure SVG" séparée a été supprimée car la figure 
-                    est déjà incluse dans enonce_html via build_enonce_html() côté backend.
-                    Cela évite la duplication visuelle de la figure. */}
-
-                {/* Solution (repliable) */}
+                {/* Solution */}
                 <details className="bg-green-50 p-4 rounded-lg border border-green-200">
                   <summary className="cursor-pointer font-semibold text-green-900 flex items-center gap-2">
                     <CheckCircle className="h-5 w-5" />
@@ -595,7 +704,13 @@ const ExerciseGeneratorPage = () => {
             <CardContent className="py-12 text-center text-gray-500">
               <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <p className="text-lg">
-                Sélectionnez un niveau et un chapitre, puis cliquez sur "Générer" pour commencer
+                Sélectionnez un {viewMode === "simple" ? "thème" : "chapitre"}, puis cliquez sur "Générer" pour commencer
+              </p>
+              <p className="text-sm mt-2 text-gray-400">
+                {viewMode === "simple" 
+                  ? "Le mode simple regroupe les chapitres par thème" 
+                  : "Le mode officiel affiche les 27 chapitres du programme"
+                }
               </p>
             </CardContent>
           </Card>
