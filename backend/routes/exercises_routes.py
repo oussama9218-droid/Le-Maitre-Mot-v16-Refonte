@@ -403,7 +403,7 @@ async def generate_exercise(request: ExerciseGenerateRequest):
         
         if request.offer == "pro" and request.code_officiel:
             # Vérifier si le chapitre a des générateurs premium
-            from curriculum.loader import get_chapter_by_official_code
+            # Note: get_chapter_by_official_code est déjà importé en haut du fichier
             chapter_info = get_chapter_by_official_code(request.code_officiel)
             if chapter_info and hasattr(chapter_info, 'exercise_types'):
                 # Chercher DUREES_PREMIUM dans les types
