@@ -23,6 +23,10 @@ CURRICULUM_6E_PATH = os.path.join(CURRICULUM_DIR, "curriculum_6e.json")
 CURRICULUM_COLLECTION = "curriculum_chapters"
 
 
+import re
+from pydantic import field_validator
+
+
 def normalize_code_officiel(code: str) -> str:
     """
     Normalise le code officiel au format canonique.
@@ -34,7 +38,6 @@ def normalize_code_officiel(code: str) -> str:
         return code
     
     # Pattern: niveau_reste (ex: 6e_N01, 5e_G02)
-    import re
     match = re.match(r'^(\d+[eE])_(.+)$', code)
     if match:
         niveau = match.group(1).lower()  # 6e, 5e, etc. en minuscules
@@ -58,13 +61,11 @@ class ChapterCreateRequest(BaseModel):
     tags: List[str] = Field(default_factory=list, description="Tags pour filtrage")
     contexts: List[str] = Field(default_factory=list, description="Contextes disponibles")
     
+    @field_validator('code_officiel', mode='before')
     @classmethod
-    def model_validate(cls, obj, *args, **kwargs):
-        """Normalise le code_officiel avant la validation"""
-        if isinstance(obj, dict) and 'code_officiel' in obj:
-            obj = obj.copy()
-            obj['code_officiel'] = normalize_code_officiel(obj['code_officiel'])
-        return super().model_validate(obj, *args, **kwargs)
+    def normalize_code(cls, v: str) -> str:
+        """Normalise le code_officiel au format canonique"""
+        return normalize_code_officiel(v)
 
 
 class ChapterUpdateRequest(BaseModel):
