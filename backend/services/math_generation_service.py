@@ -361,7 +361,9 @@ class MathGenerationService:
             MathExerciseType.LECTURE_HORLOGE: self._gen_lecture_horloge,
             MathExerciseType.CONVERSION_DUREES: self._gen_conversion_durees,
             MathExerciseType.CALCUL_DUREE: self._gen_calcul_duree,
-            MathExerciseType.PROBLEME_DUREES: self._gen_probleme_durees
+            MathExerciseType.PROBLEME_DUREES: self._gen_probleme_durees,
+            # ========== GÉNÉRATEUR PREMIUM: DURÉES (6e_GM07) ==========
+            MathExerciseType.DUREES_PREMIUM: self._gen_durees_premium
         }
         
         generator = generators.get(exercise_type)
