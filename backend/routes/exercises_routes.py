@@ -397,7 +397,32 @@ async def generate_exercise(request: ExerciseGenerateRequest):
         # V1-BE-002-FIX: Utiliser l'instance globale (performance)
         # Générer l'exercice avec le service math
         
-        if exercise_types_override and len(exercise_types_override) > 0:
+        # PREMIUM CHECK: Si offer=pro et générateur premium disponible
+        use_premium = False
+        premium_generators = []
+        
+        if request.offer == "pro" and request.code_officiel:
+            # Vérifier si le chapitre a des générateurs premium
+            from curriculum.loader import get_chapter_by_official_code
+            chapter_info = get_chapter_by_official_code(request.code_officiel)
+            if chapter_info and hasattr(chapter_info, 'exercise_types'):
+                # Chercher DUREES_PREMIUM dans les types
+                if "DUREES_PREMIUM" in chapter_info.exercise_types:
+                    use_premium = True
+                    premium_generators = ["DUREES_PREMIUM"]
+                    logger.info(f"🌟 Mode PREMIUM activé pour {request.code_officiel}")
+        
+        if use_premium and premium_generators:
+            # Utiliser le générateur premium
+            from models.math_models import MathExerciseType
+            specs = _math_service.generate_math_exercise_specs_with_types(
+                niveau=request.niveau,
+                chapitre=request.chapitre,
+                difficulte=request.difficulte,
+                exercise_types=[MathExerciseType(g) for g in premium_generators],
+                nb_exercices=1
+            )
+        elif exercise_types_override and len(exercise_types_override) > 0:
             # Mode code_officiel : utiliser les types spécifiés dans le référentiel
             specs = _math_service.generate_math_exercise_specs_with_types(
                 niveau=request.niveau,
