@@ -1769,3 +1769,45 @@ agent_communication:
 - [ ] Export PDF V1
 - [ ] Implémentation niveau 5e
 
+
+---
+
+## Latest Test Session - PREMIUM Generator Bug Fix - 2025-12-13
+
+### Test Focus
+Correction de deux bugs critiques dans l'implémentation du générateur PREMIUM pour le chapitre "Durées et lecture de l'heure" (6e_GM07):
+1. **Bug 1 (UnboundLocalError)**: Import redondant de `get_chapter_by_official_code` causant une erreur à l'exécution
+2. **Bug 2 (Invalid MathExerciseType)**: Utilisation de `MathExerciseType(g)` au lieu de `MathExerciseType[g]`
+
+### Bugs Corrigés
+
+#### Bug 1 - UnboundLocalError: 'get_chapter_by_official_code'
+- **Localisation**: `/app/backend/routes/exercises_routes.py` ligne 406
+- **Problème**: Import redondant `from curriculum.loader import get_chapter_by_official_code` dans le bloc conditionnel `if request.offer == "pro"`
+- **Cause**: Python traite la variable comme locale dans toute la fonction, créant une UnboundLocalError à la ligne 307 (avant l'import à la ligne 406)
+- **Solution**: Suppression de l'import redondant (la fonction est déjà importée en haut du fichier)
+
+#### Bug 2 - 'DUREES_PREMIUM' is not a valid MathExerciseType
+- **Localisation**: `/app/backend/routes/exercises_routes.py` ligne 422
+- **Problème**: `MathExerciseType(g)` tente d'accéder par valeur (`"durees_premium"`) au lieu du nom (`"DUREES_PREMIUM"`)
+- **Solution**: Changement en `MathExerciseType[g]` (accès par nom/clé)
+
+### Tests Exécutés
+
+| Test | Endpoint | Résultat | Détails |
+|------|----------|----------|---------|
+| Test 1 - Mode Standard | POST /api/v1/exercises/generate (6e_GM07, offer=free) | ✅ OK | generator: CALCUL_DUREE, is_premium: false |
+| Test 2 - Mode PREMIUM | POST /api/v1/exercises/generate (6e_GM07, offer=pro) | ✅ OK | generator: DUREES_PREMIUM, is_premium: true |
+| Test 3 - Mode Legacy | POST /api/v1/exercises/generate (niveau+chapitre) | ✅ OK | generator: FRACTION_COMPARAISON |
+| Test 4 - Autre chapitre | POST /api/v1/exercises/generate (6e_N08) | ✅ OK | generator: FRACTION_REPRESENTATION |
+
+### Status Summary
+- **Bug 1 (UnboundLocalError)**: ✅ CORRIGÉ
+- **Bug 2 (Invalid MathExerciseType)**: ✅ CORRIGÉ
+- **Génération Standard**: ✅ FONCTIONNEL
+- **Génération PREMIUM**: ✅ FONCTIONNEL
+- **Compatibilité Legacy**: ✅ MAINTENUE
+
+### Files Modified
+- `/app/backend/routes/exercises_routes.py` - Suppression import redondant + correction accès enum
+
