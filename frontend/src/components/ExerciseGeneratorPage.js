@@ -704,12 +704,12 @@ const ExerciseGeneratorPage = () => {
             <CardContent className="py-12 text-center text-gray-500">
               <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <p className="text-lg">
-                Sélectionnez un {viewMode === "simple" ? "{"thème"} : "{`chapitre`}}, puis cliquez sur "Générer" pour commencer
+                Sélectionnez un {viewMode === "simple" ? "thème" : "chapitre"}, puis cliquez sur Générer pour commencer
               </p>
               <p className="text-sm mt-2 text-gray-400">
                 {viewMode === "simple" 
-                  ? "Le mode simple regroupe les chapitres par {"thème"} 
-                  : "Le mode officiel affiche les 27 chapitres du programme"
+                  ? "Le mode simple regroupe les chapitres par thème" 
+                  : "Le mode officiel affiche les 28 chapitres du programme"
                 }
               </p>
             </CardContent>
