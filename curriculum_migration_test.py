@@ -143,7 +143,7 @@ class CurriculumMigrationTester:
         
         # Vérifier 6e_GM07 générateurs
         gm07_chapter = None
-        for chapter in chapters:
+        for chapter in all_chapters:
             if chapter.get('code_officiel') == '6e_GM07':
                 gm07_chapter = chapter
                 break
