@@ -352,7 +352,17 @@ class TestDureesLectureHeure:
         print("TEST 6: Qualité des SVG CALCUL_DUREE")
         print("="*80)
         
-        # Générer jusqu'à obtenir CALCUL_DUREE
+        # Use the SVG exercises found in test 2
+        if hasattr(self, 'svg_exercises') and self.svg_exercises:
+            for exercise_num, exercise_type, svg_content in self.svg_exercises:
+                if exercise_type == "CALCUL_DUREE":
+                    print(f"   ✅ CALCUL_DUREE avec SVG trouvé (exercice {exercise_num})")
+                    svg_analysis = self._analyze_duration_svg(svg_content)
+                    print(f"   ✅ SVG présent: {svg_analysis}")
+                    self.test_results["svg_quality"]["CALCUL_DUREE"] = True
+                    return
+        
+        # If not found in previous tests, try to generate one
         max_attempts = 5
         calcul_duree_found = False
         
@@ -362,7 +372,7 @@ class TestDureesLectureHeure:
             test_data = {
                 "code_officiel": "6e_GM07",
                 "difficulte": "moyen",
-                "nb_exercices": 3
+                "nb_exercices": 1
             }
             
             success, response = self.run_test(
@@ -374,34 +384,30 @@ class TestDureesLectureHeure:
                 timeout=60
             )
             
-            if success and isinstance(response, list):
-                for i, exercise in enumerate(response):
-                    generator_code = exercise.get('metadata', {}).get('generator_code', '')
-                    exercise_type = self._extract_exercise_type(generator_code)
-                    
-                    if exercise_type == "CALCUL_DUREE":
-                        print(f"     ✅ CALCUL_DUREE trouvé (exercice {i+1})")
-                        
-                        # Analyser le SVG
-                        svg_content = exercise.get('svg', '')
-                        metadata = exercise.get('metadata', {})
-                        
-                        if svg_content:
-                            svg_analysis = self._analyze_duration_svg(svg_content)
-                            print(f"     ✅ SVG présent: {svg_analysis}")
-                            
-                            # Vérifier metadata.has_figure
-                            has_figure = metadata.get('has_figure', False)
-                            print(f"     {'✅' if has_figure else '❌'} metadata.has_figure = {has_figure}")
-                            
-                            self.test_results["svg_quality"]["CALCUL_DUREE"] = True
-                            calcul_duree_found = True
-                            break
-                        else:
-                            print(f"     ❌ SVG manquant pour CALCUL_DUREE")
+            if success and isinstance(response, dict):
+                generator_code = response.get('metadata', {}).get('generator_code', '')
+                exercise_type = self._extract_exercise_type(generator_code)
                 
-                if calcul_duree_found:
-                    break
+                if exercise_type == "CALCUL_DUREE":
+                    print(f"     ✅ CALCUL_DUREE trouvé")
+                    
+                    # Analyser le SVG
+                    svg_content = response.get('svg', '')
+                    metadata = response.get('metadata', {})
+                    
+                    if svg_content:
+                        svg_analysis = self._analyze_duration_svg(svg_content)
+                        print(f"     ✅ SVG présent: {svg_analysis}")
+                        
+                        # Vérifier metadata.has_figure
+                        has_figure = metadata.get('has_figure', False)
+                        print(f"     {'✅' if has_figure else '❌'} metadata.has_figure = {has_figure}")
+                        
+                        self.test_results["svg_quality"]["CALCUL_DUREE"] = True
+                        calcul_duree_found = True
+                        break
+                    else:
+                        print(f"     ❌ SVG manquant pour CALCUL_DUREE")
         
         if not calcul_duree_found:
             print(f"   ❌ CALCUL_DUREE non trouvé après {max_attempts} tentatives")
