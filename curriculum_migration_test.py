@@ -105,23 +105,26 @@ class CurriculumMigrationTester:
             success = False
             details['macro_groups_error'] = f"Expected >=10, got {len(macro_groups)}"
         
-        # Vérifier les chapitres ont des status
-        chapters = response.get('chapters', [])
+        # Vérifier les chapitres ont des status (dans domains)
+        all_chapters = []
+        for domain in response.get('domains', []):
+            all_chapters.extend(domain.get('chapters', []))
+        
         valid_statuses = ['prod', 'beta', 'hidden']
         chapters_with_status = 0
-        for chapter in chapters:
+        for chapter in all_chapters:
             if chapter.get('status') in valid_statuses:
                 chapters_with_status += 1
         
-        details['chapters_with_valid_status'] = f"{chapters_with_status}/{len(chapters)}"
-        if chapters_with_status < len(chapters) * 0.9:  # Au moins 90% avec status valide
+        details['chapters_with_valid_status'] = f"{chapters_with_status}/{len(all_chapters)}"
+        if chapters_with_status < len(all_chapters) * 0.9:  # Au moins 90% avec status valide
             success = False
             details['status_error'] = "Not all chapters have valid status"
         
         # Vérifier "Longueurs, masses, durées"
         longueurs_group = None
         for group in macro_groups:
-            if "Longueurs, masses, durées" in group.get('name', ''):
+            if "Longueurs, masses, durées" in group.get('label', ''):
                 longueurs_group = group
                 break
         
