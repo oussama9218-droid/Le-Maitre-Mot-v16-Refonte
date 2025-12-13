@@ -188,7 +188,7 @@ class CurriculumMigrationTester:
         # Trouver le groupe "Longueurs, masses, durées"
         longueurs_codes = []
         for group in catalog.get('macro_groups', []):
-            if "Longueurs, masses, durées" in group.get('name', ''):
+            if "Longueurs, masses, durées" in group.get('label', ''):
                 longueurs_codes = group.get('codes_officiels', [])
                 break
         
