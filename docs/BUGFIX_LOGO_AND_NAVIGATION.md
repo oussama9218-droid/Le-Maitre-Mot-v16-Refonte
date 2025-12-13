@@ -225,7 +225,7 @@ ls -la /app/backend/uploads/logos/
 ls -la /app/backend/uploads/
 
 # Vérifier la config utilisateur
-curl -X GET "https://math-navigator-2.preview.emergentagent.com/api/mathalea/pro/config" \
+curl -X GET "https://exercisefix.preview.emergentagent.com/api/mathalea/pro/config" \
   -H "X-Session-Token: email@example.com" | jq '.logo_url'
 ```
 
@@ -258,8 +258,8 @@ const logoUrl = logo_url.startsWith('http')
 
 **Exemple** :
 - Base : `/uploads/logos/abc123.png`
-- API_BASE_URL : `https://math-navigator-2.preview.emergentagent.com`
-- Résultat : `https://math-navigator-2.preview.emergentagent.com/uploads/logos/abc123.png`
+- API_BASE_URL : `https://exercisefix.preview.emergentagent.com`
+- Résultat : `https://exercisefix.preview.emergentagent.com/uploads/logos/abc123.png`
 
 ### Sécurité du nouvel onglet
 

@@ -9,7 +9,7 @@ import sys
 
 def test_admin_crud_apis():
     """Test Admin Page V2 CRUD APIs for curriculum management"""
-    base_url = "https://math-navigator-2.preview.emergentagent.com"
+    base_url = "https://exercisefix.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     print("🔧 TESTING ADMIN PAGE V2 CRUD APIs")

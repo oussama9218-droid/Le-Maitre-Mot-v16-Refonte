@@ -15,7 +15,7 @@ class LibPangoFT2FixTester:
     def __init__(self):
         self.tests_run = 0
         self.tests_passed = 0
-        self.backend_url = "https://math-navigator-2.preview.emergentagent.com"
+        self.backend_url = "https://exercisefix.preview.emergentagent.com"
         
     def log_test(self, test_name, success, details=""):
         """Log test result"""

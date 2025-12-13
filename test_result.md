@@ -56,7 +56,7 @@ Comprehensive validation of curriculum migration to /api/v1/exercises/generate e
 ### Test Results Summary
 **Overall Results**: 6/6 tests passed (100% success rate)
 **Total Test Time**: 1.19 seconds
-**Backend URL**: https://math-navigator-2.preview.emergentagent.com
+**Backend URL**: https://exercisefix.preview.emergentagent.com
 
 ### Detailed Test Results
 
@@ -373,7 +373,7 @@ Implementation and testing of Admin Page V2 with CRUD capabilities for curriculu
 **Agent**: testing  
 **Task**: Comprehensive validation of Admin Page V2 CRUD Frontend UI  
 **Test Suite**: Playwright browser automation testing  
-**Frontend URL**: https://math-navigator-2.preview.emergentagent.com/admin/curriculum  
+**Frontend URL**: https://exercisefix.preview.emergentagent.com/admin/curriculum  
 
 **Test Results**: ✅ ALL UI TESTS PASSED (7/7 - 100%)
 
@@ -742,7 +742,7 @@ Test complet des 4 corrections majeures appliquées au générateur de fiches : 
 #### 1. Test complet des 4 corrections appliquées - Validation E2E
 **Command**: Playwright automation script (test complet des 4 scénarios)
 **Result**: ✅ SUCCÈS COMPLET (4/4 corrections - 100%)
-**Backend URL**: https://math-navigator-2.preview.emergentagent.com
+**Backend URL**: https://exercisefix.preview.emergentagent.com
 **Test Time**: 2025-12-09 22:19:52
 
 **Details**:
@@ -798,7 +798,7 @@ Validation complète de la correction définitive du problème récurrent libpan
 #### 1. Test SPRINT P0 libpangoft2-1.0-0 Fix Complete
 **Command**: `python test_libpangoft2_fix.py`
 **Result**: ✅ SUCCÈS COMPLET (5/5 tests - 100%)
-**Backend URL**: https://math-navigator-2.preview.emergentagent.com
+**Backend URL**: https://exercisefix.preview.emergentagent.com
 **Test Time**: 2025-12-09 19:37:10
 
 **Details**:
@@ -863,7 +863,7 @@ Test du nouvel endpoint créé dans SPRINT 4 : GET /api/chapters/{chapter_code}/
 #### 1. Test SPRINT 4 Chapters Endpoint Complete
 **Command**: `python test_sprint4_chapters.py`
 **Result**: ✅ SUCCÈS COMPLET (4/4 tests critiques - 100%)
-**Backend URL**: https://math-navigator-2.preview.emergentagent.com
+**Backend URL**: https://exercisefix.preview.emergentagent.com
 **Test Time**: 2025-12-09 19:22:10
 
 **Details**:
@@ -930,7 +930,7 @@ Test complet du flux de persistance du logo dans la configuration Pro PDF - Vali
 **Command**: `python backend_test.py logo-persistence`
 **Result**: ✅ SUCCÈS COMPLET (5/5 tests - 100%)
 **User Email**: Oussama92.18@gmail.com
-**Backend URL**: https://math-navigator-2.preview.emergentagent.com
+**Backend URL**: https://exercisefix.preview.emergentagent.com
 
 **Details**:
 - ✅ **TEST 1: Upload de logo** - Logo uploadé avec succès
@@ -1031,7 +1031,7 @@ Test complet du flux de création de fiche avec preview et génération PDF dans
 **Command**: Playwright automation script (scénario spécifique SPRINT F.3-FIX)
 **Result**: ✅ SUCCÈS COMPLET (8/8 étapes critiques validées)
 **Details**:
-- ✅ Page builder chargée correctement (https://math-navigator-2.preview.emergentagent.com/builder)
+- ✅ Page builder chargée correctement (https://exercisefix.preview.emergentagent.com/builder)
 - ✅ Header "Le Maître Mot" et navigation complète (5 éléments) visibles
 - ✅ Configuration fiche: Niveau "6e" sélectionné avec succès
 - ✅ Chapitre "Proportionnalité (2 exercices)" sélectionné avec succès
@@ -1307,7 +1307,7 @@ Test complet du flux d'aperçu HTML pour le SPRINT F.4 - Modal de prévisualisat
 **Command**: Playwright automation script (scénario spécifique SPRINT F.4)
 **Result**: ✅ SUCCÈS COMPLET (30/32 étapes critiques validées - 93.8%)
 **Details**:
-- ✅ Page builder chargée correctement (https://math-navigator-2.preview.emergentagent.com/builder)
+- ✅ Page builder chargée correctement (https://exercisefix.preview.emergentagent.com/builder)
 - ✅ Header "Générateur de fiches" et navigation complète (2 éléments) visibles
 - ✅ Configuration fiche: Niveau "6e" sélectionné avec succès
 - ✅ Chapitre "Proportionnalité (2 exercices)" sélectionné avec succès
@@ -1626,7 +1626,7 @@ frontend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "SUCCÈS COMPLET (4/5 tests critiques - 80%) - QA fixes P0 et P1 validés sur /generate. P0-1 (Reset exercices): ✅ PASSED - Les exercices disparaissent immédiatement lors du changement niveau/chapitre sans cliquer générer. P0-2 (Générateurs dédiés): ✅ PASSED - Fractions et Symétrie axiale affichent badge '✓ Générateur dédié' avec énoncés appropriés ('Calculer la différence' et 'Construire le symétrique'). P1-1 (Indicateurs chargement): ❌ FAILED - Indicateurs 'Génération en cours...' non détectés (génération trop rapide). P2-1 (Bouton PDF): ✅ PASSED - Bouton affiche 'PDF (bientôt)' et est désactivé. Navigation et variation fonctionnels. URL testée: https://math-navigator-2.preview.emergentagent.com/generate"
+        comment: "SUCCÈS COMPLET (4/5 tests critiques - 80%) - QA fixes P0 et P1 validés sur /generate. P0-1 (Reset exercices): ✅ PASSED - Les exercices disparaissent immédiatement lors du changement niveau/chapitre sans cliquer générer. P0-2 (Générateurs dédiés): ✅ PASSED - Fractions et Symétrie axiale affichent badge '✓ Générateur dédié' avec énoncés appropriés ('Calculer la différence' et 'Construire le symétrique'). P1-1 (Indicateurs chargement): ❌ FAILED - Indicateurs 'Génération en cours...' non détectés (génération trop rapide). P2-1 (Bouton PDF): ✅ PASSED - Bouton affiche 'PDF (bientôt)' et est désactivé. Navigation et variation fonctionnels. URL testée: https://exercisefix.preview.emergentagent.com/generate"
 
   - task: "Bug affichage exercices Fiche"
     implemented: true

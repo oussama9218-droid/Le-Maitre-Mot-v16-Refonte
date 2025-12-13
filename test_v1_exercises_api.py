@@ -20,9 +20,9 @@ class V1ExercisesAPITester:
                         self.base_url = line.split('=')[1].strip()
                         break
                 else:
-                    self.base_url = "https://math-navigator-2.preview.emergentagent.com"
+                    self.base_url = "https://exercisefix.preview.emergentagent.com"
         except:
-            self.base_url = "https://math-navigator-2.preview.emergentagent.com"
+            self.base_url = "https://exercisefix.preview.emergentagent.com"
         
         self.api_url = f"{self.base_url}/api"
         self.tests_run = 0
