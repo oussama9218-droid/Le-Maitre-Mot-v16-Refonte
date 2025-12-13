@@ -248,7 +248,7 @@ const ExerciseGeneratorPage = () => {
   // Générer les exercices
   const generateExercises = async () => {
     if (!selectedItem) {
-      setError("Veuillez sélectionner un {`chapitre`});
+      setError("Veuillez sélectionner un chapitre");
       return;
     }
 
