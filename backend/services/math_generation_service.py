@@ -348,7 +348,12 @@ class MathGenerationService:
             MathExerciseType.CALCUL_MENTAL_DEDIE: self._gen_calcul_mental_dedie,
             MathExerciseType.CALCUL_POSE_DEDIE: self._gen_calcul_pose_dedie,
             MathExerciseType.CALCUL_INSTRUMENTE_DEDIE: self._gen_calcul_instrumente_dedie,
-            MathExerciseType.GRANDEURS_MESURES_DEDIE: self._gen_grandeurs_mesures_dedie
+            MathExerciseType.GRANDEURS_MESURES_DEDIE: self._gen_grandeurs_mesures_dedie,
+            # ========== CHAPITRE MODÈLE: DURÉES ET LECTURE DE L'HEURE ==========
+            MathExerciseType.LECTURE_HORLOGE: self._gen_lecture_horloge,
+            MathExerciseType.CONVERSION_DUREES: self._gen_conversion_durees,
+            MathExerciseType.CALCUL_DUREE: self._gen_calcul_duree,
+            MathExerciseType.PROBLEME_DUREES: self._gen_probleme_durees
         }
         
         generator = generators.get(exercise_type)
