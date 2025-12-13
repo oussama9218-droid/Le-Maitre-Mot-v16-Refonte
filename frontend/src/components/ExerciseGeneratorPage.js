@@ -362,17 +362,25 @@ const ExerciseGeneratorPage = () => {
       
       const seed = Date.now() + Math.random() * 1000;
       
-      const response = await axios.post(`${API_V1}/generate`, {
+      // Construire le payload avec offer: "pro" si utilisateur PRO
+      const payload = {
         code_officiel: codeOfficiel,
         difficulte: difficulte,
         seed: seed
-      });
+      };
+      
+      // Ajouter offer: "pro" pour les utilisateurs PRO
+      if (isPro) {
+        payload.offer = "pro";
+      }
+      
+      const response = await axios.post(`${API_V1}/generate`, payload);
       
       const newExercises = [...exercises];
       newExercises[index] = response.data;
       setExercises(newExercises);
       
-      console.log('✅ Variation générée via', codeOfficiel);
+      console.log('✅ Variation générée via', codeOfficiel, isPro ? '(PRO)' : '(FREE)');
       
     } catch (error) {
       console.error("Erreur lors de la génération de variation:", error);
