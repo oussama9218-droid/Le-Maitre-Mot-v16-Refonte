@@ -216,7 +216,7 @@ class CurriculumMigrationTester:
             if status_code == 200:
                 exercise = response
                 generator_code = exercise.get('metadata', {}).get('generator_code', '')
-                has_svg = bool(exercise.get('figure_svg') or exercise.get('figure_svg_question'))
+                has_svg = bool(exercise.get('svg') or exercise.get('figure_svg') or exercise.get('figure_svg_question'))
                 
                 generations.append({
                     'code_officiel': code,
@@ -288,7 +288,7 @@ class CurriculumMigrationTester:
             if status_code == 200:
                 exercise = response
                 generator_code = exercise.get('metadata', {}).get('generator_code', '')
-                has_svg = bool(exercise.get('figure_svg') or exercise.get('figure_svg_question'))
+                has_svg = bool(exercise.get('svg') or exercise.get('figure_svg') or exercise.get('figure_svg_question'))
                 
                 generations.append({
                     'generator_code': generator_code,
