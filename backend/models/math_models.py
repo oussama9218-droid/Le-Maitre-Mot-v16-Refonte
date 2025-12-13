@@ -130,6 +130,16 @@ class MathExerciseType(str, Enum):
     CALCUL_POSE_DEDIE = "calcul_pose_dedie"
     CALCUL_INSTRUMENTE_DEDIE = "calcul_instrumente_dedie"
     GRANDEURS_MESURES_DEDIE = "grandeurs_mesures_dedie"
+    
+    # ========== CHAPITRE MODÈLE: DURÉES ET LECTURE DE L'HEURE (6e) ==========
+    # Type 1: Lecture d'horloge analogique (SVG obligatoire)
+    LECTURE_HORLOGE = "lecture_horloge"
+    # Type 2: Conversions de durées (h↔min, min↔s)
+    CONVERSION_DUREES = "conversion_durees"
+    # Type 3: Calcul de durée entre deux instants (SVG recommandé)
+    CALCUL_DUREE = "calcul_duree"
+    # Type 4: Problèmes contextualisés sur les durées
+    PROBLEME_DUREES = "probleme_durees"
 
 class GeometricFigure(BaseModel):
     """Définition structurée d'une figure géométrique"""
