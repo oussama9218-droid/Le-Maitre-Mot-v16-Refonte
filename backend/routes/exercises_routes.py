@@ -507,7 +507,7 @@ async def generate_exercise(request: ExerciseGenerateRequest):
         "duree_estimee": 5,  # minutes (valeur par défaut)
         "points": 2.0,  # points de barème (valeur par défaut)
         "domaine": curriculum_service.get_domaine_by_chapitre(request.niveau, request.chapitre),
-        "has_figure": spec.figure_geometrique is not None,
+        "has_figure": spec.figure_geometrique is not None or svg_question is not None,
         # Nouveaux champs pour debug/identification du générateur
         "is_fallback": is_fallback,
         "generator_code": generator_code
