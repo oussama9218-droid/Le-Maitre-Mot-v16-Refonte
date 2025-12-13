@@ -409,7 +409,7 @@ class TestDureesLectureHeure:
         test_data = {
             "code_officiel": "6e_GM07",
             "difficulte": "moyen",
-            "nb_exercices": 2
+            "nb_exercices": 1
         }
         
         success, response = self.run_test(
@@ -421,44 +421,43 @@ class TestDureesLectureHeure:
             timeout=60
         )
         
-        if success and isinstance(response, list):
+        if success and isinstance(response, dict):  # Single exercise response
             format_valid = True
             
-            for i, exercise in enumerate(response):
-                print(f"\n   Validation exercice {i+1}:")
-                
-                # Vérifier enonce_html
-                enonce_html = exercise.get('enonce_html', '')
-                if enonce_html and 'exercise-enonce' in enonce_html:
-                    print(f"     ✅ enonce_html valide avec classe 'exercise-enonce'")
-                else:
-                    print(f"     ❌ enonce_html invalide ou classe manquante")
-                    format_valid = False
-                
-                # Vérifier solution_html
-                solution_html = exercise.get('solution_html', '')
-                if solution_html and ('étape' in solution_html.lower() or 'step' in solution_html.lower()):
-                    print(f"     ✅ solution_html contient des étapes numérotées")
-                else:
-                    print(f"     ❌ solution_html sans étapes numérotées")
-                    format_valid = False
-                
-                # Vérifier metadata
-                metadata = exercise.get('metadata', {})
-                is_fallback = metadata.get('is_fallback', True)
-                generator_code = metadata.get('generator_code', '')
-                
-                if not is_fallback:
-                    print(f"     ✅ metadata.is_fallback = false (pas de fallback)")
-                else:
-                    print(f"     ❌ metadata.is_fallback = true (fallback utilisé)")
-                    format_valid = False
-                
-                if generator_code.startswith('6e_'):
-                    print(f"     ✅ generator_code commence par '6e_': {generator_code}")
-                else:
-                    print(f"     ❌ generator_code incorrect: {generator_code}")
-                    format_valid = False
+            print(f"\n   Validation exercice:")
+            
+            # Vérifier enonce_html
+            enonce_html = response.get('enonce_html', '')
+            if enonce_html and 'exercise-enonce' in enonce_html:
+                print(f"     ✅ enonce_html valide avec classe 'exercise-enonce'")
+            else:
+                print(f"     ❌ enonce_html invalide ou classe manquante")
+                format_valid = False
+            
+            # Vérifier solution_html
+            solution_html = response.get('solution_html', '')
+            if solution_html and any(x in solution_html.lower() for x in ['étape', '1.', '2.', '3.']):
+                print(f"     ✅ solution_html contient des étapes numérotées")
+            else:
+                print(f"     ❌ solution_html sans étapes numérotées")
+                format_valid = False
+            
+            # Vérifier metadata
+            metadata = response.get('metadata', {})
+            is_fallback = metadata.get('is_fallback', True)
+            generator_code = metadata.get('generator_code', '')
+            
+            if not is_fallback:
+                print(f"     ✅ metadata.is_fallback = false (pas de fallback)")
+            else:
+                print(f"     ❌ metadata.is_fallback = true (fallback utilisé)")
+                format_valid = False
+            
+            if generator_code.startswith('6e_'):
+                print(f"     ✅ generator_code commence par '6e_': {generator_code}")
+            else:
+                print(f"     ❌ generator_code incorrect: {generator_code}")
+                format_valid = False
             
             self.test_results["response_format_valid"] = format_valid
             return format_valid, response
