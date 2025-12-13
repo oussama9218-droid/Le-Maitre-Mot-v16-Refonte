@@ -23,6 +23,27 @@ CURRICULUM_6E_PATH = os.path.join(CURRICULUM_DIR, "curriculum_6e.json")
 CURRICULUM_COLLECTION = "curriculum_chapters"
 
 
+def normalize_code_officiel(code: str) -> str:
+    """
+    Normalise le code officiel au format canonique.
+    Accepte 6E_N99 ou 6e_N99 et retourne 6e_N99.
+    Le niveau (6e, 5e, 4e, 3e) est en minuscules, le reste en majuscules.
+    """
+    code = code.strip()
+    if not code:
+        return code
+    
+    # Pattern: niveau_reste (ex: 6e_N01, 5e_G02)
+    import re
+    match = re.match(r'^(\d+[eE])_(.+)$', code)
+    if match:
+        niveau = match.group(1).lower()  # 6e, 5e, etc. en minuscules
+        reste = match.group(2).upper()    # N01, G02, etc. en majuscules
+        return f"{niveau}_{reste}"
+    
+    return code  # Retourne tel quel si le format n'est pas reconnu
+
+
 class ChapterCreateRequest(BaseModel):
     """Modèle pour la création d'un chapitre"""
     code_officiel: str = Field(..., description="Code officiel unique (ex: 6e_N01)")
@@ -36,6 +57,14 @@ class ChapterCreateRequest(BaseModel):
     statut: str = Field(default="beta", description="Statut: prod, beta, hidden")
     tags: List[str] = Field(default_factory=list, description="Tags pour filtrage")
     contexts: List[str] = Field(default_factory=list, description="Contextes disponibles")
+    
+    @classmethod
+    def model_validate(cls, obj, *args, **kwargs):
+        """Normalise le code_officiel avant la validation"""
+        if isinstance(obj, dict) and 'code_officiel' in obj:
+            obj = obj.copy()
+            obj['code_officiel'] = normalize_code_officiel(obj['code_officiel'])
+        return super().model_validate(obj, *args, **kwargs)
 
 
 class ChapterUpdateRequest(BaseModel):
