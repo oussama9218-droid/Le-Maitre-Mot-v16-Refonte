@@ -203,3 +203,90 @@ class TestErrorHandling:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])
+
+
+class TestVariationPremiumFix:
+    """Tests spécifiques pour le fix de variation PREMIUM"""
+    
+    def test_variation_premium_stays_premium(self):
+        """Une variation d'un exercice PREMIUM doit rester PREMIUM"""
+        # Génération initiale PREMIUM
+        data1, status1 = generate_exercise({
+            "code_officiel": "6e_GM07",
+            "difficulte": "moyen",
+            "offer": "pro",
+            "seed": 11111
+        })
+        
+        assert status1 == 200
+        assert data1.get("metadata", {}).get("is_premium") == True, "L'exercice initial doit être PREMIUM"
+        assert "DUREES_PREMIUM" in data1.get("metadata", {}).get("generator_code", "")
+        
+        # Variation PREMIUM (simule le frontend qui détecte is_premium=true et envoie offer=pro)
+        time.sleep(1.1)
+        data2, status2 = generate_exercise({
+            "code_officiel": "6e_GM07",
+            "difficulte": "moyen",
+            "offer": "pro",  # Car l'exercice courant est PREMIUM
+            "seed": 22222
+        })
+        
+        assert status2 == 200
+        assert data2.get("metadata", {}).get("is_premium") == True, "La variation PREMIUM doit rester PREMIUM"
+        assert "DUREES_PREMIUM" in data2.get("metadata", {}).get("generator_code", "")
+        assert data1["id_exercice"] != data2["id_exercice"], "Les IDs doivent être différents"
+    
+    def test_variation_standard_stays_standard(self):
+        """Une variation d'un exercice STANDARD doit rester STANDARD"""
+        # Génération initiale STANDARD (pas de offer=pro)
+        data1, status1 = generate_exercise({
+            "code_officiel": "6e_GM07",
+            "difficulte": "moyen",
+            "seed": 33333
+        })
+        
+        assert status1 == 200
+        assert data1.get("metadata", {}).get("is_premium") == False, "L'exercice initial doit être STANDARD"
+        assert "DUREES_PREMIUM" not in data1.get("metadata", {}).get("generator_code", "")
+        
+        # Variation STANDARD (simule le frontend qui détecte is_premium=false et n'envoie PAS offer=pro)
+        time.sleep(1.1)
+        data2, status2 = generate_exercise({
+            "code_officiel": "6e_GM07",
+            "difficulte": "moyen",
+            # PAS de offer=pro car l'exercice courant est STANDARD
+            "seed": 44444
+        })
+        
+        assert status2 == 200
+        assert data2.get("metadata", {}).get("is_premium") == False, "La variation STANDARD doit rester STANDARD"
+        assert "DUREES_PREMIUM" not in data2.get("metadata", {}).get("generator_code", "")
+        assert data1["id_exercice"] != data2["id_exercice"], "Les IDs doivent être différents"
+    
+    def test_no_accidental_premium_upgrade(self):
+        """Un utilisateur PRO avec un exercice STANDARD ne doit pas upgrader en PREMIUM via variation"""
+        # Même si l'utilisateur est PRO, si son exercice courant est STANDARD,
+        # la variation doit rester STANDARD (comportement attendu après le fix)
+        
+        # Génération initiale STANDARD (utilisateur PRO mais pas de offer=pro)
+        data1, status1 = generate_exercise({
+            "code_officiel": "6e_GM07",
+            "difficulte": "facile",
+            "seed": 55555
+            # PAS de offer=pro → exercice STANDARD
+        })
+        
+        assert status1 == 200
+        assert data1.get("metadata", {}).get("is_premium") == False
+        
+        # Variation (le frontend détecte que l'exercice courant est STANDARD)
+        time.sleep(1.1)
+        data2, status2 = generate_exercise({
+            "code_officiel": "6e_GM07",
+            "difficulte": "facile",
+            "seed": 66666
+            # PAS de offer=pro car exercice courant est STANDARD
+        })
+        
+        assert status2 == 200
+        assert data2.get("metadata", {}).get("is_premium") == False, "Ne doit pas upgrader accidentellement"
