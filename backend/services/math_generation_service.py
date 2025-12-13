@@ -9538,3 +9538,66 @@ class MathGenerationService:
             etapes_calculees=etapes,
             resultat_final=resultat_str
         )
+
+    # ============================================================================
+    # GÉNÉRATEUR PREMIUM: DURÉES ET LECTURE DE L'HEURE (6e_GM07)
+    # Qualité: Manuel scolaire professionnel
+    # Activation: Offre PRO uniquement
+    # ============================================================================
+    
+    def _gen_durees_premium(self, niveau: str, chapitre: str, difficulte: str) -> MathExerciseSpec:
+        """
+        Générateur PREMIUM pour le chapitre 6e_GM07 : Durées et lecture de l'heure.
+        
+        Qualité MANUEL SCOLAIRE PROFESSIONNEL avec:
+        - Énoncés contextualisés riches et variés
+        - Solutions détaillées avec étapes pédagogiques
+        - Alertes sur les pièges classiques
+        - SVG de haute qualité pour les horloges
+        
+        4 familles d'exercices:
+        - LECTURE_HORLOGE: Lecture d'horloge analogique
+        - CONVERSION: Conversions h↔min↔sec, heures décimales
+        - CALCUL_DUREE: Calcul de durées (avec/sans report, minuit)
+        - PROBLEME_DUREES: Problèmes de planification
+        """
+        from services.durees_premium_generator import get_durees_premium_generator
+        
+        generator = get_durees_premium_generator()
+        
+        # Générer l'exercice premium
+        exercise = generator.generate(difficulty=difficulte)
+        
+        # Construire l'énoncé HTML complet
+        enonce = exercise.enonce_html
+        
+        # Construire la solution HTML avec les pièges classiques
+        solution = exercise.solution_html
+        
+        # Construire les étapes pour le format standard
+        etapes = [
+            f"Famille: {exercise.family.value}",
+            f"Difficulté: {exercise.difficulty}",
+            "Voir solution détaillée ci-dessus"
+        ]
+        
+        return MathExerciseSpec(
+            niveau=niveau, chapitre=chapitre,
+            type_exercice=MathExerciseType.DUREES_PREMIUM,
+            difficulte=DifficultyLevel(difficulte),
+            parametres={
+                "enonce": enonce,
+                "figure_svg": exercise.svg_content if exercise.needs_svg else None,
+                "family": exercise.family.value,
+                "premium": True,
+                "code_ref": "6M-DUREES-PRO"
+            },
+            solution_calculee={
+                "solution_html": solution,
+                "family": exercise.family.value,
+                "metadata": exercise.metadata
+            },
+            etapes_calculees=etapes,
+            resultat_final="Voir correction détaillée"
+        )
+
