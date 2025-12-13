@@ -350,7 +350,11 @@
         "LECTURE_HORLOGE",
         "CALCUL_DUREE",
         "CONVERSION_DUREES",
-        "PROBLEME_DUREES"
+        "PROBLEME_DUREES",
+        "DUREES_PREMIUM"
+      ],
+      "premium_generators": [
+        "DUREES_PREMIUM"
       ],
       "schema_requis": true,
       "difficulte_min": 1,
@@ -360,7 +364,8 @@
         "heure",
         "horloge",
         "lecture",
-        "SVG"
+        "SVG",
+        "premium"
       ],
       "contexts": [
         "école",
