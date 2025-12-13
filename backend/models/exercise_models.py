@@ -35,6 +35,14 @@ class ExerciseGenerateRequest(BaseModel):
         le=10,
         description="Nombre d'exercices à générer (1-10)"
     )
+    offer: Optional[str] = Field(
+        default="free",
+        description="Type d'offre: 'free' (gratuit) ou 'pro' (premium). Détermine le type de générateur utilisé."
+    )
+    seed: Optional[int] = Field(
+        default=None,
+        description="Seed pour la génération aléatoire (optionnel)"
+    )
     
     @model_validator(mode='after')
     def validate_request_mode(self):
