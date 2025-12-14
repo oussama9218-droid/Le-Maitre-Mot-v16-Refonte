@@ -279,6 +279,7 @@ const ExerciseGeneratorPage = () => {
     setError(null);
     setExercises([]);
     setCurrentIndex(0);
+    setBatchWarning(null);
 
     try {
       // Déterminer le code_officiel à utiliser
@@ -305,7 +306,41 @@ const ExerciseGeneratorPage = () => {
         throw new Error("Impossible de déterminer le code officiel");
       }
 
-      // Créer les appels parallèles
+      // ========================================================================
+      // GM07 BATCH: Utiliser l'endpoint batch pour garantir l'unicité
+      // ========================================================================
+      if (codeOfficiel.toUpperCase() === "6E_GM07") {
+        const seed = Date.now();
+        setGm07Seed(seed);
+        
+        const batchPayload = {
+          code_officiel: "6e_GM07",
+          nb_exercices: nbExercices,
+          difficulte: difficulte,
+          offer: isPro ? "pro" : "free",
+          seed: seed
+        };
+        
+        console.log('🎯 GM07 Batch Request:', batchPayload);
+        
+        const response = await axios.post(`${API_V1}/generate/batch/gm07`, batchPayload);
+        const { exercises: batchExercises, batch_metadata } = response.data;
+        
+        // Vérifier si on a reçu moins que demandé
+        if (batch_metadata.warning) {
+          setBatchWarning(batch_metadata.warning);
+          console.log('⚠️ GM07 Warning:', batch_metadata.warning);
+        }
+        
+        setExercises(batchExercises);
+        console.log(`✅ GM07 Batch: ${batchExercises.length} exercices générés (demandés: ${batch_metadata.requested}, disponibles: ${batch_metadata.available})`);
+        
+        return; // Sortir ici pour GM07
+      }
+
+      // ========================================================================
+      // AUTRES CHAPITRES: Comportement existant (appels parallèles)
+      // ========================================================================
       const promises = [];
       for (let i = 0; i < nbExercices; i++) {
         const seed = Date.now() + i;
