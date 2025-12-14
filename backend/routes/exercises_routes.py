@@ -345,7 +345,7 @@ def _build_fallback_enonce(spec, chapitre: str) -> str:
 
 
 @router.post(
-    "/api/v1/exercises/generate",
+    "/generate",
     response_model=ExerciseGenerateResponse,
     responses={
         422: {
