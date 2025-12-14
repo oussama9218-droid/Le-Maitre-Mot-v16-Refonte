@@ -3,8 +3,9 @@ Routes API v1 pour la génération d'exercices
 Endpoint: POST /api/v1/exercises/generate
 
 Modes de fonctionnement:
-1. Mode legacy: niveau + chapitre (comportement existant)
-2. Mode officiel: code_officiel (nouveau, basé sur le référentiel 6e)
+1. Mode GM07 (chapitre pilote): exercices figés depuis gm07_exercises.py
+2. Mode legacy: niveau + chapitre (comportement existant)
+3. Mode officiel: code_officiel (basé sur le référentiel 6e)
 """
 from fastapi import APIRouter, HTTPException
 from typing import Optional, List
@@ -22,6 +23,7 @@ from services.curriculum_service import curriculum_service
 from services.math_generation_service import MathGenerationService
 from services.geometry_render_service import GeometryRenderService
 from curriculum.loader import get_chapter_by_official_code, CurriculumChapter
+from services.gm07_handler import is_gm07_request, generate_gm07_exercise
 from logger import get_logger
 
 logger = get_logger()
