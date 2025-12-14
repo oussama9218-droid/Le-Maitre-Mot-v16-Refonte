@@ -366,6 +366,41 @@ def get_gm07_batch(
     }
 
 
+def get_exercise_by_seed_index(
+    offer: Optional[str] = None,
+    difficulty: Optional[str] = None,
+    seed: Optional[int] = None
+) -> Optional[Dict[str, Any]]:
+    """
+    Retourne un exercice basé sur le seed.
+    
+    Le seed est utilisé pour sélectionner un index dans la liste filtrée.
+    Cela garantit que des seeds différents retournent des exercices différents
+    (tant qu'il y a assez d'exercices disponibles).
+    
+    Args:
+        offer: "free" ou "pro"
+        difficulty: "facile", "moyen", "difficile"
+        seed: Graine pour la sélection (utilisée comme index)
+    
+    Returns:
+        Un exercice ou None si aucun ne correspond
+    """
+    exercises = get_gm07_exercises(offer=offer, difficulty=difficulty)
+    
+    if not exercises:
+        return None
+    
+    # Utiliser le seed comme index (modulo le nombre d'exercices)
+    if seed is not None:
+        index = seed % len(exercises)
+    else:
+        import random
+        index = random.randint(0, len(exercises) - 1)
+    
+    return exercises[index]
+
+
 def get_gm07_stats() -> Dict[str, Any]:
     """Retourne les statistiques des exercices GM07"""
     stats = {
