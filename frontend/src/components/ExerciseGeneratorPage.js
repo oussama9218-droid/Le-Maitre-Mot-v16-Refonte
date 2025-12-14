@@ -468,6 +468,41 @@ const ExerciseGeneratorPage = () => {
         
         return; // Sortir ici pour GM07
       }
+
+      // ========================================================================
+      // GM08 VARIATION: Relancer le batch avec un nouveau seed
+      // ========================================================================
+      if (codeOfficiel.toUpperCase() === "6E_GM08") {
+        // Nouveau seed pour une nouvelle liste
+        const newSeed = Date.now();
+        setGm07Seed(newSeed);
+        
+        // Respecter le statut premium de l'exercice courant
+        const currentExerciseForVariation = exercises[index];
+        const isCurrentPremium = currentExerciseForVariation?.metadata?.is_premium === true;
+        
+        const batchPayload = {
+          code_officiel: "6e_GM08",
+          nb_exercices: exercises.length, // Même nombre que la liste actuelle
+          difficulte: difficulte,
+          offer: isCurrentPremium ? "pro" : (isPro ? "pro" : "free"),
+          seed: newSeed
+        };
+        
+        console.log('🔄 GM08 Variation Batch:', batchPayload);
+        
+        const response = await axios.post(`${API_V1}/generate/batch/gm08`, batchPayload);
+        const { exercises: batchExercises, batch_metadata } = response.data;
+        
+        if (batch_metadata.warning) {
+          setBatchWarning(batch_metadata.warning);
+        }
+        
+        setExercises(batchExercises);
+        console.log(`✅ GM08 Variation: ${batchExercises.length} nouveaux exercices générés`);
+        
+        return; // Sortir ici pour GM08
+      }
       
       // ========================================================================
       // AUTRES CHAPITRES: Comportement existant (variation single)
