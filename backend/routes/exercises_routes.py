@@ -422,7 +422,7 @@ def _build_fallback_enonce(spec, chapitre: str) -> str:
         # Chercher des indices dans les clés des paramètres
         param_keys = list(params.keys())
         if any("nombre" in k.lower() for k in param_keys):
-            return f"Effectuer les calculs demandés sur les nombres suivants."
+            return "Effectuer les calculs demandés sur les nombres suivants."
         if any("point" in k.lower() for k in param_keys):
             return "Réaliser la construction géométrique demandée."
     
@@ -520,7 +520,7 @@ async def generate_exercise(request: ExerciseGenerateRequest):
                 status_code=422,
                 detail={
                     "error": "no_gm07_exercise_found",
-                    "message": batch_meta.get("warning", f"Aucun exercice GM07 trouvé"),
+                    "message": batch_meta.get("warning", "Aucun exercice GM07 trouvé"),
                     "hint": "Vérifiez les filtres ou utilisez /generate/batch/gm07 pour les lots"
                 }
             )
@@ -580,7 +580,7 @@ async def generate_exercise(request: ExerciseGenerateRequest):
                 status_code=422,
                 detail={
                     "error": "no_gm08_exercise_found",
-                    "message": batch_meta.get("warning", f"Aucun exercice GM08 trouvé"),
+                    "message": batch_meta.get("warning", "Aucun exercice GM08 trouvé"),
                     "hint": "Vérifiez les filtres ou utilisez /generate/batch/gm08 pour les lots"
                 }
             )
