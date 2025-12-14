@@ -2434,3 +2434,86 @@ Cela garantit que des seeds consécutifs donnent des indices très différents.
 - ✅ Autres chapitres non impactés
 - ✅ Logique Free/Pro préservée
 
+
+---
+
+## GM07 v3 - Batch Production Ready - 2025-12-14
+
+### Objectif
+Finaliser GM07 pour qu'il soit "production ready" avec:
+1. Unicité batch garantie quand pool_size >= N
+2. Comportement produit explicite quand pool_size < N
+3. API batch avec format de réponse liste
+
+### Nouveau Endpoint
+
+**POST /api/v1/exercises/generate/batch/gm07**
+
+Request:
+```json
+{
+  "code_officiel": "6e_GM07",
+  "nb_exercices": 5,
+  "offer": "pro",
+  "difficulte": "moyen",
+  "seed": 12345
+}
+```
+
+Response:
+```json
+{
+  "exercises": [...],
+  "batch_metadata": {
+    "requested": 5,
+    "returned": 5,
+    "available": 20
+  }
+}
+```
+
+### Comportement Produit
+
+| Cas | pool_size >= N | pool_size < N |
+|-----|----------------|---------------|
+| Retourne | N exercices UNIQUES | pool_size exercices UNIQUES |
+| Warning | Non | Oui: "Seulement X exercices disponibles..." |
+| Doublons | JAMAIS | JAMAIS |
+
+### Pool Sizes par Filtre
+
+| Filtre | Pool Size (FREE) | Pool Size (PRO) |
+|--------|------------------|-----------------|
+| Tous | 10 | 20 |
+| facile | 4 | 6 |
+| moyen | 4 | 9 |
+| difficile | 2 | 6 |
+
+### Tests Automatisés (49/49 - 100%)
+
+| Suite | Tests | Description |
+|-------|-------|-------------|
+| test_gm07_pilote.py | 24 | Critères d'acceptance originaux |
+| test_gm07_v2_fixes.py | 13 | HTML pur + anti-doublons single |
+| test_gm07_v3_batch.py | 12 | Batch unicité + warning |
+
+### Fichiers Modifiés
+
+| Fichier | Modifications |
+|---------|---------------|
+| `gm07_exercises.py` | `get_gm07_batch()` sans doublons, avec warning |
+| `gm07_handler.py` | `generate_gm07_batch()` retourne tuple (exercises, metadata) |
+| `exercises_routes.py` | Nouvel endpoint `/generate/batch/gm07` |
+| `server.py` | Prefix `/api/v1/exercises` pour le router |
+| `test_gm07_v3_batch.py` | 12 nouveaux tests |
+
+### Critères Validés
+
+- ✅ pool_size >= N → len(set(ids)) == N (unicité garantie)
+- ✅ pool_size < N → len(returned) == pool_size + metadata.warning
+- ✅ Chaque exercice a: exercise_id, difficulty, offer, is_premium, family
+- ✅ Reproductibilité avec seed
+- ✅ Non-régression sur autres chapitres
+
+**GM07 v3 est PRODUCTION READY.**
+
