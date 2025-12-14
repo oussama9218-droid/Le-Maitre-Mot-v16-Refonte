@@ -298,7 +298,37 @@ async def generate_exercise(request: ExerciseGenerateRequest):
     """
     
     # ============================================================================
-    # 0. RÉSOLUTION DU MODE (code_officiel vs legacy)
+    # GM07 INTERCEPT: Chapitre pilote avec exercices figés
+    # ============================================================================
+    
+    if is_gm07_request(request.code_officiel):
+        logger.info(f"🎯 GM07 Request intercepted: offer={request.offer}, difficulty={request.difficulte}")
+        
+        # Générer l'exercice depuis la source figée GM07
+        gm07_exercise = generate_gm07_exercise(
+            offer=request.offer,
+            difficulty=request.difficulte,
+            seed=request.seed
+        )
+        
+        if not gm07_exercise:
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "error": "no_gm07_exercise_found",
+                    "message": f"Aucun exercice GM07 trouvé pour offer='{request.offer}' et difficulty='{request.difficulte}'",
+                    "hint": "Vérifiez les filtres: offer='free'|'pro', difficulty='facile'|'moyen'|'difficile'"
+                }
+            )
+        
+        logger.info(f"✅ GM07 Exercise generated: id={gm07_exercise['metadata']['exercise_id']}, "
+                   f"family={gm07_exercise['metadata']['family']}, "
+                   f"is_premium={gm07_exercise['metadata']['is_premium']}")
+        
+        return gm07_exercise
+    
+    # ============================================================================
+    # 0. RÉSOLUTION DU MODE (code_officiel vs legacy) - Pour autres chapitres
     # ============================================================================
     
     curriculum_chapter: Optional[CurriculumChapter] = None
