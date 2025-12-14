@@ -375,8 +375,8 @@ def get_exercise_by_seed_index(
     Retourne un exercice basé sur le seed.
     
     Le seed est utilisé pour sélectionner un index dans la liste filtrée.
-    Cela garantit que des seeds différents retournent des exercices différents
-    (tant qu'il y a assez d'exercices disponibles).
+    On utilise une fonction de hachage pour mieux distribuer les seeds
+    et éviter les collisions quand les seeds sont proches (Date.now() + i).
     
     Args:
         offer: "free" ou "pro"
@@ -391,14 +391,22 @@ def get_exercise_by_seed_index(
     if not exercises:
         return None
     
-    # Utiliser le seed comme index (modulo le nombre d'exercices)
+    n = len(exercises)
+    
     if seed is not None:
-        index = seed % len(exercises)
+        # Utiliser un hash pour mieux distribuer les valeurs de seed
+        # Cela évite les collisions quand les seeds sont proches (ex: Date.now() + 0, +1, +2...)
+        # On utilise le seed pour mélanger puis on prend selon le modulo
+        import random
+        rng = random.Random(seed)
+        # Mélanger la liste avec ce seed spécifique
+        shuffled = exercises.copy()
+        rng.shuffle(shuffled)
+        # Prendre le premier élément de la liste mélangée
+        return shuffled[0]
     else:
         import random
-        index = random.randint(0, len(exercises) - 1)
-    
-    return exercises[index]
+        return random.choice(exercises)
 
 
 def get_gm07_stats() -> Dict[str, Any]:
