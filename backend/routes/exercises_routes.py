@@ -62,7 +62,26 @@ class GM07BatchResponse(BaseModel):
 
 
 # ============================================================================
-# ENDPOINT BATCH DÉDIÉ GM07
+# MODÈLES POUR L'ENDPOINT BATCH GM08
+# ============================================================================
+
+class GM08BatchRequest(BaseModel):
+    """Request model pour le batch GM08"""
+    code_officiel: str = Field(default="6e_GM08", description="Code officiel (doit être 6e_GM08)")
+    difficulte: Optional[str] = Field(default=None, description="facile, moyen, difficile")
+    offer: Optional[str] = Field(default="free", description="free ou pro")
+    nb_exercices: int = Field(default=1, ge=1, le=20, description="Nombre d'exercices (1-20)")
+    seed: Optional[int] = Field(default=None, description="Seed pour reproductibilité")
+
+
+class GM08BatchResponse(BaseModel):
+    """Response model pour le batch GM08"""
+    exercises: List[dict] = Field(description="Liste des exercices générés")
+    batch_metadata: dict = Field(description="Métadonnées du batch")
+
+
+# ============================================================================
+# ENDPOINTS BATCH DÉDIÉS GM07 / GM08
 # ============================================================================
 
 @router.post("/generate/batch/gm07", response_model=GM07BatchResponse, tags=["GM07"])
