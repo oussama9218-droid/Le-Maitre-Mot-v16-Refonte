@@ -2603,3 +2603,86 @@ Response:
 
 **GM07 v3 est PRODUCTION READY.**
 
+
+---
+
+## Frontend GM07 Batch Integration - 2025-12-14
+
+### Objectif
+Basculer le frontend sur l'endpoint batch pour GM07 afin de garantir l'unicité des exercices.
+
+### Modifications Frontend (ExerciseGeneratorPage.js)
+
+#### 1. Détection GM07
+```javascript
+if (codeOfficiel.toUpperCase() === "6E_GM07") {
+  // Utiliser l'endpoint batch
+}
+```
+
+#### 2. Appel Batch Endpoint
+```javascript
+const batchPayload = {
+  code_officiel: "6e_GM07",
+  nb_exercices: nbExercices,
+  difficulte: difficulte,
+  offer: isPro ? "pro" : "free",
+  seed: seed
+};
+
+const response = await axios.post(`${API_V1}/generate/batch/gm07`, batchPayload);
+const { exercises: batchExercises, batch_metadata } = response.data;
+```
+
+#### 3. Gestion du Warning
+```javascript
+if (batch_metadata.warning) {
+  setBatchWarning(batch_metadata.warning);
+}
+```
+
+#### 4. Affichage UI du Warning
+```jsx
+{batchWarning && (
+  <Alert className="mb-6 border-amber-300 bg-amber-50">
+    <AlertDescription className="text-amber-800">
+      <strong>Information :</strong> {batchWarning}
+    </AlertDescription>
+  </Alert>
+)}
+```
+
+#### 5. Variation GM07
+```javascript
+if (codeOfficiel.toUpperCase() === "6E_GM07") {
+  const newSeed = Date.now();
+  // Relancer le batch avec le nouveau seed
+}
+```
+
+### Tests Automatisés (Frontend - 5/5)
+
+| Test | Résultat |
+|------|----------|
+| GM07 Batch 5 exercices facile | ✅ Warning affiché (4 disponibles) |
+| Navigation entre exercices | ✅ Pagination fonctionne |
+| Variation GM07 | ✅ Relance batch avec nouveau seed |
+| Non-régression autres chapitres | ✅ Fractions OK |
+| Erreurs console | ✅ Aucune |
+
+### Critères d'Acceptance Validés
+
+- ✅ GM07 facile / 5 exercices → 4 exercices tous différents + warning
+- ✅ GM07 moyen / 5 exercices → exercices tous différents
+- ✅ GM07 difficile / 5 exercices → exercices tous différents
+- ✅ Bouton "Variation" change réellement la liste
+- ✅ Autres chapitres fonctionnent comme avant
+
+### Fichiers Modifiés
+
+| Fichier | Modifications |
+|---------|---------------|
+| `ExerciseGeneratorPage.js` | Logique batch GM07 + warning UI |
+
+**Frontend GM07 Batch est maintenant PRODUCTION READY.**
+
