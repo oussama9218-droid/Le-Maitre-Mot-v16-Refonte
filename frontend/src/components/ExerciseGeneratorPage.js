@@ -149,6 +149,12 @@ const ExerciseGeneratorPage = () => {
   const [isPro, setIsPro] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   
+  // État pour le seed de génération GM07 (pour reproductibilité des variations)
+  const [gm07Seed, setGm07Seed] = useState(null);
+  
+  // État pour le warning batch (pool insuffisant)
+  const [batchWarning, setBatchWarning] = useState(null);
+  
   // Initialiser l'authentification PRO
   useEffect(() => {
     const storedSessionToken = localStorage.getItem('lemaitremot_session_token');
