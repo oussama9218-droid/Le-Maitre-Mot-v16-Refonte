@@ -13,7 +13,7 @@ from datetime import datetime
 class TestDureesLectureHeure:
     def __init__(self):
         # Use REACT_APP_BACKEND_URL from frontend/.env
-        self.base_url = "https://exercisefix.preview.emergentagent.com"
+        self.base_url = "https://exerrchive.preview.emergentagent.com"
         self.api_url = f"{self.base_url}/api"
         self.tests_run = 0
         self.tests_passed = 0

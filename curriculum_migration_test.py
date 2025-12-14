@@ -16,7 +16,7 @@ from datetime import datetime
 class CurriculumMigrationTester:
     def __init__(self):
         # Utiliser REACT_APP_BACKEND_URL depuis frontend/.env
-        self.base_url = "https://exercisefix.preview.emergentagent.com"
+        self.base_url = "https://exerrchive.preview.emergentagent.com"
         try:
             with open('/app/frontend/.env', 'r') as f:
                 for line in f:

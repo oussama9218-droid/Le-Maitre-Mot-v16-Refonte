@@ -42,7 +42,7 @@ class Wave1GeneratorsTest:
             print(f"Warning: Could not read frontend .env: {e}")
         
         # Fallback to default
-        return "https://exercisefix.preview.emergentagent.com"
+        return "https://exerrchive.preview.emergentagent.com"
     
     def log_test(self, test_name, passed, details=""):
         """Log test result"""

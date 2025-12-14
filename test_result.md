@@ -32,7 +32,7 @@ Validation complète de l'intégration frontend du nouvel endpoint batch `/api/v
 
 ### Validation Technique Détaillée
 
-**Frontend URL**: https://exercisefix.preview.emergentagent.com/generate  
+**Frontend URL**: https://exerrchive.preview.emergentagent.com/generate  
 **Test Time**: 2025-12-14 19:48:12  
 **Mode Testé**: Mode Simple avec thème "Longueurs, masses, durées"
 
@@ -113,7 +113,7 @@ Validation complète des deux bugs corrigés dans GM07 v2:
 
 ### Validation Technique Détaillée
 
-**Backend URL**: https://exercisefix.preview.emergentagent.com  
+**Backend URL**: https://exerrchive.preview.emergentagent.com  
 **Test Time**: 2025-12-14 17:30:00  
 **API Endpoint**: POST /api/v1/exercises/generate  
 
@@ -191,7 +191,7 @@ Validation complète du chapitre pilote GM07 (Durées et lecture de l'heure) ave
 
 ### Validation Technique Détaillée
 
-**Frontend URL**: https://exercisefix.preview.emergentagent.com/generate  
+**Frontend URL**: https://exerrchive.preview.emergentagent.com/generate  
 **Test Time**: 2025-12-14 16:56:24  
 **Mode Testé**: Mode Simple avec thème "Longueurs, masses, durées"
 
@@ -267,7 +267,7 @@ Validation complète du fix de la fonction `generateVariation` selon la review r
 
 ### Validation Technique Backend
 
-**Backend URL**: https://exercisefix.preview.emergentagent.com  
+**Backend URL**: https://exerrchive.preview.emergentagent.com  
 **API Endpoint**: POST /api/v1/exercises/generate  
 **Code Officiel Testé**: 6e_GM07 (Longueurs, masses, durées)
 
@@ -388,7 +388,7 @@ Validation complète de l'intégration PRO dans ExerciseGeneratorPage selon la r
 
 ### Validation Technique
 
-**Frontend URL**: https://exercisefix.preview.emergentagent.com/generate  
+**Frontend URL**: https://exerrchive.preview.emergentagent.com/generate  
 **Test Time**: 2025-12-13 05:27:41  
 **API Endpoint**: POST /api/v1/exercises/generate  
 
@@ -445,7 +445,7 @@ Validation complète du générateur PREMIUM pour le chapitre "Durées et lectur
 
 ### Validation Technique
 
-**Backend URL**: https://exercisefix.preview.emergentagent.com  
+**Backend URL**: https://exerrchive.preview.emergentagent.com  
 **Temps total**: 0.61s (performance excellente)  
 **API Endpoint**: POST /api/v1/exercises/generate  
 
@@ -525,7 +525,7 @@ Comprehensive validation of curriculum migration to /api/v1/exercises/generate e
 ### Test Results Summary
 **Overall Results**: 6/6 tests passed (100% success rate)
 **Total Test Time**: 1.19 seconds
-**Backend URL**: https://exercisefix.preview.emergentagent.com
+**Backend URL**: https://exerrchive.preview.emergentagent.com
 
 ### Detailed Test Results
 
@@ -842,7 +842,7 @@ Implementation and testing of Admin Page V2 with CRUD capabilities for curriculu
 **Agent**: testing  
 **Task**: Comprehensive validation of Admin Page V2 CRUD Frontend UI  
 **Test Suite**: Playwright browser automation testing  
-**Frontend URL**: https://exercisefix.preview.emergentagent.com/admin/curriculum  
+**Frontend URL**: https://exerrchive.preview.emergentagent.com/admin/curriculum  
 
 **Test Results**: ✅ ALL UI TESTS PASSED (7/7 - 100%)
 
@@ -1211,7 +1211,7 @@ Test complet des 4 corrections majeures appliquées au générateur de fiches : 
 #### 1. Test complet des 4 corrections appliquées - Validation E2E
 **Command**: Playwright automation script (test complet des 4 scénarios)
 **Result**: ✅ SUCCÈS COMPLET (4/4 corrections - 100%)
-**Backend URL**: https://exercisefix.preview.emergentagent.com
+**Backend URL**: https://exerrchive.preview.emergentagent.com
 **Test Time**: 2025-12-09 22:19:52
 
 **Details**:
@@ -1267,7 +1267,7 @@ Validation complète de la correction définitive du problème récurrent libpan
 #### 1. Test SPRINT P0 libpangoft2-1.0-0 Fix Complete
 **Command**: `python test_libpangoft2_fix.py`
 **Result**: ✅ SUCCÈS COMPLET (5/5 tests - 100%)
-**Backend URL**: https://exercisefix.preview.emergentagent.com
+**Backend URL**: https://exerrchive.preview.emergentagent.com
 **Test Time**: 2025-12-09 19:37:10
 
 **Details**:
@@ -1332,7 +1332,7 @@ Test du nouvel endpoint créé dans SPRINT 4 : GET /api/chapters/{chapter_code}/
 #### 1. Test SPRINT 4 Chapters Endpoint Complete
 **Command**: `python test_sprint4_chapters.py`
 **Result**: ✅ SUCCÈS COMPLET (4/4 tests critiques - 100%)
-**Backend URL**: https://exercisefix.preview.emergentagent.com
+**Backend URL**: https://exerrchive.preview.emergentagent.com
 **Test Time**: 2025-12-09 19:22:10
 
 **Details**:
@@ -1399,7 +1399,7 @@ Test complet du flux de persistance du logo dans la configuration Pro PDF - Vali
 **Command**: `python backend_test.py logo-persistence`
 **Result**: ✅ SUCCÈS COMPLET (5/5 tests - 100%)
 **User Email**: Oussama92.18@gmail.com
-**Backend URL**: https://exercisefix.preview.emergentagent.com
+**Backend URL**: https://exerrchive.preview.emergentagent.com
 
 **Details**:
 - ✅ **TEST 1: Upload de logo** - Logo uploadé avec succès
@@ -1500,7 +1500,7 @@ Test complet du flux de création de fiche avec preview et génération PDF dans
 **Command**: Playwright automation script (scénario spécifique SPRINT F.3-FIX)
 **Result**: ✅ SUCCÈS COMPLET (8/8 étapes critiques validées)
 **Details**:
-- ✅ Page builder chargée correctement (https://exercisefix.preview.emergentagent.com/builder)
+- ✅ Page builder chargée correctement (https://exerrchive.preview.emergentagent.com/builder)
 - ✅ Header "Le Maître Mot" et navigation complète (5 éléments) visibles
 - ✅ Configuration fiche: Niveau "6e" sélectionné avec succès
 - ✅ Chapitre "Proportionnalité (2 exercices)" sélectionné avec succès
@@ -1776,7 +1776,7 @@ Test complet du flux d'aperçu HTML pour le SPRINT F.4 - Modal de prévisualisat
 **Command**: Playwright automation script (scénario spécifique SPRINT F.4)
 **Result**: ✅ SUCCÈS COMPLET (30/32 étapes critiques validées - 93.8%)
 **Details**:
-- ✅ Page builder chargée correctement (https://exercisefix.preview.emergentagent.com/builder)
+- ✅ Page builder chargée correctement (https://exerrchive.preview.emergentagent.com/builder)
 - ✅ Header "Générateur de fiches" et navigation complète (2 éléments) visibles
 - ✅ Configuration fiche: Niveau "6e" sélectionné avec succès
 - ✅ Chapitre "Proportionnalité (2 exercices)" sélectionné avec succès
@@ -2095,7 +2095,7 @@ frontend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "SUCCÈS COMPLET (5/5 tests - 100%) - Intégration PRO entièrement fonctionnelle sur /generate. TEST 1 (Page charge): ✅ PASSED - Titre 'Générateur d'exercices' et 28 chapitres affichés. TEST 2 (Mode gratuit): ✅ PASSED - Thème 'Longueurs, masses, durées' sélectionné, exercice généré sans badge PREMIUM. TEST 3 (Connexion PRO): ✅ PASSED - Badge '⭐ PRO' apparaît après injection localStorage. TEST 4 (Mode PRO): ✅ PASSED - Badge '⭐ PREMIUM' affiché sur exercice généré avec offer='pro'. TEST 5 (Variation PRO): ✅ PASSED - Bouton variation fonctionne, badge PREMIUM maintenu. Détection PRO via localStorage (session_token, user_email, login_method='session') opérationnelle. URL testée: https://exercisefix.preview.emergentagent.com/generate"
+        comment: "SUCCÈS COMPLET (5/5 tests - 100%) - Intégration PRO entièrement fonctionnelle sur /generate. TEST 1 (Page charge): ✅ PASSED - Titre 'Générateur d'exercices' et 28 chapitres affichés. TEST 2 (Mode gratuit): ✅ PASSED - Thème 'Longueurs, masses, durées' sélectionné, exercice généré sans badge PREMIUM. TEST 3 (Connexion PRO): ✅ PASSED - Badge '⭐ PRO' apparaît après injection localStorage. TEST 4 (Mode PRO): ✅ PASSED - Badge '⭐ PREMIUM' affiché sur exercice généré avec offer='pro'. TEST 5 (Variation PRO): ✅ PASSED - Bouton variation fonctionne, badge PREMIUM maintenu. Détection PRO via localStorage (session_token, user_email, login_method='session') opérationnelle. URL testée: https://exerrchive.preview.emergentagent.com/generate"
 
   - task: "QA Fixes P0/P1 - Exercise Generator Page"
     implemented: true
@@ -2107,7 +2107,7 @@ frontend:
     status_history:
       - working: true
         agent: "testing"
-        comment: "SUCCÈS COMPLET (4/5 tests critiques - 80%) - QA fixes P0 et P1 validés sur /generate. P0-1 (Reset exercices): ✅ PASSED - Les exercices disparaissent immédiatement lors du changement niveau/chapitre sans cliquer générer. P0-2 (Générateurs dédiés): ✅ PASSED - Fractions et Symétrie axiale affichent badge '✓ Générateur dédié' avec énoncés appropriés ('Calculer la différence' et 'Construire le symétrique'). P1-1 (Indicateurs chargement): ❌ FAILED - Indicateurs 'Génération en cours...' non détectés (génération trop rapide). P2-1 (Bouton PDF): ✅ PASSED - Bouton affiche 'PDF (bientôt)' et est désactivé. Navigation et variation fonctionnels. URL testée: https://exercisefix.preview.emergentagent.com/generate"
+        comment: "SUCCÈS COMPLET (4/5 tests critiques - 80%) - QA fixes P0 et P1 validés sur /generate. P0-1 (Reset exercices): ✅ PASSED - Les exercices disparaissent immédiatement lors du changement niveau/chapitre sans cliquer générer. P0-2 (Générateurs dédiés): ✅ PASSED - Fractions et Symétrie axiale affichent badge '✓ Générateur dédié' avec énoncés appropriés ('Calculer la différence' et 'Construire le symétrique'). P1-1 (Indicateurs chargement): ❌ FAILED - Indicateurs 'Génération en cours...' non détectés (génération trop rapide). P2-1 (Bouton PDF): ✅ PASSED - Bouton affiche 'PDF (bientôt)' et est désactivé. Navigation et variation fonctionnels. URL testée: https://exerrchive.preview.emergentagent.com/generate"
 
   - task: "Bug affichage exercices Fiche"
     implemented: true
