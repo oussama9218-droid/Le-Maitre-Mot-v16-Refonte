@@ -308,13 +308,18 @@ def get_gm07_batch(
     seed: Optional[int] = None
 ) -> tuple:
     """
-    Retourne un lot d'exercices GM07 SANS DOUBLONS.
+    Retourne un lot d'exercices GM07 SANS DOUBLONS - VERSION PRODUCTION.
+    
+    Comportement produit:
+    - Si pool_size >= count: retourne exactement count exercices UNIQUES
+    - Si pool_size < count: retourne pool_size exercices (tous disponibles), avec warning
+    - JAMAIS de doublons, JAMAIS d'élargissement de filtre
     
     Args:
         offer: "free" ou "pro"
         difficulty: "facile", "moyen", "difficile"
         count: Nombre d'exercices demandés
-        seed: Graine pour le mélange aléatoire
+        seed: Graine pour le mélange aléatoire (déterministe)
     
     Returns:
         Tuple (exercices: List, metadata: Dict)
@@ -322,48 +327,56 @@ def get_gm07_batch(
         - requested: nombre demandé
         - returned: nombre retourné
         - available: nombre disponible après filtrage
-        - has_duplicates: True si on a dû boucler
+        - warning: message si returned < requested (optionnel)
     """
     import random
     
     exercises = get_gm07_exercises(offer=offer, difficulty=difficulty)
-    available = len(exercises)
+    pool_size = len(exercises)
     
+    # Cas: aucun exercice disponible
     if not exercises:
         return [], {
             "requested": count,
             "returned": 0,
             "available": 0,
-            "has_duplicates": False
+            "warning": f"Aucun exercice disponible pour ce filtre (difficulty={difficulty}, offer={offer})."
         }
     
-    # Mélanger avec seed si fourni
-    if seed is not None:
-        random.seed(seed)
-    
+    # Mélanger avec seed pour reproductibilité
+    rng = random.Random(seed) if seed is not None else random.Random()
     shuffled = exercises.copy()
-    random.shuffle(shuffled)
+    rng.shuffle(shuffled)
     
-    # Si on demande plus que disponible, boucler
-    has_duplicates = count > available
-    
-    if has_duplicates:
-        # Boucler la liste pour atteindre count
-        result = []
-        idx = 0
-        for _ in range(count):
-            result.append(shuffled[idx % available])
-            idx += 1
-    else:
-        # Prendre les N premiers (sans doublon)
+    # Déterminer combien d'exercices retourner
+    if pool_size >= count:
+        # Cas normal: assez d'exercices, prendre les N premiers (tous uniques)
         result = shuffled[:count]
+        metadata = {
+            "requested": count,
+            "returned": count,
+            "available": pool_size
+        }
+    else:
+        # Cas insuffisant: retourner tout ce qui est disponible, avec warning
+        result = shuffled  # Tous les exercices disponibles
+        
+        # Construire le message de warning explicite
+        filter_desc = []
+        if difficulty:
+            filter_desc.append(f"difficulté '{difficulty}'")
+        if offer and offer != "pro":
+            filter_desc.append(f"offre '{offer}'")
+        filter_str = " et ".join(filter_desc) if filter_desc else "ce filtre"
+        
+        metadata = {
+            "requested": count,
+            "returned": pool_size,
+            "available": pool_size,
+            "warning": f"Seulement {pool_size} exercice(s) disponible(s) pour {filter_str}."
+        }
     
-    return result, {
-        "requested": count,
-        "returned": len(result),
-        "available": available,
-        "has_duplicates": has_duplicates
-    }
+    return result, metadata
 
 
 def get_exercise_by_seed_index(
