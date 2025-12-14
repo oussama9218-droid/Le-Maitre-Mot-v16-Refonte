@@ -716,6 +716,16 @@ const ExerciseGeneratorPage = () => {
           </Alert>
         )}
 
+        {/* Warning batch GM07 (pool insuffisant) */}
+        {batchWarning && (
+          <Alert className="mb-6 border-amber-300 bg-amber-50">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-800">
+              <strong>Information :</strong> {batchWarning}
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Affichage des exercices */}
         {exercises.length > 0 && currentExercise && (
           <div className="space-y-6">
