@@ -82,10 +82,13 @@ def generate_gm07_exercise(
     """
     Génère UN exercice GM07 depuis la source figée.
     
+    Utilise le seed pour sélectionner un index déterministe,
+    garantissant que des seeds différents retournent des exercices différents.
+    
     Args:
         offer: "free" ou "pro" (défaut: "free")
         difficulty: "facile", "moyen", "difficile" (défaut: tous)
-        seed: Graine pour la sélection aléatoire
+        seed: Graine pour la sélection (utilisée comme index déterministe)
     
     Returns:
         Exercice formaté pour l'API ou None si aucun exercice disponible
@@ -95,8 +98,8 @@ def generate_gm07_exercise(
     if difficulty:
         difficulty = difficulty.lower()
     
-    # Sélectionner un exercice
-    exercise = get_random_gm07_exercise(
+    # Sélectionner un exercice basé sur le seed (sélection déterministe)
+    exercise = get_exercise_by_seed_index(
         offer=offer,
         difficulty=difficulty,
         seed=seed
