@@ -148,6 +148,72 @@ async def generate_gm07_batch_endpoint(request: GM07BatchRequest):
     )
 
 
+@router.post("/generate/batch/gm08", response_model=GM08BatchResponse, tags=["GM08"])
+async def generate_gm08_batch_endpoint(request: GM08BatchRequest):
+    """
+    Génère un lot d'exercices GM08 SANS DOUBLONS.
+    
+    **Thème:** Grandeurs et Mesures - Longueurs, Périmètres
+    
+    **Comportement produit:**
+    - Si pool_size >= N: retourne exactement N exercices UNIQUES
+    - Si pool_size < N: retourne pool_size exercices avec metadata.warning
+    - JAMAIS de doublons
+    
+    **Exemple de réponse:**
+    ```json
+    {
+        "exercises": [...],
+        "batch_metadata": {
+            "requested": 5,
+            "returned": 4,
+            "available": 4,
+            "warning": "Seulement 4 exercices disponibles pour difficulté 'facile' et offre 'free'."
+        }
+    }
+    ```
+    """
+    # Vérifier que c'est bien GM08
+    if request.code_officiel.upper() != "6E_GM08":
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "invalid_chapter",
+                "message": "Cet endpoint est réservé au chapitre GM08",
+                "hint": "Utilisez code_officiel='6e_GM08'"
+            }
+        )
+    
+    logger.info(f"🎯 GM08 Batch Request: offer={request.offer}, difficulty={request.difficulte}, count={request.nb_exercices}")
+    
+    # Générer le batch
+    exercises, batch_meta = generate_gm08_batch(
+        offer=request.offer,
+        difficulty=request.difficulte,
+        count=request.nb_exercices,
+        seed=request.seed
+    )
+    
+    if not exercises:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "no_exercises_found",
+                "message": batch_meta.get("warning", "Aucun exercice disponible"),
+                "batch_metadata": batch_meta
+            }
+        )
+    
+    # Log le résultat
+    warning = batch_meta.get("warning", "")
+    logger.info(f"✅ GM08 Batch generated: {len(exercises)} exercises. {warning}")
+    
+    return GM08BatchResponse(
+        exercises=exercises,
+        batch_metadata=batch_meta
+    )
+
+
 def generate_exercise_id(niveau: str, chapitre: str) -> str:
     """
     Génère un identifiant unique pour l'exercice
