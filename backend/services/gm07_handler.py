@@ -9,12 +9,18 @@ Logique métier:
 - FREE: ne voit que les exercices offer="free" (ids 1-10)
 - PRO: voit tous les exercices (ids 1-20)
 - La difficulté filtre réellement les exercices disponibles
+- Génération de lots SANS DOUBLONS (tant que possible)
 """
 
 import random
 import time
-from typing import Dict, Any, Optional
-from data.gm07_exercises import get_random_gm07_exercise, get_gm07_exercises, get_gm07_stats
+from typing import Dict, Any, Optional, List
+from data.gm07_exercises import (
+    get_random_gm07_exercise, 
+    get_gm07_exercises, 
+    get_gm07_stats,
+    get_gm07_batch
+)
 
 
 def is_gm07_request(code_officiel: Optional[str]) -> bool:
@@ -30,13 +36,50 @@ def is_gm07_request(code_officiel: Optional[str]) -> bool:
     return code_officiel and code_officiel.upper() == "6E_GM07"
 
 
+def _format_exercise_response(exercise: Dict[str, Any], timestamp: int) -> Dict[str, Any]:
+    """
+    Formate un exercice brut en réponse API.
+    
+    Args:
+        exercise: Exercice brut depuis gm07_exercises.py
+        timestamp: Timestamp pour l'ID unique
+    
+    Returns:
+        Exercice formaté pour l'API
+    """
+    is_premium = exercise["offer"] == "pro"
+    exercise_id = f"ex_6e_gm07_{exercise['id']}_{timestamp}"
+    
+    return {
+        "id_exercice": exercise_id,
+        "niveau": "6e",
+        "chapitre": "Durées et lecture de l'heure",
+        "enonce_html": exercise["enonce_html"],
+        "solution_html": exercise["solution_html"],
+        "svg": _generate_clock_svg() if exercise.get("needs_svg") else None,
+        "pdf_token": exercise_id,
+        "metadata": {
+            "code_officiel": "6e_GM07",
+            "difficulte": exercise["difficulty"],
+            "difficulty": exercise["difficulty"],
+            "is_premium": is_premium,
+            "offer": "pro" if is_premium else "free",
+            "generator_code": f"6e_GM07_{exercise['family']}",
+            "family": exercise["family"],
+            "exercise_id": exercise["id"],
+            "is_fallback": False,
+            "source": "gm07_fixed_exercises"
+        }
+    }
+
+
 def generate_gm07_exercise(
     offer: Optional[str] = None,
     difficulty: Optional[str] = None,
     seed: Optional[int] = None
 ) -> Optional[Dict[str, Any]]:
     """
-    Génère un exercice GM07 depuis la source figée.
+    Génère UN exercice GM07 depuis la source figée.
     
     Args:
         offer: "free" ou "pro" (défaut: "free")
@@ -61,38 +104,66 @@ def generate_gm07_exercise(
     if not exercise:
         return None
     
-    # Déterminer si l'exercice est premium
-    is_premium = exercise["offer"] == "pro"
-    
-    # Générer un ID unique pour cet exercice
     timestamp = int(time.time() * 1000)
-    exercise_id = f"ex_6e_gm07_{exercise['id']}_{timestamp}"
+    return _format_exercise_response(exercise, timestamp)
+
+
+def generate_gm07_batch(
+    offer: Optional[str] = None,
+    difficulty: Optional[str] = None,
+    count: int = 1,
+    seed: Optional[int] = None
+) -> List[Dict[str, Any]]:
+    """
+    Génère un LOT d'exercices GM07 SANS DOUBLONS.
     
-    # Générer le pdf_token (même format que l'id_exercice)
-    pdf_token = exercise_id
+    Cette fonction garantit:
+    - Pas de doublons si count <= exercices disponibles
+    - Si count > exercices disponibles: boucle avec metadata.has_duplicates=True
     
-    # Formater la réponse pour l'API
-    return {
-        "id_exercice": exercise_id,
-        "niveau": "6e",
-        "chapitre": "Durées et lecture de l'heure",
-        "enonce_html": exercise["enonce_html"],
-        "solution_html": exercise["solution_html"],
-        "svg": _generate_clock_svg() if exercise.get("needs_svg") else None,
-        "pdf_token": pdf_token,
-        "metadata": {
-            "code_officiel": "6e_GM07",
-            "difficulte": exercise["difficulty"],
-            "difficulty": exercise["difficulty"],  # Alias pour compatibilité
-            "is_premium": is_premium,
-            "offer": "pro" if is_premium else "free",
-            "generator_code": f"6e_GM07_{exercise['family']}",
-            "family": exercise["family"],
-            "exercise_id": exercise["id"],
-            "is_fallback": False,
-            "source": "gm07_fixed_exercises"
+    Args:
+        offer: "free" ou "pro" (défaut: "free")
+        difficulty: "facile", "moyen", "difficile" (défaut: tous)
+        count: Nombre d'exercices demandés
+        seed: Graine pour le mélange aléatoire
+    
+    Returns:
+        Liste d'exercices formatés pour l'API
+    """
+    # Normaliser les paramètres
+    offer = (offer or "free").lower()
+    if difficulty:
+        difficulty = difficulty.lower()
+    
+    # Obtenir le lot sans doublons
+    exercises, batch_meta = get_gm07_batch(
+        offer=offer,
+        difficulty=difficulty,
+        count=count,
+        seed=seed
+    )
+    
+    if not exercises:
+        return []
+    
+    # Formater chaque exercice avec un timestamp unique
+    base_timestamp = int(time.time() * 1000)
+    result = []
+    
+    for idx, exercise in enumerate(exercises):
+        formatted = _format_exercise_response(exercise, base_timestamp + idx)
+        
+        # Ajouter les métadonnées de lot
+        formatted["metadata"]["batch_info"] = {
+            "requested": batch_meta["requested"],
+            "available": batch_meta["available"],
+            "has_duplicates": batch_meta["has_duplicates"],
+            "position": idx + 1
         }
-    }
+        
+        result.append(formatted)
+    
+    return result
 
 
 def get_gm07_available_exercises(
