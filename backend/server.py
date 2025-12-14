@@ -4749,7 +4749,7 @@ app.include_router(catalogue_router)
 
 # Include Exercises v1 API router (V1-BE-002)
 from routes.exercises_routes import router as exercises_router
-app.include_router(exercises_router, tags=["Exercises v1"])
+app.include_router(exercises_router, prefix="/api/v1/exercises", tags=["Exercises v1"])
 
 # Include Admin Curriculum router (V1 - READ-ONLY)
 from routes.admin_curriculum_routes import router as admin_curriculum_router
