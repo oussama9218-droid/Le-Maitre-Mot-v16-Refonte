@@ -2374,3 +2374,63 @@ Implémentation du chapitre pilote GM07 (Durées et lecture de l'heure) avec 20 
 | `/app/backend/routes/exercises_routes.py` | MODIFIÉ - Intercepteur GM07 |
 | `/app/backend/tests/test_gm07_pilote.py` | CRÉÉ - 24 tests automatisés |
 
+
+---
+
+## GM07 Correctifs v2 - HTML Pur & Anti-Doublons - 2025-12-14
+
+### Problèmes corrigés
+
+#### A) Normalisation HTML STRICTE
+**Problème**: Les champs `enonce_html` et `solution_html` contenaient du Markdown (`**texte**`) et LaTeX (`$3 \times 5 = 15$`) qui s'affichaient en brut dans le frontend.
+
+**Solution**: Remplacement complet par HTML pur dans `gm07_exercises.py`:
+- `**texte**` → `<strong>texte</strong>`
+- `$3 \times 5 = 15$` → `3 × 5 = 15`
+- `\times` → `×`
+- `\div` → `÷`
+- `\frac{a}{b}` → `a/b`
+
+#### B) Génération de lots sans doublons
+**Problème**: Quand le frontend demandait 5 exercices avec des seeds consécutifs (`Date.now() + i`), on obtenait des doublons car le simple modulo ne distribuait pas bien les seeds proches.
+
+**Solution**: Utilisation du hash multiplicatif de Knuth dans `get_exercise_by_seed_index()`:
+```python
+hash_seed = (seed * 2654435761) % (2**32)  # Multiplicateur de Knuth
+index = hash_seed % n
+```
+
+Cela garantit que des seeds consécutifs donnent des indices très différents.
+
+### Tests automatisés
+
+| Fichier | Tests | Statut |
+|---------|-------|--------|
+| `test_gm07_v2_fixes.py` | 13 | ✅ 13/13 |
+| `test_gm07_pilote.py` | 24 | ✅ 24/24 |
+| `test_gm07_v2_validation.py` | 6 | ✅ 6/6 |
+
+### Distribution des exercices
+
+| Filtre | Stock | Seeds 0-4 → IDs |
+|--------|-------|-----------------|
+| FREE moyen | 4 | 2, 4, 7, 8, 2 (4 uniques) |
+| PRO difficile | 6 | 13, 20, 3, 16, 19 (5 uniques) |
+
+### Fichiers modifiés
+
+| Fichier | Modifications |
+|---------|---------------|
+| `gm07_exercises.py` | HTML pur + fonction `get_exercise_by_seed_index()` avec hash Knuth |
+| `gm07_handler.py` | Import de `get_exercise_by_seed_index()` |
+| `exercises_routes.py` | Import de `generate_gm07_batch()` pour lots |
+
+### Critères validés
+
+- ✅ `solution_html` ne contient plus `**` ni `$`
+- ✅ Utilise `<strong>`, `×`, `÷` au lieu de Markdown/LaTeX
+- ✅ 5 seeds consécutifs donnent ≥4 exercices uniques (FREE moyen)
+- ✅ 5 seeds consécutifs donnent 5 exercices uniques (PRO difficile)
+- ✅ Autres chapitres non impactés
+- ✅ Logique Free/Pro préservée
+
