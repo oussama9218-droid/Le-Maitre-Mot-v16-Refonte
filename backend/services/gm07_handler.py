@@ -117,13 +117,14 @@ def generate_gm07_batch(
     difficulty: Optional[str] = None,
     count: int = 1,
     seed: Optional[int] = None
-) -> List[Dict[str, Any]]:
+) -> tuple:
     """
-    Génère un LOT d'exercices GM07 SANS DOUBLONS.
+    Génère un LOT d'exercices GM07 SANS DOUBLONS - VERSION PRODUCTION.
     
-    Cette fonction garantit:
-    - Pas de doublons si count <= exercices disponibles
-    - Si count > exercices disponibles: boucle avec metadata.has_duplicates=True
+    Comportement produit:
+    - Si pool_size >= count: retourne exactement count exercices UNIQUES
+    - Si pool_size < count: retourne pool_size exercices avec metadata.warning
+    - JAMAIS de doublons
     
     Args:
         offer: "free" ou "pro" (défaut: "free")
@@ -132,7 +133,9 @@ def generate_gm07_batch(
         seed: Graine pour le mélange aléatoire
     
     Returns:
-        Liste d'exercices formatés pour l'API
+        Tuple (exercices: List[Dict], batch_metadata: Dict)
+        - exercices: Liste d'exercices formatés pour l'API
+        - batch_metadata: Infos sur le batch (requested, returned, available, warning?)
     """
     # Normaliser les paramètres
     offer = (offer or "free").lower()
@@ -148,7 +151,7 @@ def generate_gm07_batch(
     )
     
     if not exercises:
-        return []
+        return [], batch_meta
     
     # Formater chaque exercice avec un timestamp unique
     base_timestamp = int(time.time() * 1000)
@@ -157,17 +160,21 @@ def generate_gm07_batch(
     for idx, exercise in enumerate(exercises):
         formatted = _format_exercise_response(exercise, base_timestamp + idx)
         
-        # Ajouter les métadonnées de lot
+        # Ajouter les métadonnées de batch à chaque exercice
         formatted["metadata"]["batch_info"] = {
+            "position": idx + 1,
+            "total_in_batch": len(exercises),
             "requested": batch_meta["requested"],
-            "available": batch_meta["available"],
-            "has_duplicates": batch_meta["has_duplicates"],
-            "position": idx + 1
+            "available": batch_meta["available"]
         }
+        
+        # Ajouter le warning si présent (uniquement sur le premier exercice)
+        if idx == 0 and "warning" in batch_meta:
+            formatted["metadata"]["warning"] = batch_meta["warning"]
         
         result.append(formatted)
     
-    return result
+    return result, batch_meta
 
 
 def get_gm07_available_exercises(
