@@ -339,6 +339,38 @@ const ExerciseGeneratorPage = () => {
       }
 
       // ========================================================================
+      // GM08 BATCH: Utiliser l'endpoint batch pour garantir l'unicité
+      // ========================================================================
+      if (codeOfficiel.toUpperCase() === "6E_GM08") {
+        const seed = Date.now();
+        setGm07Seed(seed); // Réutiliser le state existant pour le seed
+        
+        const batchPayload = {
+          code_officiel: "6e_GM08",
+          nb_exercices: nbExercices,
+          difficulte: difficulte,
+          offer: isPro ? "pro" : "free",
+          seed: seed
+        };
+        
+        console.log('🎯 GM08 Batch Request:', batchPayload);
+        
+        const response = await axios.post(`${API_V1}/generate/batch/gm08`, batchPayload);
+        const { exercises: batchExercises, batch_metadata } = response.data;
+        
+        // Vérifier si on a reçu moins que demandé
+        if (batch_metadata.warning) {
+          setBatchWarning(batch_metadata.warning);
+          console.log('⚠️ GM08 Warning:', batch_metadata.warning);
+        }
+        
+        setExercises(batchExercises);
+        console.log(`✅ GM08 Batch: ${batchExercises.length} exercices générés (demandés: ${batch_metadata.requested}, disponibles: ${batch_metadata.available})`);
+        
+        return; // Sortir ici pour GM08
+      }
+
+      // ========================================================================
       // AUTRES CHAPITRES: Comportement existant (appels parallèles)
       // ========================================================================
       const promises = [];
