@@ -420,34 +420,33 @@ async def generate_exercise(request: ExerciseGenerateRequest):
             
             return gm07_exercise
         
-        # Si on demande plusieurs exercices, utiliser la génération par lot SANS DOUBLONS
-        gm07_batch = generate_gm07_batch(
+        # Si on demande plusieurs exercices via cet endpoint, utiliser le batch
+        # Note: Le frontend devrait utiliser /generate/batch/gm07 pour les lots
+        exercises, batch_meta = generate_gm07_batch(
             offer=request.offer,
             difficulty=request.difficulte,
             count=nb,
             seed=request.seed
         )
         
-        if not gm07_batch:
+        if not exercises:
             raise HTTPException(
                 status_code=422,
                 detail={
                     "error": "no_gm07_exercise_found",
-                    "message": f"Aucun exercice GM07 trouvé pour offer='{request.offer}' et difficulty='{request.difficulte}'",
-                    "hint": "Vérifiez les filtres: offer='free'|'pro', difficulty='facile'|'moyen'|'difficile'"
+                    "message": batch_meta.get("warning", f"Aucun exercice GM07 trouvé"),
+                    "hint": "Vérifiez les filtres ou utilisez /generate/batch/gm07 pour les lots"
                 }
             )
         
-        # Log le premier exercice pour info
-        first_ex = gm07_batch[0]
-        batch_info = first_ex['metadata'].get('batch_info', {})
-        logger.info(f"✅ GM07 Batch generated: {len(gm07_batch)} exercises, "
-                   f"available={batch_info.get('available')}, "
-                   f"has_duplicates={batch_info.get('has_duplicates')}")
+        # Log le résultat
+        logger.info(f"✅ GM07 Batch via /generate: {len(exercises)} exercises, "
+                   f"available={batch_meta.get('available')}, "
+                   f"warning={batch_meta.get('warning', 'none')}")
         
-        # Retourner le premier exercice (l'UI fait des appels séparés)
-        # Note: Pour une vraie implémentation batch, on pourrait retourner la liste
-        return gm07_batch[0]
+        # Retourner le premier exercice pour compatibilité avec l'API actuelle
+        # Le warning est inclus dans les metadata
+        return exercises[0]
     
     # ============================================================================
     # 0. RÉSOLUTION DU MODE (code_officiel vs legacy) - Pour autres chapitres
