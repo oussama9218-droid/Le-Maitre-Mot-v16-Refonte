@@ -302,16 +302,44 @@ async def generate_exercise(request: ExerciseGenerateRequest):
     # ============================================================================
     
     if is_gm07_request(request.code_officiel):
-        logger.info(f"🎯 GM07 Request intercepted: offer={request.offer}, difficulty={request.difficulte}")
+        from services.gm07_handler import generate_gm07_batch
         
-        # Générer l'exercice depuis la source figée GM07
-        gm07_exercise = generate_gm07_exercise(
+        nb = request.nb_exercices if hasattr(request, 'nb_exercices') else 1
+        logger.info(f"🎯 GM07 Request intercepted: offer={request.offer}, difficulty={request.difficulte}, count={nb}")
+        
+        # Si on demande 1 seul exercice, utiliser la fonction simple
+        if nb == 1:
+            gm07_exercise = generate_gm07_exercise(
+                offer=request.offer,
+                difficulty=request.difficulte,
+                seed=request.seed
+            )
+            
+            if not gm07_exercise:
+                raise HTTPException(
+                    status_code=422,
+                    detail={
+                        "error": "no_gm07_exercise_found",
+                        "message": f"Aucun exercice GM07 trouvé pour offer='{request.offer}' et difficulty='{request.difficulte}'",
+                        "hint": "Vérifiez les filtres: offer='free'|'pro', difficulty='facile'|'moyen'|'difficile'"
+                    }
+                )
+            
+            logger.info(f"✅ GM07 Exercise generated: id={gm07_exercise['metadata']['exercise_id']}, "
+                       f"family={gm07_exercise['metadata']['family']}, "
+                       f"is_premium={gm07_exercise['metadata']['is_premium']}")
+            
+            return gm07_exercise
+        
+        # Si on demande plusieurs exercices, utiliser la génération par lot SANS DOUBLONS
+        gm07_batch = generate_gm07_batch(
             offer=request.offer,
             difficulty=request.difficulte,
+            count=nb,
             seed=request.seed
         )
         
-        if not gm07_exercise:
+        if not gm07_batch:
             raise HTTPException(
                 status_code=422,
                 detail={
@@ -321,11 +349,16 @@ async def generate_exercise(request: ExerciseGenerateRequest):
                 }
             )
         
-        logger.info(f"✅ GM07 Exercise generated: id={gm07_exercise['metadata']['exercise_id']}, "
-                   f"family={gm07_exercise['metadata']['family']}, "
-                   f"is_premium={gm07_exercise['metadata']['is_premium']}")
+        # Log le premier exercice pour info
+        first_ex = gm07_batch[0]
+        batch_info = first_ex['metadata'].get('batch_info', {})
+        logger.info(f"✅ GM07 Batch generated: {len(gm07_batch)} exercises, "
+                   f"available={batch_info.get('available')}, "
+                   f"has_duplicates={batch_info.get('has_duplicates')}")
         
-        return gm07_exercise
+        # Retourner le premier exercice (l'UI fait des appels séparés)
+        # Note: Pour une vraie implémentation batch, on pourrait retourner la liste
+        return gm07_batch[0]
     
     # ============================================================================
     # 0. RÉSOLUTION DU MODE (code_officiel vs legacy) - Pour autres chapitres
