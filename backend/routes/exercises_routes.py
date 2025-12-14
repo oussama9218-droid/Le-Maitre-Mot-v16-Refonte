@@ -535,6 +535,66 @@ async def generate_exercise(request: ExerciseGenerateRequest):
         return exercises[0]
     
     # ============================================================================
+    # GM08 INTERCEPT: Chapitre pilote #2 avec exercices figés
+    # ============================================================================
+    
+    if is_gm08_request(request.code_officiel):
+        nb = request.nb_exercices if hasattr(request, 'nb_exercices') else 1
+        logger.info(f"🎯 GM08 Request intercepted: offer={request.offer}, difficulty={request.difficulte}, count={nb}")
+        
+        # Si on demande 1 seul exercice, utiliser la fonction simple
+        if nb == 1:
+            gm08_exercise = generate_gm08_exercise(
+                offer=request.offer,
+                difficulty=request.difficulte,
+                seed=request.seed
+            )
+            
+            if not gm08_exercise:
+                raise HTTPException(
+                    status_code=422,
+                    detail={
+                        "error": "no_gm08_exercise_found",
+                        "message": f"Aucun exercice GM08 trouvé pour offer='{request.offer}' et difficulty='{request.difficulte}'",
+                        "hint": "Vérifiez les filtres: offer='free'|'pro', difficulty='facile'|'moyen'|'difficile'"
+                    }
+                )
+            
+            logger.info(f"✅ GM08 Exercise generated: id={gm08_exercise['metadata']['exercise_id']}, "
+                       f"family={gm08_exercise['metadata']['family']}, "
+                       f"is_premium={gm08_exercise['metadata']['is_premium']}")
+            
+            return gm08_exercise
+        
+        # Si on demande plusieurs exercices via cet endpoint, utiliser le batch
+        # Note: Le frontend devrait utiliser /generate/batch/gm08 pour les lots
+        exercises, batch_meta = generate_gm08_batch(
+            offer=request.offer,
+            difficulty=request.difficulte,
+            count=nb,
+            seed=request.seed
+        )
+        
+        if not exercises:
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "error": "no_gm08_exercise_found",
+                    "message": batch_meta.get("warning", f"Aucun exercice GM08 trouvé"),
+                    "hint": "Vérifiez les filtres ou utilisez /generate/batch/gm08 pour les lots"
+                }
+            )
+        
+        # Log le résultat
+        logger.info(f"✅ GM08 Batch via /generate: {len(exercises)} exercises, "
+                   f"available={batch_meta.get('available')}, "
+                   f"warning={batch_meta.get('warning', 'none')}")
+        
+        # Retourner le premier exercice pour compatibilité avec l'API actuelle
+        # Le warning est inclus dans les metadata
+        return exercises[0]
+    
+    # ============================================================================
     # 0. RÉSOLUTION DU MODE (code_officiel vs legacy) - Pour autres chapitres
     # ============================================================================
     
