@@ -374,14 +374,13 @@ def get_exercise_by_seed_index(
     """
     Retourne un exercice basé sur le seed.
     
-    Le seed est utilisé pour sélectionner un index dans la liste filtrée.
-    On utilise une fonction de hachage pour mieux distribuer les seeds
-    et éviter les collisions quand les seeds sont proches (Date.now() + i).
+    Utilise une combinaison du seed et d'un hash pour sélectionner
+    un exercice de manière déterministe mais bien distribuée.
     
     Args:
         offer: "free" ou "pro"
         difficulty: "facile", "moyen", "difficile"
-        seed: Graine pour la sélection (utilisée comme index)
+        seed: Graine pour la sélection
     
     Returns:
         Un exercice ou None si aucun ne correspond
@@ -394,19 +393,16 @@ def get_exercise_by_seed_index(
     n = len(exercises)
     
     if seed is not None:
-        # Utiliser un hash pour mieux distribuer les valeurs de seed
-        # Cela évite les collisions quand les seeds sont proches (ex: Date.now() + 0, +1, +2...)
-        # On utilise le seed pour mélanger puis on prend selon le modulo
-        import random
-        rng = random.Random(seed)
-        # Mélanger la liste avec ce seed spécifique
-        shuffled = exercises.copy()
-        rng.shuffle(shuffled)
-        # Prendre le premier élément de la liste mélangée
-        return shuffled[0]
+        # Pour des seeds proches (Date.now() + 0, +1, +2...), on veut des résultats différents
+        # On utilise un hash simple qui amplifie les petites différences
+        # seed * grand_nombre_premier % n donne une bonne distribution
+        hash_seed = (seed * 2654435761) % (2**32)  # Multiplicateur de Knuth
+        index = hash_seed % n
     else:
         import random
-        return random.choice(exercises)
+        index = random.randint(0, n - 1)
+    
+    return exercises[index]
 
 
 def get_gm07_stats() -> Dict[str, Any]:
