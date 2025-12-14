@@ -35,8 +35,8 @@
     },
     {
       "label": "Longueurs, masses, durées",
-      "codes_officiels": ["6e_GM01", "6e_GM05", "6e_GM06", "6e_GM07"],
-      "description": "Mesures et conversions (inclut lecture de l'heure)"
+      "codes_officiels": ["6e_GM01", "6e_GM05", "6e_GM06", "6e_GM07", "6e_GM08"],
+      "description": "Mesures et conversions (inclut lecture de l'heure et longueurs)"
     },
     {
       "label": "Périmètres et aires",
