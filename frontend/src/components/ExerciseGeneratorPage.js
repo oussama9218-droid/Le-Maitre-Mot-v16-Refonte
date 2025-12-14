@@ -388,6 +388,7 @@ const ExerciseGeneratorPage = () => {
     if (!selectedItem) return;
 
     setLoadingVariation(true);
+    setBatchWarning(null);
     
     try {
       // Même logique que generateExercises pour déterminer le code
@@ -401,6 +402,44 @@ const ExerciseGeneratorPage = () => {
         codeOfficiel = selectedItem;
       }
       
+      // ========================================================================
+      // GM07 VARIATION: Relancer le batch avec un nouveau seed
+      // ========================================================================
+      if (codeOfficiel.toUpperCase() === "6E_GM07") {
+        // Nouveau seed pour une nouvelle liste
+        const newSeed = Date.now();
+        setGm07Seed(newSeed);
+        
+        // Respecter le statut premium de l'exercice courant
+        const currentExerciseForVariation = exercises[index];
+        const isCurrentPremium = currentExerciseForVariation?.metadata?.is_premium === true;
+        
+        const batchPayload = {
+          code_officiel: "6e_GM07",
+          nb_exercices: exercises.length, // Même nombre que la liste actuelle
+          difficulte: difficulte,
+          offer: isCurrentPremium ? "pro" : (isPro ? "pro" : "free"),
+          seed: newSeed
+        };
+        
+        console.log('🔄 GM07 Variation Batch:', batchPayload);
+        
+        const response = await axios.post(`${API_V1}/generate/batch/gm07`, batchPayload);
+        const { exercises: batchExercises, batch_metadata } = response.data;
+        
+        if (batch_metadata.warning) {
+          setBatchWarning(batch_metadata.warning);
+        }
+        
+        setExercises(batchExercises);
+        console.log(`✅ GM07 Variation: ${batchExercises.length} nouveaux exercices générés`);
+        
+        return; // Sortir ici pour GM07
+      }
+      
+      // ========================================================================
+      // AUTRES CHAPITRES: Comportement existant (variation single)
+      // ========================================================================
       const seed = Date.now() + Math.random() * 1000;
       
       // IMPORTANT: Pour une variation, on doit respecter le type de l'exercice COURANT
