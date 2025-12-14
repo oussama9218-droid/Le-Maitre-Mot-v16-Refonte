@@ -19,7 +19,8 @@ from data.gm07_exercises import (
     get_random_gm07_exercise, 
     get_gm07_exercises, 
     get_gm07_stats,
-    get_gm07_batch
+    get_gm07_batch,
+    get_exercise_by_seed_index
 )
 
 
