@@ -1,6 +1,82 @@
 # Testing Protocol and Results
 
-## Latest Test Session - Validation Frontend GM07 Chapitre Pilote - 2025-12-14
+## Latest Test Session - Validation des correctifs GM07 v2 - 2025-12-14
+
+### Test Focus
+Validation complète des deux bugs corrigés dans GM07 v2:
+1. **HTML pur**: Remplacement de Markdown (`**texte**`) et LaTeX (`$...$`) par HTML (`<strong>`, `×`)
+2. **Pas de doublons**: Seeds différents retournent des exercices différents grâce au hash de Knuth
+
+### Tests Exécutés - Tous Passés ✅ (6/6 - 100%)
+
+| Test | Description | Résultat | Détails |
+|------|-------------|----------|---------|
+| Test 1 | HTML pur - Pas de Markdown | ✅ PASSED | solution_html ne contient PAS `**`, contient `<strong>` |
+| Test 2 | HTML pur - Pas de LaTeX | ✅ PASSED | solution_html ne contient PAS `$`, utilise `×` et `÷` |
+| Test 3 | Pas de doublons - FREE moyen (stock=4) | ✅ PASSED | 4/5 exercices uniques avec seeds consécutifs |
+| Test 4 | Pas de doublons - PRO difficile (stock=6) | ✅ PASSED | 5/5 exercices uniques avec seeds consécutifs |
+| Test 5 | Non-régression - Autres chapitres | ✅ PASSED | 6e_N08 fonctionne, generator FRACTION détecté |
+| Test 6 | Non-régression - Logique Free/Pro | ✅ PASSED | FREE: is_premium=false, PRO: au moins 1 is_premium=true |
+
+### Critères de Succès - Tous Validés ✅
+
+- ✅ **Pas de Markdown ni LaTeX dans les solutions**: HTML pur avec `<strong>` et symboles `×`, `÷`
+- ✅ **Au moins 4/5 uniques avec seeds consécutifs**: Diversité suffisante pour éviter les doublons
+- ✅ **Autres chapitres non impactés**: 6e_N08 (Fractions) fonctionne correctement
+- ✅ **Logique Free/Pro préservée**: FREE toujours false, PRO génère des exercices premium
+
+### Validation Technique Détaillée
+
+**Backend URL**: https://exercisefix.preview.emergentagent.com  
+**Test Time**: 2025-12-14 17:30:00  
+**API Endpoint**: POST /api/v1/exercises/generate  
+
+**Test 1 - HTML pur - Pas de Markdown**:
+- ✅ Code officiel: "6e_GM07", difficulté: "facile"
+- ✅ Solution HTML (182 chars): Pas de `**`, contient `<strong>`
+- ✅ Pas de LaTeX: Aucun `\times`, `\frac`, `\text` détecté
+- ✅ HTML pur validé
+
+**Test 2 - HTML pur - Pas de LaTeX**:
+- ✅ Code officiel: "6e_GM07", difficulté: "moyen"
+- ✅ Solution HTML (287 chars): Pas de `$`, utilise `×` et `÷`
+- ✅ Pas de LaTeX: Aucun `\times`, `\div` détecté
+- ✅ Symboles HTML corrects utilisés
+
+**Test 3 - Pas de doublons FREE moyen**:
+- ✅ 5 générations avec seeds 1734100000000 à 1734100000004
+- ✅ 4 exercices uniques détectés (1 doublon acceptable pour stock=4)
+- ✅ Hash diversité: b656a3a2, 86134a00, 1350ec0c, 2462cc36
+- ✅ Critère "au moins 4/5 uniques" respecté
+
+**Test 4 - Pas de doublons PRO difficile**:
+- ✅ 5 générations avec seeds 1734200000000 à 1734200000004
+- ✅ 5 exercices uniques (diversité parfaite pour stock=6)
+- ✅ Hash diversité: 901cd962, 32879f4d, 037d24e9, cfa59b27, 6e4eef78
+- ✅ Critère "5/5 uniques" respecté
+
+**Test 5 - Non-régression autres chapitres**:
+- ✅ Code officiel: "6e_N08", difficulté: "facile"
+- ✅ Generator code: "6e_FRACTION_REPRESENTATION"
+- ✅ Chapitre Fractions fonctionne correctement
+- ✅ Pas d'impact sur autres chapitres
+
+**Test 6 - Non-régression logique Free/Pro**:
+- ✅ 5 appels FREE: [False, False, False, False, False]
+- ✅ 5 appels PRO: [False, True, True, False, True]
+- ✅ Tous les FREE ont is_premium=false
+- ✅ Au moins 1 PRO a is_premium=true (3/5 en fait)
+
+### Status Summary
+- **HTML pur (Markdown/LaTeX)**: ✅ COMPLÈTEMENT CORRIGÉ
+- **Diversité exercices (doublons)**: ✅ COMPLÈTEMENT CORRIGÉ
+- **Non-régression chapitres**: ✅ VALIDÉE (6e_N08 OK)
+- **Non-régression Free/Pro**: ✅ VALIDÉE (logique préservée)
+- **Taux de succès global**: ✅ 6/6 (100%)
+
+---
+
+## Previous Test Session - Validation Frontend GM07 Chapitre Pilote - 2025-12-14
 
 ### Test Focus
 Validation complète du chapitre pilote GM07 (Durées et lecture de l'heure) avec 20 exercices figés:
