@@ -68,6 +68,9 @@ def generate_gm07_exercise(
     timestamp = int(time.time() * 1000)
     exercise_id = f"ex_6e_gm07_{exercise['id']}_{timestamp}"
     
+    # Générer le pdf_token (même format que l'id_exercice)
+    pdf_token = exercise_id
+    
     # Formater la réponse pour l'API
     return {
         "id_exercice": exercise_id,
@@ -76,7 +79,7 @@ def generate_gm07_exercise(
         "enonce_html": exercise["enonce_html"],
         "solution_html": exercise["solution_html"],
         "svg": _generate_clock_svg() if exercise.get("needs_svg") else None,
-        "pdf_token": None,
+        "pdf_token": pdf_token,
         "metadata": {
             "code_officiel": "6e_GM07",
             "difficulte": exercise["difficulty"],
