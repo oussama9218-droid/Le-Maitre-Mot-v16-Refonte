@@ -2224,3 +2224,75 @@ if (isCurrentPremium) {
 - **Tests Backend**: ✅ 12/12 PASSENT
 - **Règle généralisable**: ✅ (vérification via metadata.is_premium)
 
+
+---
+
+## GM07 Chapitre Pilote - IMPLÉMENTATION COMPLÈTE - 2025-12-14
+
+### Résumé
+Implémentation du chapitre pilote GM07 (Durées et lecture de l'heure) avec 20 exercices figés.
+
+### Architecture Créée
+
+```
+/app/backend/
+├── data/
+│   ├── __init__.py
+│   └── gm07_exercises.py       # 20 exercices figés (10 FREE + 10 PRO)
+├── services/
+│   └── gm07_handler.py         # Handler dédié GM07
+├── routes/
+│   └── exercises_routes.py     # Intercepte GM07 avant les générateurs génériques
+└── tests/
+    └── test_gm07_pilote.py     # 24 tests automatisés
+```
+
+### Règles Métier Implémentées
+
+| Règle | Implémentation |
+|-------|----------------|
+| FREE = ids 1-10 | `offer="free"` dans gm07_exercises.py |
+| PRO = ids 11-20 | `offer="pro"` dans gm07_exercises.py |
+| FREE ne voit que FREE | Filtrage strict dans get_gm07_exercises() |
+| PRO voit tous | Pas de filtre offer pour pro |
+| Difficulté stricte | Filtre par difficulty si présent |
+| metadata.is_premium obligatoire | Toujours présent dans la réponse |
+
+### Tests Automatisés (24/24 - 100%)
+
+| Catégorie | Tests | Statut |
+|-----------|-------|--------|
+| Critère 1: Free → Free | 5 | ✅ |
+| Critère 2: Pro → Premium | 2 | ✅ |
+| Critère 3: Difficulté | 4 | ✅ |
+| Critère 4: Solutions | 4 | ✅ |
+| Critère 5: Non-régression | 3 | ✅ |
+| Métadonnées | 5 | ✅ |
+| Error handling | 1 | ✅ |
+
+### Validation Frontend (6/6 - 100%)
+
+- ✅ Génération GM07 mode FREE
+- ✅ Génération GM07 mode PRO
+- ✅ Badge PRO visible en mode PRO
+- ✅ Variation fonctionne
+- ✅ Solutions affichées correctement
+- ✅ Aucune erreur console
+
+### Critères d'Acceptance VALIDÉS
+
+1. ✅ GM07 Free génère toujours un exercice Free
+2. ✅ GM07 Pro génère des exercices Premium  
+3. ✅ La difficulté change réellement le contenu
+4. ✅ Les solutions sont affichées correctement
+5. ✅ Aucun autre chapitre n'est impacté
+
+### Fichiers Créés/Modifiés
+
+| Fichier | Action |
+|---------|--------|
+| `/app/backend/data/gm07_exercises.py` | CRÉÉ - 20 exercices figés |
+| `/app/backend/services/gm07_handler.py` | CRÉÉ - Handler GM07 |
+| `/app/backend/routes/exercises_routes.py` | MODIFIÉ - Intercepteur GM07 |
+| `/app/backend/tests/test_gm07_pilote.py` | CRÉÉ - 24 tests automatisés |
+
