@@ -1,6 +1,7 @@
 """
 Routes API v1 pour la génération d'exercices
 Endpoint: POST /api/v1/exercises/generate
+Endpoint batch: POST /api/v1/exercises/generate/batch (GM07 uniquement)
 
 Modes de fonctionnement:
 1. Mode GM07 (chapitre pilote): exercices figés depuis gm07_exercises.py
@@ -8,7 +9,8 @@ Modes de fonctionnement:
 3. Mode officiel: code_officiel (basé sur le référentiel 6e)
 """
 from fastapi import APIRouter, HTTPException
-from typing import Optional, List
+from typing import Optional, List, Any
+from pydantic import BaseModel, Field
 from html import escape
 import time
 import re
@@ -23,7 +25,7 @@ from services.curriculum_service import curriculum_service
 from services.math_generation_service import MathGenerationService
 from services.geometry_render_service import GeometryRenderService
 from curriculum.loader import get_chapter_by_official_code, CurriculumChapter
-from services.gm07_handler import is_gm07_request, generate_gm07_exercise
+from services.gm07_handler import is_gm07_request, generate_gm07_exercise, generate_gm07_batch
 from logger import get_logger
 
 logger = get_logger()
@@ -37,6 +39,93 @@ router = APIRouter()
 
 _math_service = MathGenerationService()
 _geom_service = GeometryRenderService()
+
+
+# ============================================================================
+# MODÈLES POUR L'ENDPOINT BATCH GM07
+# ============================================================================
+
+class GM07BatchRequest(BaseModel):
+    """Request model pour le batch GM07"""
+    code_officiel: str = Field(default="6e_GM07", description="Code officiel (doit être 6e_GM07)")
+    difficulte: Optional[str] = Field(default=None, description="facile, moyen, difficile")
+    offer: Optional[str] = Field(default="free", description="free ou pro")
+    nb_exercices: int = Field(default=1, ge=1, le=20, description="Nombre d'exercices (1-20)")
+    seed: Optional[int] = Field(default=None, description="Seed pour reproductibilité")
+
+
+class GM07BatchResponse(BaseModel):
+    """Response model pour le batch GM07"""
+    exercises: List[dict] = Field(description="Liste des exercices générés")
+    batch_metadata: dict = Field(description="Métadonnées du batch")
+
+
+# ============================================================================
+# ENDPOINT BATCH DÉDIÉ GM07
+# ============================================================================
+
+@router.post("/generate/batch/gm07", response_model=GM07BatchResponse, tags=["GM07"])
+async def generate_gm07_batch_endpoint(request: GM07BatchRequest):
+    """
+    Génère un lot d'exercices GM07 SANS DOUBLONS.
+    
+    **Comportement produit:**
+    - Si pool_size >= N: retourne exactement N exercices UNIQUES
+    - Si pool_size < N: retourne pool_size exercices avec metadata.warning
+    - JAMAIS de doublons
+    
+    **Exemple de réponse:**
+    ```json
+    {
+        "exercises": [...],
+        "batch_metadata": {
+            "requested": 5,
+            "returned": 4,
+            "available": 4,
+            "warning": "Seulement 4 exercices disponibles pour difficulté 'facile' et offre 'free'."
+        }
+    }
+    ```
+    """
+    # Vérifier que c'est bien GM07
+    if request.code_officiel.upper() != "6E_GM07":
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "invalid_chapter",
+                "message": "Cet endpoint est réservé au chapitre GM07",
+                "hint": "Utilisez code_officiel='6e_GM07'"
+            }
+        )
+    
+    logger.info(f"🎯 GM07 Batch Request: offer={request.offer}, difficulty={request.difficulte}, count={request.nb_exercices}")
+    
+    # Générer le batch
+    exercises, batch_meta = generate_gm07_batch(
+        offer=request.offer,
+        difficulty=request.difficulte,
+        count=request.nb_exercices,
+        seed=request.seed
+    )
+    
+    if not exercises:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "no_exercises_found",
+                "message": batch_meta.get("warning", "Aucun exercice disponible"),
+                "batch_metadata": batch_meta
+            }
+        )
+    
+    # Log le résultat
+    warning = batch_meta.get("warning", "")
+    logger.info(f"✅ GM07 Batch generated: {len(exercises)} exercises. {warning}")
+    
+    return GM07BatchResponse(
+        exercises=exercises,
+        batch_metadata=batch_meta
+    )
 
 
 def generate_exercise_id(niveau: str, chapitre: str) -> str:
