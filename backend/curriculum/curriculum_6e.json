@@ -376,6 +376,37 @@
     },
     {
       "niveau": "6e",
+      "code_officiel": "6e_GM08",
+      "domaine": "Grandeurs et mesures",
+      "libelle": "Longueurs et périmètres",
+      "chapitre_backend": "Grandeurs et mesures - Longueurs",
+      "exercise_types": [
+        "CONVERSION_LONGUEURS",
+        "COMPARAISON_LONGUEURS",
+        "PERIMETRE",
+        "PROBLEME_LONGUEURS"
+      ],
+      "premium_generators": [],
+      "schema_requis": false,
+      "difficulte_min": 1,
+      "difficulte_max": 3,
+      "statut": "prod",
+      "tags": [
+        "longueurs",
+        "conversion",
+        "périmètre",
+        "mesures",
+        "pilote"
+      ],
+      "contexts": [
+        "école",
+        "sport",
+        "jardinage",
+        "bricolage"
+      ]
+    },
+    {
+      "niveau": "6e",
       "code_officiel": "6e_N01",
       "domaine": "Nombres et calculs",
       "libelle": "Lire et écrire les nombres entiers",
