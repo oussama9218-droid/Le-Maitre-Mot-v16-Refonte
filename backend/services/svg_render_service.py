@@ -430,19 +430,23 @@ def _extract_time_from_enonce(enonce: str, exercise_id: int) -> tuple:
 # GÉNÉRATION SVG AVEC TYPES D'EXERCICES
 # =============================================================================
 
+import logging
+_svg_logger = logging.getLogger("svg_render_service")
+
 def generate_exercise_svgs(exercise: dict) -> dict:
     """
     Génère les SVG pour l'énoncé et la solution selon le type d'exercice.
     
-    Cette fonction est la nouvelle API principale pour la génération de SVG.
-    Elle prend en compte:
-    1. Les briefs personnalisés (svg_enonce_brief, svg_solution_brief) - prioritaire
-    2. Le champ exercise_type s'il est présent
-    3. Le comportement rétro-compatible basé sur family
+    ORDRE DE PRIORITÉ (source de vérité unique):
+    1. variables (dict) - SOURCE DE VÉRITÉ ABSOLUE si présent
+    2. svg_enonce_brief / svg_solution_brief - Briefs personnalisés
+    3. exercise_type + family - Comportement par défaut
+    4. Parsing HTML - DERNIER RECOURS avec WARNING
     
     Args:
         exercise: Dictionnaire de l'exercice avec les champs:
             - needs_svg: bool
+            - variables: Optional[dict] - SOURCE DE VÉRITÉ (ex: {"hour": 8, "minute": 0})
             - exercise_type: Optional[str] - Type explicite
             - svg_enonce_brief: Optional[str] - Brief pour SVG énoncé
             - svg_solution_brief: Optional[str] - Brief pour SVG solution
@@ -455,13 +459,15 @@ def generate_exercise_svgs(exercise: dict) -> dict:
             - figure_svg_enonce: str|None
             - figure_svg_solution: str|None
             - figure_svg: str|None (compatibilité)
+            - variables_used: dict|None (variables utilisées pour le rendu)
     """
     from models.exercise_types import get_svg_behavior
     
     result = {
         "figure_svg_enonce": None,
         "figure_svg_solution": None,
-        "figure_svg": None  # Compatibilité avec l'existant
+        "figure_svg": None,  # Compatibilité avec l'existant
+        "variables_used": None  # Variables utilisées pour le rendu
     }
     
     # Si needs_svg est False, pas de SVG
@@ -470,60 +476,115 @@ def generate_exercise_svgs(exercise: dict) -> dict:
     
     exercise_type = exercise.get("exercise_type")
     family = exercise.get("family", "")
-    enonce = exercise.get("enonce_html", "")
     exercise_id = exercise.get("id", 1)
     
-    # Briefs personnalisés (nouvelle fonctionnalité)
+    # =========================================================================
+    # PRIORITÉ 1: Variables explicites (SOURCE DE VÉRITÉ)
+    # =========================================================================
+    variables = exercise.get("variables")
+    
+    if variables and isinstance(variables, dict):
+        hour = variables.get("hour")
+        minute = variables.get("minute", 0)
+        
+        if hour is not None:
+            result["variables_used"] = {"hour": hour, "minute": minute, "source": "variables"}
+            
+            # Générer SVG selon le type d'exercice
+            if exercise_type == "PLACER_AIGUILLES":
+                # Énoncé: horloge VIDE, Solution: horloge avec aiguilles
+                result["figure_svg_enonce"] = _render_clock_empty_svg()
+                result["figure_svg_solution"] = _render_clock_svg(hour, minute)
+            else:
+                # Par défaut: horloge avec aiguilles dans l'énoncé
+                result["figure_svg_enonce"] = _render_clock_svg(hour, minute)
+                # Pas de SVG solution pour LECTURE_HEURE classique
+            
+            result["figure_svg"] = result["figure_svg_enonce"]
+            return result
+    
+    # =========================================================================
+    # PRIORITÉ 2: Briefs personnalisés
+    # =========================================================================
     svg_enonce_brief = exercise.get("svg_enonce_brief")
     svg_solution_brief = exercise.get("svg_solution_brief")
     
-    # Extraire l'heure si pertinent
-    hour, minute = _extract_time_from_enonce(enonce, exercise_id)
-    
-    # =========================================================================
-    # MODE 1: Briefs personnalisés (prioritaire)
-    # =========================================================================
     if svg_enonce_brief or svg_solution_brief:
-        # Générer SVG énoncé
+        # Extraire l'heure depuis le brief si possible
+        hour, minute = _extract_time_from_brief(svg_enonce_brief or svg_solution_brief)
+        result["variables_used"] = {"hour": hour, "minute": minute, "source": "brief"}
+        
         if svg_enonce_brief:
             result["figure_svg_enonce"] = render_svg_from_brief(
                 svg_enonce_brief, hour=hour, minute=minute
             )
         
-        # Générer SVG solution (fallback sur brief énoncé si absent)
         if svg_solution_brief:
             result["figure_svg_solution"] = render_svg_from_brief(
                 svg_solution_brief, hour=hour, minute=minute
             )
         elif svg_enonce_brief and exercise_type == "PLACER_AIGUILLES":
-            # Cas spécial: PLACER_AIGUILLES sans solution brief → horloge avec aiguilles
             result["figure_svg_solution"] = _render_clock_svg(hour, minute)
+        
+        result["figure_svg"] = result["figure_svg_enonce"]
+        return result
     
     # =========================================================================
-    # MODE 2: Comportement basé sur exercise_type / family
+    # PRIORITÉ 3: Comportement basé sur exercise_type / family
     # =========================================================================
-    else:
-        # Obtenir le comportement SVG selon le type
-        behavior = get_svg_behavior(exercise_type, family)
-        
-        # Générer le SVG de l'énoncé
-        if behavior.svg_in_enonce:
-            svg_type = behavior.enonce_svg_type
-            result["figure_svg_enonce"] = _generate_svg_by_type(
-                svg_type, exercise_type, family, hour, minute, exercise
-            )
-        
-        # Générer le SVG de la solution
-        if behavior.svg_in_solution:
-            svg_type = behavior.solution_svg_type
-            result["figure_svg_solution"] = _generate_svg_by_type(
-                svg_type, exercise_type, family, hour, minute, exercise
-            )
+    behavior = get_svg_behavior(exercise_type, family)
+    
+    # =========================================================================
+    # PRIORITÉ 4 (DERNIER RECOURS): Parsing HTML - avec WARNING
+    # =========================================================================
+    enonce = exercise.get("enonce_html", "")
+    hour, minute = _extract_time_from_enonce(enonce, exercise_id)
+    
+    # Émettre un warning car on utilise le parsing HTML (fragile)
+    if family.upper() in ["LECTURE_HORLOGE", "CALCUL_DUREE", "DUREES"]:
+        _svg_logger.warning(
+            f"⚠️ Exercice #{exercise_id}: SVG généré par parsing HTML (fragile). "
+            f"Ajoutez 'variables' pour garantir la cohérence texte/figure."
+        )
+    
+    result["variables_used"] = {"hour": hour, "minute": minute, "source": "html_parsing"}
+    
+    # Générer le SVG de l'énoncé
+    if behavior.svg_in_enonce:
+        svg_type = behavior.enonce_svg_type
+        result["figure_svg_enonce"] = _generate_svg_by_type(
+            svg_type, exercise_type, family, hour, minute, exercise
+        )
+    
+    # Générer le SVG de la solution
+    if behavior.svg_in_solution:
+        svg_type = behavior.solution_svg_type
+        result["figure_svg_solution"] = _generate_svg_by_type(
+            svg_type, exercise_type, family, hour, minute, exercise
+        )
     
     # Compatibilité: figure_svg = figure_svg_enonce (comportement précédent)
     result["figure_svg"] = result["figure_svg_enonce"]
     
     return result
+
+
+def _extract_time_from_brief(brief: str) -> tuple:
+    """
+    Extrait l'heure depuis un brief SVG.
+    Ex: "Horloge à 9h20" -> (9, 20)
+    """
+    import re
+    
+    if not brief:
+        return (12, 0)
+    
+    # Pattern: "HHhMM" ou "HH h MM"
+    match = re.search(r'(\d{1,2})\s*h\s*(\d{1,2})', brief, re.IGNORECASE)
+    if match:
+        return int(match.group(1)), int(match.group(2))
+    
+    return (12, 0)
 
 
 def _generate_svg_by_type(
