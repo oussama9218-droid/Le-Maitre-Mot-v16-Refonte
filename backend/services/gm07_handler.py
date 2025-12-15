@@ -78,7 +78,9 @@ def _format_exercise_response(exercise: Dict[str, Any], timestamp: int) -> Dict[
             "exercise_id": exercise["id"],
             "is_fallback": False,
             "source": "gm07_fixed_exercises",
-            "needs_svg": exercise.get("needs_svg", False)
+            "needs_svg": exercise.get("needs_svg", False),
+            "variables": exercise.get("variables"),
+            "variables_used": svg_result.get("variables_used")
         }
     }
 
