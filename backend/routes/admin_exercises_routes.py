@@ -257,6 +257,8 @@ async def get_exercise_stats(
 )
 async def list_pilot_chapters():
     """Retourne la liste des chapitres pilotes supportés"""
+    from models.exercise_types import get_all_exercise_types
+    
     return {
         "pilot_chapters": [
             {
@@ -274,5 +276,7 @@ async def list_pilot_chapters():
         ],
         "families": ["CONVERSION", "COMPARAISON", "PERIMETRE", "PROBLEME", "DUREES", "LECTURE_HORLOGE"],
         "difficulties": ["facile", "moyen", "difficile"],
-        "offers": ["free", "pro"]
+        "offers": ["free", "pro"],
+        "exercise_types": get_all_exercise_types()
     }
+
