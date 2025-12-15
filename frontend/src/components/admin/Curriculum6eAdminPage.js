@@ -270,10 +270,13 @@ const Curriculum6eAdminPage = () => {
   const validateForm = () => {
     const errors = {};
     
-    if (!formData.code_officiel.trim()) {
-      errors.code_officiel = 'Le code officiel est requis';
-    } else if (!/^\d+[eE]_[A-Za-z0-9]+$/.test(formData.code_officiel)) {
-      errors.code_officiel = 'Format invalide (ex: 6e_N01)';
+    // En mode édition, le code_officiel est read-only donc pas de validation
+    if (modalMode === 'create') {
+      if (!formData.code_officiel.trim()) {
+        errors.code_officiel = 'Le code officiel est requis';
+      } else if (!/^(6e|5e|4e|3e|2nde|1ere|term)_[A-Z0-9]+(_[A-Z0-9]+)*$/i.test(formData.code_officiel)) {
+        errors.code_officiel = 'Format invalide (ex: 6e_N01, 6e_GM07, 6e_TESTS_DYN)';
+      }
     }
     
     if (!formData.libelle.trim()) {
