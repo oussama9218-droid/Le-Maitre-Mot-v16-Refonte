@@ -117,6 +117,7 @@ class ExerciseGenerateResponse(BaseModel):
     chapitre: str = Field(..., description="Chapitre du curriculum")
     enonce_html: str = Field(..., description="Énoncé au format HTML (inclut la figure SVG si applicable)")
     svg: Optional[str] = Field(None, description="Figure géométrique SVG brute (pour compatibilité, déjà incluse dans enonce_html)")
+    figure_svg: Optional[str] = Field(None, description="Figure SVG pour affichage séparé (horloge, règle, etc.)")
     solution_html: str = Field(..., description="Solution détaillée au format HTML")
     pdf_token: str = Field(..., description="Token pour télécharger le PDF")
     metadata: Dict[str, Any] = Field(..., description="Métadonnées supplémentaires incluant is_fallback et generator_code")
