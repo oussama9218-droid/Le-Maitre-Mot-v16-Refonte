@@ -9,7 +9,7 @@ Tests the new GM08 chapter implementation according to the review request:
 3. Content Validation (HTML purity, solution structure, families)
 4. Non-regression GM07
 
-API Base URL: https://math-admin-hub.preview.emergentagent.com/api/v1/exercises
+API Base URL: https://math-exercise-sync.preview.emergentagent.com/api/v1/exercises
 """
 
 import requests
@@ -20,7 +20,7 @@ import uuid
 from datetime import datetime
 
 class GM08Tester:
-    def __init__(self, base_url="https://math-admin-hub.preview.emergentagent.com"):
+    def __init__(self, base_url="https://math-exercise-sync.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api/v1/exercises"
         self.tests_run = 0
@@ -474,7 +474,7 @@ def main():
     if len(sys.argv) > 1:
         base_url = sys.argv[1]
     else:
-        base_url = "https://math-admin-hub.preview.emergentagent.com"
+        base_url = "https://math-exercise-sync.preview.emergentagent.com"
     
     tester = GM08Tester(base_url)
     success = tester.run_all_tests()

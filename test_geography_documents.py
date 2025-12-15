@@ -10,7 +10,7 @@ import sys
 import json
 
 class GeographyDocumentTester:
-    def __init__(self, base_url="https://math-admin-hub.preview.emergentagent.com"):
+    def __init__(self, base_url="https://math-exercise-sync.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.guest_id = str(uuid.uuid4())

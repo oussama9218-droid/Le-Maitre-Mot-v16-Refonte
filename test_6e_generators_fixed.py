@@ -15,7 +15,7 @@ import os
 class SixeGeneratorsTester:
     def __init__(self):
         # Use REACT_APP_BACKEND_URL from frontend/.env
-        self.base_url = "https://math-admin-hub.preview.emergentagent.com"
+        self.base_url = "https://math-exercise-sync.preview.emergentagent.com"
         self.api_url = f"{self.base_url}/api"
         self.guest_id = f"test-6e-generators-{datetime.now().strftime('%H%M%S')}-{uuid.uuid4().hex[:8]}"
         

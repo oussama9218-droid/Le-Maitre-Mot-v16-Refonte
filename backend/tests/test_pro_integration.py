@@ -15,7 +15,7 @@ import json
 import time
 from typing import Dict, Any
 
-BASE_URL = "https://math-admin-hub.preview.emergentagent.com"
+BASE_URL = "https://math-exercise-sync.preview.emergentagent.com"
 API_URL = f"{BASE_URL}/api/v1/exercises"
 
 
