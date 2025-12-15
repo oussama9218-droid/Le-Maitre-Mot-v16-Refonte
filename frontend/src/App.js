@@ -681,6 +681,24 @@ function MainApp() {
     setOpenedDocument(null);
   };
 
+  // Retry function for API errors
+  const handleRetry = async () => {
+    setIsRetrying(true);
+    setApiError(null);
+    try {
+      await Promise.all([
+        fetchCatalog(),
+        fetchPricing(),
+        fetchExportStyles(),
+        guestId ? fetchQuotaStatus() : Promise.resolve()
+      ]);
+    } catch (error) {
+      console.error("Retry failed:", error);
+    } finally {
+      setIsRetrying(false);
+    }
+  };
+
   // Initialize authentication on load and set up session monitoring
   useEffect(() => {
     initializeAuth();
