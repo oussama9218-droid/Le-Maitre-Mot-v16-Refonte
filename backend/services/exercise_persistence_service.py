@@ -235,6 +235,11 @@ import random
         
         # Ajouter chaque exercice
         for ex in exercises:
+            # Construire les champs optionnels
+            exercise_type_str = f'"{ex["exercise_type"]}"' if ex.get('exercise_type') else 'None'
+            svg_enonce_brief_str = f'"{ex["svg_enonce_brief"]}"' if ex.get('svg_enonce_brief') else 'None'
+            svg_solution_brief_str = f'"{ex["svg_solution_brief"]}"' if ex.get('svg_solution_brief') else 'None'
+            
             content = f'''    {{
         "id": {ex['id']},
         "family": "{ex['family']}",
@@ -243,7 +248,9 @@ import random
         "enonce_html": """{ex['enonce_html']}""",
         "solution_html": """{ex['solution_html']}""",
         "needs_svg": {str(ex.get('needs_svg', False))},
-        "exercise_type": {f'"{ex["exercise_type"]}"' if ex.get('exercise_type') else 'None'}
+        "exercise_type": {exercise_type_str},
+        "svg_enonce_brief": {svg_enonce_brief_str},
+        "svg_solution_brief": {svg_solution_brief_str}
     }},
 '''
             header += content
