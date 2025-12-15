@@ -15,14 +15,14 @@ Logique métier:
 import random
 import time
 from typing import Dict, Any, Optional, List
-from backend.data.gm08_exercises import (
+from data.gm08_exercises import (
     get_random_gm08_exercise,
     get_gm08_exercises, 
     get_gm08_stats,
     get_gm08_batch,
     get_exercise_by_seed_index
 )
-from backend.services.svg_render_service import generate_exercise_svgs
+from services.svg_render_service import generate_exercise_svgs
 
 
 def is_gm08_request(code_officiel: Optional[str]) -> bool:
