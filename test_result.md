@@ -116,14 +116,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "List pilot chapters"
-    - "List exercises for chapter"
-    - "Get single exercise"
-    - "Create new exercise"
-    - "Update exercise"
-    - "Delete exercise"
-    - "Non-regression GM08 batch"
-  stuck_tasks: []
+    - "GM07 double SVG functionality"
+    - "GM08 non-regression"
+  stuck_tasks:
+    - "GM07 double SVG functionality"
+    - "GM08 non-regression"
   test_all: false
   test_priority: "high_first"
 
