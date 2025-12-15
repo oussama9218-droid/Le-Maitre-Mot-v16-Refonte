@@ -8,7 +8,7 @@ import os
 from datetime import datetime
 
 class LeMaitreMotAPITester:
-    def __init__(self, base_url="https://exerrchive.preview.emergentagent.com"):
+    def __init__(self, base_url="https://math-admin-hub.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
@@ -7762,7 +7762,7 @@ class LeMaitreMotAPITester:
         Test complet du flux de persistance du logo dans la configuration Pro PDF
         
         Contexte: User email de test : Oussama92.18@gmail.com
-        Backend URL : https://exerrchive.preview.emergentagent.com
+        Backend URL : https://math-admin-hub.preview.emergentagent.com
         Bug fixé : Le logo ne persistait pas après sauvegarde et rechargement
         
         Tests effectués:
@@ -7776,7 +7776,7 @@ class LeMaitreMotAPITester:
         print("="*70)
         print("CONTEXT: Test complet du flux de persistance du logo Pro PDF")
         print("USER EMAIL: Oussama92.18@gmail.com")
-        print("BACKEND URL: https://exerrchive.preview.emergentagent.com")
+        print("BACKEND URL: https://math-admin-hub.preview.emergentagent.com")
         print("BUG FIXÉ: Le logo ne persistait pas après sauvegarde et rechargement")
         
         # Configuration du test
@@ -14889,7 +14889,7 @@ Résultat final.''',
         Test complet du flux de persistance du logo dans la configuration Pro PDF
         
         Contexte: User email de test : Oussama92.18@gmail.com
-        Backend URL : https://exerrchive.preview.emergentagent.com
+        Backend URL : https://math-admin-hub.preview.emergentagent.com
         Bug fixé : Le logo ne persistait pas après sauvegarde et rechargement
         
         Tests effectués:
@@ -14903,7 +14903,7 @@ Résultat final.''',
         print("="*70)
         print("CONTEXT: Test complet du flux de persistance du logo Pro PDF")
         print("USER EMAIL: Oussama92.18@gmail.com")
-        print("BACKEND URL: https://exerrchive.preview.emergentagent.com")
+        print("BACKEND URL: https://math-admin-hub.preview.emergentagent.com")
         print("BUG FIXÉ: Le logo ne persistait pas après sauvegarde et rechargement")
         
         # Configuration du test

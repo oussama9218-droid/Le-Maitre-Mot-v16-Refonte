@@ -6,7 +6,7 @@ Tests pour valider les deux bugs corrigés dans GM07:
 1. HTML pur: Remplacement de Markdown (**texte**) et LaTeX ($...$) par HTML (<strong>, ×)
 2. Pas de doublons: Seeds différents retournent des exercices différents grâce au hash de Knuth
 
-Backend URL: https://exerrchive.preview.emergentagent.com
+Backend URL: https://math-admin-hub.preview.emergentagent.com
 """
 
 import requests
@@ -16,7 +16,7 @@ import hashlib
 from typing import List, Dict, Any
 
 class GM07V2Validator:
-    def __init__(self, base_url="https://exerrchive.preview.emergentagent.com"):
+    def __init__(self, base_url="https://math-admin-hub.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0

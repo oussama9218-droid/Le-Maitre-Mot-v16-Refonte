@@ -23,7 +23,7 @@ from datetime import datetime
 from typing import Dict, List, Any
 
 class PremiumGeneratorTester:
-    def __init__(self, base_url="https://exerrchive.preview.emergentagent.com"):
+    def __init__(self, base_url="https://math-admin-hub.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
@@ -477,7 +477,7 @@ def main():
     if len(sys.argv) > 1:
         base_url = sys.argv[1]
     else:
-        base_url = "https://exerrchive.preview.emergentagent.com"
+        base_url = "https://math-admin-hub.preview.emergentagent.com"
     
     tester = PremiumGeneratorTester(base_url)
     success = tester.run_all_tests()
