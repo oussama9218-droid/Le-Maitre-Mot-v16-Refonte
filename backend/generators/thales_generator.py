@@ -126,15 +126,21 @@ class ThalesV1Generator:
     def _generate_rectangle_dimensions(self) -> Dict[str, float]:
         """Génère les dimensions d'un rectangle."""
         longueur = random.choice(ThalesV1Config.BASE_LENGTHS)
-        largeur = random.choice([l for l in ThalesV1Config.BASE_LENGTHS if l < longueur])
-        if not largeur:
-            largeur = longueur - 1
+        smaller_values = [l for l in ThalesV1Config.BASE_LENGTHS if l < longueur]
+        if smaller_values:
+            largeur = random.choice(smaller_values)
+        else:
+            largeur = max(1, longueur - 1)  # Fallback: au moins 1 cm de moins
         return {"longueur": longueur, "largeur": largeur, "type": "rectangle"}
     
     def _generate_triangle_dimensions(self) -> Dict[str, float]:
         """Génère les dimensions d'un triangle rectangle."""
         base = random.choice(ThalesV1Config.BASE_LENGTHS)
-        hauteur = random.choice([h for h in ThalesV1Config.BASE_LENGTHS if h != base])
+        other_values = [h for h in ThalesV1Config.BASE_LENGTHS if h != base]
+        if other_values:
+            hauteur = random.choice(other_values)
+        else:
+            hauteur = base + 1  # Fallback
         return {"base": base, "hauteur": hauteur, "type": "triangle"}
     
     def _calculate_final_dimensions(self, base_dim: Dict, coefficient: float) -> Dict[str, float]:
