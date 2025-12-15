@@ -75,10 +75,11 @@
     "symetrie_axiale__verifier_propriete__difficile__academique": "Démontre rigoureusement si les points {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y}) respectent les conditions d'équidistance à {axeDesc}.",
     "symetrie_axiale__trouver_valeur__difficile__concis": "Donnés : {pointA}({coordA_x}, {coordA_y}), axe {axeDesc}. Trouve {pointB}.",
     "symetrie_axiale__trouver_valeur__difficile__qr": "Q : Point initial ?\nR : {pointA}({coordA_x}, {coordA_y}).\nQ : Axe ?\nR : {axeDesc}.\nQ : Point symétrique {pointB} ?",
-    "symetrie_axiale__verifier_propriete__difficile__qr": "Q : Coordonnées de {pointA} ?\nR : ({coordA_x}, {coordA_y}).\nQ : Coordonnées de {pointB} ?\nR : ({coordB_x}, {coordB_y}).\nQ : Axe ?\nR : {axeDesc}.\nQ : Symétrie validée ?"
+    "symetrie_axiale__verifier_propriete__difficile__qr": "Q : Coordonnées de {pointA} ?\nR : ({coordA_x}, {coordA_y}).\nQ : Coordonnées de {pointB} ?\nR : ({coordB_x}, {coordB_y}).\nQ : Axe ?\nR : {axeDesc}.\nQ : Symétrie validée ?",
+    "symetrie_centrale__trouver_valeur__facile__concis": "{pointA} en ({coordA_x}, {coordA_y}). Centre : {pointO}({centreX}, {centreY}). {pointB} ?"
   },
-  "hits": 90,
-  "misses": 76,
-  "total_cost_saved": 3430.0,
-  "last_updated": "2025-12-15T15:20:58.621471"
+  "hits": 94,
+  "misses": 77,
+  "total_cost_saved": 3579.0,
+  "last_updated": "2025-12-15T15:22:44.173810"
 }
