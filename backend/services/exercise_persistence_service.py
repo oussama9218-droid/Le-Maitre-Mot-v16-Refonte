@@ -718,16 +718,28 @@ def get_{code.lower()}_stats() -> Dict[str, Any]:
         if request.offer.lower() not in ["free", "pro"]:
             raise ValueError(f"Offer invalide: {request.offer}")
         
-        # Vérifier le HTML
-        if not request.enonce_html.strip():
-            raise ValueError("L'énoncé ne peut pas être vide")
-        
-        if not request.solution_html.strip():
-            raise ValueError("La solution ne peut pas être vide")
-        
-        # Vérifier pas de LaTeX
-        if "$" in request.enonce_html or "$" in request.solution_html:
-            raise ValueError("Le contenu ne doit pas contenir de LaTeX ($). Utilisez du HTML pur.")
+        # Validation spécifique selon le type (dynamique ou statique)
+        if request.is_dynamic:
+            # Exercice dynamique - vérifier les templates
+            if not request.generator_key:
+                raise ValueError("generator_key est requis pour les exercices dynamiques")
+            
+            if not request.enonce_template_html or not request.enonce_template_html.strip():
+                raise ValueError("Le template énoncé ne peut pas être vide pour un exercice dynamique")
+            
+            if not request.solution_template_html or not request.solution_template_html.strip():
+                raise ValueError("Le template solution ne peut pas être vide pour un exercice dynamique")
+        else:
+            # Exercice statique - vérifier le HTML
+            if not request.enonce_html or not request.enonce_html.strip():
+                raise ValueError("L'énoncé ne peut pas être vide")
+            
+            if not request.solution_html or not request.solution_html.strip():
+                raise ValueError("La solution ne peut pas être vide")
+            
+            # Vérifier pas de LaTeX
+            if "$" in request.enonce_html or "$" in request.solution_html:
+                raise ValueError("Le contenu ne doit pas contenir de LaTeX ($). Utilisez du HTML pur.")
     
     async def _reload_handler(self, chapter_code: str) -> None:
         """Recharge le handler en mémoire après modification"""
