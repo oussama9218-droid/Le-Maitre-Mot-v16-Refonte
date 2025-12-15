@@ -272,6 +272,10 @@ function MainApp() {
   const [documents, setDocuments] = useState([]);
   const [openedDocument, setOpenedDocument] = useState(null);
   
+  // API Error state management
+  const [apiError, setApiError] = useState(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+  
   // Guest and quota management (new logic)
   const [guestId, setGuestId] = useState("");
   const [quotaStatus, setQuotaStatus] = useState({ 
