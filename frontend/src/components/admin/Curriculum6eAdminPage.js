@@ -741,15 +741,18 @@ const Curriculum6eAdminPage = () => {
               <div className="col-span-3">
                 <Input
                   id="code_officiel"
-                  value={formData.code_officiel}
+                  value={formData.code_officiel || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, code_officiel: e.target.value }))}
-                  placeholder="6e_N01"
+                  placeholder="6e_N01, 6e_GM07, 6e_TESTS_DYN..."
                   disabled={modalMode === 'edit'}
-                  className={formErrors.code_officiel ? 'border-red-500' : ''}
+                  className={`${formErrors.code_officiel ? 'border-red-500' : ''} ${modalMode === 'edit' ? 'bg-gray-100 text-gray-600' : ''}`}
                 />
+                {modalMode === 'edit' && (
+                  <p className="text-xs text-gray-500 mt-1">Le code officiel ne peut pas être modifié.</p>
+                )}
                 {formErrors.code_officiel && (
                   <p className="text-xs text-red-500 mt-1">{formErrors.code_officiel}</p>
-                )}
+                )}}
               </div>
             </div>
             
