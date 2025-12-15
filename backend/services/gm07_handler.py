@@ -22,7 +22,7 @@ from backend.data.gm07_exercises import (
     get_gm07_batch,
     get_exercise_by_seed_index
 )
-from services.svg_render_service import generate_exercise_svgs
+from backend.services.svg_render_service import generate_exercise_svgs
 
 
 def is_gm07_request(code_officiel: Optional[str]) -> bool:
