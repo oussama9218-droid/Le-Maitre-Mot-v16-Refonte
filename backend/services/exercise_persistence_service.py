@@ -86,7 +86,7 @@ class ExercisePersistenceService:
     """
     
     # Chapitres pilotes avec exercices figés
-    PILOT_CHAPTERS = ["6e_GM07", "6e_GM08"]
+    PILOT_CHAPTERS = ["6e_GM07", "6e_GM08", "6e_TESTS_DYN"]
     
     def __init__(self, db: AsyncIOMotorDatabase):
         self.db = db
