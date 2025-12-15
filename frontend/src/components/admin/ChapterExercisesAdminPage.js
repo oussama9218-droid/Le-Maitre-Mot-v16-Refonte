@@ -49,7 +49,8 @@ import {
   Loader2,
   BookOpen,
   Eye,
-  Code
+  ExternalLink,
+  ArrowLeft
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 
