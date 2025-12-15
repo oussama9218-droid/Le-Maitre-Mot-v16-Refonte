@@ -2,7 +2,7 @@
 GM07 - Exercices figés : Durées et lecture de l'heure
 =========================================================
 
-Chapitre pilote avec 21 exercices validés.
+Chapitre pilote avec 22 exercices validés.
 - FREE: ids 1-10
 - PREMIUM (PRO): ids 11-20
 
@@ -23,7 +23,7 @@ import random
 
 
 # =============================================================================
-# 21 EXERCICES GM07 VALIDÉS - HTML PUR (sans Markdown ni LaTeX)
+# 22 EXERCICES GM07 VALIDÉS - HTML PUR (sans Markdown ni LaTeX)
 # =============================================================================
 
 GM07_EXERCISES: List[Dict[str, Any]] = [
@@ -232,8 +232,24 @@ GM07_EXERCISES: List[Dict[str, Any]] = [
         "family": "LECTURE_HORLOGE",
         "difficulty": "moyen",
         "offer": "free",
-        "enonce_html": """Test énoncé """,
+        "enonce_html": """Test énoncé ici""",
         "solution_html": """<h4>test Correction détaillée</h4>
+<ol>
+  <li><strong>Compréhension :</strong> </li>
+  <li><strong>Méthode :</strong> </li>
+  <li><strong>Calculs :</strong> </li>
+  <li><strong>Conclusion :</strong> </li>
+</ol>""",
+        "needs_svg": True,
+        "exercise_type": "PLACER_AIGUILLES"
+    },
+    {
+        "id": 22,
+        "family": "DUREES",
+        "difficulty": "difficile",
+        "offer": "free",
+        "enonce_html": """Test 2""",
+        "solution_html": """<h4>Correction détaillée test 2</h4>
 <ol>
   <li><strong>Compréhension :</strong> </li>
   <li><strong>Méthode :</strong> </li>
