@@ -286,6 +286,33 @@ def get_gm07_exercises(
     return exercises
 
 
+def get_random_gm07_exercise(
+    offer: Optional[str] = None,
+    difficulty: Optional[str] = None,
+    seed: Optional[int] = None
+) -> Optional[Dict[str, Any]]:
+    """
+    Sélectionne UN exercice aléatoire.
+    
+    Args:
+        offer: "free" ou "pro" (None = free par défaut)
+        difficulty: "facile", "moyen", "difficile" (None = tous)
+        seed: graine pour reproductibilité (optionnel)
+    
+    Returns:
+        Un exercice aléatoire ou None si aucun disponible
+    """
+    available = get_gm07_exercises(offer=offer, difficulty=difficulty)
+    
+    if not available:
+        return None
+    
+    if seed is not None:
+        random.seed(seed)
+    
+    return random.choice(available)
+
+
 def get_gm07_batch(
     offer: Optional[str] = None,
     difficulty: Optional[str] = None,
