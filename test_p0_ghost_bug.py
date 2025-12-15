@@ -195,11 +195,11 @@ class P0GhostBugTester:
             else:
                 print(f"   ❌ Exercise #22 NOT found in generation API")
                 
-            # Validate we got 22 exercises (max available)
-            if returned_count == 22:
-                print(f"   ✅ Correct count: 22 exercises returned")
+            # Validate we got 20 exercises (API limit) but available should be 22
+            if returned_count == 20 and available_count == 22:
+                print(f"   ✅ Correct count: 20 exercises returned (API limit), 22 available")
             else:
-                print(f"   ❌ Wrong count: {returned_count} exercises (expected 22)")
+                print(f"   ❌ Wrong count: {returned_count} exercises returned, {available_count} available (expected 20 returned, 22 available)")
         else:
             print(f"   ❌ Generation API failed")
             return False, {"error": "generation_api_failed"}
