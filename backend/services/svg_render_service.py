@@ -435,13 +435,17 @@ def generate_exercise_svgs(exercise: dict) -> dict:
     Génère les SVG pour l'énoncé et la solution selon le type d'exercice.
     
     Cette fonction est la nouvelle API principale pour la génération de SVG.
-    Elle prend en compte le champ exercise_type s'il est présent,
-    sinon utilise le comportement rétro-compatible basé sur family.
+    Elle prend en compte:
+    1. Les briefs personnalisés (svg_enonce_brief, svg_solution_brief) - prioritaire
+    2. Le champ exercise_type s'il est présent
+    3. Le comportement rétro-compatible basé sur family
     
     Args:
         exercise: Dictionnaire de l'exercice avec les champs:
             - needs_svg: bool
             - exercise_type: Optional[str] - Type explicite
+            - svg_enonce_brief: Optional[str] - Brief pour SVG énoncé
+            - svg_solution_brief: Optional[str] - Brief pour SVG solution
             - family: str - Famille (fallback)
             - enonce_html: str
             - id: int
@@ -469,25 +473,52 @@ def generate_exercise_svgs(exercise: dict) -> dict:
     enonce = exercise.get("enonce_html", "")
     exercise_id = exercise.get("id", 1)
     
-    # Obtenir le comportement SVG
-    behavior = get_svg_behavior(exercise_type, family)
+    # Briefs personnalisés (nouvelle fonctionnalité)
+    svg_enonce_brief = exercise.get("svg_enonce_brief")
+    svg_solution_brief = exercise.get("svg_solution_brief")
     
     # Extraire l'heure si pertinent
     hour, minute = _extract_time_from_enonce(enonce, exercise_id)
     
-    # Générer le SVG de l'énoncé
-    if behavior.svg_in_enonce:
-        svg_type = behavior.enonce_svg_type
-        result["figure_svg_enonce"] = _generate_svg_by_type(
-            svg_type, exercise_type, family, hour, minute, exercise
-        )
+    # =========================================================================
+    # MODE 1: Briefs personnalisés (prioritaire)
+    # =========================================================================
+    if svg_enonce_brief or svg_solution_brief:
+        # Générer SVG énoncé
+        if svg_enonce_brief:
+            result["figure_svg_enonce"] = render_svg_from_brief(
+                svg_enonce_brief, hour=hour, minute=minute
+            )
+        
+        # Générer SVG solution (fallback sur brief énoncé si absent)
+        if svg_solution_brief:
+            result["figure_svg_solution"] = render_svg_from_brief(
+                svg_solution_brief, hour=hour, minute=minute
+            )
+        elif svg_enonce_brief and exercise_type == "PLACER_AIGUILLES":
+            # Cas spécial: PLACER_AIGUILLES sans solution brief → horloge avec aiguilles
+            result["figure_svg_solution"] = _render_clock_svg(hour, minute)
     
-    # Générer le SVG de la solution
-    if behavior.svg_in_solution:
-        svg_type = behavior.solution_svg_type
-        result["figure_svg_solution"] = _generate_svg_by_type(
-            svg_type, exercise_type, family, hour, minute, exercise
-        )
+    # =========================================================================
+    # MODE 2: Comportement basé sur exercise_type / family
+    # =========================================================================
+    else:
+        # Obtenir le comportement SVG selon le type
+        behavior = get_svg_behavior(exercise_type, family)
+        
+        # Générer le SVG de l'énoncé
+        if behavior.svg_in_enonce:
+            svg_type = behavior.enonce_svg_type
+            result["figure_svg_enonce"] = _generate_svg_by_type(
+                svg_type, exercise_type, family, hour, minute, exercise
+            )
+        
+        # Générer le SVG de la solution
+        if behavior.svg_in_solution:
+            svg_type = behavior.solution_svg_type
+            result["figure_svg_solution"] = _generate_svg_by_type(
+                svg_type, exercise_type, family, hour, minute, exercise
+            )
     
     # Compatibilité: figure_svg = figure_svg_enonce (comportement précédent)
     result["figure_svg"] = result["figure_svg_enonce"]
