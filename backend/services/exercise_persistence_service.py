@@ -32,6 +32,7 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 class ExerciseCreateRequest(BaseModel):
     """Modèle pour la création d'un exercice"""
     family: str = Field(..., description="Famille: CONVERSION, COMPARAISON, PERIMETRE, PROBLEME, DUREES, etc.")
+    exercise_type: Optional[str] = Field(None, description="Type d'exercice (optionnel): LECTURE_HEURE, PLACER_AIGUILLES, etc.")
     difficulty: str = Field(..., description="Difficulté: facile, moyen, difficile")
     offer: str = Field(default="free", description="Offre: free ou pro")
     enonce_html: str = Field(..., description="Énoncé en HTML pur")
@@ -42,6 +43,7 @@ class ExerciseCreateRequest(BaseModel):
 class ExerciseUpdateRequest(BaseModel):
     """Modèle pour la mise à jour d'un exercice"""
     family: Optional[str] = None
+    exercise_type: Optional[str] = None
     difficulty: Optional[str] = None
     offer: Optional[str] = None
     enonce_html: Optional[str] = None
@@ -54,6 +56,7 @@ class ExerciseResponse(BaseModel):
     id: int
     chapter_code: str
     family: str
+    exercise_type: Optional[str] = None
     difficulty: str
     offer: str
     enonce_html: str
