@@ -63,8 +63,8 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const Curriculum6eAdminPage = () => {
   const navigate = useNavigate();
   
-  // Chapitres pilotes avec exercices figés
-  const pilotChapters = ['6e_GM07', '6e_GM08'];
+  // Chapitres pilotes chargés dynamiquement depuis l'API
+  const [pilotChapterCodes, setPilotChapterCodes] = useState(new Set());
   
   // État principal
   const [curriculum, setCurriculum] = useState(null);
@@ -111,7 +111,28 @@ const Curriculum6eAdminPage = () => {
   useEffect(() => {
     fetchCurriculum();
     fetchAvailableOptions();
+    fetchPilotChapters();
   }, []);
+  
+  // Charger la liste des chapitres pilotes depuis l'API
+  const fetchPilotChapters = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/admin/exercises/pilot-chapters`);
+      if (response.ok) {
+        const data = await response.json();
+        const codes = new Set(data.pilot_chapters.map(ch => ch.code));
+        setPilotChapterCodes(codes);
+      }
+    } catch (err) {
+      console.error('Erreur chargement chapitres pilotes:', err);
+      // Fallback en dur si l'API échoue
+      setPilotChapterCodes(new Set(['6e_GM07', '6e_GM08']));
+    }
+  };
+  
+  // Helpers pour déterminer si un chapitre est pilote/éditable
+  const isPilotChapter = (code) => pilotChapterCodes.has(code);
+  const isEditableChapter = (code) => isPilotChapter(code); // Pour l'instant, éditable = pilote
   
   // Effacer le message après 5 secondes
   useEffect(() => {
