@@ -49,9 +49,10 @@ import {
   Trash2,
   Save,
   X,
-  Loader2
+  Loader2,
+  BookOpen
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
