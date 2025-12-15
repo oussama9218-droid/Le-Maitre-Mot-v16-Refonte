@@ -1279,6 +1279,7 @@ function App() {
         <Route path="/sheets" element={<MySheetsPage />} />
         <Route path="/pro/settings" element={<ProSettingsPage />} />
         <Route path="/admin/curriculum" element={<Curriculum6eAdminPage />} />
+        <Route path="/admin/curriculum/:chapterCode/exercises" element={<ChapterExercisesAdminPage />} />
         <Route path="/*" element={<MainApp />} />
       </Routes>
     </BrowserRouter>
