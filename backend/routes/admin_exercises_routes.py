@@ -78,7 +78,7 @@ async def get_exercise_service(db=Depends(get_db)):
     Retourne tous les exercices d'un chapitre pilote.
     Supporte les filtres par offre et difficulté.
     
-    **Chapitres supportés:** 6e_GM07, 6e_GM08
+    **Chapitres supportés:** 6e_GM07, 6e_GM08, 6e_TESTS_DYN
     """
 )
 async def list_exercises(
