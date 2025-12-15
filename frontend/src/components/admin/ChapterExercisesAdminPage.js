@@ -90,10 +90,19 @@ const ChapterExercisesAdminPage = () => {
     solution_html: '',
     needs_svg: false,
     svg_enonce_brief: '',
-    svg_solution_brief: ''
+    svg_solution_brief: '',
+    // Champs pour exercices dynamiques
+    is_dynamic: false,
+    generator_key: '',
+    enonce_template_html: '',
+    solution_template_html: '',
+    variables: null
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  
+  // Générateurs disponibles
+  const [availableGenerators, setAvailableGenerators] = useState([]);
   
   // Modal de prévisualisation
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -107,10 +116,10 @@ const ChapterExercisesAdminPage = () => {
   // Messages
   const [operationMessage, setOperationMessage] = useState(null);
   
-  // Familles disponibles
-  const families = ['CONVERSION', 'COMPARAISON', 'PERIMETRE', 'PROBLEME', 'DUREES', 'LECTURE_HORLOGE', 'CALCUL_DUREE'];
+  // Familles disponibles (étendues pour dynamique)
+  const families = ['CONVERSION', 'COMPARAISON', 'PERIMETRE', 'PROBLEME', 'DUREES', 'LECTURE_HORLOGE', 'CALCUL_DUREE', 'AGRANDISSEMENT_REDUCTION'];
   
-  // Charger les types d'exercices
+  // Charger les types d'exercices et générateurs
   useEffect(() => {
     const fetchExerciseTypes = async () => {
       try {
