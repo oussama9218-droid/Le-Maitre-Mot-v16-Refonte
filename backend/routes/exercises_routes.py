@@ -682,6 +682,59 @@ async def generate_exercise(request: ExerciseGenerateRequest):
         return exercises[0]
     
     # ============================================================================
+    # TESTS_DYN INTERCEPT: Chapitre de test pour exercices dynamiques
+    # ============================================================================
+    
+    if is_tests_dyn_request(request.code_officiel):
+        nb = request.nb_exercices if hasattr(request, 'nb_exercices') else 1
+        logger.info(f"🎲 TESTS_DYN Request intercepted: offer={request.offer}, difficulty={request.difficulte}, count={nb}")
+        
+        # Si on demande 1 seul exercice
+        if nb == 1:
+            dyn_exercise = generate_tests_dyn_exercise(
+                offer=request.offer,
+                difficulty=request.difficulte,
+                seed=request.seed
+            )
+            
+            if not dyn_exercise:
+                raise HTTPException(
+                    status_code=422,
+                    detail={
+                        "error": "no_tests_dyn_exercise_found",
+                        "message": f"Aucun exercice dynamique trouvé pour offer='{request.offer}' et difficulty='{request.difficulte}'",
+                        "hint": "Vérifiez les filtres ou utilisez /generate/batch/tests_dyn pour les lots"
+                    }
+                )
+            
+            logger.info(f"✅ TESTS_DYN Exercise generated: id={dyn_exercise['id_exercice']}, "
+                       f"generator={dyn_exercise['metadata'].get('generator_key')}")
+            
+            return dyn_exercise
+        
+        # Si on demande plusieurs exercices via cet endpoint
+        exercises, batch_meta = generate_tests_dyn_batch(
+            offer=request.offer,
+            difficulty=request.difficulte,
+            count=nb,
+            seed=request.seed
+        )
+        
+        if not exercises:
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "error": "no_tests_dyn_exercise_found",
+                    "message": "Aucun exercice dynamique trouvé",
+                    "hint": "Utilisez /generate/batch/tests_dyn pour les lots"
+                }
+            )
+        
+        logger.info(f"✅ TESTS_DYN Batch via /generate: {len(exercises)} exercises")
+        
+        return exercises[0]
+    
+    # ============================================================================
     # 0. RÉSOLUTION DU MODE (code_officiel vs legacy) - Pour autres chapitres
     # ============================================================================
     
