@@ -125,6 +125,7 @@ class ExercisePersistenceService:
         file_mapping = {
             "6E_GM07": "gm07_exercises.py",
             "6E_GM08": "gm08_exercises.py",
+            "6E_TESTS_DYN": "tests_dyn_exercises.py",
         }
         
         filename = file_mapping.get(chapter_code)
@@ -143,6 +144,8 @@ class ExercisePersistenceService:
                 from data.gm07_exercises import GM07_EXERCISES as exercises
             elif chapter_code == "6E_GM08":
                 from data.gm08_exercises import GM08_EXERCISES as exercises
+            elif chapter_code == "6E_TESTS_DYN":
+                from data.tests_dyn_exercises import TESTS_DYN_EXERCISES as exercises
             else:
                 logger.warning(f"Import non supporté pour {chapter_code}")
                 return
@@ -156,9 +159,19 @@ class ExercisePersistenceService:
                     "family": ex["family"],
                     "difficulty": ex["difficulty"],
                     "offer": ex["offer"],
-                    "enonce_html": ex["enonce_html"],
-                    "solution_html": ex["solution_html"],
+                    "enonce_html": ex.get("enonce_html", ""),
+                    "solution_html": ex.get("solution_html", ""),
                     "needs_svg": ex.get("needs_svg", False),
+                    "variables": ex.get("variables"),
+                    "exercise_type": ex.get("exercise_type"),
+                    "svg_enonce_brief": ex.get("svg_enonce_brief"),
+                    "svg_solution_brief": ex.get("svg_solution_brief"),
+                    # Champs dynamiques
+                    "is_dynamic": ex.get("is_dynamic", False),
+                    "generator_key": ex.get("generator_key"),
+                    "enonce_template_html": ex.get("enonce_template_html"),
+                    "solution_template_html": ex.get("solution_template_html"),
+                    "variables_schema": ex.get("variables_schema"),
                     "created_at": datetime.now(timezone.utc),
                     "updated_at": datetime.now(timezone.utc)
                 }
