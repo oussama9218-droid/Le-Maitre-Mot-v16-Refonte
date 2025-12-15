@@ -362,6 +362,7 @@ function MainApp() {
 
   const fetchCatalog = async () => {
     try {
+      setApiError(null);
       const response = await axios.get(`${API}/catalog`);
       console.log('📚 Catalog received:', response.data.catalog?.length, 'matières');
       setCatalog(response.data.catalog);
@@ -378,6 +379,10 @@ function MainApp() {
       }
     } catch (error) {
       console.error("Erreur lors du chargement du catalogue:", error);
+      const errorMessage = error.code === 'ECONNABORTED' 
+        ? "Le serveur met trop de temps à répondre. Veuillez réessayer."
+        : "Impossible de charger les données. Vérifiez votre connexion internet.";
+      setApiError(errorMessage);
     }
   };
 
