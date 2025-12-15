@@ -198,7 +198,9 @@ const ChapterExercisesAdminPage = () => {
       offer: 'free',
       enonce_html: '',
       solution_html: getSolutionTemplate(),
-      needs_svg: false
+      needs_svg: false,
+      svg_enonce_brief: '',
+      svg_solution_brief: ''
     });
     setFormErrors({});
     setIsModalOpen(true);
@@ -226,7 +228,9 @@ const ChapterExercisesAdminPage = () => {
       offer: exercise.offer,
       enonce_html: exercise.enonce_html,
       solution_html: exercise.solution_html,
-      needs_svg: exercise.needs_svg || false
+      needs_svg: exercise.needs_svg || false,
+      svg_enonce_brief: exercise.svg_enonce_brief || '',
+      svg_solution_brief: exercise.svg_solution_brief || ''
     });
     setFormErrors({});
     setIsModalOpen(true);
