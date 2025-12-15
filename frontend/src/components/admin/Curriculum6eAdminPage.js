@@ -61,6 +61,11 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
  * Version 2.0 - Lecture et Édition
  */
 const Curriculum6eAdminPage = () => {
+  const navigate = useNavigate();
+  
+  // Chapitres pilotes avec exercices figés
+  const pilotChapters = ['6e_GM07', '6e_GM08'];
+  
   // État principal
   const [curriculum, setCurriculum] = useState(null);
   const [loading, setLoading] = useState(true);
