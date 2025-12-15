@@ -4755,6 +4755,10 @@ app.include_router(exercises_router, prefix="/api/v1/exercises", tags=["Exercise
 from routes.admin_curriculum_routes import router as admin_curriculum_router
 app.include_router(admin_curriculum_router, tags=["Admin Curriculum"])
 
+# Routes admin exercices (CRUD pour exercices figés)
+from routes.admin_exercises_routes import router as admin_exercises_router
+app.include_router(admin_exercises_router, tags=["Admin Exercises"])
+
 # Route catalogue curriculum (pour /generate)
 from routes.curriculum_catalog_routes import router as curriculum_catalog_router
 app.include_router(curriculum_catalog_router, tags=["Curriculum Catalog"])
