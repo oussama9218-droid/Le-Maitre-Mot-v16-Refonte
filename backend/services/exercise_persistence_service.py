@@ -549,22 +549,30 @@ def get_{code.lower()}_stats() -> Dict[str, Any]:
             "exercise_type": request.exercise_type.upper() if request.exercise_type else None,
             "difficulty": request.difficulty.lower(),
             "offer": request.offer.lower(),
-            "enonce_html": request.enonce_html,
-            "solution_html": request.solution_html,
+            "enonce_html": request.enonce_html or "",
+            "solution_html": request.solution_html or "",
             "needs_svg": request.needs_svg,
+            "variables": request.variables,
+            "svg_enonce_brief": request.svg_enonce_brief,
+            "svg_solution_brief": request.svg_solution_brief,
+            # Champs dynamiques
+            "is_dynamic": request.is_dynamic,
+            "generator_key": request.generator_key,
+            "enonce_template_html": request.enonce_template_html,
+            "solution_template_html": request.solution_template_html,
+            "variables_schema": request.variables_schema,
             "created_at": datetime.now(timezone.utc),
             "updated_at": datetime.now(timezone.utc)
         }
         
         await self.collection.insert_one(doc)
         
-        # Synchroniser avec le fichier Python
-        await self._sync_to_python_file(chapter_upper)
+        # Synchroniser avec le fichier Python (seulement pour GM07/GM08)
+        if chapter_upper in ["6E_GM07", "6E_GM08"]:
+            await self._sync_to_python_file(chapter_upper)
+            await self._reload_handler(chapter_upper)
         
-        # Recharger le handler en mémoire
-        await self._reload_handler(chapter_upper)
-        
-        logger.info(f"Exercice créé: {chapter_upper} #{next_id}")
+        logger.info(f"Exercice créé: {chapter_upper} #{next_id} (dynamic={request.is_dynamic})")
         
         del doc["_id"]
         return doc
