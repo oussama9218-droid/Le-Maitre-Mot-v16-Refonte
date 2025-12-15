@@ -288,6 +288,33 @@ def get_{code.lower()}_exercises(
     return exercises
 
 
+def get_random_{code.lower()}_exercise(
+    offer: Optional[str] = None,
+    difficulty: Optional[str] = None,
+    seed: Optional[int] = None
+) -> Optional[Dict[str, Any]]:
+    """
+    Sélectionne UN exercice aléatoire.
+    
+    Args:
+        offer: "free" ou "pro" (None = free par défaut)
+        difficulty: "facile", "moyen", "difficile" (None = tous)
+        seed: graine pour reproductibilité (optionnel)
+    
+    Returns:
+        Un exercice aléatoire ou None si aucun disponible
+    """
+    available = get_{code.lower()}_exercises(offer=offer, difficulty=difficulty)
+    
+    if not available:
+        return None
+    
+    if seed is not None:
+        random.seed(seed)
+    
+    return random.choice(available)
+
+
 def get_{code.lower()}_batch(
     offer: Optional[str] = None,
     difficulty: Optional[str] = None,
