@@ -2753,6 +2753,15 @@ async def generate_advanced_pdf(document: dict, content: str, export_type: str, 
     return pdf_bytes
 
 # API Routes
+@api_router.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring and load balancers"""
+    return {
+        "status": "healthy",
+        "service": "le-maitre-mot-api",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
 @api_router.get("/")
 async def root():
     return {"message": "API Le Maître Mot V1 - Générateur de documents pédagogiques"}
