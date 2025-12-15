@@ -116,10 +116,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "GM07 double SVG functionality"
     - "GM08 non-regression"
   stuck_tasks:
-    - "GM07 double SVG functionality"
     - "GM08 non-regression"
   test_all: false
   test_priority: "high_first"
