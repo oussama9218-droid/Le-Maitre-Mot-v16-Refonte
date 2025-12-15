@@ -626,11 +626,24 @@ const Curriculum6eAdminPage = () => {
                       
                       <TableCell>
                         <div className="flex items-center justify-center gap-1">
+                          {/* Bouton Exercices pour les chapitres pilotes */}
+                          {pilotChapters.includes(chapitre.code_officiel) && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => navigate(`/admin/curriculum/${chapitre.code_officiel}/exercises`)}
+                              className="h-8 w-8 p-0"
+                              title="Gérer les exercices"
+                            >
+                              <BookOpen className="h-4 w-4 text-green-600" />
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleOpenEdit(chapitre)}
                             className="h-8 w-8 p-0"
+                            title="Modifier le chapitre"
                           >
                             <Pencil className="h-4 w-4 text-blue-600" />
                           </Button>
@@ -639,6 +652,7 @@ const Curriculum6eAdminPage = () => {
                             size="sm"
                             onClick={() => handleOpenDelete(chapitre)}
                             className="h-8 w-8 p-0"
+                            title="Supprimer le chapitre"
                           >
                             <Trash2 className="h-4 w-4 text-red-600" />
                           </Button>
