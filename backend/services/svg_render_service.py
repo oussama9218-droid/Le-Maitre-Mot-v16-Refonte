@@ -424,3 +424,171 @@ def _extract_time_from_enonce(enonce: str, exercise_id: int) -> tuple:
         return default_times[idx]
     
     return hour, minute
+
+
+# =============================================================================
+# GÉNÉRATION SVG AVEC TYPES D'EXERCICES
+# =============================================================================
+
+def generate_exercise_svgs(exercise: dict) -> dict:
+    """
+    Génère les SVG pour l'énoncé et la solution selon le type d'exercice.
+    
+    Cette fonction est la nouvelle API principale pour la génération de SVG.
+    Elle prend en compte le champ exercise_type s'il est présent,
+    sinon utilise le comportement rétro-compatible basé sur family.
+    
+    Args:
+        exercise: Dictionnaire de l'exercice avec les champs:
+            - needs_svg: bool
+            - exercise_type: Optional[str] - Type explicite
+            - family: str - Famille (fallback)
+            - enonce_html: str
+            - id: int
+    
+    Returns:
+        Dict avec:
+            - figure_svg_enonce: str|None
+            - figure_svg_solution: str|None
+            - figure_svg: str|None (compatibilité)
+    """
+    from models.exercise_types import get_svg_behavior
+    
+    result = {
+        "figure_svg_enonce": None,
+        "figure_svg_solution": None,
+        "figure_svg": None  # Compatibilité avec l'existant
+    }
+    
+    # Si needs_svg est False, pas de SVG
+    if not exercise.get("needs_svg", False):
+        return result
+    
+    exercise_type = exercise.get("exercise_type")
+    family = exercise.get("family", "")
+    enonce = exercise.get("enonce_html", "")
+    exercise_id = exercise.get("id", 1)
+    
+    # Obtenir le comportement SVG
+    behavior = get_svg_behavior(exercise_type, family)
+    
+    # Extraire l'heure si pertinent
+    hour, minute = _extract_time_from_enonce(enonce, exercise_id)
+    
+    # Générer le SVG de l'énoncé
+    if behavior.svg_in_enonce:
+        svg_type = behavior.enonce_svg_type
+        result["figure_svg_enonce"] = _generate_svg_by_type(
+            svg_type, exercise_type, family, hour, minute, exercise
+        )
+    
+    # Générer le SVG de la solution
+    if behavior.svg_in_solution:
+        svg_type = behavior.solution_svg_type
+        result["figure_svg_solution"] = _generate_svg_by_type(
+            svg_type, exercise_type, family, hour, minute, exercise
+        )
+    
+    # Compatibilité: figure_svg = figure_svg_enonce (comportement précédent)
+    result["figure_svg"] = result["figure_svg_enonce"]
+    
+    return result
+
+
+def _generate_svg_by_type(
+    svg_type: str,
+    exercise_type: Optional[str],
+    family: str,
+    hour: int,
+    minute: int,
+    exercise: dict
+) -> Optional[str]:
+    """
+    Génère un SVG selon le type demandé.
+    """
+    # Types d'horloge
+    if svg_type == "clock_with_hands":
+        return _render_clock_svg(hour, minute)
+    
+    elif svg_type == "clock_empty":
+        return _render_clock_empty_svg()
+    
+    # Timeline
+    elif svg_type == "timeline":
+        return _render_timeline_svg()
+    
+    # Formes géométriques
+    elif svg_type == "shape":
+        return _render_shape_svg()
+    
+    # Règle
+    elif svg_type == "ruler":
+        return _render_ruler_svg()
+    
+    # Symétrie axiale
+    elif svg_type == "axis_only":
+        return _render_axis_svg(with_symmetric=False)
+    
+    elif svg_type == "axis_with_symmetric":
+        return _render_axis_svg(with_symmetric=True)
+    
+    # Auto: déduire depuis family/exercise_type
+    elif svg_type == "auto":
+        family_upper = family.upper()
+        
+        if family_upper == "LECTURE_HORLOGE":
+            return _render_clock_svg(hour, minute)
+        elif family_upper in ["DUREES", "CALCUL_DUREE"]:
+            return _render_timeline_svg()
+        elif family_upper == "PERIMETRE":
+            return _render_shape_svg()
+        else:
+            return _render_placeholder_svg(f"Figure {family}")
+    
+    # Fallback
+    return None
+
+
+def _render_axis_svg(with_symmetric: bool = False) -> str:
+    """
+    Génère un SVG pour un exercice de symétrie axiale.
+    
+    Args:
+        with_symmetric: Si True, affiche aussi la figure symétrique
+    """
+    svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="300" height="200" style="max-width: 100%; height: auto;">
+  <!-- Grille de fond -->
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="300" height="200" fill="url(#grid)"/>
+  
+  <!-- Axe de symétrie (vertical au centre) -->
+  <line x1="150" y1="10" x2="150" y2="190" stroke="#dc2626" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="155" y="25" font-size="12" fill="#dc2626">(d)</text>
+  
+  <!-- Figure originale (triangle à gauche) -->
+  <polygon points="50,150 100,50 120,150" fill="#3b82f620" stroke="#3b82f6" stroke-width="2"/>
+  <text x="85" y="170" font-size="10" fill="#3b82f6" text-anchor="middle">Figure</text>'''
+    
+    if with_symmetric:
+        # Ajouter la figure symétrique
+        svg += '''
+  
+  <!-- Figure symétrique (triangle à droite) -->
+  <polygon points="250,150 200,50 180,150" fill="#22c55e20" stroke="#22c55e" stroke-width="2"/>
+  <text x="210" y="170" font-size="10" fill="#22c55e" text-anchor="middle">Image</text>'''
+    else:
+        svg += '''
+  
+  <!-- Zone pour la figure symétrique (pointillés) -->
+  <rect x="180" y="50" width="70" height="100" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="215" y="105" font-size="10" fill="#94a3b8" text-anchor="middle">?</text>'''
+    
+    svg += '''
+</svg>'''
+    
+    return svg
+
