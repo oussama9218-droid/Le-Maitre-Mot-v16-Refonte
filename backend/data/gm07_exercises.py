@@ -129,7 +129,7 @@ def get_gm07_batch(
     }
     
     if pool_size == 0:
-        batch_meta["warning"] = f"Aucun exercice disponible pour les filtres sélectionnés."
+        batch_meta["warning"] = "Aucun exercice disponible pour les filtres sélectionnés."
         return [], batch_meta
     
     # Mélanger avec seed pour reproductibilité
