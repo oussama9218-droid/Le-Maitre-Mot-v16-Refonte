@@ -52,13 +52,17 @@ def _format_exercise_response(exercise: Dict[str, Any], timestamp: int) -> Dict[
     is_premium = exercise["offer"] == "pro"
     exercise_id = f"ex_6e_gm07_{exercise['id']}_{timestamp}"
     
+    # Générer le SVG si nécessaire
+    figure_svg = render_clock_for_exercise(exercise) if exercise.get("needs_svg") else None
+    
     return {
         "id_exercice": exercise_id,
         "niveau": "6e",
         "chapitre": "Durées et lecture de l'heure",
         "enonce_html": exercise["enonce_html"],
         "solution_html": exercise["solution_html"],
-        "svg": _generate_clock_svg() if exercise.get("needs_svg") else None,
+        "figure_svg": figure_svg,
+        "svg": figure_svg,  # Compatibilité avec l'ancien champ
         "pdf_token": exercise_id,
         "metadata": {
             "code_officiel": "6e_GM07",
@@ -70,7 +74,8 @@ def _format_exercise_response(exercise: Dict[str, Any], timestamp: int) -> Dict[
             "family": exercise["family"],
             "exercise_id": exercise["id"],
             "is_fallback": False,
-            "source": "gm07_fixed_exercises"
+            "source": "gm07_fixed_exercises",
+            "needs_svg": exercise.get("needs_svg", False)
         }
     }
 
