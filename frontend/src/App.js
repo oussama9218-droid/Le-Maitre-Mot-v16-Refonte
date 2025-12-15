@@ -20,6 +20,7 @@ import MySheetsPage from "./components/MySheetsPage";
 import ProSettingsPage from "./components/ProSettingsPage";
 import ExerciseGeneratorPage from "./components/ExerciseGeneratorPage";
 import Curriculum6eAdminPage from "./components/admin/Curriculum6eAdminPage";
+import ChapterExercisesAdminPage from "./components/admin/ChapterExercisesAdminPage";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
