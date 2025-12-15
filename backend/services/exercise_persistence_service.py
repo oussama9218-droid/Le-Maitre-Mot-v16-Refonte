@@ -38,6 +38,8 @@ class ExerciseCreateRequest(BaseModel):
     enonce_html: str = Field(..., description="Énoncé en HTML pur")
     solution_html: str = Field(..., description="Solution en HTML pur (4 étapes)")
     needs_svg: bool = Field(default=False, description="Nécessite un SVG")
+    svg_enonce_brief: Optional[str] = Field(None, description="Description du SVG pour l'énoncé")
+    svg_solution_brief: Optional[str] = Field(None, description="Description du SVG pour la solution")
 
 
 class ExerciseUpdateRequest(BaseModel):
@@ -49,6 +51,8 @@ class ExerciseUpdateRequest(BaseModel):
     enonce_html: Optional[str] = None
     solution_html: Optional[str] = None
     needs_svg: Optional[bool] = None
+    svg_enonce_brief: Optional[str] = None
+    svg_solution_brief: Optional[str] = None
 
 
 class ExerciseResponse(BaseModel):
@@ -62,6 +66,8 @@ class ExerciseResponse(BaseModel):
     enonce_html: str
     solution_html: str
     needs_svg: bool
+    svg_enonce_brief: Optional[str] = None
+    svg_solution_brief: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
