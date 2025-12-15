@@ -816,7 +816,7 @@ const ChapterExercisesAdminPage = () => {
           <DialogHeader>
             <DialogTitle className="text-red-600">Confirmer la suppression</DialogTitle>
             <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer l'exercice #{exerciseToDelete?.id} ?
+              Êtes-vous sûr de vouloir supprimer exercice #{exerciseToDelete?.id} ?
               <br />
               <span className="text-red-500">Cette action est irréversible.</span>
             </DialogDescription>
