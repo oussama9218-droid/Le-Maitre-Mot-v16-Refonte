@@ -21,7 +21,7 @@ from data.gm08_exercises import (
     get_gm08_batch,
     get_exercise_by_seed_index
 )
-from services.svg_render_service import render_svg_from_brief
+from services.svg_render_service import generate_exercise_svgs
 
 
 def is_gm08_request(code_officiel: Optional[str]) -> bool:
@@ -51,16 +51,8 @@ def _format_exercise_response(exercise: Dict[str, Any], timestamp: int) -> Dict[
     is_premium = exercise["offer"] == "pro"
     exercise_id = f"ex_6e_gm08_{exercise['id']}_{timestamp}"
     
-    # Générer le SVG si nécessaire
-    figure_svg = None
-    if exercise.get("needs_svg"):
-        family = exercise.get("family", "")
-        if family == "PERIMETRE":
-            figure_svg = render_svg_from_brief("périmètre rectangle")
-        elif family == "CONVERSION":
-            figure_svg = render_svg_from_brief("règle graduation")
-        else:
-            figure_svg = render_svg_from_brief(f"figure {family}")
+    # Générer les SVG selon le type d'exercice
+    svg_result = generate_exercise_svgs(exercise)
     
     return {
         "id_exercice": exercise_id,
@@ -68,8 +60,10 @@ def _format_exercise_response(exercise: Dict[str, Any], timestamp: int) -> Dict[
         "chapitre": "Grandeurs et mesures - Longueurs",
         "enonce_html": exercise["enonce_html"],
         "solution_html": exercise["solution_html"],
-        "figure_svg": figure_svg,
-        "svg": figure_svg,  # Compatibilité
+        "figure_svg": svg_result["figure_svg"],  # Compatibilité
+        "figure_svg_enonce": svg_result["figure_svg_enonce"],
+        "figure_svg_solution": svg_result["figure_svg_solution"],
+        "svg": svg_result["figure_svg"],  # Compatibilité
         "pdf_token": exercise_id,
         "metadata": {
             "code_officiel": "6e_GM08",
@@ -79,6 +73,7 @@ def _format_exercise_response(exercise: Dict[str, Any], timestamp: int) -> Dict[
             "offer": "pro" if is_premium else "free",
             "generator_code": f"6e_GM08_{exercise['family']}",
             "family": exercise["family"],
+            "exercise_type": exercise.get("exercise_type"),
             "exercise_id": exercise["id"],
             "is_fallback": False,
             "source": "gm08_fixed_exercises",
