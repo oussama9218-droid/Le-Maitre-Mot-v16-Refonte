@@ -240,6 +240,7 @@ import random
         for ex in exercises:
             # Construire les champs optionnels
             exercise_type_str = f'"{ex["exercise_type"]}"' if ex.get('exercise_type') else 'None'
+            variables_str = repr(ex.get('variables')) if ex.get('variables') else 'None'
             svg_enonce_brief_str = f'"{ex["svg_enonce_brief"]}"' if ex.get('svg_enonce_brief') else 'None'
             svg_solution_brief_str = f'"{ex["svg_solution_brief"]}"' if ex.get('svg_solution_brief') else 'None'
             
@@ -248,6 +249,7 @@ import random
         "family": "{ex['family']}",
         "difficulty": "{ex['difficulty']}",
         "offer": "{ex['offer']}",
+        "variables": {variables_str},
         "enonce_html": """{ex['enonce_html']}""",
         "solution_html": """{ex['solution_html']}""",
         "needs_svg": {str(ex.get('needs_svg', False))},
