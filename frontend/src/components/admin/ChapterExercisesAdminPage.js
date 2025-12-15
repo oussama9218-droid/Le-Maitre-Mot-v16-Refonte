@@ -88,7 +88,9 @@ const ChapterExercisesAdminPage = () => {
     offer: 'free',
     enonce_html: '',
     solution_html: '',
-    needs_svg: false
+    needs_svg: false,
+    svg_enonce_brief: '',
+    svg_solution_brief: ''
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
