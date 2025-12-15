@@ -70,6 +70,9 @@ const ChapterExercisesAdminPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  // Types d'exercices disponibles (chargés depuis l'API)
+  const [exerciseTypes, setExerciseTypes] = useState([]);
+  
   // Filtres
   const [filterOffer, setFilterOffer] = useState('all');
   const [filterDifficulty, setFilterDifficulty] = useState('all');
@@ -80,6 +83,7 @@ const ChapterExercisesAdminPage = () => {
   const [editingExercise, setEditingExercise] = useState(null);
   const [formData, setFormData] = useState({
     family: 'CONVERSION',
+    exercise_type: '',
     difficulty: 'facile',
     offer: 'free',
     enonce_html: '',
@@ -102,7 +106,23 @@ const ChapterExercisesAdminPage = () => {
   const [operationMessage, setOperationMessage] = useState(null);
   
   // Familles disponibles
-  const families = ['CONVERSION', 'COMPARAISON', 'PERIMETRE', 'PROBLEME', 'DUREES', 'LECTURE_HORLOGE'];
+  const families = ['CONVERSION', 'COMPARAISON', 'PERIMETRE', 'PROBLEME', 'DUREES', 'LECTURE_HORLOGE', 'CALCUL_DUREE'];
+  
+  // Charger les types d'exercices
+  useEffect(() => {
+    const fetchExerciseTypes = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/admin/exercises/pilot-chapters`);
+        if (response.ok) {
+          const data = await response.json();
+          setExerciseTypes(data.exercise_types || []);
+        }
+      } catch (err) {
+        console.error('Erreur chargement types:', err);
+      }
+    };
+    fetchExerciseTypes();
+  }, []);
   
   // Charger les exercices
   const fetchExercises = useCallback(async () => {
