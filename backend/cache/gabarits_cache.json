@@ -79,10 +79,11 @@
     "symetrie_centrale__trouver_valeur__facile__concis": "{pointA} en ({coordA_x}, {coordA_y}). Centre : {pointO}({centreX}, {centreY}). {pointB} ?",
     "theoreme_de_pythagore__trouver_valeur__facile__narratif": "Marc dessine un triangle {triangle} avec un angle droit en {angleD}. Il sait que {cote1} = {long1} cm et {cote2} = {long2} cm. Quelle est la longueur de {coteACalculer} ?",
     "theoreme_de_pythagore__trouver_valeur__facile__guide": "Observe le triangle {triangle} rectangle en {angleD}. Tu connais {cote1} = {long1} cm et {cote2} = {long2} cm. Pour trouver {coteACalculer}, utilise le théorème de Pythagore.",
-    "symetrie_axiale__verifier_propriete__difficile__narratif": "Léo affirme que {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y}) sont symétriques par rapport à {axeDesc}. A-t-il raison ?"
+    "symetrie_axiale__verifier_propriete__difficile__narratif": "Léo affirme que {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y}) sont symétriques par rapport à {axeDesc}. A-t-il raison ?",
+    "symetrie_axiale__trouver_valeur__difficile__narratif": "Emma dessine un point {pointA} aux coordonnées ({coordA_x}, {coordA_y}) sur son cahier quadrillé. Elle souhaite tracer son symétrique {pointB} par rapport à {axeDesc}. Aide-la à trouver où placer {pointB}."
   },
-  "hits": 112,
-  "misses": 80,
-  "total_cost_saved": 4176.0,
-  "last_updated": "2025-12-15T15:26:53.059445"
+  "hits": 113,
+  "misses": 81,
+  "total_cost_saved": 4215.0,
+  "last_updated": "2025-12-15T15:30:49.549152"
 }
