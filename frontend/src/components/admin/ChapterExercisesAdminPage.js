@@ -132,7 +132,22 @@ const ChapterExercisesAdminPage = () => {
         console.error('Erreur chargement types:', err);
       }
     };
+    
+    const fetchGenerators = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/v1/exercises/generators`);
+        if (response.ok) {
+          const data = await response.json();
+          setAvailableGenerators(data.generators || []);
+        }
+      } catch (err) {
+        console.error('Erreur chargement générateurs:', err);
+        setAvailableGenerators(['THALES_V1']); // Fallback
+      }
+    };
+    
     fetchExerciseTypes();
+    fetchGenerators();
   }, []);
   
   // Charger les exercices
