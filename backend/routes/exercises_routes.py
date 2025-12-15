@@ -27,6 +27,7 @@ from services.geometry_render_service import GeometryRenderService
 from curriculum.loader import get_chapter_by_official_code, CurriculumChapter
 from services.gm07_handler import is_gm07_request, generate_gm07_exercise, generate_gm07_batch
 from services.gm08_handler import is_gm08_request, generate_gm08_exercise, generate_gm08_batch
+from services.tests_dyn_handler import is_tests_dyn_request, generate_tests_dyn_exercise, generate_tests_dyn_batch, get_available_generators
 from logger import get_logger
 
 logger = get_logger()
