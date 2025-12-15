@@ -82,8 +82,94 @@ class GM08BatchResponse(BaseModel):
 
 
 # ============================================================================
-# ENDPOINTS BATCH DÉDIÉS GM07 / GM08
+# MODÈLES POUR L'ENDPOINT BATCH TESTS_DYN (Exercices Dynamiques)
 # ============================================================================
+
+class TestsDynBatchRequest(BaseModel):
+    """Request model pour le batch TESTS_DYN (dynamique)"""
+    code_officiel: str = Field(default="6e_TESTS_DYN", description="Code officiel")
+    difficulte: Optional[str] = Field(default=None, description="facile, moyen, difficile")
+    offer: Optional[str] = Field(default="free", description="free ou pro")
+    nb_exercices: int = Field(default=1, ge=1, le=20, description="Nombre d'exercices (1-20)")
+    seed: Optional[int] = Field(default=None, description="Seed pour reproductibilité")
+
+
+class TestsDynBatchResponse(BaseModel):
+    """Response model pour le batch TESTS_DYN"""
+    exercises: List[dict] = Field(description="Liste des exercices générés dynamiquement")
+    batch_metadata: dict = Field(description="Métadonnées du batch")
+
+
+# ============================================================================
+# ENDPOINTS BATCH DÉDIÉS GM07 / GM08 / TESTS_DYN
+# ============================================================================
+
+@router.post("/generate/batch/tests_dyn", response_model=TestsDynBatchResponse, tags=["Dynamic"])
+async def generate_tests_dyn_batch_endpoint(request: TestsDynBatchRequest):
+    """
+    Génère un lot d'exercices DYNAMIQUES (templates + générateur THALES_V1).
+    
+    **Comportement:**
+    - Les exercices sont générés à la volée avec des valeurs différentes
+    - Chaque appel avec un seed différent produit des exercices différents
+    - Le même seed reproduit exactement les mêmes exercices
+    
+    **Générateur THALES_V1:**
+    - Agrandissements et réductions de figures géométriques
+    - Variables: coefficient, dimensions initiales/finales
+    - SVG générés dynamiquement pour chaque exercice
+    """
+    logger.info(f"🎲 TESTS_DYN Batch Request: offer={request.offer}, difficulty={request.difficulte}, count={request.nb_exercices}, seed={request.seed}")
+    
+    # Générer le batch dynamique
+    exercises, batch_meta = generate_tests_dyn_batch(
+        offer=request.offer,
+        difficulty=request.difficulte,
+        count=request.nb_exercices,
+        seed=request.seed
+    )
+    
+    if not exercises:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "no_exercises_found",
+                "message": "Aucun exercice disponible pour les filtres sélectionnés.",
+                "batch_metadata": batch_meta
+            }
+        )
+    
+    logger.info(f"✅ TESTS_DYN Batch generated: {len(exercises)} dynamic exercises")
+    
+    return TestsDynBatchResponse(
+        exercises=exercises,
+        batch_metadata=batch_meta
+    )
+
+
+@router.get("/generators", tags=["Dynamic"])
+async def list_available_generators():
+    """
+    Liste les générateurs dynamiques disponibles.
+    
+    **Générateurs actuels:**
+    - THALES_V1: Agrandissements/réductions de figures (6e)
+    """
+    generators = get_available_generators()
+    return {
+        "generators": generators,
+        "count": len(generators),
+        "details": {
+            "THALES_V1": {
+                "name": "Agrandissements et Réductions",
+                "niveau": "6e",
+                "description": "Génère des exercices sur les transformations de figures géométriques",
+                "figure_types": ["carre", "rectangle", "triangle"],
+                "difficulties": ["facile", "moyen", "difficile"]
+            }
+        }
+    }
+
 
 @router.post("/generate/batch/gm07", response_model=GM07BatchResponse, tags=["GM07"])
 async def generate_gm07_batch_endpoint(request: GM07BatchRequest):
