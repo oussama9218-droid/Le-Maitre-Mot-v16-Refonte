@@ -730,6 +730,30 @@ const ChapterExercisesAdminPage = () => {
               </div>
             </div>
             
+            {/* Type d'exercice (optionnel) */}
+            <div>
+              <Label className="text-sm">Type d'exercice (optionnel)</Label>
+              <Select 
+                value={formData.exercise_type || ''} 
+                onValueChange={(v) => setFormData(p => ({...p, exercise_type: v === 'none' ? '' : v}))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un type..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">-- Aucun (auto) --</SelectItem>
+                  {exerciseTypes.map(t => (
+                    <SelectItem key={t.value} value={t.value}>
+                      {t.label} - {t.description}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">
+                Le type pilote automatiquement le comportement des figures (énoncé / solution).
+              </p>
+            </div>
+            
             {/* Énoncé */}
             <div>
               <Label className="text-sm">Énoncé HTML *</Label>
