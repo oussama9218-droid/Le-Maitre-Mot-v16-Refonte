@@ -659,14 +659,14 @@ const Curriculum6eAdminPage = () => {
                       
                       <TableCell>
                         <div className="flex items-center justify-center gap-1">
-                          {/* Bouton Exercices pour les chapitres pilotes */}
-                          {pilotChapters.includes(chapitre.code_officiel) && (
+                          {/* Bouton Exercices pour les chapitres éditables */}
+                          {isEditableChapter(chapitre.code_officiel) && (
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => navigate(`/admin/curriculum/${chapitre.code_officiel}/exercises`)}
                               className="h-8 w-8 p-0"
-                              title="Gérer les exercices"
+                              title="📗 Gérer les exercices"
                             >
                               <BookOpen className="h-4 w-4 text-green-600" />
                             </Button>
