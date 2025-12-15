@@ -191,6 +191,7 @@ const ChapterExercisesAdminPage = () => {
     setEditingExercise(null);
     setFormData({
       family: 'CONVERSION',
+      exercise_type: '',
       difficulty: 'facile',
       offer: 'free',
       enonce_html: '',
@@ -218,6 +219,7 @@ const ChapterExercisesAdminPage = () => {
     setEditingExercise(exercise);
     setFormData({
       family: exercise.family,
+      exercise_type: exercise.exercise_type || '',
       difficulty: exercise.difficulty,
       offer: exercise.offer,
       enonce_html: exercise.enonce_html,
