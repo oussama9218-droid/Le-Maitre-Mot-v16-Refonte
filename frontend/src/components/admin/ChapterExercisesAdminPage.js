@@ -916,19 +916,21 @@ const ChapterExercisesAdminPage = () => {
               </div>
             )}
             
-            {/* Solution */}
-            <div>
-              <Label className="text-sm">Solution HTML (4 étapes) *</Label>
-              <Textarea
-                value={formData.solution_html}
-                onChange={(e) => setFormData(p => ({...p, solution_html: e.target.value}))}
-                placeholder={getSolutionTemplate()}
-                className={`font-mono text-sm min-h-[200px] ${formErrors.solution_html ? 'border-red-500' : ''}`}
-              />
-              {formErrors.solution_html && (
-                <p className="text-xs text-red-500 mt-1">{formErrors.solution_html}</p>
-              )}
-            </div>
+            {/* Solution - seulement si non dynamique */}
+            {!formData.is_dynamic && (
+              <div>
+                <Label className="text-sm">Solution HTML (4 étapes) *</Label>
+                <Textarea
+                  value={formData.solution_html}
+                  onChange={(e) => setFormData(p => ({...p, solution_html: e.target.value}))}
+                  placeholder={getSolutionTemplate()}
+                  className={`font-mono text-sm min-h-[200px] ${formErrors.solution_html ? 'border-red-500' : ''}`}
+                />
+                {formErrors.solution_html && (
+                  <p className="text-xs text-red-500 mt-1">{formErrors.solution_html}</p>
+                )}
+              </div>
+            )}
             
             {/* Erreur LaTeX */}
             {formErrors.latex && (
@@ -945,10 +947,15 @@ const ChapterExercisesAdminPage = () => {
                 onCheckedChange={(checked) => setFormData(p => ({...p, needs_svg: checked}))}
               />
               <Label className="text-sm">Nécessite un SVG (schéma)</Label>
+              {formData.is_dynamic && (
+                <Badge variant="outline" className="ml-2 text-purple-600 border-purple-300">
+                  Auto-généré par {formData.generator_key || 'THALES_V1'}
+                </Badge>
+              )}
             </div>
             
-            {/* Champs SVG conditionnels - affichés uniquement si needs_svg est true */}
-            {formData.needs_svg && (
+            {/* Champs SVG conditionnels - affichés uniquement si needs_svg est true ET non dynamique */}
+            {formData.needs_svg && !formData.is_dynamic && (
               <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
