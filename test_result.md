@@ -157,3 +157,14 @@ agent_communication:
     message: "❌ GM07 DOUBLE SVG FUNCTIONALITY TESTING COMPLETED - CRITICAL ISSUES FOUND: 1) Duplicate exercise IDs (all exercises have same ID), 2) Missing figure_svg_enonce in 40% of exercises, 3) Incorrect SVG configuration for CLASSIQUE exercises, 4) No PLACER_AIGUILLES exercises generated to test double SVG feature. GM08 non-regression also failed - no exercises available for free/moyen filters. Main agent needs to investigate exercise generation logic and SVG field population."
   - agent: "testing"
     message: "✅ GM07 DOUBLE SVG FUNCTIONALITY CONFIRMED WORKING: Frontend UI test successful on /generate page. Selected GM05 (Durées) chapter in 'Officiel' mode, generated 5 exercises with 'Moyen' difficulty. Found exercises displaying SVG figures in both énoncé and solution sections. The double SVG feature is working correctly - exercises show clock/time-related SVG graphics in problem statement and different corrected SVG in solution section. Frontend integration complete and functional."
+
+test_plan:
+  current_focus:
+    - "P0 Ghost Exercise Bug - Data Synchronization Validation"
+  test_priority: "critical"
+  test_description: |
+    Validate that the ghost exercise bug (exercise visible in /generate but not in admin) is resolved.
+    Need to verify:
+    1. Admin API and Generation API return the same set of exercise IDs for chapter 6e_GM07
+    2. Exercises 21 (PLACER_AIGUILLES) and 22 (PERIMETRE) are visible in both APIs
+    3. Data is consistent between MongoDB and Python file sources
