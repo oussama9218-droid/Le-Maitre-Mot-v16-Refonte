@@ -805,6 +805,57 @@ const ChapterExercisesAdminPage = () => {
               <Label className="text-sm">Nécessite un SVG (schéma)</Label>
             </div>
             
+            {/* Champs SVG conditionnels - affichés uniquement si needs_svg est true */}
+            {formData.needs_svg && (
+              <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                  Configuration des figures SVG
+                </div>
+                
+                <div>
+                  <Label className="text-sm">Brief SVG pour l'énoncé</Label>
+                  <Input
+                    value={formData.svg_enonce_brief}
+                    onChange={(e) => setFormData(p => ({...p, svg_enonce_brief: e.target.value}))}
+                    placeholder="Ex: Horloge sans aiguilles, Rectangle 6cm × 4cm..."
+                    className="mt-1"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Laissez vide pour utiliser le comportement par défaut du type d'exercice.
+                  </p>
+                </div>
+                
+                <div>
+                  <Label className="text-sm">Brief SVG pour la solution</Label>
+                  <Input
+                    value={formData.svg_solution_brief}
+                    onChange={(e) => setFormData(p => ({...p, svg_solution_brief: e.target.value}))}
+                    placeholder="Ex: Horloge avec aiguilles à 9h20, Figure symétrique complète..."
+                    className="mt-1"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Si absent, utilise le brief de l'énoncé ou le comportement par défaut.
+                  </p>
+                </div>
+                
+                {/* Info sur le type sélectionné */}
+                {formData.exercise_type && (
+                  <div className="text-xs text-blue-700 bg-blue-50 p-2 rounded">
+                    💡 Type <strong>{formData.exercise_type}</strong> : 
+                    {formData.exercise_type === 'PLACER_AIGUILLES' && " Figure vide (énoncé) → Figure complète (solution)"}
+                    {formData.exercise_type === 'LECTURE_HEURE' && " Figure avec aiguilles dans l'énoncé uniquement"}
+                    {formData.exercise_type === 'SYMETRIE_AXIALE' && " Axe seul (énoncé) → Figure symétrique (solution)"}
+                    {formData.exercise_type === 'PERIMETRE' && " Forme géométrique dans l'énoncé"}
+                  </div>
+                )}
+              </div>
+            )}
+            
             {/* Aide */}
             <div className="bg-blue-50 p-3 rounded-md text-sm text-blue-800">
               <p className="font-medium mb-1">💡 Rappel HTML :</p>
