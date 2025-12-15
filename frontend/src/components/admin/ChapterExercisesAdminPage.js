@@ -339,6 +339,12 @@ const ChapterExercisesAdminPage = () => {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
   
+  // Ouvrir la page élève avec le chapitre pré-sélectionné
+  const handleOpenStudentView = () => {
+    const url = `/generate?code_officiel=${chapterCode}&difficulte=moyen`;
+    window.open(url, '_blank');
+  };
+  
   // Loading
   if (loading) {
     return (
