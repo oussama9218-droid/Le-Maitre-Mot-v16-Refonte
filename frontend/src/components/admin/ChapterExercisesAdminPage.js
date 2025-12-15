@@ -224,7 +224,12 @@ const ChapterExercisesAdminPage = () => {
       solution_html: getSolutionTemplate(),
       needs_svg: false,
       svg_enonce_brief: '',
-      svg_solution_brief: ''
+      svg_solution_brief: '',
+      is_dynamic: false,
+      generator_key: '',
+      enonce_template_html: '',
+      solution_template_html: '',
+      variables: null
     });
     setFormErrors({});
     setIsModalOpen(true);
@@ -241,6 +246,26 @@ const ChapterExercisesAdminPage = () => {
 </ol>`;
   };
   
+  // Template pour exercice dynamique THALES_V1
+  const getDynamicTemplates = (generatorKey) => {
+    if (generatorKey === 'THALES_V1') {
+      return {
+        enonce: `<p><strong>Agrandissement d'{{figure_type_article}} :</strong></p>
+<p>On considère {{figure_type_article}} de côté <strong>{{cote_initial}} cm</strong>.</p>
+<p>On effectue un <strong>{{transformation}}</strong> de coefficient <strong>{{coefficient_str}}</strong>.</p>
+<p><em>Question :</em> Quelle est la mesure du côté de la figure obtenue ?</p>`,
+        solution: `<h4>Correction détaillée</h4>
+<ol>
+  <li><strong>Compréhension :</strong> On a {{figure_type_article}} qu'on {{transformation_verbe}}.</li>
+  <li><strong>Méthode :</strong> Multiplier chaque dimension par le coefficient.</li>
+  <li><strong>Calculs :</strong> {{cote_initial}} × {{coefficient_str}} = <strong>{{cote_final}} cm</strong></li>
+  <li><strong>Conclusion :</strong> La figure mesure <strong>{{cote_final}} cm</strong>.</li>
+</ol>`
+      };
+    }
+    return { enonce: '', solution: '' };
+  };
+  
   // Ouvrir modal édition
   const handleOpenEdit = (exercise) => {
     setModalMode('edit');
@@ -250,11 +275,16 @@ const ChapterExercisesAdminPage = () => {
       exercise_type: exercise.exercise_type || '',
       difficulty: exercise.difficulty,
       offer: exercise.offer,
-      enonce_html: exercise.enonce_html,
-      solution_html: exercise.solution_html,
+      enonce_html: exercise.enonce_html || '',
+      solution_html: exercise.solution_html || '',
       needs_svg: exercise.needs_svg || false,
       svg_enonce_brief: exercise.svg_enonce_brief || '',
-      svg_solution_brief: exercise.svg_solution_brief || ''
+      svg_solution_brief: exercise.svg_solution_brief || '',
+      is_dynamic: exercise.is_dynamic || false,
+      generator_key: exercise.generator_key || '',
+      enonce_template_html: exercise.enonce_template_html || '',
+      solution_template_html: exercise.solution_template_html || '',
+      variables: exercise.variables || null
     });
     setFormErrors({});
     setIsModalOpen(true);
