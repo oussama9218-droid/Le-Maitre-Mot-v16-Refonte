@@ -887,8 +887,8 @@ const ExerciseGeneratorPage = () => {
                   )}
                 </div>
 
-                {/* Figure SVG (si présente) */}
-                {currentExercise.figure_svg && (
+                {/* Figure SVG Énoncé (nouvelle API ou compatibilité) */}
+                {(currentExercise.figure_svg_enonce || currentExercise.figure_svg) && (
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                       <svg className="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -900,7 +900,7 @@ const ExerciseGeneratorPage = () => {
                     </h3>
                     <div 
                       className="bg-white p-4 rounded-lg border flex justify-center"
-                      dangerouslySetInnerHTML={{ __html: currentExercise.figure_svg }}
+                      dangerouslySetInnerHTML={{ __html: currentExercise.figure_svg_enonce || currentExercise.figure_svg }}
                       style={{ maxWidth: '100%', overflow: 'hidden' }}
                     />
                   </div>
