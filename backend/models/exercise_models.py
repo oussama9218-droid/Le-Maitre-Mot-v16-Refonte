@@ -117,7 +117,9 @@ class ExerciseGenerateResponse(BaseModel):
     chapitre: str = Field(..., description="Chapitre du curriculum")
     enonce_html: str = Field(..., description="Énoncé au format HTML (inclut la figure SVG si applicable)")
     svg: Optional[str] = Field(None, description="Figure géométrique SVG brute (pour compatibilité, déjà incluse dans enonce_html)")
-    figure_svg: Optional[str] = Field(None, description="Figure SVG pour affichage séparé (horloge, règle, etc.)")
+    figure_svg: Optional[str] = Field(None, description="Figure SVG pour affichage séparé (compatibilité)")
+    figure_svg_enonce: Optional[str] = Field(None, description="Figure SVG pour l'énoncé (nouvelle API)")
+    figure_svg_solution: Optional[str] = Field(None, description="Figure SVG pour la solution (nouvelle API)")
     solution_html: str = Field(..., description="Solution détaillée au format HTML")
     pdf_token: str = Field(..., description="Token pour télécharger le PDF")
     metadata: Dict[str, Any] = Field(..., description="Métadonnées supplémentaires incluant is_fallback et generator_code")
@@ -130,6 +132,8 @@ class ExerciseGenerateResponse(BaseModel):
                 "chapitre": "Symétrie axiale",
                 "enonce_html": "<div class='exercise-enonce'><p>Construire le symétrique du point A par rapport à l'axe.</p><div class='exercise-figure'><svg>...</svg></div></div>",
                 "svg": "<svg width=\"400\" height=\"300\">...</svg>",
+                "figure_svg_enonce": "<svg>...</svg>",
+                "figure_svg_solution": "<svg>...</svg>",
                 "solution_html": "<div class='exercise-solution'><p><strong>Solution :</strong></p><ol><li>Étape 1...</li></ol></div>",
                 "pdf_token": "ex_5e_symetrie-axiale_1702401234",
                 "metadata": {
@@ -140,7 +144,8 @@ class ExerciseGenerateResponse(BaseModel):
                     "domaine": "Géométrie",
                     "has_figure": True,
                     "is_fallback": False,
-                    "generator_code": "5e_SYMETRIE_AXIALE"
+                    "generator_code": "5e_SYMETRIE_AXIALE",
+                    "exercise_type": "SYMETRIE_AXIALE"
                 }
             }
         }
