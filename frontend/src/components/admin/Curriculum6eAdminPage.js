@@ -589,7 +589,19 @@ const Curriculum6eAdminPage = () => {
                   {filteredChapitres.map((chapitre) => (
                     <TableRow key={chapitre.code_officiel} className="hover:bg-gray-50">
                       <TableCell className="font-mono text-sm font-medium">
-                        {chapitre.code_officiel}
+                        <div className="flex items-center gap-2">
+                          {chapitre.code_officiel}
+                          {isPilotChapter(chapitre.code_officiel) && (
+                            <Badge className="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0">
+                              Pilote
+                            </Badge>
+                          )}
+                          {isEditableChapter(chapitre.code_officiel) && (
+                            <Badge className="bg-green-100 text-green-700 text-[10px] px-1.5 py-0">
+                              Éditable
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       
                       <TableCell>
