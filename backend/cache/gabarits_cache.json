@@ -84,10 +84,11 @@
     "symetrie_axiale__verifier_propriete__difficile__oral": "Bon alors, t'as {pointA} en ({coordA_x}, {coordA_y}) et {pointB} en ({coordB_x}, {coordB_y}). Avec {axeDesc}, ils sont symétriques ou pas ?",
     "symetrie_centrale__trouver_valeur__moyen__qr": "Q : Où est {pointA} ?\nR : En ({coordA_x}, {coordA_y}).\nQ : Centre de symétrie ?\nR : {pointO}({centreX}, {centreY}).\nQ : Où placer {pointB} ?",
     "symetrie_centrale__trouver_valeur__moyen__scolaire": "Le point {pointA} est placé en ({coordA_x}, {coordA_y}). Détermine les coordonnées de {pointB}, son image par la symétrie de centre {pointO}({centreX}, {centreY}).",
-    "symetrie_centrale__verifier_propriete__moyen__scolaire": "Vérifie si {pointA} de coordonnées ({coordA_x}, {coordA_y}) et {pointB} de coordonnées ({coordB_x}, {coordB_y}) sont symétriques relativement au point {pointO}({centreX}, {centreY})."
+    "symetrie_centrale__verifier_propriete__moyen__scolaire": "Vérifie si {pointA} de coordonnées ({coordA_x}, {coordA_y}) et {pointB} de coordonnées ({coordB_x}, {coordB_y}) sont symétriques relativement au point {pointO}({centreX}, {centreY}).",
+    "symetrie_axiale__trouver_valeur__difficile__inductif": "Comme dans l'exercice précédent, utilise les propriétés de la symétrie. {pointA} : ({coordA_x}, {coordA_y}), axe : {axeDesc}. Où placer {pointB} ?"
   },
-  "hits": 128,
-  "misses": 85,
-  "total_cost_saved": 4853.0,
-  "last_updated": "2025-12-15T15:38:06.401030"
+  "hits": 136,
+  "misses": 86,
+  "total_cost_saved": 5176.0,
+  "last_updated": "2025-12-15T15:38:53.697385"
 }
