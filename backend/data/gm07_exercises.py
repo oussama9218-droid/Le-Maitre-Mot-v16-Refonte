@@ -242,29 +242,31 @@ GM07_EXERCISES: List[Dict[str, Any]] = [
         "family": "LECTURE_HORLOGE",
         "difficulty": "moyen",
         "offer": "free",
-        "enonce_html": """Test énoncé ici""",
-        "solution_html": """<h4>test Correction détaillée</h4>
+        "variables": {"hour": 9, "minute": 20},
+        "enonce_html": """<p><strong>Place les aiguilles :</strong> Dessine les aiguilles de l'horloge pour indiquer <strong>9h20</strong>. L'aiguille des heures (courte) doit pointer vers le 9 et l'aiguille des minutes (longue) vers le 4.</p>""",
+        "solution_html": """<h4>Correction détaillée</h4>
 <ol>
-  <li><strong>Compréhension :</strong> </li>
-  <li><strong>Méthode :</strong> </li>
-  <li><strong>Calculs :</strong> </li>
-  <li><strong>Conclusion :</strong> </li>
+  <li><strong>Compréhension :</strong> On doit placer les aiguilles à 9h20.</li>
+  <li><strong>Méthode :</strong> L'aiguille des heures (courte) pointe vers le 9, légèrement après car 20 min se sont écoulées.</li>
+  <li><strong>Aiguille des minutes :</strong> 20 min → sur le 4 (car 20 ÷ 5 = 4).</li>
+  <li><strong>Conclusion :</strong> L'horloge affiche bien <strong>9h20</strong>.</li>
 </ol>""",
         "needs_svg": True,
         "exercise_type": "PLACER_AIGUILLES"
     },
     {
         "id": 22,
-        "family": "DUREES",
+        "family": "LECTURE_HORLOGE",
         "difficulty": "difficile",
         "offer": "free",
-        "enonce_html": """Test 2""",
-        "solution_html": """<h4>Correction détaillée test 2</h4>
+        "variables": {"hour": 14, "minute": 35},
+        "enonce_html": """<p><strong>Place les aiguilles (après-midi) :</strong> Dessine les aiguilles de l'horloge pour indiquer <strong>14h35</strong> (2h35 de l'après-midi). Attention, une horloge à aiguilles n'affiche que 12 heures !</p>""",
+        "solution_html": """<h4>Correction détaillée</h4>
 <ol>
-  <li><strong>Compréhension :</strong> </li>
-  <li><strong>Méthode :</strong> </li>
-  <li><strong>Calculs :</strong> </li>
-  <li><strong>Conclusion :</strong> </li>
+  <li><strong>Compréhension :</strong> 14h35 en format 24h = 2h35 sur une horloge classique.</li>
+  <li><strong>Méthode :</strong> L'aiguille des heures pointe vers le 2, légèrement après (35 min écoulées).</li>
+  <li><strong>Aiguille des minutes :</strong> 35 min → sur le 7 (car 35 ÷ 5 = 7).</li>
+  <li><strong>Conclusion :</strong> L'horloge affiche <strong>2h35</strong> (qui correspond à 14h35).</li>
 </ol>""",
         "needs_svg": True,
         "exercise_type": "PLACER_AIGUILLES"
