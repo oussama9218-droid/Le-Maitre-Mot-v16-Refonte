@@ -290,6 +290,62 @@ def _render_placeholder_svg(brief: str) -> str:
     return svg
 
 
+def _render_clock_empty_svg() -> str:
+    """
+    Génère un SVG d'horloge VIDE (sans aiguilles).
+    Pour les exercices de type PLACER_AIGUILLES.
+    """
+    cx, cy = 100, 100
+    radius = 80
+    
+    # Générer les chiffres du cadran
+    numbers_svg = ""
+    for i in range(1, 13):
+        angle = math.radians(i * 30 - 90)
+        num_x = cx + (radius - 15) * math.cos(angle)
+        num_y = cy + (radius - 15) * math.sin(angle) + 5
+        numbers_svg += f'    <text x="{num_x:.1f}" y="{num_y:.1f}" text-anchor="middle" font-size="14" font-weight="500" fill="#333">{i}</text>\n'
+    
+    # Générer les graduations
+    ticks_svg = ""
+    for i in range(60):
+        angle = math.radians(i * 6 - 90)
+        if i % 5 == 0:
+            inner_r = radius - 10
+            outer_r = radius - 3
+            stroke_width = 2
+        else:
+            inner_r = radius - 5
+            outer_r = radius - 3
+            stroke_width = 1
+        
+        x1 = cx + inner_r * math.cos(angle)
+        y1 = cy + inner_r * math.sin(angle)
+        x2 = cx + outer_r * math.cos(angle)
+        y2 = cy + outer_r * math.sin(angle)
+        
+        ticks_svg += f'    <line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="#666" stroke-width="{stroke_width}"/>\n'
+    
+    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" style="max-width: 100%; height: auto;">
+  <!-- Fond du cadran -->
+  <circle cx="{cx}" cy="{cy}" r="{radius}" fill="#fefefe" stroke="#333" stroke-width="3"/>
+  
+  <!-- Graduations -->
+{ticks_svg}
+  <!-- Chiffres -->
+{numbers_svg}
+  <!-- Centre (sans aiguilles) -->
+  <circle cx="{cx}" cy="{cy}" r="5" fill="#333"/>
+  
+  <!-- Instruction -->
+  <text x="{cx}" y="190" text-anchor="middle" font-size="9" fill="#666" font-style="italic">
+    Place les aiguilles pour indiquer l'heure
+  </text>
+</svg>'''
+    
+    return svg
+
+
 def render_clock_for_exercise(exercise: dict) -> Optional[str]:
     """
     Génère le SVG approprié pour un exercice donné.
