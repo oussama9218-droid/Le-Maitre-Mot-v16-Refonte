@@ -35,9 +35,9 @@ class ExerciseCreateRequest(BaseModel):
     exercise_type: Optional[str] = Field(None, description="Type d'exercice (optionnel): LECTURE_HEURE, PLACER_AIGUILLES, etc.")
     difficulty: str = Field(..., description="Difficulté: facile, moyen, difficile")
     offer: str = Field(default="free", description="Offre: free ou pro")
-    # Exercices statiques (requis si is_dynamic=false)
-    enonce_html: Optional[str] = Field(None, description="Énoncé en HTML pur (requis si non dynamique)")
-    solution_html: Optional[str] = Field(None, description="Solution en HTML pur (requis si non dynamique)")
+    # Exercices statiques
+    enonce_html: Optional[str] = Field(default="", description="Énoncé en HTML pur (requis si non dynamique)")
+    solution_html: Optional[str] = Field(default="", description="Solution en HTML pur (requis si non dynamique)")
     needs_svg: bool = Field(default=False, description="Nécessite un SVG")
     variables: Optional[Dict[str, Any]] = Field(None, description="Variables pour le SVG (ex: {hour: 8, minute: 0})")
     svg_enonce_brief: Optional[str] = Field(None, description="Description du SVG pour l'énoncé")
@@ -48,6 +48,20 @@ class ExerciseCreateRequest(BaseModel):
     enonce_template_html: Optional[str] = Field(None, description="Template énoncé avec {{variables}}")
     solution_template_html: Optional[str] = Field(None, description="Template solution avec {{variables}}")
     variables_schema: Optional[Dict[str, str]] = Field(None, description="Schéma des variables")
+    
+    @validator('generator_key', always=True)
+    def validate_dynamic_fields(cls, v, values):
+        is_dynamic = values.get('is_dynamic', False)
+        if is_dynamic:
+            if not v:
+                raise ValueError('generator_key est requis pour les exercices dynamiques')
+            enonce_template = values.get('enonce_template_html')
+            solution_template = values.get('solution_template_html')
+            if not enonce_template:
+                raise ValueError('enonce_template_html est requis pour les exercices dynamiques')
+            if not solution_template:
+                raise ValueError('solution_template_html est requis pour les exercices dynamiques')
+        return v
     
     @validator('enonce_html', always=True)
     def validate_enonce(cls, v, values):
@@ -62,13 +76,6 @@ class ExerciseCreateRequest(BaseModel):
         if not is_dynamic and not v:
             raise ValueError('solution_html est requis pour les exercices statiques')
         return v or ''
-    
-    @validator('generator_key', always=True)
-    def validate_generator(cls, v, values):
-        is_dynamic = values.get('is_dynamic', False)
-        if is_dynamic and not v:
-            raise ValueError('generator_key est requis pour les exercices dynamiques')
-        return v
 
 
 class ExerciseUpdateRequest(BaseModel):
