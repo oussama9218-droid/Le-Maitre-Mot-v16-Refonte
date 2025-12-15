@@ -127,6 +127,33 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 
+backend:
+  - task: "GM07 double SVG functionality"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ GM07 double SVG functionality has critical issues: 1) Duplicate IDs (5 exercises, 1 unique ID), 2) Missing figure_svg_enonce in some exercises, 3) Incorrect SVG configuration (CLASSIQUE exercise has both enonce and solution SVGs), 4) No PLACER_AIGUILLES exercises generated. CLASSIQUE exercises: 2/5 correct SVG configuration."
+
+  - task: "GM08 non-regression"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ GM08 batch generation failed with 422 error: 'Aucun exercice disponible pour les filtres sélectionnés' for offer=free, difficulty=moyen. Available exercises: 0/3 requested. May need different filters (pro offer or different difficulty)."
+
 agent_communication:
   - agent: "testing"
     message: "✅ ALL ADMIN EXERCISE MANAGEMENT API TESTS PASSED (7/7). Complete CRUD functionality working correctly for pilot chapters GM07/GM08. API endpoints return proper data structures with comprehensive stats. Non-regression testing confirms existing GM08 batch endpoint still functional. Ready for frontend integration."
+  - agent: "testing"
+    message: "❌ GM07 DOUBLE SVG FUNCTIONALITY TESTING COMPLETED - CRITICAL ISSUES FOUND: 1) Duplicate exercise IDs (all exercises have same ID), 2) Missing figure_svg_enonce in 40% of exercises, 3) Incorrect SVG configuration for CLASSIQUE exercises, 4) No PLACER_AIGUILLES exercises generated to test double SVG feature. GM08 non-regression also failed - no exercises available for free/moyen filters. Main agent needs to investigate exercise generation logic and SVG field population."
