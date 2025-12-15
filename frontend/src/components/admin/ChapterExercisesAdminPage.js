@@ -388,9 +388,16 @@ const ChapterExercisesAdminPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link to="/admin/curriculum" className="text-gray-500 hover:text-gray-700">
-                <ChevronLeft className="h-5 w-5" />
-              </Link>
+              {/* Bouton Retour amélioré */}
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/admin/curriculum')}
+                className="flex items-center gap-1"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Retour curriculum</span>
+              </Button>
               <div>
                 <h1 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                   <BookOpen className="h-5 w-5 text-blue-600" />
@@ -403,9 +410,19 @@ const ChapterExercisesAdminPage = () => {
             </div>
             
             <div className="flex items-center gap-2">
+              {/* Bouton Ouvrir côté élève */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleOpenStudentView}
+                className="flex items-center gap-1"
+              >
+                <ExternalLink className="h-4 w-4" />
+                <span className="hidden sm:inline">👀 Côté élève</span>
+              </Button>
               <Button variant="outline" size="sm" onClick={fetchExercises}>
                 <RefreshCw className="h-4 w-4 mr-1" />
-                Actualiser
+                <span className="hidden sm:inline">Actualiser</span>
               </Button>
               <Button size="sm" onClick={handleOpenCreate}>
                 <Plus className="h-4 w-4 mr-1" />
