@@ -22,6 +22,7 @@ from data.gm07_exercises import (
     get_gm07_batch,
     get_exercise_by_seed_index
 )
+from services.svg_render_service import render_clock_for_exercise
 
 
 def is_gm07_request(code_officiel: Optional[str]) -> bool:
