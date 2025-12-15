@@ -733,7 +733,7 @@ const ChapterExercisesAdminPage = () => {
             <div className="bg-blue-50 p-3 rounded-md text-sm text-blue-800">
               <p className="font-medium mb-1">💡 Rappel HTML :</p>
               <ul className="list-disc list-inside text-xs space-y-1">
-                <li><code>&lt;strong&gt;</code> pour le gras, <code>&lt;em&gt;</code> pour l'italique</li>
+                <li><code>&lt;strong&gt;</code> pour le gras, <code>&lt;em&gt;</code> pour italique</li>
                 <li><code>×</code> pour la multiplication, <code>÷</code> pour la division</li>
                 <li>Structure solution : <code>&lt;ol&gt;&lt;li&gt;Étape 1&lt;/li&gt;...&lt;/ol&gt;</code></li>
               </ul>
