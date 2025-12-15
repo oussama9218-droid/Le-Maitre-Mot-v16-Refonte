@@ -139,7 +139,7 @@ class P0GhostBugTester:
         print("\n🔍 TEST 2: Generation API - Generate batch for 6e_GM07")
         generation_data = {
             "code_officiel": "6e_GM07",
-            "nb_exercices": 30,  # Request more than available to get all
+            "nb_exercices": 20,  # Request maximum allowed to get as many as possible
             "offer": "pro"  # Pro to see all exercises
         }
         
