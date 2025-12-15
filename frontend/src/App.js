@@ -861,6 +861,43 @@ function MainApp() {
   const availableLevels = catalog.find(m => m.name === selectedMatiere)?.levels || [];
   const availableChapters = availableLevels.find(l => l.name === selectedNiveau)?.chapters || [];
 
+  // Show error screen if API is unavailable
+  if (apiError && catalog.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
+        <Card className="w-full max-w-md mx-4">
+          <CardHeader className="text-center">
+            <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
+            <CardTitle className="text-xl text-gray-900">Service temporairement indisponible</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-gray-600">{apiError}</p>
+            <Button 
+              onClick={handleRetry} 
+              disabled={isRetrying}
+              className="w-full"
+            >
+              {isRetrying ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Nouvelle tentative...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Réessayer
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-gray-500">
+              Si le problème persiste, veuillez réessayer dans quelques minutes.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <div className="container mx-auto px-4 py-8">
