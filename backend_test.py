@@ -15537,6 +15537,188 @@ Résultat final.''',
         
         return passed_tests == total_tests, crud_results
 
+    def test_gm07_double_svg_functionality(self):
+        """Test la fonctionnalité de double figure SVG (énoncé vs solution) pour le chapitre GM07"""
+        print("\n🕐 TESTING GM07 DOUBLE SVG FUNCTIONALITY")
+        print("="*60)
+        print("CONTEXT: Testing double SVG figures for GM07 clock exercises")
+        print("FEATURES: figure_svg_enonce vs figure_svg_solution for PLACER_AIGUILLES exercises")
+        
+        # Test 1: Test exercice CLASSIQUE (sans exercise_type)
+        print("\n📝 Test 1: EXERCICE CLASSIQUE (standard LECTURE_HORLOGE)")
+        gm07_batch_data = {
+            "code_officiel": "6e_GM07",
+            "nb_exercices": 5,
+            "difficulte": "moyen",
+            "offer": "free"
+        }
+        
+        success, response = self.run_test(
+            "GM07 Batch Generation",
+            "POST",
+            "v1/exercises/generate/batch/gm07",
+            200,
+            data=gm07_batch_data,
+            timeout=90
+        )
+        
+        if not success:
+            print("❌ Failed to generate GM07 batch - cannot test SVG functionality")
+            return False, {}
+        
+        exercises = response.get('exercises', [])
+        if not exercises:
+            print("❌ No exercises generated in GM07 batch")
+            return False, {}
+        
+        print(f"✅ Generated {len(exercises)} GM07 exercises")
+        
+        # Analyze exercises for SVG functionality
+        results = {
+            "total_exercises": len(exercises),
+            "classique_exercises": 0,
+            "placer_aiguilles_exercises": 0,
+            "classique_svg_correct": 0,
+            "placer_aiguilles_svg_correct": 0,
+            "unique_ids": len(set(ex.get('id') for ex in exercises)),
+            "svg_analysis": []
+        }
+        
+        for i, exercise in enumerate(exercises):
+            exercise_id = exercise.get('id', f'ex_{i}')
+            exercise_type = exercise.get('exercise_type')
+            figure_svg_enonce = exercise.get('figure_svg_enonce')
+            figure_svg_solution = exercise.get('figure_svg_solution')
+            enonce = exercise.get('enonce', '')
+            
+            print(f"\n   📋 Exercise {i+1} (ID: {exercise_id[:8]}...):")
+            print(f"      Type: {exercise_type or 'CLASSIQUE'}")
+            print(f"      Has figure_svg_enonce: {bool(figure_svg_enonce)}")
+            print(f"      Has figure_svg_solution: {bool(figure_svg_solution)}")
+            
+            analysis = {
+                "exercise_id": exercise_id,
+                "exercise_type": exercise_type,
+                "has_enonce_svg": bool(figure_svg_enonce),
+                "has_solution_svg": bool(figure_svg_solution),
+                "svg_different": False,
+                "correct_for_type": False
+            }
+            
+            if exercise_type == "PLACER_AIGUILLES":
+                results["placer_aiguilles_exercises"] += 1
+                print(f"      🎯 PLACER_AIGUILLES exercise - checking double SVG...")
+                
+                # Check for empty clock in enonce (should contain "Place les aiguilles")
+                if figure_svg_enonce and "Place les aiguilles" in enonce:
+                    print(f"      ✅ Enonce contains empty clock instruction")
+                else:
+                    print(f"      ⚠️  Enonce may not contain empty clock instruction")
+                
+                # Check that both SVGs exist and are different
+                if figure_svg_enonce and figure_svg_solution:
+                    if figure_svg_enonce != figure_svg_solution:
+                        analysis["svg_different"] = True
+                        analysis["correct_for_type"] = True
+                        results["placer_aiguilles_svg_correct"] += 1
+                        print(f"      ✅ Has both different SVGs (enonce: {len(figure_svg_enonce)} chars, solution: {len(figure_svg_solution)} chars)")
+                    else:
+                        print(f"      ❌ SVGs are identical - should be different")
+                else:
+                    print(f"      ❌ Missing SVG(s) - PLACER_AIGUILLES should have both")
+                    
+            else:
+                # CLASSIQUE exercise
+                results["classique_exercises"] += 1
+                print(f"      📖 CLASSIQUE exercise - checking single SVG...")
+                
+                # Should have enonce SVG but no solution SVG
+                if figure_svg_enonce and not figure_svg_solution:
+                    analysis["correct_for_type"] = True
+                    results["classique_svg_correct"] += 1
+                    print(f"      ✅ Has enonce SVG only (correct for CLASSIQUE)")
+                elif figure_svg_enonce and figure_svg_solution:
+                    print(f"      ⚠️  Has both SVGs - CLASSIQUE should only have enonce SVG")
+                elif not figure_svg_enonce:
+                    print(f"      ❌ Missing enonce SVG - CLASSIQUE should have enonce SVG")
+                else:
+                    print(f"      ❌ Unexpected SVG configuration")
+            
+            results["svg_analysis"].append(analysis)
+        
+        # Test 2: Check for unique IDs (no duplicates)
+        print(f"\n📊 Test 2: DUPLICATE CHECK")
+        if results["unique_ids"] == results["total_exercises"]:
+            print(f"   ✅ All {results['total_exercises']} exercises have unique IDs")
+        else:
+            print(f"   ❌ Duplicate IDs detected: {results['total_exercises']} exercises, {results['unique_ids']} unique IDs")
+        
+        # Test 3: Summary of SVG functionality
+        print(f"\n📊 Test 3: SVG FUNCTIONALITY SUMMARY")
+        print(f"   Total exercises: {results['total_exercises']}")
+        print(f"   CLASSIQUE exercises: {results['classique_exercises']}")
+        print(f"   PLACER_AIGUILLES exercises: {results['placer_aiguilles_exercises']}")
+        print(f"   CLASSIQUE with correct SVG: {results['classique_svg_correct']}/{results['classique_exercises']}")
+        print(f"   PLACER_AIGUILLES with correct SVG: {results['placer_aiguilles_svg_correct']}/{results['placer_aiguilles_exercises']}")
+        
+        # Overall assessment
+        classique_success = (results['classique_exercises'] == 0 or 
+                           results['classique_svg_correct'] == results['classique_exercises'])
+        placer_success = (results['placer_aiguilles_exercises'] == 0 or 
+                         results['placer_aiguilles_svg_correct'] == results['placer_aiguilles_exercises'])
+        unique_ids_success = results['unique_ids'] == results['total_exercises']
+        
+        overall_success = classique_success and placer_success and unique_ids_success
+        
+        if overall_success:
+            print(f"   🎉 GM07 DOUBLE SVG FUNCTIONALITY WORKING CORRECTLY")
+        else:
+            print(f"   ❌ GM07 double SVG functionality has issues")
+        
+        return overall_success, results
+
+    def test_gm08_non_regression(self):
+        """Test batch GM08 pour vérifier la non-régression"""
+        print("\n🔄 TESTING GM08 NON-REGRESSION")
+        print("="*50)
+        print("CONTEXT: Ensuring GM08 batch still works correctly after GM07 changes")
+        
+        gm08_batch_data = {
+            "code_officiel": "6e_GM08",
+            "nb_exercices": 3,
+            "difficulte": "moyen",
+            "offer": "free"
+        }
+        
+        success, response = self.run_test(
+            "GM08 Non-Regression Batch",
+            "POST",
+            "v1/exercises/generate/batch/gm08",
+            200,
+            data=gm08_batch_data,
+            timeout=60
+        )
+        
+        if success and isinstance(response, dict):
+            exercises = response.get('exercises', [])
+            if exercises:
+                print(f"   ✅ GM08 batch generated {len(exercises)} exercises successfully")
+                print(f"   ✅ No regression detected in GM08 functionality")
+                
+                # Check basic exercise structure
+                for i, exercise in enumerate(exercises[:2]):
+                    exercise_id = exercise.get('id', f'ex_{i}')
+                    enonce = exercise.get('enonce', '')
+                    print(f"   Exercise {i+1} (ID: {exercise_id[:8]}...): {len(enonce)} chars")
+                
+                return True, {"exercises_generated": len(exercises)}
+            else:
+                print(f"   ❌ GM08 batch generated no exercises")
+                return False, {}
+        else:
+            print(f"   ❌ GM08 batch generation failed")
+            return False, {}
+
 if __name__ == "__main__":
     tester = LeMaitreMotAPITester()
     
