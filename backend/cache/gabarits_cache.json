@@ -61,10 +61,24 @@
     "theoreme_de_pythagore__trouver_valeur__moyen__inductif": "Tu connais le théorème de Pythagore. Applique-le au triangle {triangle} rectangle en {angleD} avec {cote1} = {long1} cm et {cote2} = {long2} cm. Que trouves-tu pour {coteACalculer} ?",
     "theoreme_de_pythagore__trouver_valeur__moyen__concis": "{triangle} rectangle en {angleD}. Données : {cote1} = {long1} cm, {cote2} = {long2} cm. {coteACalculer} = ?",
     "theoreme_de_pythagore__trouver_valeur__moyen__qr": "Question : Type de triangle ?\nRéponse : {triangle}, rectangle en {angleD}.\nQuestion : Données ?\nRéponse : {cote1} = {long1} cm, {cote2} = {long2} cm.\nQuestion : Longueur de {coteACalculer} ?",
-    "theoreme_de_pythagore__trouver_valeur__moyen__oral": "Alors voilà : triangle {triangle}, angle droit en {angleD}. T'as {cote1} qui fait {long1} cm et {cote2} qui fait {long2} cm. Trouve {coteACalculer}."
+    "theoreme_de_pythagore__trouver_valeur__moyen__oral": "Alors voilà : triangle {triangle}, angle droit en {angleD}. T'as {cote1} qui fait {long1} cm et {cote2} qui fait {long2} cm. Trouve {coteACalculer}.",
+    "theoreme_de_pythagore__trouver_valeur__moyen__defi": "Défi Pythagore ! Triangle {triangle}, angle droit en {angleD}, {cote1} = {long1} cm, {cote2} = {long2} cm. Trouve {coteACalculer} en moins de 2 minutes !",
+    "symetrie_axiale__trouver_valeur__facile__defi": "Défi géométrie ! Le point {pointA} est en ({coordA_x}, {coordA_y}). Sauras-tu trouver rapidement où se place son symétrique {pointB} par rapport à {axeDesc} ?",
+    "symetrie_axiale__verifier_propriete__difficile__inductif": "Rappelle-toi la propriété fondamentale de la symétrie. Vérifie-la pour {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y}) par rapport à {axeDesc}.",
+    "symetrie_axiale__verifier_propriete__difficile__etapes": "1) Repère {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y})\n2) Localise {axeDesc}\n3) Calcule et compare les distances\n4) Conclus sur la symétrie",
+    "symetrie_axiale__trouver_valeur__difficile__defi": "Défi géométrie ! Le point {pointA} est en ({coordA_x}, {coordA_y}). Sauras-tu trouver rapidement où se place son symétrique {pointB} par rapport à {axeDesc} ?",
+    "symetrie_axiale__trouver_valeur__difficile__scolaire": "Soit le point {pointA} de coordonnées ({coordA_x}, {coordA_y}). Détermine les coordonnées du point {pointB} symétrique de {pointA} par rapport à l'axe {axeDesc}.",
+    "theoreme_de_pythagore__trouver_valeur__moyen__academique": "Dans le triangle {triangle} rectangle en {angleD}, utilise les propriétés du théorème de Pythagore pour déterminer {coteACalculer}, sachant que {cote1} = {long1} cm et {cote2} = {long2} cm.",
+    "symetrie_axiale__trouver_valeur__difficile__etapes": "1) Place {pointA} en ({coordA_x}, {coordA_y})\n2) Trace {axeDesc}\n3) Détermine {pointB}, symétrique de {pointA}",
+    "symetrie_axiale__trouver_valeur__difficile__oral": "Regarde {pointA} en ({coordA_x}, {coordA_y}). T'as {axeDesc}. Donc {pointB}, il va où ?",
+    "symetrie_axiale__trouver_valeur__difficile__guide": "Étape par étape : localise {pointA} en ({coordA_x}, {coordA_y}), puis identifie {axeDesc}. Le point {pointB} sera à la même distance de l'axe, mais de l'autre côté. Calcule ses coordonnées.",
+    "symetrie_axiale__verifier_propriete__difficile__academique": "Démontre rigoureusement si les points {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y}) respectent les conditions d'équidistance à {axeDesc}.",
+    "symetrie_axiale__trouver_valeur__difficile__concis": "Donnés : {pointA}({coordA_x}, {coordA_y}), axe {axeDesc}. Trouve {pointB}.",
+    "symetrie_axiale__trouver_valeur__difficile__qr": "Q : Point initial ?\nR : {pointA}({coordA_x}, {coordA_y}).\nQ : Axe ?\nR : {axeDesc}.\nQ : Point symétrique {pointB} ?",
+    "symetrie_axiale__verifier_propriete__difficile__qr": "Q : Coordonnées de {pointA} ?\nR : ({coordA_x}, {coordA_y}).\nQ : Coordonnées de {pointB} ?\nR : ({coordB_x}, {coordB_y}).\nQ : Axe ?\nR : {axeDesc}.\nQ : Symétrie validée ?"
   },
-  "hits": 40,
-  "misses": 62,
-  "total_cost_saved": 1543.0,
-  "last_updated": "2025-12-15T00:34:51.890314"
+  "hits": 90,
+  "misses": 76,
+  "total_cost_saved": 3430.0,
+  "last_updated": "2025-12-15T15:20:58.621471"
 }
