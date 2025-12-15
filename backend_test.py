@@ -15843,9 +15843,39 @@ if __name__ == "__main__":
         elif test_mode == "race-condition":
             # Legacy support for race condition tests
             run_magic_link_race_condition_tests()
+        elif test_mode == "gm07":
+            # Run GM07 double SVG functionality tests
+            print("🕐 RUNNING GM07 DOUBLE SVG FUNCTIONALITY TESTS")
+            success, results = tester.test_gm07_double_svg_functionality()
+            print(f"\n🕐 GM07 Double SVG Test: {'PASSED' if success else 'FAILED'}")
+            if success:
+                print(f"✅ All SVG functionality working correctly")
+                print(f"✅ CLASSIQUE exercises: {results.get('classique_svg_correct', 0)}/{results.get('classique_exercises', 0)}")
+                print(f"✅ PLACER_AIGUILLES exercises: {results.get('placer_aiguilles_svg_correct', 0)}/{results.get('placer_aiguilles_exercises', 0)}")
+                print(f"✅ Unique IDs: {results.get('unique_ids', 0)}/{results.get('total_exercises', 0)}")
+            else:
+                print("🚨 GM07 SVG FUNCTIONALITY ISSUES DETECTED:")
+                svg_analysis = results.get('svg_analysis', [])
+                for analysis in svg_analysis:
+                    if not analysis.get('correct_for_type', False):
+                        print(f"   ❌ Exercise {analysis.get('exercise_id', 'unknown')}: SVG configuration incorrect")
+            sys.exit(0 if success else 1)
+        elif test_mode == "gm08":
+            # Run GM08 non-regression tests
+            print("🔄 RUNNING GM08 NON-REGRESSION TESTS")
+            success, results = tester.test_gm08_non_regression()
+            print(f"\n🔄 GM08 Non-Regression Test: {'PASSED' if success else 'FAILED'}")
+            if success:
+                exercises_generated = results.get('exercises_generated', 0)
+                print(f"✅ GM08 batch generated {exercises_generated} exercises successfully")
+                print(f"✅ No regression detected in GM08 functionality")
+            else:
+                print("🚨 GM08 NON-REGRESSION ISSUES DETECTED:")
+                print("   ❌ GM08 batch generation failed")
+            sys.exit(0 if success else 1)
         else:
             print(f"Unknown test mode: {test_mode}")
-            print("Available modes: math, curriculum, newsubjects, auth, logo, logo-persistence, magic, security, template, subscription, feature_flags, urgent, coherence, admin-crud")
+            print("Available modes: math, curriculum, newsubjects, auth, logo, logo-persistence, magic, security, template, subscription, feature_flags, urgent, coherence, admin-crud, gm07, gm08")
         sys.exit(0)
     
     # Run all tests if no specific mode specified
