@@ -732,7 +732,7 @@ const ChapterExercisesAdminPage = () => {
             
             {/* Type d'exercice (optionnel) */}
             <div>
-              <Label className="text-sm">Type d'exercice (optionnel)</Label>
+              <Label className="text-sm">Type exercice (optionnel)</Label>
               <Select 
                 value={formData.exercise_type || ''} 
                 onValueChange={(v) => setFormData(p => ({...p, exercise_type: v === 'none' ? '' : v}))}
