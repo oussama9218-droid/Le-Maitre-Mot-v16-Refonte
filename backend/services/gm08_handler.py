@@ -21,6 +21,7 @@ from data.gm08_exercises import (
     get_gm08_batch,
     get_exercise_by_seed_index
 )
+from services.svg_render_service import render_svg_from_brief
 
 
 def is_gm08_request(code_officiel: Optional[str]) -> bool:
@@ -50,13 +51,25 @@ def _format_exercise_response(exercise: Dict[str, Any], timestamp: int) -> Dict[
     is_premium = exercise["offer"] == "pro"
     exercise_id = f"ex_6e_gm08_{exercise['id']}_{timestamp}"
     
+    # Générer le SVG si nécessaire
+    figure_svg = None
+    if exercise.get("needs_svg"):
+        family = exercise.get("family", "")
+        if family == "PERIMETRE":
+            figure_svg = render_svg_from_brief("périmètre rectangle")
+        elif family == "CONVERSION":
+            figure_svg = render_svg_from_brief("règle graduation")
+        else:
+            figure_svg = render_svg_from_brief(f"figure {family}")
+    
     return {
         "id_exercice": exercise_id,
         "niveau": "6e",
         "chapitre": "Grandeurs et mesures - Longueurs",
         "enonce_html": exercise["enonce_html"],
         "solution_html": exercise["solution_html"],
-        "svg": None,  # GM08 n'utilise pas de SVG
+        "figure_svg": figure_svg,
+        "svg": figure_svg,  # Compatibilité
         "pdf_token": exercise_id,
         "metadata": {
             "code_officiel": "6e_GM08",
@@ -68,7 +81,8 @@ def _format_exercise_response(exercise: Dict[str, Any], timestamp: int) -> Dict[
             "family": exercise["family"],
             "exercise_id": exercise["id"],
             "is_fallback": False,
-            "source": "gm08_fixed_exercises"
+            "source": "gm08_fixed_exercises",
+            "needs_svg": exercise.get("needs_svg", False)
         }
     }
 
