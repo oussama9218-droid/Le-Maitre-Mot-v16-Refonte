@@ -59,10 +59,12 @@
     "theoreme_de_pythagore__trouver_valeur__moyen__guide": "Observe le triangle {triangle} rectangle en {angleD}. Tu connais {cote1} = {long1} cm et {cote2} = {long2} cm. Pour trouver {coteACalculer}, utilise le théorème de Pythagore.",
     "theoreme_de_pythagore__trouver_valeur__moyen__scolaire": "Soit le triangle {triangle} rectangle en {angleD}. On donne {cote1} = {long1} cm et {cote2} = {long2} cm. Calcule la longueur {coteACalculer}.",
     "theoreme_de_pythagore__trouver_valeur__moyen__inductif": "Tu connais le théorème de Pythagore. Applique-le au triangle {triangle} rectangle en {angleD} avec {cote1} = {long1} cm et {cote2} = {long2} cm. Que trouves-tu pour {coteACalculer} ?",
-    "theoreme_de_pythagore__trouver_valeur__moyen__concis": "{triangle} rectangle en {angleD}. Données : {cote1} = {long1} cm, {cote2} = {long2} cm. {coteACalculer} = ?"
+    "theoreme_de_pythagore__trouver_valeur__moyen__concis": "{triangle} rectangle en {angleD}. Données : {cote1} = {long1} cm, {cote2} = {long2} cm. {coteACalculer} = ?",
+    "theoreme_de_pythagore__trouver_valeur__moyen__qr": "Question : Type de triangle ?\nRéponse : {triangle}, rectangle en {angleD}.\nQuestion : Données ?\nRéponse : {cote1} = {long1} cm, {cote2} = {long2} cm.\nQuestion : Longueur de {coteACalculer} ?",
+    "theoreme_de_pythagore__trouver_valeur__moyen__oral": "Alors voilà : triangle {triangle}, angle droit en {angleD}. T'as {cote1} qui fait {long1} cm et {cote2} qui fait {long2} cm. Trouve {coteACalculer}."
   },
-  "hits": 38,
-  "misses": 60,
-  "total_cost_saved": 1480.0,
-  "last_updated": "2025-12-08T10:38:17.844678"
+  "hits": 40,
+  "misses": 62,
+  "total_cost_saved": 1543.0,
+  "last_updated": "2025-12-15T00:34:51.890314"
 }
