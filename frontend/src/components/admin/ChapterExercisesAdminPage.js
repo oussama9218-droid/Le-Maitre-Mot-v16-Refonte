@@ -790,43 +790,131 @@ const ChapterExercisesAdminPage = () => {
               </div>
             </div>
             
-            {/* Type d'exercice (optionnel) */}
-            <div>
-              <Label className="text-sm">Type exercice (optionnel)</Label>
-              <Select 
-                value={formData.exercise_type || ''} 
-                onValueChange={(v) => setFormData(p => ({...p, exercise_type: v === 'none' ? '' : v}))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un type..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">-- Aucun (auto) --</SelectItem>
-                  {exerciseTypes.map(t => (
-                    <SelectItem key={t.value} value={t.value}>
-                      {t.label} - {t.description}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-gray-500 mt-1">
-                Le type pilote automatiquement le comportement des figures (énoncé / solution).
-              </p>
-            </div>
-            
-            {/* Énoncé */}
-            <div>
-              <Label className="text-sm">Énoncé HTML *</Label>
-              <Textarea
-                value={formData.enonce_html}
-                onChange={(e) => setFormData(p => ({...p, enonce_html: e.target.value}))}
-                placeholder="<p><strong>Titre :</strong> Description de l'exercice...</p>"
-                className={`font-mono text-sm min-h-[120px] ${formErrors.enonce_html ? 'border-red-500' : ''}`}
-              />
-              {formErrors.enonce_html && (
-                <p className="text-xs text-red-500 mt-1">{formErrors.enonce_html}</p>
+            {/* Toggle Exercice Dynamique */}
+            <div className="p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🎲</span>
+                  <Label className="text-sm font-medium text-purple-800">Exercice dynamique (template)</Label>
+                </div>
+                <Switch
+                  checked={formData.is_dynamic}
+                  onCheckedChange={(checked) => {
+                    setFormData(p => ({
+                      ...p, 
+                      is_dynamic: checked,
+                      generator_key: checked ? 'THALES_V1' : '',
+                      enonce_template_html: checked ? getDynamicTemplates('THALES_V1').enonce : '',
+                      solution_template_html: checked ? getDynamicTemplates('THALES_V1').solution : ''
+                    }));
+                  }}
+                />
+              </div>
+              
+              {formData.is_dynamic && (
+                <div className="space-y-4 mt-4">
+                  <div className="text-xs text-purple-600 bg-purple-100 p-2 rounded">
+                    💡 Les exercices dynamiques utilisent des templates avec variables <code>{'{{variable}}'}</code> 
+                    et génèrent des variantes infinies.
+                  </div>
+                  
+                  {/* Sélecteur de générateur */}
+                  <div>
+                    <Label className="text-sm">Générateur *</Label>
+                    <Select 
+                      value={formData.generator_key || 'THALES_V1'} 
+                      onValueChange={(v) => {
+                        const templates = getDynamicTemplates(v);
+                        setFormData(p => ({
+                          ...p, 
+                          generator_key: v,
+                          enonce_template_html: templates.enonce,
+                          solution_template_html: templates.solution
+                        }));
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choisir un générateur..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableGenerators.map(g => (
+                          <SelectItem key={g} value={g}>
+                            {g === 'THALES_V1' ? '🔺 THALES_V1 - Agrandissements/Réductions' : g}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {/* Template énoncé */}
+                  <div>
+                    <Label className="text-sm">Template énoncé *</Label>
+                    <Textarea
+                      value={formData.enonce_template_html}
+                      onChange={(e) => setFormData(p => ({...p, enonce_template_html: e.target.value}))}
+                      placeholder="<p>Exercice avec {{variable}}...</p>"
+                      className="font-mono text-sm min-h-[100px] bg-white"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Variables disponibles: <code>{'{{figure_type}}'}</code>, <code>{'{{coefficient}}'}</code>, <code>{'{{cote_initial}}'}</code>...
+                    </p>
+                  </div>
+                  
+                  {/* Template solution */}
+                  <div>
+                    <Label className="text-sm">Template solution *</Label>
+                    <Textarea
+                      value={formData.solution_template_html}
+                      onChange={(e) => setFormData(p => ({...p, solution_template_html: e.target.value}))}
+                      placeholder="<h4>Correction</h4>..."
+                      className="font-mono text-sm min-h-[100px] bg-white"
+                    />
+                  </div>
+                </div>
               )}
             </div>
+            
+            {/* Type d'exercice (optionnel) - seulement si non dynamique */}
+            {!formData.is_dynamic && (
+              <div>
+                <Label className="text-sm">Type exercice (optionnel)</Label>
+                <Select 
+                  value={formData.exercise_type || ''} 
+                  onValueChange={(v) => setFormData(p => ({...p, exercise_type: v === 'none' ? '' : v}))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner un type..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">-- Aucun (auto) --</SelectItem>
+                    {exerciseTypes.map(t => (
+                      <SelectItem key={t.value} value={t.value}>
+                        {t.label} - {t.description}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Le type pilote automatiquement le comportement des figures (énoncé / solution).
+                </p>
+              </div>
+            )}
+            
+            {/* Énoncé - seulement si non dynamique */}
+            {!formData.is_dynamic && (
+              <div>
+                <Label className="text-sm">Énoncé HTML *</Label>
+                <Textarea
+                  value={formData.enonce_html}
+                  onChange={(e) => setFormData(p => ({...p, enonce_html: e.target.value}))}
+                  placeholder="<p><strong>Titre :</strong> Description de l'exercice...</p>"
+                  className={`font-mono text-sm min-h-[120px] ${formErrors.enonce_html ? 'border-red-500' : ''}`}
+                />
+                {formErrors.enonce_html && (
+                  <p className="text-xs text-red-500 mt-1">{formErrors.enonce_html}</p>
+                )}
+              </div>
+            )}
             
             {/* Solution */}
             <div>
