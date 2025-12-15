@@ -497,6 +497,8 @@ def get_{code.lower()}_stats() -> Dict[str, Any]:
         
         if request.family is not None:
             update_data["family"] = request.family.upper()
+        if request.exercise_type is not None:
+            update_data["exercise_type"] = request.exercise_type.upper() if request.exercise_type else None
         if request.difficulty is not None:
             update_data["difficulty"] = request.difficulty.lower()
         if request.offer is not None:
