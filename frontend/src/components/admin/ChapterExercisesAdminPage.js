@@ -307,22 +307,40 @@ const ChapterExercisesAdminPage = () => {
   const validateForm = () => {
     const errors = {};
     
-    if (!formData.enonce_html.trim()) {
-      errors.enonce_html = "L'énoncé est requis";
+    // Validation pour exercices STATIQUES
+    if (!formData.is_dynamic) {
+      if (!formData.enonce_html.trim()) {
+        errors.enonce_html = "L'énoncé est requis";
+      }
+      
+      if (!formData.solution_html.trim()) {
+        errors.solution_html = 'La solution est requise';
+      }
+      
+      // Vérifier pas de LaTeX
+      if (formData.enonce_html.includes('$') || formData.solution_html.includes('$')) {
+        errors.latex = 'Le contenu ne doit pas contenir de LaTeX ($). Utilisez du HTML pur.';
+      }
+      
+      // Vérifier structure solution
+      if (!formData.solution_html.includes('<ol>') || !formData.solution_html.includes('<li>')) {
+        errors.solution_html = 'La solution doit contenir une structure en 4 étapes (<ol><li>...)';
+      }
     }
     
-    if (!formData.solution_html.trim()) {
-      errors.solution_html = 'La solution est requise';
-    }
-    
-    // Vérifier pas de LaTeX
-    if (formData.enonce_html.includes('$') || formData.solution_html.includes('$')) {
-      errors.latex = 'Le contenu ne doit pas contenir de LaTeX ($). Utilisez du HTML pur.';
-    }
-    
-    // Vérifier structure solution
-    if (!formData.solution_html.includes('<ol>') || !formData.solution_html.includes('<li>')) {
-      errors.solution_html = 'La solution doit contenir une structure en 4 étapes (<ol><li>...)';
+    // Validation pour exercices DYNAMIQUES
+    if (formData.is_dynamic) {
+      if (!formData.generator_key) {
+        errors.generator_key = 'Le générateur est requis pour les exercices dynamiques';
+      }
+      
+      if (!formData.enonce_template_html?.trim()) {
+        errors.enonce_template_html = 'Le template énoncé est requis';
+      }
+      
+      if (!formData.solution_template_html?.trim()) {
+        errors.solution_template_html = 'Le template solution est requis';
+      }
     }
     
     setFormErrors(errors);
