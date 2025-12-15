@@ -85,10 +85,17 @@
     "symetrie_centrale__trouver_valeur__moyen__qr": "Q : Où est {pointA} ?\nR : En ({coordA_x}, {coordA_y}).\nQ : Centre de symétrie ?\nR : {pointO}({centreX}, {centreY}).\nQ : Où placer {pointB} ?",
     "symetrie_centrale__trouver_valeur__moyen__scolaire": "Le point {pointA} est placé en ({coordA_x}, {coordA_y}). Détermine les coordonnées de {pointB}, son image par la symétrie de centre {pointO}({centreX}, {centreY}).",
     "symetrie_centrale__verifier_propriete__moyen__scolaire": "Vérifie si {pointA} de coordonnées ({coordA_x}, {coordA_y}) et {pointB} de coordonnées ({coordB_x}, {coordB_y}) sont symétriques relativement au point {pointO}({centreX}, {centreY}).",
-    "symetrie_axiale__trouver_valeur__difficile__inductif": "Comme dans l'exercice précédent, utilise les propriétés de la symétrie. {pointA} : ({coordA_x}, {coordA_y}), axe : {axeDesc}. Où placer {pointB} ?"
+    "symetrie_axiale__trouver_valeur__difficile__inductif": "Comme dans l'exercice précédent, utilise les propriétés de la symétrie. {pointA} : ({coordA_x}, {coordA_y}), axe : {axeDesc}. Où placer {pointB} ?",
+    "symetrie_centrale__trouver_valeur__difficile__academique": "Dans un repère orthonormé, considère le point {pointA}({coordA_x}, {coordA_y}). En appliquant les propriétés de la symétrie centrale, détermine les coordonnées du point {pointB}, image de {pointA} par la symétrie de centre {pointO}({centreX}, {centreY}).",
+    "symetrie_centrale__verifier_propriete__difficile__etapes": "Procédure :\n→ Données : {pointA}({coordA_x}, {coordA_y}), {pointB}({coordB_x}, {coordB_y}), {pointO}({centreX}, {centreY})\n→ Calcul du milieu\n→ Validation",
+    "symetrie_centrale__verifier_propriete__difficile__narratif": "Léo affirme que {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y}) sont symétriques par rapport au centre {pointO}({centreX}, {centreY}). A-t-il raison ?",
+    "symetrie_centrale__trouver_valeur__difficile__scolaire": "Le point {pointA} est placé en ({coordA_x}, {coordA_y}). Détermine les coordonnées de {pointB}, son image par la symétrie de centre {pointO}({centreX}, {centreY}).",
+    "symetrie_centrale__verifier_propriete__difficile__defi": "Défi ! {pointA}({coordA_x}, {coordA_y}), {pointB}({coordB_x}, {coordB_y}), centre {pointO}({centreX}, {centreY}). Symétrie centrale : vrai ou faux ?",
+    "symetrie_centrale__verifier_propriete__difficile__oral": "Dis-moi, avec {pointA} en ({coordA_x}, {coordA_y}), {pointB} en ({coordB_x}, {coordB_y}) et {pointO} en ({centreX}, {centreY}), on a une symétrie centrale ?",
+    "symetrie_centrale__trouver_valeur__difficile__inductif": "Tu connais le principe : {pointO} est le milieu. Avec {pointA}({coordA_x}, {coordA_y}) et {pointO}({centreX}, {centreY}), calcule {pointB}."
   },
-  "hits": 136,
-  "misses": 86,
-  "total_cost_saved": 5176.0,
-  "last_updated": "2025-12-15T15:38:53.697385"
+  "hits": 138,
+  "misses": 93,
+  "total_cost_saved": 5251.0,
+  "last_updated": "2025-12-15T15:40:30.640634"
 }
