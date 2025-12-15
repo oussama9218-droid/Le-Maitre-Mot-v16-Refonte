@@ -211,57 +211,6 @@ def get_gm07_available_exercises(
     }
 
 
-def _generate_clock_svg() -> str:
-    """
-    Génère un SVG d'horloge vide pour les exercices qui en ont besoin.
-    L'horloge est vide car l'exercice demande de lire/positionner les aiguilles.
-    """
-    return '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-  <!-- Cadran -->
-  <circle cx="100" cy="100" r="95" fill="#fff" stroke="#333" stroke-width="3"/>
-  
-  <!-- Centre -->
-  <circle cx="100" cy="100" r="4" fill="#333"/>
-  
-  <!-- Graduations des heures -->
-  <g stroke="#333" stroke-width="2">
-    <!-- 12h --><line x1="100" y1="15" x2="100" y2="25"/>
-    <!-- 1h --><line x1="142.5" y1="22.5" x2="137.5" y2="31"/>
-    <!-- 2h --><line x1="177.5" y1="57.5" x2="169" y2="62.5"/>
-    <!-- 3h --><line x1="185" y1="100" x2="175" y2="100"/>
-    <!-- 4h --><line x1="177.5" y1="142.5" x2="169" y2="137.5"/>
-    <!-- 5h --><line x1="142.5" y1="177.5" x2="137.5" y2="169"/>
-    <!-- 6h --><line x1="100" y1="185" x2="100" y2="175"/>
-    <!-- 7h --><line x1="57.5" y1="177.5" x2="62.5" y2="169"/>
-    <!-- 8h --><line x1="22.5" y1="142.5" x2="31" y2="137.5"/>
-    <!-- 9h --><line x1="15" y1="100" x2="25" y2="100"/>
-    <!-- 10h --><line x1="22.5" y1="57.5" x2="31" y2="62.5"/>
-    <!-- 11h --><line x1="57.5" y1="22.5" x2="62.5" y2="31"/>
-  </g>
-  
-  <!-- Chiffres -->
-  <g font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">
-    <text x="100" y="40">12</text>
-    <text x="150" y="55">1</text>
-    <text x="170" y="90">2</text>
-    <text x="170" y="108">3</text>
-    <text x="170" y="125">4</text>
-    <text x="150" y="160">5</text>
-    <text x="100" y="175">6</text>
-    <text x="50" y="160">7</text>
-    <text x="30" y="125">8</text>
-    <text x="30" y="108">9</text>
-    <text x="30" y="90">10</text>
-    <text x="50" y="55">11</text>
-  </g>
-  
-  <!-- Note: Aiguilles à positionner mentalement par l'élève -->
-  <text x="100" y="130" font-family="Arial" font-size="10" text-anchor="middle" fill="#666">
-    (Horloge de référence)
-  </text>
-</svg>'''
-
-
 # =============================================================================
 # STATISTIQUES GM07 (pour debug)
 # =============================================================================
