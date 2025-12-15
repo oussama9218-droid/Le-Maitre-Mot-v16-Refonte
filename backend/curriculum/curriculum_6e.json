@@ -5,53 +5,99 @@
   "macro_groups": [
     {
       "label": "Nombres entiers",
-      "codes_officiels": ["6e_N01", "6e_N02", "6e_N03"],
+      "codes_officiels": [
+        "6e_N01",
+        "6e_N02",
+        "6e_N03"
+      ],
       "description": "Lecture, écriture, comparaison des nombres entiers"
     },
     {
       "label": "Calcul posé et mental",
-      "codes_officiels": ["6e_N04", "6e_N05", "6e_N06", "6e_N07"],
+      "codes_officiels": [
+        "6e_N04",
+        "6e_N05",
+        "6e_N06",
+        "6e_N07"
+      ],
       "description": "Opérations et calculs avec les entiers"
     },
     {
       "label": "Fractions",
-      "codes_officiels": ["6e_N08", "6e_N09"],
+      "codes_officiels": [
+        "6e_N08",
+        "6e_N09"
+      ],
       "description": "Fractions comme partage, quotient et comparaison"
     },
     {
       "label": "Problèmes",
-      "codes_officiels": ["6e_N10"],
+      "codes_officiels": [
+        "6e_N10"
+      ],
       "description": "Résolution de problèmes à étapes"
     },
     {
       "label": "Géométrie plane",
-      "codes_officiels": ["6e_G01", "6e_G02", "6e_G03", "6e_G04", "6e_G05", "6e_G06"],
+      "codes_officiels": [
+        "6e_G01",
+        "6e_G02",
+        "6e_G03",
+        "6e_G04",
+        "6e_G05",
+        "6e_G06"
+      ],
       "description": "Points, droites, triangles, quadrilatères, cercles"
     },
     {
       "label": "Symétrie axiale",
-      "codes_officiels": ["6e_G07"],
+      "codes_officiels": [
+        "6e_G07"
+      ],
       "description": "Transformations et symétrie"
     },
     {
       "label": "Longueurs, masses, durées",
-      "codes_officiels": ["6e_GM01", "6e_GM05", "6e_GM06", "6e_GM07", "6e_GM08"],
+      "codes_officiels": [
+        "6e_GM01",
+        "6e_GM05",
+        "6e_GM06",
+        "6e_GM07",
+        "6e_GM08"
+      ],
       "description": "Mesures et conversions (inclut lecture de l'heure et longueurs)"
     },
     {
       "label": "Périmètres et aires",
-      "codes_officiels": ["6e_GM02", "6e_GM03", "6e_GM04"],
+      "codes_officiels": [
+        "6e_GM02",
+        "6e_GM03",
+        "6e_GM04"
+      ],
       "description": "Calcul de périmètres et aires de figures"
     },
     {
       "label": "Données et statistiques",
-      "codes_officiels": ["6e_SP01", "6e_SP02", "6e_SP04"],
+      "codes_officiels": [
+        "6e_SP01",
+        "6e_SP02",
+        "6e_SP04"
+      ],
       "description": "Tableaux, diagrammes et moyennes"
     },
     {
       "label": "Proportionnalité",
-      "codes_officiels": ["6e_SP03"],
+      "codes_officiels": [
+        "6e_SP03"
+      ],
       "description": "Tableaux de proportionnalité"
+    },
+    {
+      "label": "Tests Dynamiques",
+      "codes_officiels": [
+        "6e_TESTS_DYN"
+      ],
+      "description": "Chapitre de test pour les exercices générés dynamiquement"
     }
   ],
   "chapitres": [
@@ -701,6 +747,32 @@
         "calcul"
       ],
       "contexts": []
+    },
+    {
+      "niveau": "6e",
+      "code_officiel": "6e_TESTS_DYN",
+      "domaine": "Tests",
+      "libelle": "Exercices Dynamiques (Test)",
+      "chapitre_backend": "Tests Dynamiques",
+      "exercise_types": [
+        "AGRANDISSEMENT_REDUCTION"
+      ],
+      "schema_requis": true,
+      "difficulte_min": 1,
+      "difficulte_max": 3,
+      "statut": "beta",
+      "tags": [
+        "dynamique",
+        "proportionnalité",
+        "agrandissement",
+        "réduction"
+      ],
+      "contexts": [],
+      "is_pilot": true,
+      "supports_dynamic": true,
+      "available_generators": [
+        "THALES_V1"
+      ]
     }
   ]
 }

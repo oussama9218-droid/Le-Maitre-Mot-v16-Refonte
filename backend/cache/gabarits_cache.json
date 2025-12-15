@@ -78,10 +78,11 @@
     "symetrie_axiale__verifier_propriete__difficile__qr": "Q : Coordonnées de {pointA} ?\nR : ({coordA_x}, {coordA_y}).\nQ : Coordonnées de {pointB} ?\nR : ({coordB_x}, {coordB_y}).\nQ : Axe ?\nR : {axeDesc}.\nQ : Symétrie validée ?",
     "symetrie_centrale__trouver_valeur__facile__concis": "{pointA} en ({coordA_x}, {coordA_y}). Centre : {pointO}({centreX}, {centreY}). {pointB} ?",
     "theoreme_de_pythagore__trouver_valeur__facile__narratif": "Marc dessine un triangle {triangle} avec un angle droit en {angleD}. Il sait que {cote1} = {long1} cm et {cote2} = {long2} cm. Quelle est la longueur de {coteACalculer} ?",
-    "theoreme_de_pythagore__trouver_valeur__facile__guide": "Observe le triangle {triangle} rectangle en {angleD}. Tu connais {cote1} = {long1} cm et {cote2} = {long2} cm. Pour trouver {coteACalculer}, utilise le théorème de Pythagore."
+    "theoreme_de_pythagore__trouver_valeur__facile__guide": "Observe le triangle {triangle} rectangle en {angleD}. Tu connais {cote1} = {long1} cm et {cote2} = {long2} cm. Pour trouver {coteACalculer}, utilise le théorème de Pythagore.",
+    "symetrie_axiale__verifier_propriete__difficile__narratif": "Léo affirme que {pointA}({coordA_x}, {coordA_y}) et {pointB}({coordB_x}, {coordB_y}) sont symétriques par rapport à {axeDesc}. A-t-il raison ?"
   },
-  "hits": 111,
-  "misses": 79,
-  "total_cost_saved": 4136.0,
-  "last_updated": "2025-12-15T15:25:24.059477"
+  "hits": 112,
+  "misses": 80,
+  "total_cost_saved": 4176.0,
+  "last_updated": "2025-12-15T15:26:53.059445"
 }
