@@ -450,6 +450,7 @@ def get_{code.lower()}_stats() -> Dict[str, Any]:
             "chapter_code": chapter_upper,
             "id": next_id,
             "family": request.family.upper(),
+            "exercise_type": request.exercise_type.upper() if request.exercise_type else None,
             "difficulty": request.difficulty.lower(),
             "offer": request.offer.lower(),
             "enonce_html": request.enonce_html,
