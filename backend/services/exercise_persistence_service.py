@@ -236,7 +236,8 @@ import random
         "offer": "{ex['offer']}",
         "enonce_html": """{ex['enonce_html']}""",
         "solution_html": """{ex['solution_html']}""",
-        "needs_svg": {str(ex.get('needs_svg', False))}
+        "needs_svg": {str(ex.get('needs_svg', False))},
+        "exercise_type": {f'"{ex["exercise_type"]}"' if ex.get('exercise_type') else 'None'}
     }},
 '''
             header += content
