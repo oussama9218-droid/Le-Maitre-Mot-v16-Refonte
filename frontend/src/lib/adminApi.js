@@ -65,9 +65,34 @@ export async function apiCall(endpoint, options = {}) {
 }
 
 /**
- * Récupère le schéma d'un générateur
+ * Récupère le schéma d'un générateur (essaie le nouveau endpoint Factory, puis legacy)
  */
 export async function fetchGeneratorSchema(generatorKey) {
+  // Essayer d'abord le nouveau endpoint Factory
+  const factoryResult = await apiCall(`/api/v1/exercises/generators/${generatorKey}/full-schema`);
+  if (factoryResult.success) {
+    // Adapter la réponse Factory au format legacy pour compatibilité
+    const data = factoryResult.data;
+    return {
+      success: true,
+      data: {
+        generator_key: data.generator_key,
+        label: data.meta?.label || data.generator_key,
+        description: data.meta?.description || '',
+        niveau: data.meta?.niveaux?.[0] || '6e',
+        variables: data.schema || [],
+        svg_modes: data.meta?.svg_mode ? [data.meta.svg_mode] : ['AUTO', 'CUSTOM'],
+        supports_double_svg: data.meta?.supports_double_svg ?? true,
+        pedagogical_tips: data.meta?.pedagogical_tips,
+        template_example_enonce: data.presets?.[0]?.params?.enonce_template || '',
+        template_example_solution: data.presets?.[0]?.params?.solution_template || '',
+        presets: data.presets || [],
+        defaults: data.defaults || {}
+      }
+    };
+  }
+  
+  // Fallback sur l'ancien endpoint
   return apiCall(`/api/v1/exercises/generators/${generatorKey}/schema`);
 }
 
