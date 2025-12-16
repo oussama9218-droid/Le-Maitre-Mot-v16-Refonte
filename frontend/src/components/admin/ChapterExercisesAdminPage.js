@@ -121,6 +121,12 @@ const ChapterExercisesAdminPage = () => {
   // Messages
   const [operationMessage, setOperationMessage] = useState(null);
   
+  // Preview dynamique (P2)
+  const [dynamicPreviewOpen, setDynamicPreviewOpen] = useState(false);
+  
+  // Schéma du générateur sélectionné (P0.2)
+  const [generatorSchema, setGeneratorSchema] = useState(null);
+  
   // Familles disponibles (étendues pour dynamique)
   const families = ['CONVERSION', 'COMPARAISON', 'PERIMETRE', 'PROBLEME', 'DUREES', 'LECTURE_HORLOGE', 'CALCUL_DUREE', 'AGRANDISSEMENT_REDUCTION'];
   
