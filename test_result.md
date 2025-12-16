@@ -248,13 +248,18 @@ backend:
 
 test_plan:
   current_focus:
-    - "P0/P1/P2 Admin Dynamic Exercise UX Improvements - COMPLETED"
+    - "Dynamic Factory v1 - Complete Implementation"
   test_priority: "high"
   test_description: |
-    ✅ COMPLETED - All P0/P1/P2 Admin Dynamic Exercise UX Improvements tested successfully:
-    1. P0.2: Generator schema endpoint ✅ - Returns 22 variables, SVG modes, templates
-    2. P0.2: Generators list endpoint ✅ - Returns THALES_V1 generator correctly
-    3. P2: Dynamic preview endpoint ✅ - Variable replacement and SVG generation working
-    4. Non-regression: GM07 batch ✅ - 5 exercises generated correctly
-    5. Non-regression: GM08 batch ✅ - 5 exercises generated correctly  
-    6. Non-regression: TESTS_DYN batch ✅ - 3 dynamic exercises with THALES_V1 generator
+    Test Dynamic Factory v1 implementation:
+    - P0: Non-regression GM07/GM08
+    - P1: Registry central (GET /generators, GET /generators/{key}/full-schema)
+    - P2: Modèle exercice dynamique (generator_params)
+    - P3: Fusion des paramètres (defaults + exercise_params + overrides)
+    - P4: UI Admin auto-générée
+    - P5: SYMETRIE_AXIALE_V2 pilote
+    
+    Endpoints to test:
+    - GET /api/v1/exercises/generators - List all
+    - GET /api/v1/exercises/generators/{key}/full-schema - Schema + defaults + presets
+    - POST /api/v1/exercises/generate-from-factory - Generate with params fusion
