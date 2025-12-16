@@ -157,6 +157,8 @@ agent_communication:
     message: "✅ GM07 DOUBLE SVG FUNCTIONALITY CONFIRMED WORKING"
   - agent: "main"
     message: "✅ P0 Ghost Exercise Bug RESOLVED - Data synchronized between MongoDB and Python files"
+  - agent: "testing"
+    message: "🎉 P0/P1/P2 ADMIN DYNAMIC EXERCISE UX IMPROVEMENTS - ALL TESTS PASSED (6/6). Generator schema endpoint returns 22 variables and templates. Dynamic preview endpoint working with variable replacement and SVG generation. All batch endpoints (GM07, GM08, TESTS_DYN) functioning correctly with no regressions detected. Dynamic exercise system fully operational."
 
 backend:
   - task: "P0 Ghost Exercise Bug - Data Synchronization Validation"
