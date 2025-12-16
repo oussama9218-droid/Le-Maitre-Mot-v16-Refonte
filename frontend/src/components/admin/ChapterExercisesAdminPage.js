@@ -890,6 +890,23 @@ const ChapterExercisesAdminPage = () => {
                     </Select>
                   </div>
                   
+                  {/* Panneau des variables disponibles (P0.2) */}
+                  {formData.generator_key && (
+                    <GeneratorVariablesPanel 
+                      generatorKey={formData.generator_key}
+                      onTemplatesLoaded={(templates) => {
+                        // Ne mettre à jour que si les templates sont vides
+                        if (!formData.enonce_template_html && !formData.solution_template_html) {
+                          setFormData(p => ({
+                            ...p,
+                            enonce_template_html: templates.enonce,
+                            solution_template_html: templates.solution
+                          }));
+                        }
+                      }}
+                    />
+                  )}
+                  
                   {/* Template énoncé */}
                   <div>
                     <Label className="text-sm">Template énoncé *</Label>
@@ -899,9 +916,9 @@ const ChapterExercisesAdminPage = () => {
                       placeholder="<p>Exercice avec {{variable}}...</p>"
                       className="font-mono text-sm min-h-[100px] bg-white"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Variables disponibles: <code>{'{{figure_type}}'}</code>, <code>{'{{coefficient}}'}</code>, <code>{'{{cote_initial}}'}</code>...
-                    </p>
+                    {formErrors.enonce_template_html && (
+                      <p className="text-xs text-red-500 mt-1">{formErrors.enonce_template_html}</p>
+                    )}
                   </div>
                   
                   {/* Template solution */}
@@ -913,7 +930,22 @@ const ChapterExercisesAdminPage = () => {
                       placeholder="<h4>Correction</h4>..."
                       className="font-mono text-sm min-h-[100px] bg-white"
                     />
+                    {formErrors.solution_template_html && (
+                      <p className="text-xs text-red-500 mt-1">{formErrors.solution_template_html}</p>
+                    )}
                   </div>
+                  
+                  {/* Bouton Preview (P2) */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setDynamicPreviewOpen(true)}
+                    className="w-full border-purple-300 text-purple-700 hover:bg-purple-50"
+                    disabled={!formData.enonce_template_html || !formData.solution_template_html}
+                  >
+                    <PlayCircle className="h-4 w-4 mr-2" />
+                    Prévisualiser un exemple généré
+                  </Button>
                 </div>
               )}
             </div>
