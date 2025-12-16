@@ -16431,6 +16431,23 @@ if __name__ == "__main__":
                     if not analysis.get('correct_for_type', False):
                         print(f"   ❌ Exercise {analysis.get('exercise_id', 'unknown')}: SVG configuration incorrect")
             sys.exit(0 if success else 1)
+        elif test_mode == "dynamic-factory":
+            # Run Dynamic Factory v1 tests
+            print("🏭 RUNNING DYNAMIC FACTORY V1 TESTS")
+            success, results = tester.test_dynamic_factory_v1_complete()
+            print(f"\n🏭 Dynamic Factory v1 Test: {'PASSED' if success else 'FAILED'}")
+            if success:
+                print(f"✅ All Dynamic Factory components working correctly")
+                print(f"✅ P0 Non-regression: {results['p0_non_regression']['passed']}/{results['p0_non_regression']['total']}")
+                print(f"✅ P1 Registry Central: {results['p1_registry_central']['passed']}/{results['p1_registry_central']['total']}")
+                print(f"✅ P3 Params Fusion: {results['p3_params_fusion']['passed']}/{results['p3_params_fusion']['total']}")
+                print(f"✅ P5 SYMETRIE Pilot: {results['p5_symetrie_pilot']['passed']}/{results['p5_symetrie_pilot']['total']}")
+                print(f"✅ Template Rendering: {results['template_rendering']['passed']}/{results['template_rendering']['total']}")
+            else:
+                print("🚨 DYNAMIC FACTORY V1 ISSUES DETECTED:")
+                for failure in results.get('critical_failures', []):
+                    print(f"   ❌ {failure}")
+            sys.exit(0 if success else 1)
         elif test_mode == "gm08":
             # Run GM08 non-regression tests
             print("🔄 RUNNING GM08 NON-REGRESSION TESTS")
