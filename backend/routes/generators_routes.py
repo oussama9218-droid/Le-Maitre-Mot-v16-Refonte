@@ -157,7 +157,7 @@ async def validate_template(template: str, generator_key: str):
     """Valide les variables d'un template."""
     import re
     
-    schema = get_generator_schema(generator_key.upper())
+    schema = legacy_get_schema(generator_key.upper())
     if not schema:
         raise HTTPException(status_code=400, detail={"error": "invalid_generator"})
     
@@ -168,3 +168,191 @@ async def validate_template(template: str, generator_key: str):
     unknown = list(used_vars - known_var_names)
     
     return {"valid": len(unknown) == 0, "unknown_variables": unknown, "known_variables": known}
+
+
+# =============================================================================
+# NOUVEAUX ENDPOINTS - DYNAMIC FACTORY V1
+# =============================================================================
+
+@router.get("/generators", tags=["Factory"])
+async def list_all_generators():
+    """
+    Liste tous les générateurs disponibles (Dynamic Factory v1).
+    
+    Retourne les métadonnées de chaque générateur:
+    - key, label, description
+    - version, niveaux supportés
+    - exercise_type, svg_mode
+    - nombre de paramètres et presets
+    """
+    generators = get_generators_list()
+    return {
+        "generators": generators,
+        "count": len(generators),
+        "api_version": "2.0.0"
+    }
+
+
+class FactorySchemaResponse(BaseModel):
+    """Réponse du schéma Factory."""
+    generator_key: str
+    meta: Dict[str, Any]
+    defaults: Dict[str, Any]
+    schema: List[Dict[str, Any]]
+    presets: List[Dict[str, Any]]
+
+
+@router.get("/generators/{generator_key}/full-schema", response_model=FactorySchemaResponse, tags=["Factory"])
+async def get_factory_schema(generator_key: str):
+    """
+    Récupère le schéma complet d'un générateur (Dynamic Factory v1).
+    
+    Retourne:
+    - meta: métadonnées du générateur
+    - defaults: valeurs par défaut
+    - schema: définition des paramètres avec types
+    - presets: configurations pédagogiques prédéfinies
+    """
+    schema = factory_get_schema(generator_key.upper())
+    
+    if not schema:
+        # Fallback sur le système legacy
+        legacy = legacy_get_schema(generator_key.upper())
+        if legacy:
+            return FactorySchemaResponse(
+                generator_key=generator_key.upper(),
+                meta={
+                    "key": generator_key.upper(),
+                    "label": legacy.label,
+                    "description": legacy.description,
+                    "version": "1.0.0",
+                    "niveaux": [legacy.niveau],
+                    "exercise_type": "DYNAMIC",
+                    "svg_mode": "AUTO"
+                },
+                defaults={},
+                schema=[v.to_dict() for v in legacy.variables],
+                presets=[]
+            )
+        
+        available = get_generators_list()
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "error": "generator_not_found",
+                "message": f"Générateur '{generator_key}' non trouvé",
+                "available": [g["key"] for g in available]
+            }
+        )
+    
+    return FactorySchemaResponse(**schema)
+
+
+class FactoryGenerateRequest(BaseModel):
+    """Request pour génération via Factory."""
+    generator_key: str = Field(description="Clé du générateur")
+    exercise_params: Optional[Dict[str, Any]] = Field(default=None, description="Paramètres stockés dans l'exercice")
+    overrides: Optional[Dict[str, Any]] = Field(default=None, description="Overrides du prof")
+    seed: Optional[int] = Field(default=None, description="Seed pour reproductibilité")
+    enonce_template: Optional[str] = Field(default=None, description="Template HTML énoncé")
+    solution_template: Optional[str] = Field(default=None, description="Template HTML solution")
+
+
+class FactoryGenerateResponse(BaseModel):
+    """Réponse de génération Factory."""
+    success: bool
+    variables: Dict[str, Any]
+    geo_data: Dict[str, Any]
+    figure_svg_enonce: Optional[str]
+    figure_svg_solution: Optional[str]
+    enonce_html: Optional[str]
+    solution_html: Optional[str]
+    generation_meta: Dict[str, Any]
+    errors: List[str] = Field(default_factory=list)
+
+
+@router.post("/generate-from-factory", response_model=FactoryGenerateResponse, tags=["Factory"])
+async def generate_from_factory(request: FactoryGenerateRequest):
+    """
+    Génère un exercice via Dynamic Factory avec fusion des paramètres.
+    
+    Ordre de fusion: defaults < exercise_params < overrides
+    
+    Workflow:
+    1. Récupère le générateur
+    2. Fusionne defaults + exercise_params + overrides
+    3. Valide les paramètres
+    4. Génère l'exercice
+    5. Rend les templates (si fournis)
+    """
+    logger.info(f"🏭 Factory generate: {request.generator_key}, seed={request.seed}")
+    
+    errors = []
+    
+    try:
+        # Générer via Factory
+        result = factory_generate(
+            key=request.generator_key,
+            exercise_params=request.exercise_params,
+            overrides=request.overrides,
+            seed=request.seed
+        )
+        
+        variables = result.get("variables", {})
+        
+        # Rendre les templates si fournis
+        enonce_html = None
+        solution_html = None
+        
+        if request.enonce_template:
+            import re
+            all_vars = {**variables, **result.get("results", {}), **result.get("geo_data", {})}
+            enonce_html = render_template(request.enonce_template, all_vars)
+            
+            unreplaced = re.findall(r'\{\{(\w+)\}\}', enonce_html)
+            for var in unreplaced:
+                errors.append(f"Variable inconnue dans énoncé: {{{{{var}}}}}")
+        
+        if request.solution_template:
+            import re
+            all_vars = {**variables, **result.get("results", {}), **result.get("geo_data", {})}
+            solution_html = render_template(request.solution_template, all_vars)
+            
+            unreplaced = re.findall(r'\{\{(\w+)\}\}', solution_html)
+            for var in unreplaced:
+                errors.append(f"Variable inconnue dans solution: {{{{{var}}}}}")
+        
+        return FactoryGenerateResponse(
+            success=len(errors) == 0,
+            variables=variables,
+            geo_data=result.get("geo_data", {}),
+            figure_svg_enonce=result.get("figure_svg_enonce"),
+            figure_svg_solution=result.get("figure_svg_solution"),
+            enonce_html=enonce_html,
+            solution_html=solution_html,
+            generation_meta=result.get("generation_meta", {}),
+            errors=errors
+        )
+        
+    except ValueError as e:
+        logger.error(f"❌ Factory validation error: {str(e)}")
+        raise HTTPException(status_code=400, detail={"error": "validation_failed", "message": str(e)})
+    except Exception as e:
+        logger.error(f"❌ Factory generate error: {str(e)}")
+        raise HTTPException(status_code=500, detail={"error": "generation_failed", "message": str(e)})
+
+
+@router.post("/validate-params", tags=["Factory"])
+async def validate_generator_params(generator_key: str, params: Dict[str, Any]):
+    """
+    Valide des paramètres pour un générateur sans générer.
+    
+    Utile pour la validation en temps réel dans l'admin.
+    """
+    valid, result = validate_exercise_params(generator_key, params)
+    
+    return {
+        "valid": valid,
+        "validated_params": result if valid else None,
+        "errors": result if not valid else []
+    }
