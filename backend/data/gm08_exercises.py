@@ -2,7 +2,7 @@
 GM08 - Exercices figés : Grandeurs et Mesures (Longueurs, Périmètres)
 =========================================================================
 
-Chapitre pilote avec 20 exercices validés.
+Chapitre pilote avec 21 exercices validés.
 - FREE: ids 1-10
 - PREMIUM (PRO): ids 11-20
 
@@ -23,7 +23,7 @@ import random
 
 
 # =============================================================================
-# 20 EXERCICES GM08 VALIDÉS - HTML PUR (sans Markdown ni LaTeX)
+# 21 EXERCICES GM08 VALIDÉS - HTML PUR (sans Markdown ni LaTeX)
 # =============================================================================
 
 GM08_EXERCISES: List[Dict[str, Any]] = [
@@ -283,6 +283,25 @@ GM08_EXERCISES: List[Dict[str, Any]] = [
         "enonce_html": """<p><strong>Problème de planification :</strong> Pour un projet d'arts plastiques, Emma doit découper des bandes de papier de <strong>5 cm</strong> de large dans une feuille de <strong>1,2 m</strong> de long. Combien de bandes peut-elle découper ? Quelle longueur de papier restera-t-il ?</p>""",
         "solution_html": """<h4>Correction détaillée</h4><ol><li><strong>Compréhension :</strong> On découpe des bandes de 5 cm dans 1,2 m = 120 cm.</li><li><strong>Méthode :</strong> Division euclidienne : 120 ÷ 5 = quotient (nombre de bandes) + reste.</li><li><strong>Calculs :</strong> 120 ÷ 5 = 24 exactement. 24 × 5 = 120, reste = 0.</li><li><strong>Conclusion :</strong> Emma peut découper <strong>24 bandes</strong> et il ne restera <strong>pas de papier</strong>.</li></ol>""",
         "needs_svg": False,
+        "exercise_type": None,
+        "svg_enonce_brief": None,
+        "svg_solution_brief": None
+    },
+    {
+        "id": 21,
+        "family": "CALCUL_DUREE",
+        "difficulty": "difficile",
+        "offer": "free",
+        "variables": None,
+        "enonce_html": """test ouss""",
+        "solution_html": """<h4>Correction détaillée</h4>
+<ol>
+  <li><strong>Compréhension :</strong> </li>
+  <li><strong>Méthode :</strong> </li>
+  <li><strong>Calculs :</strong> </li>
+  <li><strong>Conclusion :</strong> </li>
+</ol>""",
+        "needs_svg": True,
         "exercise_type": None,
         "svg_enonce_brief": None,
         "svg_solution_brief": None
