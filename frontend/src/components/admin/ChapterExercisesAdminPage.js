@@ -560,7 +560,7 @@ const ChapterExercisesAdminPage = () => {
       </header>
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Message */}
+        {/* Message avec bouton Réessayer (P0.1) */}
         {operationMessage && (
           <Alert 
             className={`mb-4 ${operationMessage.type === 'success' ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'}`}
@@ -570,8 +570,19 @@ const ChapterExercisesAdminPage = () => {
             ) : (
               <AlertCircle className="h-4 w-4 text-red-600" />
             )}
-            <AlertDescription className={operationMessage.type === 'success' ? 'text-green-800' : 'text-red-800'}>
-              {operationMessage.text}
+            <AlertDescription className={`flex items-center justify-between ${operationMessage.type === 'success' ? 'text-green-800' : 'text-red-800'}`}>
+              <span>{operationMessage.text}</span>
+              {operationMessage.showRetry && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSubmit}
+                  className="ml-4"
+                >
+                  <RefreshCw className="h-3 w-3 mr-1" />
+                  Réessayer
+                </Button>
+              )}
             </AlertDescription>
           </Alert>
         )}
