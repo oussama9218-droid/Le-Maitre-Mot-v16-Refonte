@@ -50,9 +50,14 @@ import {
   BookOpen,
   Eye,
   ExternalLink,
-  ArrowLeft
+  ArrowLeft,
+  Sparkles,
+  PlayCircle
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import GeneratorVariablesPanel from './GeneratorVariablesPanel';
+import DynamicPreviewModal from './DynamicPreviewModal';
+import { apiCall, fetchGeneratorsList } from '../../lib/adminApi';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
