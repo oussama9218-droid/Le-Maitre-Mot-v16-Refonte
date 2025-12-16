@@ -358,11 +358,15 @@ const ChapterExercisesAdminPage = () => {
     return Object.keys(errors).length === 0;
   };
   
-  // Soumettre
+  // Soumettre avec gestion robuste des erreurs (P0.1)
   const handleSubmit = async () => {
     if (!validateForm()) return;
     
     setSaving(true);
+    
+    // Timeout controller
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     
     try {
       const url = modalMode === 'create'
@@ -374,13 +378,16 @@ const ChapterExercisesAdminPage = () => {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.detail || 'Erreur lors de la sauvegarde');
+        throw new Error(data.detail?.message || data.detail || 'Erreur lors de la sauvegarde');
       }
       
       setOperationMessage({
@@ -392,9 +399,17 @@ const ChapterExercisesAdminPage = () => {
       fetchExercises();
       
     } catch (err) {
+      clearTimeout(timeoutId);
+      
+      let errorMessage = err.message;
+      if (err.name === 'AbortError') {
+        errorMessage = 'La requête a expiré. Vérifiez votre connexion et réessayez.';
+      }
+      
       setOperationMessage({
         type: 'error',
-        text: err.message
+        text: errorMessage,
+        showRetry: true
       });
     } finally {
       setSaving(false);
