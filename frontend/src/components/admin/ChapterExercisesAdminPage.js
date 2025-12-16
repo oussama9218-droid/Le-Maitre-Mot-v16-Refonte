@@ -915,7 +915,9 @@ const ChapterExercisesAdminPage = () => {
                       <SelectContent>
                         {availableGenerators.map(g => (
                           <SelectItem key={g} value={g}>
-                            {g === 'THALES_V1' ? '🔺 THALES_V1 - Agrandissements/Réductions' : g}
+                            {g === 'THALES_V1' ? '🔺 THALES_V1 - Agrandissements/Réductions' : 
+                             g === 'SYMETRIE_AXIALE_V2' ? '📐 SYMETRIE_AXIALE_V2 - Symétrie Axiale' :
+                             g === 'THALES_V2' ? '🔺 THALES_V2 - Agrandissements/Réductions' : g}
                           </SelectItem>
                         ))}
                       </SelectContent>
