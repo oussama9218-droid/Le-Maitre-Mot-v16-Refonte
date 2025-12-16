@@ -4772,6 +4772,11 @@ app.include_router(admin_exercises_router, tags=["Admin Exercises"])
 from routes.curriculum_catalog_routes import router as curriculum_catalog_router
 app.include_router(curriculum_catalog_router, tags=["Curriculum Catalog"])
 
+# Routes générateurs dynamiques (P0.2 + P2 - Variables schema & Preview)
+from routes.generators_routes import router as generators_router
+app.include_router(generators_router, prefix="/api/v1/exercises", tags=["Generators"])
+app.include_router(generators_router, prefix="/api/admin/exercises", tags=["Admin Generators"])
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
