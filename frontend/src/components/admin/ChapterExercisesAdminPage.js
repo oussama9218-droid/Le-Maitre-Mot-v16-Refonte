@@ -275,6 +275,19 @@ const ChapterExercisesAdminPage = () => {
 </ol>`
       };
     }
+    if (generatorKey === 'SYMETRIE_AXIALE_V2') {
+      return {
+        enonce: `<p><strong>Symétrie axiale</strong></p>
+<p>Soit {{figure_description}} <strong>{{points_labels}}</strong> et la droite {{axe_label}} d'équation <strong>{{axe_equation}}</strong>.</p>
+<p><em>Construire le symétrique de {{points_labels}} par rapport à {{axe_label}}.</em></p>`,
+        solution: `<h4>Correction</h4>
+<ol>
+  <li><strong>Méthode :</strong> Pour chaque point, tracer la perpendiculaire à {{axe_label}} passant par ce point.</li>
+  <li><strong>Report des distances :</strong> Reporter la même distance de l'autre côté de l'axe.</li>
+  <li><strong>Résultat :</strong> Les symétriques sont : <strong>{{points_symmetric_labels}}</strong></li>
+</ol>`
+      };
+    }
     return { enonce: '', solution: '' };
   };
   
