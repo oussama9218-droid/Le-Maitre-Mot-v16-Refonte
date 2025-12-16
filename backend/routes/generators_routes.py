@@ -1,20 +1,31 @@
 """
-Routes API pour les générateurs dynamiques
-==========================================
+Routes API pour les générateurs dynamiques (Dynamic Factory v1)
+===============================================================
 
 Endpoints:
-- GET /api/v1/exercises/generators/{key}/schema : Schéma d'un générateur
+- GET /api/v1/exercises/generators : Liste tous les générateurs
+- GET /api/v1/exercises/generators/{key}/schema : Schéma complet d'un générateur
 - POST /api/admin/exercises/preview-dynamic : Preview d'un exercice dynamique
+- POST /api/admin/exercises/generate-from-factory : Génération via Factory
 
-Version: 1.0.0 (P0.2 + P2)
+Version: 2.0.0 (Dynamic Factory v1)
 """
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any, List
 
+# Import du nouveau système Factory
+from generators.factory import (
+    get_generators_list,
+    get_generator_schema as factory_get_schema,
+    generate_exercise as factory_generate,
+    validate_exercise_params
+)
+
+# Imports legacy pour compatibilité
 from generators.generator_registry import (
-    get_generator_schema,
+    get_generator_schema as legacy_get_schema,
     get_all_generator_keys,
     get_all_schemas_summary
 )
