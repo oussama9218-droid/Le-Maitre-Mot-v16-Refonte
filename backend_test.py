@@ -16161,11 +16161,7 @@ Résultat final.''',
         
         return overall_success, results
 
-    # =============================================================================
-    # DYNAMIC FACTORY V1 TESTS
-    # =============================================================================
-
-    def test_dynamic_factory_v1_complete(self):
+if __name__ == "__main__":
         """
         Test Dynamic Factory v1 - Complete Implementation
         
