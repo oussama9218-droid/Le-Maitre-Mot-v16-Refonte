@@ -292,7 +292,7 @@ async def generate_from_factory(request: FactoryGenerateRequest):
     try:
         # Générer via Factory
         result = factory_generate(
-            key=request.generator_key,
+            generator_key=request.generator_key,
             exercise_params=request.exercise_params,
             overrides=request.overrides,
             seed=request.seed
