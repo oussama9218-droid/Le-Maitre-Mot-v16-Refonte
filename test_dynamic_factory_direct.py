@@ -146,14 +146,24 @@ class DynamicFactoryTester:
         if list_success and isinstance(list_response, dict):
             generators = list_response.get('generators', [])
             count = list_response.get('count', 0)
-            print(f"   ✅ Found {count} generators: {[g.get('key') for g in generators]}")
-            results["p1_registry_central"]["passed"] += 1
+            print(f"   ✅ Found {count} generators")
+            print(f"   Response structure: {list_response}")
             
-            # Check for expected generators
-            generator_keys = [g.get('key') for g in generators]
-            expected_keys = ['SYMETRIE_AXIALE_V2', 'THALES_V2']
-            found_keys = [k for k in expected_keys if k in generator_keys]
-            print(f"   Expected generators found: {found_keys}")
+            # Handle different response formats
+            if generators and isinstance(generators, list):
+                if isinstance(generators[0], dict):
+                    generator_keys = [g.get('key') for g in generators]
+                else:
+                    generator_keys = generators  # If it's a list of strings
+                print(f"   Generator keys: {generator_keys}")
+                results["p1_registry_central"]["passed"] += 1
+                
+                # Check for expected generators
+                expected_keys = ['SYMETRIE_AXIALE_V2', 'THALES_V2']
+                found_keys = [k for k in expected_keys if k in generator_keys]
+                print(f"   Expected generators found: {found_keys}")
+            else:
+                print(f"   ❌ Unexpected generators format: {type(generators)}")
         else:
             print(f"   ❌ Generators list failed")
             results["critical_failures"].append("P1 Generators list failed")
