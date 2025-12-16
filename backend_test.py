@@ -15945,6 +15945,351 @@ Résultat final.''',
             "generation_ids": sorted(gen_exercise_ids)
         }
 
+    # =============================================================================
+    # DYNAMIC FACTORY V1 TESTS
+    # =============================================================================
+
+    def test_dynamic_factory_v1_complete(self):
+        """
+        Test Dynamic Factory v1 - Complete Implementation
+        
+        Tests all priorities from the review request:
+        - P0: Non-regression GM07/GM08
+        - P1: Registry Central (GET /generators, GET /generators/{key}/full-schema)
+        - P3: Params Fusion (defaults + exercise_params + overrides)
+        - P5: SYMETRIE_AXIALE_V2 Pilot
+        - Template Rendering
+        """
+        print("\n🏭 TESTING DYNAMIC FACTORY V1 - COMPLETE IMPLEMENTATION")
+        print("="*70)
+        
+        results = {
+            "p0_non_regression": {"passed": 0, "total": 3},
+            "p1_registry_central": {"passed": 0, "total": 3},
+            "p3_params_fusion": {"passed": 0, "total": 1},
+            "p5_symetrie_pilot": {"passed": 0, "total": 2},
+            "template_rendering": {"passed": 0, "total": 1},
+            "all_tests": {"passed": 0, "total": 10},
+            "critical_failures": []
+        }
+        
+        # P0 - Non-regression tests
+        print("\n📋 P0 - NON-REGRESSION TESTS")
+        print("-" * 40)
+        
+        # Test GM07 batch
+        print("Testing GM07 batch generation...")
+        gm07_success, gm07_response = self.run_test(
+            "P0 GM07 Non-regression",
+            "POST",
+            "v1/exercises/generate/batch/gm07",
+            200,
+            data={"nb_exercices": 5, "offer": "pro"},
+            timeout=60
+        )
+        
+        if gm07_success and isinstance(gm07_response, dict):
+            exercises = gm07_response.get('exercises', [])
+            if len(exercises) == 5:
+                print(f"   ✅ GM07 generated {len(exercises)} exercises")
+                results["p0_non_regression"]["passed"] += 1
+                
+                # Check SVG generation
+                svg_count = sum(1 for ex in exercises if ex.get('figure_svg_enonce') or ex.get('figure_svg_solution'))
+                if svg_count > 0:
+                    print(f"   ✅ SVG generation working ({svg_count} exercises with SVG)")
+                    results["p0_non_regression"]["passed"] += 1
+                else:
+                    print(f"   ❌ No SVG found in GM07 exercises")
+            else:
+                print(f"   ❌ GM07 expected 5 exercises, got {len(exercises)}")
+        else:
+            print(f"   ❌ GM07 batch generation failed")
+            results["critical_failures"].append("P0 GM07 batch generation failed")
+        
+        # Test GM08 batch
+        print("Testing GM08 batch generation...")
+        gm08_success, gm08_response = self.run_test(
+            "P0 GM08 Non-regression",
+            "POST",
+            "v1/exercises/generate/batch/gm08",
+            200,
+            data={"nb_exercices": 5, "offer": "free"},
+            timeout=60
+        )
+        
+        if gm08_success and isinstance(gm08_response, dict):
+            exercises = gm08_response.get('exercises', [])
+            if len(exercises) == 5:
+                print(f"   ✅ GM08 generated {len(exercises)} exercises")
+                results["p0_non_regression"]["passed"] += 1
+            else:
+                print(f"   ❌ GM08 expected 5 exercises, got {len(exercises)}")
+        else:
+            print(f"   ❌ GM08 batch generation failed")
+            results["critical_failures"].append("P0 GM08 batch generation failed")
+        
+        # P1 - Registry Central
+        print("\n📚 P1 - REGISTRY CENTRAL")
+        print("-" * 40)
+        
+        # Test generators list
+        print("Testing generators list...")
+        list_success, list_response = self.run_test(
+            "P1 Generators List",
+            "GET",
+            "v1/exercises/generators",
+            200,
+            timeout=30
+        )
+        
+        if list_success and isinstance(list_response, dict):
+            generators = list_response.get('generators', [])
+            count = list_response.get('count', 0)
+            print(f"   ✅ Found {count} generators: {[g.get('key') for g in generators]}")
+            results["p1_registry_central"]["passed"] += 1
+            
+            # Check for expected generators
+            generator_keys = [g.get('key') for g in generators]
+            expected_keys = ['SYMETRIE_AXIALE_V2', 'THALES_V2']
+            found_keys = [k for k in expected_keys if k in generator_keys]
+            print(f"   Expected generators found: {found_keys}")
+        else:
+            print(f"   ❌ Generators list failed")
+            results["critical_failures"].append("P1 Generators list failed")
+        
+        # Test SYMETRIE_AXIALE_V2 schema
+        print("Testing SYMETRIE_AXIALE_V2 full schema...")
+        symetrie_success, symetrie_response = self.run_test(
+            "P1 SYMETRIE_AXIALE_V2 Schema",
+            "GET",
+            "v1/exercises/generators/SYMETRIE_AXIALE_V2/full-schema",
+            200,
+            timeout=30
+        )
+        
+        if symetrie_success and isinstance(symetrie_response, dict):
+            generator_key = symetrie_response.get('generator_key')
+            meta = symetrie_response.get('meta', {})
+            defaults = symetrie_response.get('defaults', {})
+            schema = symetrie_response.get('schema', [])
+            presets = symetrie_response.get('presets', [])
+            
+            print(f"   ✅ Generator key: {generator_key}")
+            print(f"   ✅ Schema params: {len(schema)} (expected: 6)")
+            print(f"   ✅ Presets: {len(presets)} (expected: 4)")
+            
+            if len(schema) == 6 and len(presets) == 4:
+                results["p1_registry_central"]["passed"] += 1
+            else:
+                print(f"   ❌ Schema structure incorrect: {len(schema)} params, {len(presets)} presets")
+        else:
+            print(f"   ❌ SYMETRIE_AXIALE_V2 schema failed")
+            results["critical_failures"].append("P1 SYMETRIE_AXIALE_V2 schema failed")
+        
+        # Test THALES_V2 schema
+        print("Testing THALES_V2 full schema...")
+        thales_success, thales_response = self.run_test(
+            "P1 THALES_V2 Schema",
+            "GET",
+            "v1/exercises/generators/THALES_V2/full-schema",
+            200,
+            timeout=30
+        )
+        
+        if thales_success and isinstance(thales_response, dict):
+            generator_key = thales_response.get('generator_key')
+            schema = thales_response.get('schema', [])
+            presets = thales_response.get('presets', [])
+            
+            print(f"   ✅ THALES_V2 Generator key: {generator_key}")
+            print(f"   ✅ THALES_V2 Schema params: {len(schema)}")
+            print(f"   ✅ THALES_V2 Presets: {len(presets)}")
+            results["p1_registry_central"]["passed"] += 1
+        else:
+            print(f"   ❌ THALES_V2 schema failed")
+        
+        # P3 - Params Fusion
+        print("\n🔧 P3 - PARAMS FUSION (defaults + exercise_params + overrides)")
+        print("-" * 40)
+        
+        print("Testing params fusion with SYMETRIE_AXIALE_V2...")
+        fusion_data = {
+            "generator_key": "SYMETRIE_AXIALE_V2",
+            "exercise_params": {"figure_type": "triangle"},
+            "seed": 42
+        }
+        
+        fusion_success, fusion_response = self.run_test(
+            "P3 Params Fusion",
+            "POST",
+            "v1/exercises/generate-from-factory",
+            200,
+            data=fusion_data,
+            timeout=60
+        )
+        
+        if fusion_success and isinstance(fusion_response, dict):
+            success = fusion_response.get('success', False)
+            variables = fusion_response.get('variables', {})
+            svg_enonce = fusion_response.get('figure_svg_enonce')
+            
+            if success and variables.get('figure_type') == 'triangle' and svg_enonce:
+                print(f"   ✅ Params fusion successful")
+                print(f"   ✅ figure_type = {variables.get('figure_type')}")
+                print(f"   ✅ SVG generated ({len(svg_enonce)} chars)")
+                results["p3_params_fusion"]["passed"] += 1
+            else:
+                print(f"   ❌ Params fusion failed: success={success}, figure_type={variables.get('figure_type')}, svg={bool(svg_enonce)}")
+        else:
+            print(f"   ❌ Params fusion request failed")
+            results["critical_failures"].append("P3 Params fusion failed")
+        
+        # P5 - SYMETRIE_AXIALE_V2 Pilot
+        print("\n🎯 P5 - SYMETRIE_AXIALE_V2 PILOT")
+        print("-" * 40)
+        
+        # Test 6e_facile preset
+        print("Testing 6e_facile preset...")
+        facile_data = {
+            "generator_key": "SYMETRIE_AXIALE_V2",
+            "exercise_params": {"figure_type": "point", "axe_type": "vertical"},
+            "seed": 123
+        }
+        
+        facile_success, facile_response = self.run_test(
+            "P5 6e_facile Preset",
+            "POST",
+            "v1/exercises/generate-from-factory",
+            200,
+            data=facile_data,
+            timeout=60
+        )
+        
+        if facile_success and isinstance(facile_response, dict):
+            variables = facile_response.get('variables', {})
+            geo_data = facile_response.get('geo_data', {})
+            svg_enonce = facile_response.get('figure_svg_enonce')
+            
+            coords_orig = variables.get('coordinates_original', [])
+            coords_sym = variables.get('coordinates_symmetric', [])
+            
+            if coords_orig and coords_sym and svg_enonce:
+                print(f"   ✅ 6e_facile generation successful")
+                print(f"   ✅ Original coordinates: {coords_orig}")
+                print(f"   ✅ Symmetric coordinates: {coords_sym}")
+                results["p5_symetrie_pilot"]["passed"] += 1
+            else:
+                print(f"   ❌ 6e_facile missing data: orig={bool(coords_orig)}, sym={bool(coords_sym)}, svg={bool(svg_enonce)}")
+        else:
+            print(f"   ❌ 6e_facile generation failed")
+        
+        # Test 6e_difficile preset
+        print("Testing 6e_difficile preset...")
+        difficile_data = {
+            "generator_key": "SYMETRIE_AXIALE_V2",
+            "exercise_params": {"figure_type": "triangle", "axe_type": "oblique"},
+            "seed": 456
+        }
+        
+        difficile_success, difficile_response = self.run_test(
+            "P5 6e_difficile Preset",
+            "POST",
+            "v1/exercises/generate-from-factory",
+            200,
+            data=difficile_data,
+            timeout=60
+        )
+        
+        if difficile_success and isinstance(difficile_response, dict):
+            variables = difficile_response.get('variables', {})
+            svg_enonce = difficile_response.get('figure_svg_enonce')
+            svg_solution = difficile_response.get('figure_svg_solution')
+            
+            if svg_enonce and svg_solution and 'triangle' in str(variables):
+                print(f"   ✅ 6e_difficile generation successful")
+                print(f"   ✅ Double SVG generated (enonce + solution)")
+                results["p5_symetrie_pilot"]["passed"] += 1
+            else:
+                print(f"   ❌ 6e_difficile missing elements")
+        else:
+            print(f"   ❌ 6e_difficile generation failed")
+        
+        # Template Rendering
+        print("\n📝 TEMPLATE RENDERING")
+        print("-" * 40)
+        
+        print("Testing template rendering with variables...")
+        template_data = {
+            "generator_key": "SYMETRIE_AXIALE_V2",
+            "exercise_params": {"figure_type": "segment"},
+            "enonce_template": "<p>Symétrique de {{points_labels}} par rapport à {{axe_label}}</p>",
+            "solution_template": "<p>Réponse: {{points_symmetric_labels}}</p>",
+            "seed": 789
+        }
+        
+        template_success, template_response = self.run_test(
+            "Template Rendering",
+            "POST",
+            "v1/exercises/generate-from-factory",
+            200,
+            data=template_data,
+            timeout=60
+        )
+        
+        if template_success and isinstance(template_response, dict):
+            enonce_html = template_response.get('enonce_html', '')
+            solution_html = template_response.get('solution_html', '')
+            errors = template_response.get('errors', [])
+            
+            # Check if variables were replaced (no {{ }} left)
+            enonce_replaced = '{{' not in enonce_html and '}}' not in enonce_html
+            solution_replaced = '{{' not in solution_html and '}}' not in solution_html
+            
+            if enonce_replaced and solution_replaced and not errors:
+                print(f"   ✅ Template rendering successful")
+                print(f"   ✅ Enonce: {enonce_html}")
+                print(f"   ✅ Solution: {solution_html}")
+                results["template_rendering"]["passed"] += 1
+            else:
+                print(f"   ❌ Template rendering issues: enonce_ok={enonce_replaced}, solution_ok={solution_replaced}, errors={errors}")
+        else:
+            print(f"   ❌ Template rendering request failed")
+            results["critical_failures"].append("Template rendering failed")
+        
+        # Calculate totals
+        results["all_tests"]["passed"] = sum(cat["passed"] for cat in results.values() if "passed" in cat)
+        
+        # Summary
+        print(f"\n📊 DYNAMIC FACTORY V1 TEST SUMMARY:")
+        print(f"   P0 Non-regression: {results['p0_non_regression']['passed']}/{results['p0_non_regression']['total']}")
+        print(f"   P1 Registry Central: {results['p1_registry_central']['passed']}/{results['p1_registry_central']['total']}")
+        print(f"   P3 Params Fusion: {results['p3_params_fusion']['passed']}/{results['p3_params_fusion']['total']}")
+        print(f"   P5 SYMETRIE Pilot: {results['p5_symetrie_pilot']['passed']}/{results['p5_symetrie_pilot']['total']}")
+        print(f"   Template Rendering: {results['template_rendering']['passed']}/{results['template_rendering']['total']}")
+        print(f"   OVERALL: {results['all_tests']['passed']}/{results['all_tests']['total']}")
+        
+        if results['critical_failures']:
+            print(f"\n🚨 CRITICAL FAILURES:")
+            for failure in results['critical_failures']:
+                print(f"   - {failure}")
+        
+        # Success criteria: All P0 + P1 + P3 must pass, P5 and Template at least 50%
+        p0_success = results['p0_non_regression']['passed'] == results['p0_non_regression']['total']
+        p1_success = results['p1_registry_central']['passed'] == results['p1_registry_central']['total']
+        p3_success = results['p3_params_fusion']['passed'] == results['p3_params_fusion']['total']
+        p5_partial = results['p5_symetrie_pilot']['passed'] >= 1
+        template_partial = results['template_rendering']['passed'] >= 1
+        
+        overall_success = p0_success and p1_success and p3_success and p5_partial and template_partial
+        
+        if overall_success:
+            print(f"\n   🎉 DYNAMIC FACTORY V1 IMPLEMENTATION SUCCESSFUL")
+        else:
+            print(f"\n   ❌ DYNAMIC FACTORY V1 IMPLEMENTATION HAS ISSUES")
+        
+        return overall_success, results
+
 if __name__ == "__main__":
     tester = LeMaitreMotAPITester()
     
