@@ -258,9 +258,9 @@ const ChapterExercisesAdminPage = () => {
 </ol>`;
   };
   
-  // Template pour exercice dynamique THALES_V1
+  // Template pour exercice dynamique
   const getDynamicTemplates = (generatorKey) => {
-    if (generatorKey === 'THALES_V1') {
+    if (generatorKey === 'THALES_V1' || generatorKey === 'THALES_V2') {
       return {
         enonce: `<p><strong>Agrandissement d'{{figure_type_article}} :</strong></p>
 <p>On considère {{figure_type_article}} de côté <strong>{{cote_initial}} cm</strong>.</p>
