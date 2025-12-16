@@ -150,11 +150,18 @@ const ChapterExercisesAdminPage = () => {
         const response = await fetch(`${BACKEND_URL}/api/v1/exercises/generators`);
         if (response.ok) {
           const data = await response.json();
-          setAvailableGenerators(data.generators || []);
+          // Gérer les deux formats: liste d'objets ou liste de strings
+          const generators = data.generators || [];
+          const keys = generators.map(g => typeof g === 'string' ? g : g.key);
+          // Ajouter SYMETRIE_AXIALE_V2 si non présent (nouveau générateur)
+          if (!keys.includes('SYMETRIE_AXIALE_V2')) {
+            keys.push('SYMETRIE_AXIALE_V2');
+          }
+          setAvailableGenerators(keys);
         }
       } catch (err) {
         console.error('Erreur chargement générateurs:', err);
-        setAvailableGenerators(['THALES_V1']); // Fallback
+        setAvailableGenerators(['THALES_V1', 'SYMETRIE_AXIALE_V2']); // Fallback avec les deux
       }
     };
     
