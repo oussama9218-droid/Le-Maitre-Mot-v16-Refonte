@@ -392,9 +392,10 @@ class P0P1P2DynamicExercisesTester:
             thales_exercises_found = 0
             
             for i, exercise in enumerate(exercises):
-                # Check if exercise is marked as dynamic
-                is_dynamic = exercise.get('is_dynamic', False)
-                generator_key = exercise.get('generator_key', '')
+                # Check if exercise is marked as dynamic (in metadata)
+                metadata = exercise.get('metadata', {})
+                is_dynamic = metadata.get('is_dynamic', False)
+                generator_key = metadata.get('generator_key', '')
                 
                 if is_dynamic:
                     dynamic_exercises_found += 1
@@ -404,10 +405,12 @@ class P0P1P2DynamicExercisesTester:
                     thales_exercises_found += 1
                     print(f"   ✅ Exercise {i+1} uses THALES_V1 generator")
                 
-                # Check for required fields
-                required_fields = ['id', 'enonce', 'solution']
+                # Check for required fields (different field names for dynamic exercises)
+                required_fields = ['id_exercice', 'enonce_html', 'solution_html']
                 for field in required_fields:
-                    if field not in exercise:
+                    if field in exercise:
+                        print(f"   ✅ Exercise {i+1} has {field}")
+                    else:
                         print(f"   ❌ Exercise {i+1} missing {field}")
             
             print(f"   🎲 Dynamic exercises: {dynamic_exercises_found}/{len(exercises)}")
