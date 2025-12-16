@@ -1201,6 +1201,16 @@ const ChapterExercisesAdminPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      {/* Modal Preview Dynamique (P2) */}
+      <DynamicPreviewModal
+        open={dynamicPreviewOpen}
+        onOpenChange={setDynamicPreviewOpen}
+        generatorKey={formData.generator_key}
+        enonceTemplate={formData.enonce_template_html}
+        solutionTemplate={formData.solution_template_html}
+        difficulty={formData.difficulty}
+      />
     </div>
   );
 };
