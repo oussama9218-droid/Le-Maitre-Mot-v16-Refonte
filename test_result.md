@@ -173,13 +173,12 @@ backend:
 
 test_plan:
   current_focus:
-    - "P0 Ghost Exercise Bug - Data Synchronization Validation"
-  test_priority: "critical"
+    - "P0/P1/P2 Admin Dynamic Exercise UX Improvements"
+  test_priority: "high"
   test_description: |
-    ✅ COMPLETED - Ghost exercise bug validation successful.
-    Results:
-    1. ✅ Admin API returns all 22 exercises for chapter 6e_GM07
-    2. ✅ Exercise #21 (PLACER_AIGUILLES) found in both Admin and Generation APIs
-    3. ✅ Exercise #22 (PERIMETRE) found in both Admin and Generation APIs
-    4. ✅ Data synchronization working correctly between APIs
-    5. ✅ Generation API returns 20/22 exercises (API limit) with 22 available in pool
+    Test the new admin UX improvements for dynamic exercises:
+    1. P0.1: Timeout handling and error messages with retry button
+    2. P0.2: Generator schema endpoint and variables display in admin UI
+    3. P1: SVG AUTO mode for dynamic exercises
+    4. P2: Dynamic preview endpoint and modal
+    5. Non-regression: GM07, GM08, TESTS_DYN batch generation
