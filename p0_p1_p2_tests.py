@@ -350,15 +350,28 @@ class P0P1P2DynamicExercisesTester:
                 if warning:
                     print(f"   ℹ️  Warning: {warning}")
             
-            # Check exercise structure
+            # Check exercise structure (GM08 uses different field names)
             if exercises:
                 first_ex = exercises[0]
-                required_fields = ['id', 'enonce', 'solution']
-                for field in required_fields:
-                    if field in first_ex:
-                        print(f"   ✅ Exercise has {field}")
-                    else:
-                        print(f"   ❌ Exercise missing {field}")
+                # Check for either format
+                has_id = 'id' in first_ex or 'id_exercice' in first_ex
+                has_enonce = 'enonce' in first_ex or 'enonce_html' in first_ex
+                has_solution = 'solution' in first_ex or 'solution_html' in first_ex
+                
+                if has_id:
+                    print(f"   ✅ Exercise has ID field")
+                else:
+                    print(f"   ❌ Exercise missing ID field")
+                    
+                if has_enonce:
+                    print(f"   ✅ Exercise has enonce field")
+                else:
+                    print(f"   ❌ Exercise missing enonce field")
+                    
+                if has_solution:
+                    print(f"   ✅ Exercise has solution field")
+                else:
+                    print(f"   ❌ Exercise missing solution field")
             
             return True, response
         else:
